@@ -47,8 +47,10 @@ function formatDuration(seconds: number): string {
 
 @Component
 export default struct Detail {
-  @State displayWidth: number = 0
-  @State displayHeight: number = 0
+  uiContext: UIContext | undefined = undefined
+  context: common.UIAbilityContext | undefined = undefined
+  @Consume displayWidth: number = 0
+  @Consume displayHeight: number = 0
   @Consume startPlayingTransfer: boolean
   @State coverWidth: string = "20%"
   @State descriptionLine: number = 0
@@ -93,6 +95,7 @@ export default struct Detail {
   @Consume nowPlayingBookmarks: Bookmark[]
   @Consume jumpTime: number
   @Consume serverStatus: boolean
+  @Consume selectedLibraryMediaType: string
 
   async setSessionInfo() {
     let metadata: AVSessionManager.AVMetadata = {
@@ -216,8 +219,8 @@ export default struct Detail {
     let wantAgentInfo: wantAgent.WantAgentInfo = {
       wants: [
         {
-          bundleName: "com.audiobookshelf.shanyan",
-          abilityName: "com.audiobookshelf.shanyan.EntryAbility"
+          bundleName: "com.shanyan.harmshelf",
+          abilityName: "com.shanyan.harmshelf.EntryAbility"
         }
       ],
       actionType: wantAgent.OperationType.START_ABILITY,
@@ -258,7 +261,7 @@ export default struct Detail {
         }
       }
       this.nowPlayedProgress = this.nowPlayedTime / this.nowPlayingDuration * 100
-      if (this.elapsedTime >= 1000) {
+      if (this.elapsedTime >= 10000) {
         let bundleFlags = bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT;
         let bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleFlags)
         let upProgress: UpdateProgress = {
@@ -507,9 +510,13 @@ export default struct Detail {
   }
 
   async aboutToAppear() {
-    this.mainWindow = await window.getLastWindow(getContext(this))
-    this.displayWidth = px2vp(this.mainWindow.getWindowProperties().windowRect.width)
-    this.displayHeight = px2vp(this.mainWindow.getWindowProperties().windowRect.height)
+    this.uiContext = this.getUIContext();
+    if (!this.uiContext) {
+      console.warn("no uiContext");
+      return;
+    }
+    this.context = this.uiContext.getHostContext() as common.UIAbilityContext;
+    this.mainWindow = await window.getLastWindow(this.context)
     if (this.displayHeight < 700) {
       this.showCover = false
     } else if (this.displayWidth >= 320 && this.displayWidth < 550) {
@@ -632,7 +639,7 @@ export default struct Detail {
                 this.playItem = await getPlayItem(this.nowPlayingItem.id)
                 let url: string = await this.getPlayContent(this.playItem)
                 this.sessionId = this.playItem.id
-                this.session = await AVSessionManager.createAVSession(context, 'AUDIO_PLAY', 'audio');
+                this.session = await AVSessionManager.createAVSession(context, 'AUDIO_PLAY', 'video');
                 console.log("创建Session。")
                 await this.setSessionCallback()
                 await this.session!.activate()
@@ -750,8 +757,8 @@ export default struct Detail {
           .height(92)
           .justifyContent(FlexAlign.SpaceBetween)
 
-          Column() {
-            Row() {
+          Grid() {
+            GridItem() {
               Row() {
                 Text("作者")
                   .fontSize(14)
@@ -759,7 +766,8 @@ export default struct Detail {
                   .width('auto')
                   .height('auto')
                   .textAlign(TextAlign.Start)
-                Text(this.itemTransfer.media.metadata.authorName)
+                Text(this.selectedLibraryMediaType === 'book' ? this.itemTransfer.media.metadata.authorName :
+                this.itemTransfer.media.metadata.author)
                   .fontSize(14)
                   .fontColor(Color.White)
                   .width('100%')
@@ -772,58 +780,64 @@ export default struct Detail {
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
                   .decoration({ type: TextDecorationType.Underline, color: Color.White })
               }
-              .width('50%')
-              .justifyContent(FlexAlign.Start)
-
-              Row() {
-                Text("时长")
-                  .fontSize(14)
-                  .fontColor('#8F9396')
-                  .width('auto')
-                  .height('auto')
-                  .textAlign(TextAlign.Start)
-                Text(formatDuration(this.itemTransfer.media.duration))
-                  .fontSize(14)
-                  .fontColor(Color.White)
-                  .width('100%')
-                  .height('auto')
-                  .layoutWeight(1)
-                  .margin({ left: 10 })
-                  .padding({ right: 15 })
-                  .textAlign(TextAlign.Start)
-                  .maxLines(1)
-                  .textOverflow({ overflow: TextOverflow.Ellipsis })
-              }
-              .width('50%')
+              .width('100%')
               .justifyContent(FlexAlign.Start)
             }
-            .width('100%')
-            .justifyContent(FlexAlign.Start)
 
-            Row() {
-              Row() {
-                Text("演播")
-                  .fontSize(14)
-                  .fontColor('#8F9396')
-                  .width('auto')
-                  .height('auto')
-                  .textAlign(TextAlign.Start)
-                Text(this.itemTransfer.media.metadata.narratorName)
-                  .fontSize(14)
-                  .fontColor(Color.White)
-                  .width('100%')
-                  .height('auto')
-                  .layoutWeight(1)
-                  .margin({ left: 10 })
-                  .padding({ right: 15 })
-                  .textAlign(TextAlign.Start)
-                  .maxLines(1)
-                  .textOverflow({ overflow: TextOverflow.Ellipsis })
-                  .decoration({ type: TextDecorationType.Underline, color: Color.White })
+            if (this.itemTransfer.media.duration) {
+              GridItem() {
+                Row() {
+                  Text("时长")
+                    .fontSize(14)
+                    .fontColor('#8F9396')
+                    .width('auto')
+                    .height('auto')
+                    .textAlign(TextAlign.Start)
+                  Text(formatDuration(this.itemTransfer.media.duration))
+                    .fontSize(14)
+                    .fontColor(Color.White)
+                    .width('100%')
+                    .height('auto')
+                    .layoutWeight(1)
+                    .margin({ left: 10 })
+                    .padding({ right: 15 })
+                    .textAlign(TextAlign.Start)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                }
+                .width('100%')
+                .justifyContent(FlexAlign.Start)
               }
-              .width('50%')
-              .justifyContent(FlexAlign.Start)
+            }
 
+            if (this.itemTransfer.media.metadata.narratorName) {
+              GridItem() {
+                Row() {
+                  Text("演播")
+                    .fontSize(14)
+                    .fontColor('#8F9396')
+                    .width('auto')
+                    .height('auto')
+                    .textAlign(TextAlign.Start)
+                  Text(this.itemTransfer.media.metadata.narratorName)
+                    .fontSize(14)
+                    .fontColor(Color.White)
+                    .width('100%')
+                    .height('auto')
+                    .layoutWeight(1)
+                    .margin({ left: 10 })
+                    .padding({ right: 15 })
+                    .textAlign(TextAlign.Start)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    .decoration({ type: TextDecorationType.Underline, color: Color.White })
+                }
+                .width('100%')
+                .justifyContent(FlexAlign.Start)
+              }
+            }
+
+            GridItem() {
               Row() {
                 Text("流派")
                   .fontSize(14)
@@ -844,39 +858,67 @@ export default struct Detail {
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
                   .decoration({ type: TextDecorationType.Underline, color: Color.White })
               }
-              .width('50%')
+              .width('100%')
               .justifyContent(FlexAlign.Start)
             }
-            .width('100%')
-            .justifyContent(FlexAlign.Start)
 
-            Row() {
-              Text("年份")
-                .fontSize(14)
-                .fontColor('#8F9396')
-                .width('auto')
-                .height('auto')
-                .textAlign(TextAlign.Start)
-              Text(this.itemTransfer.media.metadata.publishedYear)
-                .fontSize(14)
-                .fontColor(Color.White)
-                .width('100%')
-                .height('auto')
-                .layoutWeight(1)
-                .margin({ left: 10 })
-                .padding({ right: 15 })
-                .textAlign(TextAlign.Start)
-                .maxLines(1)
-                .textOverflow({ overflow: TextOverflow.Ellipsis })
+            GridItem() {
+              Row() {
+                Text("年份")
+                  .fontSize(14)
+                  .fontColor('#8F9396')
+                  .width('auto')
+                  .height('auto')
+                  .textAlign(TextAlign.Start)
+                Text(this.selectedLibraryMediaType === 'book' ? this.itemTransfer.media.metadata.publishedYear :
+                this.itemTransfer.media.metadata.releaseDate?.substring(0, 4))
+                  .fontSize(14)
+                  .fontColor(Color.White)
+                  .width('100%')
+                  .height('auto')
+                  .layoutWeight(1)
+                  .margin({ left: 10 })
+                  .padding({ right: 15 })
+                  .textAlign(TextAlign.Start)
+                  .maxLines(1)
+                  .textOverflow({ overflow: TextOverflow.Ellipsis })
+              }
+              .width('100%')
+              .justifyContent(FlexAlign.Start)
             }
-            .width('50%')
-            .justifyContent(FlexAlign.Start)
+
+            if (this.itemTransfer.media.metadata.language) {
+              GridItem() {
+                Row() {
+                  Text("语言")
+                    .fontSize(14)
+                    .fontColor('#8F9396')
+                    .width('auto')
+                    .height('auto')
+                    .textAlign(TextAlign.Start)
+                  Text(this.itemTransfer.media.metadata.language)
+                    .fontSize(14)
+                    .fontColor(Color.White)
+                    .width('100%')
+                    .height('auto')
+                    .layoutWeight(1)
+                    .margin({ left: 10 })
+                    .padding({ right: 15 })
+                    .textAlign(TextAlign.Start)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                }
+                .width('100%')
+                .justifyContent(FlexAlign.Start)
+              }
+            }
           }
-          .margin({ top: 10 })
           .width('100%')
-          .height(70)
-          .justifyContent(FlexAlign.SpaceBetween)
-          .alignItems(HorizontalAlign.Start)
+          .height(this.itemTransfer.media.metadata.narratorName ? 70 : 45)
+          .margin({ top: 10 })
+          .columnsTemplate("1fr 1fr")
+          .columnsGap(0)
+          .rowsGap(10)
 
           Column() {
             Text("\u3000\u3000" +

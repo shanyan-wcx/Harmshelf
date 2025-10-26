@@ -7,7 +7,7 @@ let filesDir = context.filesDir;
 
 @Component
 export default struct series {
-  @State displayWidth: number = 0
+  @Consume displayWidth: number = 0
   @State columnsTemplate: string = "1fr"
   @State libraryId: string = ''
   @State imageWidth: number = 0
@@ -19,11 +19,20 @@ export default struct series {
   @Consume backPageIndex: number
   @Consume sidebarShow: boolean
   @Consume mainWindow: window.Window
+  @Consume isSeries: boolean
   @Consume server: string
   @Consume apitoken: string
 
+  private getPosition(item: Series, index: number): number {
+    const gap = this.imageWidth / (item.books.length - 1);
+    if (item.books.length == 1) {
+      return this.imageWidth / 2
+    } else {
+      return (item.books.length - 1 - index) * gap
+    }
+  }
+
   async aboutToAppear() {
-    this.displayWidth = px2vp(this.mainWindow.getWindowProperties().windowRect.width)
     if (this.displayWidth >= 320 && this.displayWidth < 550) {
       this.columnsTemplate = "1fr"
     } else if (this.displayWidth >= 550 && this.displayWidth < 840) {
@@ -49,7 +58,7 @@ export default struct series {
         ForEach(this.series, (item: Series, index) => {
           GridItem() {
             Stack({ alignContent: Alignment.Bottom }) {
-              ForEach(item.books.reverse(), (item2: Book, index2) => {
+              ForEach(item.books.slice().reverse(), (item2: Book, index2) => {
                 Image(this.server + `/api/items/${item2.id}/cover?format=jpeg&width=1024` + `&token=${this.apitoken}`)
                   .alt($rawfile('nocover.jpg'))
                   .height('100%')
@@ -60,7 +69,7 @@ export default struct series {
                     this.imageWidth = new Number(newValue.width).valueOf()
                     this.imageHeight = new Number(newValue.height).valueOf()
                   })
-                  .position({ right: index2 * (this.imageWidth / (item.books.length - 1)) })
+                  .position({ x: this.getPosition(item, index2) })
                   .shadow({
                     offsetX: 10,
                     offsetY: 0,
@@ -83,14 +92,15 @@ export default struct series {
             .width('100%')
             .height('100%')
             .borderRadius(10)
+            .backgroundColor('#232323')
             .clip(true)
           }
           .aspectRatio(2)
           .borderRadius(10)
           .backgroundColor("#cccccc")
           .onClick(async () => {
+            this.isSeries = true
             this.seriesTransfer = item
-            this.seriesTransfer.books = this.seriesTransfer.books.reverse()
             this.backPageIndex = 0
             this.PageIndexTransfer = 4
             animateTo({

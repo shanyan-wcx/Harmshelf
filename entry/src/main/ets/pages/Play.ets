@@ -67,7 +67,6 @@ export default struct Play {
   @Consume itemTransfer: LibraryItem
   @Consume nowPlayingChapters: Chapter[]
   @Consume nowPlayingItem: LibraryItem
-  @Consume showProgressTransfer: boolean
   @Consume avPlayer: media.AVPlayer | null
   @Consume playTitle: string
   @Consume nowPlayingDuration: number

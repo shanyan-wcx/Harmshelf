@@ -1,39 +1,13 @@
 {
   "app": {
-    "signingConfigs": [
-//      {
-//        "name": "default",
-//        "type": "HarmonyOS",
-//        "material": {
-//          "certpath": "C:/Users/21633/Desktop/audiobookshelf-key/audiobookshelf.cer",
-//          "storePassword": "0000001833E56F6D634226208D1A4627976BF76DC053ED148F6097173AF10B3BB738E0BADDA0EE87",
-//          "keyAlias": "audiobookshelf",
-//          "keyPassword": "00000018A1DCD7E58CF890BD8D5836881EC8B69135725ED508EB6F2FA6CC2A5CF562E9CA80AFE453",
-//          "profile": "C:/Users/21633/Desktop/audiobookshelf-key/AudiobookshelfRelease.p7b",
-//          "signAlg": "SHA256withECDSA",
-//          "storeFile": "C:/Users/21633/Desktop/audiobookshelf-key/audiobookshelf.p12"
-//        }
-//      },
-      {
-        "name": "default",
-        "type": "HarmonyOS",
-        "material": {
-          "certpath": "C:\\Users\\21633\\.ohos\\config\\real_Audiobookshelf_nWYTr0IApXbxytls08iCSqLiB0c-Bjaw-hzd0rAaqxc=.cer",
-          "storePassword": "0000001AD06A7E7C4E89B885360D89B5D600769C1C841256CADD57FF7DE67E12C8FF5591F308E8FE9870",
-          "keyAlias": "debugKey",
-          "keyPassword": "0000001A8C1B8C1FF26CDB30D89113EC779CD36ABCB4C739934C8DF612B3BBF0DA435101B4B38ADA0F1E",
-          "profile": "C:\\Users\\21633\\.ohos\\config\\real_Audiobookshelf_nWYTr0IApXbxytls08iCSqLiB0c-Bjaw-hzd0rAaqxc=.p7b",
-          "signAlg": "SHA256withECDSA",
-          "storeFile": "C:\\Users\\21633\\.ohos\\config\\real_Audiobookshelf_nWYTr0IApXbxytls08iCSqLiB0c-Bjaw-hzd0rAaqxc=.p12"
-        }
-      }
-    ],
+    "signingConfigs": [],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "compatibleSdkVersion": "5.0.0(12)",
+        "compatibleSdkVersion": "5.0.5(17)",
         "runtimeOS": "HarmonyOS",
+        "targetSdkVersion": "6.0.0(20)"
       }
     ],
     "buildModeSet": [

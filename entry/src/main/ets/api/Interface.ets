@@ -46,21 +46,29 @@ export interface Library {
 export interface Metadata {
   title: string;
   titleIgnorePrefix: string;
-  subtitle: string | null;
-  authorName: string;
-  authorNameLF: string;
-  narratorName: string;
-  seriesName: string;
+  subtitle?: string | null;
+  authorName?: string;
+  authorNameLF?: string;
+  narratorName?: string;
+  seriesName?: string;
   genres: string[];
-  publishedYear: string;
-  publishedDate: string | null;
-  publisher: string | null;
+  publishedYear?: string;
+  publishedDate?: string | null;
+  publisher?: string | null;
   description: string;
-  isbn: string | null;
-  asin: string | null;
+  isbn?: string | null;
+  asin?: string | null;
   language: string;
   explicit: boolean;
-  abridged: boolean;
+  abridged?: boolean;
+  author?: string;
+  releaseDate?: string;
+  feedUrl?: string;
+  imageUrl?: string;
+  itunesPageUrl?: string;
+  itunesId?: string;
+  itunesArtistId?: string | null,
+  type?: string;
 }
 
 export interface AudioFileMetadata {
@@ -153,6 +161,7 @@ export interface LibraryItem {
   media: Media;
   numFiles: number;
   size: number;
+  episodes?: Episode[];
 }
 
 export interface Progress {
@@ -269,6 +278,17 @@ export interface Series {
   totalDuration: number;
 }
 
+export interface Collection {
+  id: string;
+  libraryId: string;
+  userId: string;
+  name: string;
+  description?: string | null;
+  books: Book[];
+  lastUpdate: number;
+  createdAt: number;
+}
+
 export interface ListeningStats {
   totalTime: number;
   items: Record<string, ListeningStatsItem>;
@@ -314,4 +334,107 @@ export interface Bookmark {
   title: string;
   time: number;
   createdAt: number;
+}
+
+export interface SearchPodcast {
+  id: number;
+  artistId: number;
+  title: string;
+  artistName: string;
+  description: string;
+  descriptionPlain: string;
+  releaseDate: string;
+  genres: string[];
+  cover: string;
+  trackCount: number;
+  feedUrl: string;
+  pageUrl: string;
+  explicit: boolean;
+}
+
+export interface Feed {
+  podcast: Podcast;
+}
+
+export interface Podcast {
+  metadata: PodcastMetadata;
+  episodes: Episode[];
+}
+
+export interface PodcastMetadata {
+  image: string;
+  categories: string[];
+  feedUrl: string;
+  description: string;
+  descriptionPlain: string;
+  title: string;
+  language: string;
+  explicit: string;
+  author: string;
+  pubDate: string;
+  link: string;
+}
+
+export interface Enclosure {
+  url: string;
+  type: string;
+  length: string;
+}
+
+export interface RssFeed {
+  rssFeed: string;
+}
+
+export interface Episode {
+  libraryItemId?: string;
+  id?: string;
+  index?: number;
+  season: string;
+  episode: string;
+  episodeType: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  descriptionPlain?: string;
+  enclosure: Enclosure;
+  pubDate: string;
+  audioFile?: AudioFile;
+  audioTrack?: AudioTrack;
+  publishedAt?: number;
+  addedAt?: number;
+  updatedAt?: number;
+  duration: number;
+  size?: number;
+  podcast?: Podcast;
+  author?: string;
+}
+
+export interface AudioMetadata {
+  filename: string;
+  ext: string;
+  path: string;
+  relPath: string;
+  size: number;
+  mtimeMs: number;
+  ctimeMs: number;
+  birthtimeMs: number;
+}
+
+export interface MetaTags {
+  tagAlbum: string;
+  tagArtist: string;
+  tagGenre: string;
+  tagTitle: string;
+  tagDate: string;
+  tagEncoder: string;
+}
+
+export interface AudioTrack {
+  index: number;
+  startOffset: number;
+  duration: number;
+  title: string;
+  contentUrl: string;
+  mimeType: string;
+  metadata: AudioMetadata;
 }

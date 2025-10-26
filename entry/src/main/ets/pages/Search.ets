@@ -13,7 +13,6 @@ export default struct SearchItems {
   @Consume PageIndexTransfer: number
   @Consume libraryItems: LibraryItem[]
   @Consume itemTransfer: LibraryItem
-  @Consume showProgressTransfer: boolean
   @Consume allProgress: Progress[]
   @Consume searchTransfer: LibraryItem[]
   @Consume backPageIndex: number
@@ -76,75 +75,63 @@ export default struct SearchItems {
         .margin({ top: 20 })
         .width('100%')
         .textAlign(TextAlign.Center)
-      Stack() {
-        Column() {
-          Grid() {
-            ForEach(this.searchTransfer, (searchItem: LibraryItem, index) => {
-              GridItem() {
-                Stack({ alignContent: Alignment.Bottom }) {
-                  Image(this.server + `/api/items/${searchItem.id}/cover?format=jpeg&width=1024` + `&token=${this.apitoken}`)
-                    .alt($rawfile('nocover.jpg'))
-                    .width('100%')
-                    .aspectRatio(1)
-                    .borderRadius(10)
-                    .objectFit(ImageFit.Fill)
-                    .onClick(async () => {
-                      animateTo({
-                        duration: 300,
-                        curve: Curve.EaseOut,
-                      }, () => {
-                        this.sidebarShow = false
-                      })
-                      for (let item of this.libraryItems) {
-                        if (item.id === searchItem.id) {
-                          this.itemTransfer = item
-                          break
-                        }
-                      }
-                      this.backPageIndex = 5
-                      this.PageIndexTransfer = 3
-                    })
-                  Progress({
-                    value: this.getProgressById(searchItem.id).progress * 100,
-                    total: 100,
-                    type: ProgressType.Linear
-                  })
-                    .size({ width: '100%', height: 'auto' })
-                    .style({ strokeWidth: 5 })
-                    .color(this.getProgressById(searchItem.id).progress * 100 === 100 ?
-                    Color.Green :
-                    Color.Orange)
-                }
+      Grid() {
+        ForEach(this.searchTransfer, (searchItem: LibraryItem, index) => {
+          GridItem() {
+            Stack({ alignContent: Alignment.Bottom }) {
+              Image(this.server + `/api/items/${searchItem.id}/cover?format=jpeg&width=1024` +
+                `&token=${this.apitoken}`)
+                .alt($rawfile('nocover.jpg'))
                 .width('100%')
+                .aspectRatio(1)
                 .borderRadius(10)
-                .clip(true)
-              }
-              .borderRadius(10)
-            })
+                .objectFit(ImageFit.Fill)
+                .onClick(async () => {
+                  animateTo({
+                    duration: 300,
+                    curve: Curve.EaseOut,
+                  }, () => {
+                    this.sidebarShow = false
+                  })
+                  for (let item of this.libraryItems) {
+                    if (item.id === searchItem.id) {
+                      this.itemTransfer = item
+                      break
+                    }
+                  }
+                  this.backPageIndex = 5
+                  this.PageIndexTransfer = 3
+                })
+              Progress({
+                value: this.getProgressById(searchItem.id).progress * 100,
+                total: 100,
+                type: ProgressType.Linear
+              })
+                .size({ width: '100%', height: 'auto' })
+                .style({ strokeWidth: 5 })
+                .color(this.getProgressById(searchItem.id).progress * 100 === 100 ?
+                Color.Green :
+                Color.Orange)
+            }
+            .width('100%')
+            .borderRadius(10)
+            .clip(true)
           }
-          .columnsTemplate(this.columnsTemplate)
-          .columnsGap(20)
-          .rowsGap(20)
-          .margin({ left: 15, right: 15 })
-          .padding({ top: 20, bottom: 20 })
-          .height('100%')
-          .scrollBar(BarState.Off)
-        }
-        .width('100%')
-        .height('100%')
-        .backgroundImage($rawfile('background.jpg'))
-        .backgroundImageSize(ImageSize.Cover)
-
-        Column() {
-          Loading()
-        }
-        .width('100%')
-        .height('100%')
-        .hitTestBehavior(HitTestMode.Transparent)
+          .borderRadius(10)
+        })
       }
+      .columnsTemplate(this.columnsTemplate)
+      .columnsGap(20)
+      .rowsGap(20)
+      .padding({
+        top: 20,
+        bottom: 20,
+        left: 15,
+        right: 15
+      })
       .width('100%')
       .height('100%')
-      .layoutWeight(1)
+      .scrollBar(BarState.Off)
       .visibility(this.searchTransfer.length !== 0 ? Visibility.Visible : Visibility.None)
 
       Text("没有项目")

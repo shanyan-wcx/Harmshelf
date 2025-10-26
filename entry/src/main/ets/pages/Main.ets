@@ -1,7 +1,6 @@
 import { media } from '@kit.MediaKit';
 import { router, promptAction, curves, window } from '@kit.ArkUI';
 import { common, Want } from '@kit.AbilityKit';
-import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { avSession as AVSessionManager } from '@kit.AVSessionKit';
 import { bundleManager } from '@kit.AbilityKit';
 import { BusinessError, deviceInfo } from '@kit.BasicServicesKit';
@@ -19,7 +18,10 @@ import {
   closeSession,
   getStats,
   getBookmarks,
-  getCover
+  getCover,
+  getFeed,
+  getRecentEpisodes,
+  getCollections
 } from '../api/Api'
 import {
   Library,
@@ -32,7 +34,10 @@ import {
   PlayItem,
   UpdateSession,
   ListeningStats,
-  Bookmark
+  Bookmark,
+  SearchPodcast,
+  Episode,
+  Collection
 } from '../api/Interface'
 import library from './tabs/Library'
 import home from './tabs/Home'
@@ -40,11 +45,14 @@ import author from './tabs/Author'
 import series from './tabs/Series'
 import collection from './tabs/Collection'
 import Detail from './Detail'
-import SeriesItems from './SeriesItems'
 import Play from './Play'
 import Setting from './Setting'
 import Stats from './Stats'
 import SearchItems from './Search';
+import add from './tabs/Add';
+import newEpisode from './tabs/NewEpisode';
+import Items from './Items';
+import Loading from './Loading';
 
 let context = getContext(this) as common.UIAbilityContext;
 let filesDir = context.filesDir;
@@ -71,6 +79,7 @@ export default struct main {
   @State selectedLibrary: string = '';
   @Provide selectedLibraryId: string = '';
   @State selectedLibraryIndex: number = 0;
+  @Provide selectedLibraryMediaType: string = ''
   @State shadowRadius: number = 0;
   @State isPlaying: boolean = true
   @Provide avPlayer: media.AVPlayer | null = null
@@ -110,6 +119,10 @@ export default struct main {
   @Provide prepared: boolean = false
   @Provide searchTransfer: LibraryItem[] = []
   @Provide serverStatus: boolean = true
+  @Provide podcasts: SearchPodcast[] = []
+  @Provide searchPodcasts: boolean = false
+  @Provide searchPodcastsValue: string = ''
+  @Provide recentEpisodes: Episode[] = []
   @State searchValue: string = ''
   @State currentItem: LibraryItem = {
     id: '',
@@ -167,7 +180,9 @@ export default struct main {
   @Provide nowPlayingChapters: Chapter[] = []
   @Provide authors: Author[] = []
   @Provide series: Series[] = []
+  @Provide collections: Collection[] = []
   @Provide playItem: PlayItem | null = null
+  @Provide isSeries: boolean = true
   @Provide seriesTransfer: Series = {
     id: '',
     name: '',
@@ -178,6 +193,16 @@ export default struct main {
     addedAt: 0,
     totalDuration: 0
   }
+  @Provide collectionTransfer: Collection = {
+    id: '',
+    libraryId: '',
+    userId: '',
+    name: '',
+    description: '',
+    books: [],
+    lastUpdate: 0,
+    createdAt: 0,
+  }
   @Provide listeningStats: ListeningStats = {
     totalTime: 0,
     items: {},
@@ -186,6 +211,10 @@ export default struct main {
     today: 0,
     recentSessions: []
   }
+  uiContext: UIContext | undefined = undefined
+  context: common.UIAbilityContext | undefined = undefined
+  @Provide displayWidth: number = 0
+  @Provide displayHeight: number = 0
 
   async changePage() {
     this.pageIndex = this.PageIndexTransfer
@@ -256,13 +285,14 @@ export default struct main {
   @Builder
   bindMenuBuilder(libraries: Library[]) {
     Menu() {
-      ForEach(libraries, (item: number, index) => {
-        MenuItem({ content: libraries[index].name })
+      ForEach(libraries, (library: Library, index) => {
+        MenuItem({ content: library.name })
           .onClick(async () => {
             if (this.selectedLibraryIndex !== index) {
-              this.selectedLibrary = libraries[index].name
-              this.selectedLibraryId = libraries[index].id
+              this.selectedLibrary = library.name
+              this.selectedLibraryId = library.id
               this.selectedLibraryIndex = index
+              this.selectedLibraryMediaType = library.mediaType
               this.pageIndex = 0
               this.PageIndexTransfer = 0
               this.showProgressTransfer = true
@@ -282,8 +312,15 @@ export default struct main {
                 return 0;
               });
               this.series = await getSeries(this.selectedLibraryId)
+              this.collections = await getCollections(this.selectedLibraryId)
               this.authors =
                 (await getAuthors(this.selectedLibraryId)).sort((a, b) => a.name.localeCompare(b.name, 'zh'))
+              if (library.mediaType === 'podcast') {
+                this.recentEpisodes = await getRecentEpisodes(this.selectedLibraryId)
+                for (let item of this.libraryItems) {
+                  item.episodes = await getFeed(item.media.metadata.feedUrl!)
+                }
+              }
               this.showProgressTransfer = false
             }
           })
@@ -466,13 +503,22 @@ export default struct main {
   }
 
   async aboutToAppear() {
-    this.mainWindow = await window.getLastWindow(getContext(this))
+    this.uiContext = this.getUIContext();
+    if (!this.uiContext) {
+      console.warn("no uiContext");
+      return;
+    }
+    this.context = this.uiContext.getHostContext() as common.UIAbilityContext;
+    this.mainWindow = await window.getLastWindow(this.context)
+    this.displayWidth = this.uiContext!.px2vp(this.mainWindow.getWindowProperties().windowRect.width)
+    this.displayHeight= this.uiContext!.px2vp(this.mainWindow.getWindowProperties().windowRect.height)
     this.getStatusBarHeight()
     this.showProgressTransfer = true
     libraries = await getLibraries()
     this.selectedLibrary = libraries[0].name
     this.selectedLibraryId = libraries[0].id
     this.selectedLibraryIndex = 0
+    this.selectedLibraryMediaType = libraries[0].mediaType
     this.avPlayer = await media.createAVPlayer();
     this.allProgress = []
     console.log("获取媒体库项目", this.selectedLibraryId)
@@ -491,7 +537,14 @@ export default struct main {
     });
     this.libraryItemsFinished = await getLibrarieItemsFinished(this.selectedLibraryId)
     this.series = await getSeries(this.selectedLibraryId)
+    this.collections = await getCollections(this.selectedLibraryId)
     this.authors = (await getAuthors(this.selectedLibraryId)).sort((a, b) => a.name.localeCompare(b.name, 'zh'))
+    if (this.selectedLibraryMediaType === 'podcast') {
+      this.recentEpisodes = await getRecentEpisodes(this.selectedLibraryId)
+      for (let item of this.libraryItems) {
+        item.episodes = await getFeed(item.media.metadata.feedUrl!)
+      }
+    }
     this.bookmarks = await getBookmarks(this.userId)
     this.listeningStats = await getStats()
     let config = readConfig()
@@ -690,7 +743,7 @@ export default struct main {
               Text("项目地址")
                 .fontSize(11)
                 .fontColor(Color.Gray)
-              Text('Audiobookshelf-HarmonyOS')
+              Text('Harmshelf')
                 .fontSize(11)
                 .fontColor(Color.Gray)
                 .maxLines(1)
@@ -706,7 +759,7 @@ export default struct main {
                   let want: Want = {
                     action: 'ohos.want.action.viewData',
                     entities: ['entity.system.browsable'],
-                    uri: 'https://github.com/shanyan-wcx/Audiobookshelf-HarmonyOS'
+                    uri: 'https://github.com/shanyan-wcx/Harmshelf'
                   };
                   context.startAbility(want)
                 })
@@ -798,36 +851,70 @@ export default struct main {
               .height('100%')
               .tabBar(this.TabBuilder("媒体库", 1, $rawfile('tabs/library.png')))
 
-              TabContent() {
-                series({ libraryId: this.selectedLibraryId })
-              }
-              .width('100%')
-              .height('100%')
-              .backgroundImage($rawfile('background.jpg'))
-              .backgroundImageSize(ImageSize.Cover)
-              .tabBar(this.TabBuilder("系列", 2, $rawfile('tabs/series.png')))
+              if (this.selectedLibraryMediaType === 'book') {
+                TabContent() {
+                  series({ libraryId: this.selectedLibraryId })
+                }
+                .width('100%')
+                .height('100%')
+                .backgroundImage($rawfile('background.jpg'))
+                .backgroundImageSize(ImageSize.Cover)
+                .tabBar(this.TabBuilder("系列", 2, $rawfile('tabs/series.png')))
 
-              TabContent() {
-                collection({ libraryId: this.selectedLibraryId })
-              }
-              .width('100%')
-              .height('100%')
-              .backgroundColor("#333333")
-              .tabBar(this.TabBuilder("收藏", 3, $rawfile('tabs/collections.png')))
+                TabContent() {
+                  collection({ libraryId: this.selectedLibraryId })
+                }
+                .width('100%')
+                .height('100%')
+                .backgroundImage($rawfile('background.jpg'))
+                .backgroundImageSize(ImageSize.Cover)
+                .tabBar(this.TabBuilder("收藏", 3, $rawfile('tabs/collections.png')))
 
-              TabContent() {
-                author({ libraryId: this.selectedLibraryId })
+                TabContent() {
+                  author({ libraryId: this.selectedLibraryId })
+                }
+                .width('100%')
+                .height('100%')
+                .backgroundColor("#333333")
+                .tabBar(this.TabBuilder("作者", 4, $rawfile('tabs/authors.png')))
+              } else {
+                TabContent() {
+                  if (this.recentEpisodes.length > 0) {
+                    newEpisode()
+                  } else {
+                    Column() {
+                      Text("没有剧集")
+                        .fontSize(24)
+                        .fontWeight(FontWeight.Bold)
+                        .fontColor(Color.White)
+                    }
+                    .width('100%')
+                    .height('100%')
+                    .justifyContent(FlexAlign.Center)
+                  }
+                }
+                .width('100%')
+                .height('100%')
+                .backgroundColor("#333333")
+                .tabBar(this.TabBuilder("最新", 2, $rawfile('tabs/authors.png')))
+
+                TabContent() {
+                  add()
+                }
+                .width('100%')
+                .height('100%')
+                .backgroundColor("#333333")
+                .tabBar(this.TabBuilder("增加", 3, $rawfile('tabs/authors.png')))
               }
-              .width('100%')
-              .height('100%')
-              .backgroundColor("#333333")
-              .tabBar(this.TabBuilder("作者", 4, $rawfile('tabs/authors.png')))
             }
             .width("100%")
             .height('100%')
             .barHeight(40)
             .onChange((index: number) => {
               this.index = index
+              this.searchPodcasts = false
+              this.podcasts = []
+              this.searchPodcastsValue = ''
             })
             .visibility(this.pageIndex === 0 ? Visibility.Visible : Visibility.None)
 
@@ -856,7 +943,7 @@ export default struct main {
             .visibility(this.pageIndex === 3 ? Visibility.Visible : Visibility.None)
 
             Column() {
-              SeriesItems()
+              Items()
             }
             .backgroundImage($rawfile('background.jpg'))
             .backgroundImageSize(ImageSize.Cover)
@@ -872,6 +959,8 @@ export default struct main {
             .width("100%")
             .height('100%')
             .visibility(this.pageIndex === 5 ? Visibility.Visible : Visibility.None)
+
+            Loading()
 
             Column()
               .width('100%')

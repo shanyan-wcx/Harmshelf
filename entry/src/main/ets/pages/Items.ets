@@ -1,13 +1,13 @@
 import { window } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
-import { Book, LibraryItem, Progress, Series } from '../api/Interface'
+import { Book, Collection, LibraryItem, Progress, Series } from '../api/Interface'
 import Loading from './Loading'
 
 let context = getContext(this) as common.UIAbilityContext;
 let filesDir = context.filesDir;
 
 @Component
-export default struct SeriesItems {
+export default struct Items {
   @State displayWidth: number = 0
   @State columnsTemplate: string = "1fr"
   @Consume PageIndexTransfer: number
@@ -16,8 +16,10 @@ export default struct SeriesItems {
   @Consume showProgressTransfer: boolean
   @Consume allProgress: Progress[]
   @Consume seriesTransfer: Series
+  @Consume collectionTransfer: Collection
   @Consume backPageIndex: number
   @Consume sidebarShow: boolean
+  @Consume isSeries: boolean
   @State mainWindow: window.Window | null = null
   @Consume server: string
   @Consume apitoken: string
@@ -73,10 +75,12 @@ export default struct SeriesItems {
       Stack() {
         Column() {
           Grid() {
-            ForEach(this.seriesTransfer.books, (book: Book, index) => {
+            ForEach(this.isSeries === true ? this.seriesTransfer.books :
+            this.collectionTransfer.books, (book: Book, index) => {
               GridItem() {
                 Stack({ alignContent: Alignment.Bottom }) {
-                  Image(this.server + `/api/items/${book.id}/cover?format=jpeg&width=1024` + `&token=${this.apitoken}`)
+                  Image(this.server + `/api/items/${book.id}/cover?format=jpeg&width=1024` +
+                    `&token=${this.apitoken}`)
                     .alt($rawfile('nocover.jpg'))
                     .width('100%')
                     .aspectRatio(1)
@@ -138,13 +142,16 @@ export default struct SeriesItems {
       }
       .width('100%')
       .height('100%')
-      .visibility(this.seriesTransfer.books.length !== 0 ? Visibility.Visible : Visibility.None)
+      .visibility((this.isSeries === true && this.seriesTransfer.books.length !== 0) ||
+        (this.isSeries === false && this.collectionTransfer.books.length !== 0) ? Visibility.Visible : Visibility.None)
 
       Text("没有项目")
         .fontColor(Color.White)
         .fontSize(32)
         .margin({ top: 200 })
-        .visibility(this.seriesTransfer.books.length === 0 ? Visibility.Visible : Visibility.None)
+        .visibility((this.isSeries === true && this.seriesTransfer.books.length === 0) ||
+          (this.isSeries === false && this.collectionTransfer.books.length === 0) ? Visibility.Visible :
+        Visibility.None)
     }
     .width('100%')
     .height('100%')

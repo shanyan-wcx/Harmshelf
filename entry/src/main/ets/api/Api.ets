@@ -17,8 +17,11 @@ import {
   Series,
   UpdateSession,
   ListeningStats,
-  Bookmark
+  Bookmark,
+  RssFeed,
+  Collection
 } from './Interface'
+import { JSON } from '@kit.ArkTS';
 
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 
@@ -73,7 +76,7 @@ export async function getLogout() {
 }
 
 export async function getLibraries(): Promise<Library[]> {
-  let library: Library[] = []
+  let libraries: Library[] = []
   let libraryNames: string[] = []
   const api: Axios = createApi()
   try {
@@ -82,10 +85,11 @@ export async function getLibraries(): Promise<Library[]> {
     })
     console.log("获取媒体库成功！")
 
-    library = response.data.libraries.filter((item: Library) => {
-      return item.mediaType === "book";
-    });
-    library.forEach(element => {
+    libraries = response.data.libraries
+    //   .filter((item: Library) => {
+    //   return item.mediaType === "book";
+    // });
+    libraries.forEach(element => {
       libraryNames.push(element.name)
     });
     console.log("媒体库", libraryNames)
@@ -97,7 +101,7 @@ export async function getLibraries(): Promise<Library[]> {
       duration: 500
     });
   }
-  return library
+  return libraries
 }
 
 export async function getLibrarieItems(libraryId: string): Promise<LibraryItem[]> {
@@ -401,6 +405,27 @@ export async function getSeries(libraryId: string): Promise<Series[]> {
   }
 }
 
+export async function getCollections(libraryId: string): Promise<Collection[]> {
+  const api: Axios = createApi()
+  let collections: Collection[] = []
+  try {
+    const response: AxiosResponse =
+      await api.get<string, AxiosResponse<string>, null>(`/api/libraries/${libraryId}/collections`, {
+        params: { limit: 99999 },
+        timeout: 10000
+      })
+    collections = response.data.results
+    return collections
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    promptAction.showToast({
+      message: '获取收藏失败，请检查网络！',
+      duration: 500
+    });
+    return []
+  }
+}
+
 export async function syncSession(sessionId: string, updateSession: UpdateSession) {
   const api: Axios = createApi()
   try {
@@ -499,5 +524,57 @@ export async function deleteBookmark(itemId: string, time: number) {
       message: '删除书签失败，请检查网络！',
       duration: 500
     });
+  }
+}
+
+export async function searchPodcasts(term: string) {
+  const api: Axios = createApi()
+  try {
+    const response: AxiosResponse =
+      await api.get<string, AxiosResponse<string>>(`api/search/podcast?term=${term}`)
+    console.log("搜索播客成功，共" + response.data.length + "个结果");
+    return response.data
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    promptAction.showToast({
+      message: '搜索播客失败，请检查网络！',
+      duration: 500
+    });
+    return []
+  }
+}
+
+export async function getFeed(feed: string) {
+  const api: Axios = createApi()
+  let rssFeed: RssFeed = {
+    rssFeed: feed
+  }
+  try {
+    const response: AxiosResponse =
+      await api.post<string, AxiosResponse<string>, RssFeed>(`/api/podcasts/feed`, rssFeed)
+    return response.data.podcast.episodes
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    promptAction.showToast({
+      message: '获取剧集失败，请检查网络！',
+      duration: 500
+    });
+    return []
+  }
+}
+
+export async function getRecentEpisodes(libraryId: string) {
+  const api: Axios = createApi()
+  try {
+    const response: AxiosResponse =
+      await api.get<string, AxiosResponse<string>>(`/api/libraries/${libraryId}/recent-episodes?limit=100`)
+    return response.data.episodes
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    promptAction.showToast({
+      message: '获取最新剧集失败，请检查网络！',
+      duration: 500
+    });
+    return []
   }
 }

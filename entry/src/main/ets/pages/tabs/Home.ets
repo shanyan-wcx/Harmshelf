@@ -2,14 +2,15 @@ import { window } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import { LibraryItem, Progress } from '../../api/Interface'
 import Loading from '../Loading'
+import { JSON } from '@kit.ArkTS';
 
 let context = getContext(this) as common.UIAbilityContext;
 let filesDir = context.filesDir;
 
 @Component
 export default struct home {
-  @State displayWidth: number = 0
-  @State coverWidth: number = 100
+  @Consume displayWidth: number
+  @State coverWidth: number = 180
   @Consume PageIndexTransfer: number
   @State libraryId: string = ''
   @Consume libraryItemsInProgress: LibraryItem[]
@@ -49,7 +50,6 @@ export default struct home {
   }
 
   async aboutToAppear() {
-    this.displayWidth = px2vp(this.mainWindow.getWindowProperties().windowRect.width)
     if (this.displayWidth >= 320 && this.displayWidth < 550) {
       this.coverWidth = 180
     } else if (this.displayWidth >= 550 && this.displayWidth < 840) {
@@ -87,6 +87,7 @@ export default struct home {
                     .onClick(async () => {
                       this.itemTransfer = item
                       this.PageIndexTransfer = 3
+                      console.log(JSON.stringify(item))
                       animateTo({
                         duration: 300,
                         curve: Curve.EaseOut,
@@ -247,12 +248,12 @@ export default struct home {
       .height('100%')
       .hitTestBehavior(HitTestMode.Transparent)
 
-      Column() {
-        Loading()
-      }
-      .width('100%')
-      .height('100%')
-      .hitTestBehavior(HitTestMode.Transparent)
+      // Column() {
+      //   Loading()
+      // }
+      // .width('100%')
+      // .height('100%')
+      // .hitTestBehavior(HitTestMode.Transparent)
     }
     .width('100%')
     .height('100%')

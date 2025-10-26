@@ -21,7 +21,7 @@ function formatDuration(seconds: number): string {
 
 @Component
 export default struct library {
-  @State displayWidth: number = 0
+  @Consume displayWidth: number = 0
   @State columnsTemplate: string = "1fr"
   @Consume PageIndexTransfer: number
   @State libraryId: string = ''
@@ -74,7 +74,6 @@ export default struct library {
   }
 
   async aboutToAppear() {
-    this.displayWidth = px2vp(this.mainWindow.getWindowProperties().windowRect.width)
     if (this.displayWidth >= 320 && this.displayWidth < 550) {
       this.columnsTemplate = "1fr 1fr"
     } else if (this.displayWidth >= 550 && this.displayWidth < 840) {
@@ -147,12 +146,12 @@ export default struct library {
         .width('100%')
         .height('100%')
 
-        Column() {
-          Loading()
-        }
-        .width('100%')
-        .height('100%')
-        .hitTestBehavior(HitTestMode.Transparent)
+        // Column() {
+        //   Loading()
+        // }
+        // .width('100%')
+        // .height('100%')
+        // .hitTestBehavior(HitTestMode.Transparent)
       }
       .width('100%')
       .height('100%')

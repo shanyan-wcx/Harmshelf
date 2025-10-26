@@ -3,7 +3,7 @@ import { Author } from '../../api/Interface'
 
 @Component
 export default struct author {
-  @State displayWidth: number = 0
+  @Consume displayWidth: number = 0
   @State columnsTemplate: string = "1fr"
   @Consume PageIndexTransfer: number
   @Consume showProgressTransfer: boolean
@@ -16,7 +16,6 @@ export default struct author {
   @Consume apitoken: string
 
   async aboutToAppear() {
-    this.displayWidth = px2vp(this.mainWindow.getWindowProperties().windowRect.width)
     if (this.displayWidth >= 320 && this.displayWidth < 550) {
       this.columnsTemplate = "1fr 1fr 1fr"
     } else if (this.displayWidth >= 550 && this.displayWidth < 840) {
