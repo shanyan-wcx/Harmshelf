@@ -1,0 +1,16 @@
+{
+  "color": [
+    {
+      "name": "start_window_background",
+      "value": "#000000"
+    },
+    {
+      "name": "textInput",
+      "value": "#363839"
+    },
+    {
+      "name": "sliderBlock",
+      "value": "#BCBCBC"
+    }
+  ]
+}

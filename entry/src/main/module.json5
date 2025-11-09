@@ -17,14 +17,12 @@
         "name": "EntryAbility",
         "srcEntry": "./ets/entryability/EntryAbility.ets",
         "description": "$string:EntryAbility_desc",
-        "icon": "$media:icon",
+        "icon": "$media:layered_image",
         "label": "$string:EntryAbility_label",
         "startWindowIcon": "$media:startIcon",
         "startWindowBackground": "$color:start_window_background",
         "exported": true,
-        "backgroundModes": [
-          "audioPlayback"
-        ],
+        "recoverable": true,
         "skills": [
           {
             "entities": [
@@ -33,14 +31,11 @@
             "actions": [
               "action.system.home"
             ]
-          },
-          {
-            "uris": [
-              {
-                "scheme": "Harmshelf"
-              }
-            ]
           }
+        ],
+        "backgroundModes": [
+          "audioPlayback",
+          "multiDeviceConnection"
         ]
       }
     ],
@@ -60,32 +55,12 @@
     ],
     "requestPermissions": [
       {
-        "name": "ohos.permission.INTERNET",
-        "reason": "$string:module_desc",
-        "usedScene": {
-          "abilities": [
-            "entry"
-          ]
-        }
+        "name": "ohos.permission.INTERNET"
       },
       {
-        "name": "ohos.permission.GET_NETWORK_INFO",
-        "reason": "$string:module_desc",
-        "usedScene": {
-          "abilities": [
-            "entry"
-          ]
-        }
-      },
-      {
-        "name": "ohos.permission.KEEP_BACKGROUND_RUNNING",
-        "reason": "$string:module_desc",
-        "usedScene": {
-          "abilities": [
-            "entry"
-          ]
-        }
+        "name": "ohos.permission.KEEP_BACKGROUND_RUNNING"
       }
-    ]
+    ],
+    "routerMap": "$profile:router_map"
   }
 }

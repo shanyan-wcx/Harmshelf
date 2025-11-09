@@ -1,170 +1,90 @@
-import { window } from '@kit.ArkUI';
-import { common } from '@kit.AbilityKit';
-import { LibraryItem, Progress } from '../../api/Interface'
-import Loading from '../Loading'
+import { LibraryItemComponent1 } from '../../utils/Component';
+import { Library, LibraryItem, Progress } from '../../utils/Interface';
 
-let context = getContext(this) as common.UIAbilityContext;
-let filesDir = context.filesDir;
-
-function formatDuration(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-
-  let formattedTime = '';
-  if (hours > 0) {
-    formattedTime += `${hours} hr `;
-  }
-  formattedTime += `${minutes} min`;
-
-  return formattedTime;
-}
-
-@Component
-export default struct library {
-  @Consume displayWidth: number = 0
-  @State columnsTemplate: string = "1fr"
-  @Consume PageIndexTransfer: number
-  @State libraryId: string = ''
-  @Consume libraryItems: LibraryItem[]
-  @Consume itemTransfer: LibraryItem
-  @Consume nowPlayingItem: LibraryItem
-  @Consume showProgressTransfer: boolean
-  @Consume allProgress: Progress[]
-  @Consume backPageIndex: number
-  @Consume sidebarShow: boolean
-  @Consume mainWindow: window.Window
-  @Consume server: string
-  @Consume apitoken: string
-
-  getProgressById(itemId: string): Progress {
-    let progress: Progress = {
-      id: '',
-      libraryItemId: itemId,
-      episodeId: '',
-      duration: 0,
-      progress: 0,
-      currentTime: 0,
-      isFinished: false,
-      hideFromContinueListening: false,
-      lastUpdate: 0,
-      startedAt: 0,
-      finishedAt: null
-    }
-    for (let element of this.allProgress) {
-      if (element.libraryItemId === itemId) {
-        progress = element
-        progress.progress = Math.round(element.progress * 100) / 100
-        break
-      }
-    }
-    return progress
-  }
-
-  getDuration(itemId: string): string {
-    let duration = ''
-    if (this.getProgressById(itemId).currentTime === 0) {
-      duration = "未听过"
-    } else if (this.getProgressById(itemId).isFinished === true) {
-      duration = "已听完"
-    } else {
-      duration =
-        "剩余 " + formatDuration(this.getProgressById(itemId).duration - this.getProgressById(itemId).currentTime)
-    }
-    return duration
-  }
-
-  async aboutToAppear() {
-    if (this.displayWidth >= 320 && this.displayWidth < 550) {
-      this.columnsTemplate = "1fr 1fr"
-    } else if (this.displayWidth >= 550 && this.displayWidth < 840) {
-      this.columnsTemplate = "1fr 1fr 1fr 1fr"
-    } else if (this.displayWidth >= 840) {
-      this.columnsTemplate = "1fr 1fr 1fr 1fr 1fr"
-    }
-    this.mainWindow.on('windowSizeChange', (size) => {
-      this.displayWidth = px2vp(size.width)
-      if (this.displayWidth >= 320 && this.displayWidth < 550) {
-        this.columnsTemplate = "1fr 1fr"
-      } else if (this.displayWidth >= 550 && this.displayWidth < 840) {
-        this.columnsTemplate = "1fr 1fr 1fr 1fr"
-      } else if (this.displayWidth >= 840) {
-        this.columnsTemplate = "1fr 1fr 1fr 1fr 1fr"
-      }
-    })
-  }
+@ComponentV2
+export struct MediaLibrary {
+  private mediaLibraryScroller: Scroller = new Scroller();
+  @Consumer() displayWidth: number = 0
+  @Consumer() showLoadingProgress: boolean = false
+  @Consumer() library: Library | undefined = undefined
+  @Consumer() libraryItems: LibraryItem[] = []
+  @Consumer() progress: Progress[] = []
+  @Consumer() isStartPlaying: boolean = false
 
   build() {
-    Column() {
-      Stack() {
-        Column() {
-          Grid() {
-            ForEach(this.libraryItems, (item: LibraryItem, index) => {
-              GridItem() {
-                Stack({ alignContent: Alignment.Bottom }) {
-                  Image(this.server + `/api/items/${item.id}/cover?format=jpeg&width=1024` + `&token=${this.apitoken}`)
-                    .alt($rawfile('nocover.jpg'))
-                    .width('100%')
-                    .aspectRatio(1)
-                    .borderRadius(10)
-                    .objectFit(ImageFit.Fill)
-                    .onClick(async () => {
-                      this.itemTransfer = item
-                      this.backPageIndex = 0
-                      this.PageIndexTransfer = 3
-                      animateTo({
-                        duration: 300,
-                        curve: Curve.EaseOut,
-                      }, () => {
-                        this.sidebarShow = false
-                      })
-                    })
-                  Progress({
-                    value: this.getProgressById(item.id).progress * 100,
-                    total: 100,
-                    type: ProgressType.Linear
-                  })
-                    .size({ width: '100%', height: 'auto' })
-                    .style({ strokeWidth: 5 })
-                    .color(this.getProgressById(item.id).progress * 100 === 100 ? Color.Green :
-                    Color.Orange)
-                }
-                .width('100%')
-                .borderRadius(10)
-                .clip(true)
-              }
-              .borderRadius(10)
-            })
-          }
-          .columnsTemplate(this.columnsTemplate)
-          .columnsGap(20)
-          .rowsGap(20)
-          .margin({ left: 15, right: 15 })
-          .padding({ top: 20, bottom: 20 })
-          .height('100%')
-          .scrollBar(BarState.Off)
+    Stack() {
+      Column() {
+        Grid(this.mediaLibraryScroller) {
+          ForEach(this.libraryItems, (libraryItem: LibraryItem, index) => {
+            GridItem() {
+              LibraryItemComponent1({
+                item: libraryItem,
+                progress: this.progress.find(p => p.libraryItemId === libraryItem.id)
+              })
+                .margin({ bottom: index === this.libraryItems.length - 1 ? (this.isStartPlaying ? 102 : 20) : 0 })
+            }
+          })
         }
         .width('100%')
         .height('100%')
+        .columnsTemplate(this.displayWidth >= 1400 ? "1fr 1fr 1fr 1fr 1fr 1fr" :
+          (this.displayWidth >= 1000 ? "1fr 1fr 1fr 1fr 1fr" :
+            (this.displayWidth >= 800 ? "1fr 1fr 1fr 1fr" :
+              (this.displayWidth >= 400 ? "1fr 1fr 1fr" : "1fr 1fr"))))
+        .columnsGap(20)
+        .rowsGap(15)
+        .scrollBar(BarState.Off)
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+        .padding({
+          left: 20,
+          right: 20,
+          top: 56
+        })
+        .onReachEnd(async () => {
 
-        // Column() {
-        //   Loading()
-        // }
-        // .width('100%')
-        // .height('100%')
-        // .hitTestBehavior(HitTestMode.Transparent)
+        })
+        .visibility(this.libraryItems.length > 0 ? Visibility.Visible : Visibility.None)
+
+        Column() {
+          Text("没有媒体")
+            .fontSize(32)
+            .fontColor($r('sys.color.font'))
+        }
+        .width('100%')
+        .height('100%')
+        .justifyContent(FlexAlign.Center)
+        .visibility(this.libraryItems.length === 0 ? Visibility.Visible : Visibility.None)
       }
       .width('100%')
       .height('100%')
-      .visibility(this.libraryItems.length !== 0 ? Visibility.Visible : Visibility.None)
 
-      Text("没有项目")
-        .fontColor(Color.White)
-        .fontSize(32)
-        .margin({ top: 200 })
-        .visibility(this.libraryItems.length === 0 && this.showProgressTransfer === false ? Visibility.Visible :
-        Visibility.None)
+      Button({ type: ButtonType.Normal }) {
+        SymbolGlyph($r('sys.symbol.arrow_up_to_line'))
+          .fontWeight(FontWeight.Normal)
+          .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+          .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+          .hitTestBehavior(HitTestMode.None)
+      }
+      .position({
+        right: 15,
+        bottom: this.isStartPlaying ? 97 : 15
+      })
+      .animation({ duration: 510, curve: Curve.EaseInOut })
+      .width(36)
+      .height(36)
+      .borderRadius(6)
+      .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+      .shadow({
+        radius: 12,
+        color: $r('sys.color.font'),
+      })
+      .onClick(async () => {
+        this.mediaLibraryScroller.scrollEdge(Edge.Top)
+      })
     }
     .width('100%')
     .height('100%')
+    .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
   }
 }

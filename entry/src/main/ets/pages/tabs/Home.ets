@@ -1,261 +1,349 @@
-import { window } from '@kit.ArkUI';
-import { common } from '@kit.AbilityKit';
-import { LibraryItem, Progress } from '../../api/Interface'
-import Loading from '../Loading'
-import { JSON } from '@kit.ArkTS';
+import {
+  AuthorComponent, LibraryItemComponent, pageUpDown, RecentEpisodeComponent
+} from "../../utils/Component"
+import { Author, HomeSection, Library, LibraryItem, Progress } from "../../utils/Interface"
 
-let context = getContext(this) as common.UIAbilityContext;
-let filesDir = context.filesDir;
-
-@Component
-export default struct home {
-  @Consume displayWidth: number
-  @State coverWidth: number = 180
-  @Consume PageIndexTransfer: number
-  @State libraryId: string = ''
-  @Consume libraryItemsInProgress: LibraryItem[]
-  @Consume libraryItemsFinished: LibraryItem[]
-  @Consume itemTransfer: LibraryItem
-  @Consume nowPlayingItem: LibraryItem
-  @Consume showProgressTransfer: boolean
-  @Consume allProgress: Progress[]
-  @Consume libraryItems: LibraryItem[]
-  @Consume sidebarShow: boolean
-  @Consume mainWindow: window.Window
-  @Consume server: string
-  @Consume apitoken: string
-
-  getProgressById(itemId: string): Progress {
-    let progress: Progress = {
-      id: '',
-      libraryItemId: itemId,
-      episodeId: '',
-      duration: 0,
-      progress: 0,
-      currentTime: 0,
-      isFinished: false,
-      hideFromContinueListening: false,
-      lastUpdate: 0,
-      startedAt: 0,
-      finishedAt: null
-    }
-    for (let element of this.allProgress) {
-      if (element.libraryItemId === itemId) {
-        progress = element
-        progress.progress = Math.round(element.progress * 100) / 100
-        break
-      }
-    }
-    return progress
-  }
-
-  async aboutToAppear() {
-    if (this.displayWidth >= 320 && this.displayWidth < 550) {
-      this.coverWidth = 180
-    } else if (this.displayWidth >= 550 && this.displayWidth < 840) {
-      this.coverWidth = 170
-    } else if (this.displayWidth >= 840) {
-      this.coverWidth = 220
-    }
-    console.log("当前封面宽度", this.coverWidth)
-    this.mainWindow.on('windowSizeChange', (size) => {
-      this.displayWidth = px2vp(size.width)
-      if (this.displayWidth >= 320 && this.displayWidth < 550) {
-        this.coverWidth = 180
-      } else if (this.displayWidth >= 550 && this.displayWidth < 840) {
-        this.coverWidth = 170
-      } else if (this.displayWidth >= 840) {
-        this.coverWidth = 220
-      }
-    })
-  }
+@ComponentV2
+export struct SubHome {
+  private homeScroller: Scroller = new Scroller();
+  private continueListeningScroller: Scroller = new Scroller();
+  private newestEpisodesScroller: Scroller = new Scroller();
+  private recentlyAddedScroller: Scroller = new Scroller();
+  private discoverScroller: Scroller = new Scroller();
+  private listenAgainScroller: Scroller = new Scroller();
+  private newestAuthorsScroller: Scroller = new Scroller();
+  @Consumer() displayWidth: number = 0
+  @Consumer() library: Library | undefined = undefined
+  @Consumer() showLoadingProgress: boolean = false
+  @Consumer() homeData: HomeSection[] = []
+  @Consumer() progress: Progress[] = []
+  @Consumer() isStartPlaying: boolean = false
 
   build() {
     Stack() {
-      Column() {
+      Scroll(this.homeScroller) {
         Column() {
-          List() {
-            ForEach(this.libraryItemsInProgress, (item: LibraryItem, index) => {
-              ListItem() {
-                Stack({ alignContent: Alignment.Bottom }) {
-                  Image(this.server + `/api/items/${item.id}/cover?format=jpeg&width=1024` + `&token=${this.apitoken}`)
-                    .alt($rawfile('nocover.jpg'))
-                    .width('100%')
-                    .aspectRatio(1)
-                    .borderRadius(10)
-                    .objectFit(ImageFit.Fill)
-                    .onClick(async () => {
-                      this.itemTransfer = item
-                      this.PageIndexTransfer = 3
-                      console.log(JSON.stringify(item))
-                      animateTo({
-                        duration: 300,
-                        curve: Curve.EaseOut,
-                      }, () => {
-                        this.sidebarShow = false
-                      })
-                    })
-                  Progress({
-                    value: this.getProgressById(item.id).progress * 100,
-                    total: 100,
-                    type: ProgressType.Linear
-                  })
-                    .size({ width: '100%', height: 'auto' })
-                    .style({ strokeWidth: 5 })
-                    .color(this.getProgressById(item.id).progress * 100 === 100 ?
-                    Color.Green :
-                    Color.Orange)
-                }
-                .width('100%')
-                .height('100%')
-                .borderRadius(10)
-                .clip(true)
+          if (this.homeData.some(item => item.id === "continue-listening")) {
+            Column() {
+              Row() {
+                Text("继续收听")
+                  .fontSize(20)
+                  .fontWeight(FontWeight.Medium)
+
+                pageUpDown({
+                  scroller: this.continueListeningScroller
+                })
               }
-              .width(this.coverWidth)
-              .height(this.coverWidth)
-              .borderRadius(10)
-              .padding({ left: 20 })
-            })
+              .width('100%')
+              .justifyContent(FlexAlign.SpaceBetween)
+              .margin({ bottom: 3 })
+              .padding({
+                top: 16,
+                left: 20,
+                right: 20,
+                bottom: 5
+              })
+
+              List({ scroller: this.continueListeningScroller, space: 20 }) {
+                ForEach(this.homeData.find(item => item.id === "continue-listening")!.entities,
+                  (libraryItem: LibraryItem, index) => {
+                  if (this.library?.mediaType === 'book') {
+                    ListItem() {
+                      LibraryItemComponent({
+                        item: libraryItem,
+                        progress: this.progress.find(p => p.libraryItemId === libraryItem.id)
+                      })
+                        .margin({
+                          left: index === 0 ? 20 : 0,
+                          right: index ===
+                            this.homeData.find(item => item.id === "continue-listening")!.entities.length - 1 ? 20 : 0
+                        })
+                    }
+                  } else if (this.library?.mediaType === 'podcast') {
+                    ListItem() {
+                      RecentEpisodeComponent({
+                        item: libraryItem,
+                        progress: this.progress.find(p => p.episodeId === libraryItem.recentEpisode?.id)
+                      })
+                        .margin({
+                          left: index === 0 ? 20 : 0,
+                          right: index ===
+                            this.homeData.find(item => item.id === "continue-listening")!.entities.length - 1 ? 20 : 0
+                        })
+                    }
+                  }
+                  })
+              }
+              .width('100%')
+              .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
+              .listDirection(Axis.Horizontal)
+              .scrollBar(BarState.Off)
+            }
           }
-          .listDirection(Axis.Horizontal)
-          .width('100%')
-          .height(this.coverWidth)
-          .scrollBar(BarState.Off)
+
+          if (this.homeData.some(item => item.id === "newest-episodes")) {
+            Column() {
+              Row() {
+                Text("最新剧集")
+                  .fontSize(20)
+                  .fontWeight(FontWeight.Medium)
+
+                pageUpDown({
+                  scroller: this.newestEpisodesScroller
+                })
+              }
+              .width('100%')
+              .justifyContent(FlexAlign.SpaceBetween)
+              .margin({ bottom: 3 })
+              .padding({
+                top: 16,
+                left: 20,
+                right: 20,
+                bottom: 5
+              })
+
+              List({ scroller: this.newestEpisodesScroller, space: 20 }) {
+                ForEach(this.homeData.find(item => item.id === "newest-episodes")!.entities,
+                  (libraryItem: LibraryItem, index) => {
+                    ListItem() {
+                      RecentEpisodeComponent({
+                        item: libraryItem,
+                        progress: this.progress.find(p => p.episodeId === libraryItem.recentEpisode?.id)
+                      })
+                        .margin({
+                          left: index === 0 ? 20 : 0,
+                          right: index ===
+                            this.homeData.find(item => item.id === "newest-episodes")!.entities.length - 1 ? 20 : 0
+                        })
+                    }
+                  })
+              }
+              .width('100%')
+              .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
+              .listDirection(Axis.Horizontal)
+              .scrollBar(BarState.Off)
+            }
+          }
+
+          if (this.homeData.some(item => item.id === "recently-added")) {
+            Column() {
+              Row() {
+                Text("最近添加")
+                  .fontSize(20)
+                  .fontWeight(FontWeight.Medium)
+
+                pageUpDown({
+                  scroller: this.recentlyAddedScroller
+                })
+              }
+              .width('100%')
+              .justifyContent(FlexAlign.SpaceBetween)
+              .margin({ bottom: 3 })
+              .padding({
+                top: 16,
+                left: 20,
+                right: 20,
+                bottom: 5
+              })
+
+              List({ scroller: this.recentlyAddedScroller, space: 20 }) {
+                ForEach(this.homeData.find(item => item.id === "recently-added")!.entities,
+                  (libraryItem: LibraryItem, index) => {
+                    ListItem() {
+                      LibraryItemComponent({
+                        item: libraryItem,
+                        progress: this.progress.find(p => p.libraryItemId === libraryItem.id)
+                      })
+                        .margin({
+                          left: index === 0 ? 20 : 0,
+                          right: index ===
+                            this.homeData.find(item => item.id === "recently-added")!.entities.length - 1 ? 20 : 0
+                        })
+                    }
+                  })
+              }
+              .width('100%')
+              .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
+              .listDirection(Axis.Horizontal)
+              .scrollBar(BarState.Off)
+            }
+          }
+
+          if (this.homeData.some(item => item.id === "discover")) {
+            Column() {
+              Row() {
+                Text("发现")
+                  .fontSize(20)
+                  .fontWeight(FontWeight.Medium)
+
+                pageUpDown({
+                  scroller: this.discoverScroller
+                })
+              }
+              .width('100%')
+              .justifyContent(FlexAlign.SpaceBetween)
+              .margin({ bottom: 3 })
+              .padding({
+                top: 16,
+                left: 20,
+                right: 20,
+                bottom: 5
+              })
+
+              List({ scroller: this.discoverScroller, space: 20 }) {
+                ForEach(this.homeData.find(item => item.id === "discover")!.entities,
+                  (libraryItem: LibraryItem, index) => {
+                    ListItem() {
+                      LibraryItemComponent({
+                        item: libraryItem,
+                        progress: this.progress.find(p => p.libraryItemId === libraryItem.id)
+                      })
+                        .margin({
+                          left: index === 0 ? 20 : 0,
+                          right: index === this.homeData.find(item => item.id === "discover")!.entities.length - 1 ?
+                            20 : 0
+                        })
+                    }
+                  })
+              }
+              .width('100%')
+              .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
+              .listDirection(Axis.Horizontal)
+              .scrollBar(BarState.Off)
+            }
+          }
+
+
+          if (this.homeData.some(item => item.id === "listen-again")) {
+            Column() {
+              Row() {
+                Text("再次收听")
+                  .fontSize(20)
+                  .fontWeight(FontWeight.Medium)
+
+                pageUpDown({
+                  scroller: this.listenAgainScroller
+                })
+              }
+              .width('100%')
+              .justifyContent(FlexAlign.SpaceBetween)
+              .margin({ bottom: 3 })
+              .padding({
+                top: 16,
+                left: 20,
+                right: 20,
+                bottom: 5
+              })
+
+              List({ scroller: this.listenAgainScroller, space: 20 }) {
+                ForEach(this.homeData.find(item => item.id === "listen-again")!.entities,
+                  (libraryItem: LibraryItem, index) => {
+                    if (this.library?.mediaType === 'book') {
+                      ListItem() {
+                        LibraryItemComponent({
+                          item: libraryItem,
+                          progress: this.progress.find(p => p.libraryItemId === libraryItem.id)
+                        })
+                          .margin({
+                            left: index === 0 ? 20 : 0,
+                            right: index === this.homeData.find(item => item.id === "listen-again")!.entities.length - 1 ?
+                              20 : 0
+                          })
+                      }
+                    } else if (this.library?.mediaType === 'podcast') {
+                      ListItem() {
+                        RecentEpisodeComponent({
+                          item: libraryItem,
+                          progress: this.progress.find(p => p.episodeId === libraryItem.recentEpisode?.id)
+                        })
+                          .margin({
+                            left: index === 0 ? 20 : 0,
+                            right: index === this.homeData.find(item => item.id === "listen-again")!.entities.length - 1 ?
+                              20 : 0
+                          })
+                      }
+                    }
+                  })
+              }
+              .width('100%')
+              .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
+              .listDirection(Axis.Horizontal)
+              .scrollBar(BarState.Off)
+            }
+          }
+
+          if (this.homeData.some(item => item.id === "newest-authors")) {
+            Column() {
+              Row() {
+                Text("最新作者")
+                  .fontSize(20)
+                  .fontWeight(FontWeight.Medium)
+
+                pageUpDown({
+                  scroller: this.newestAuthorsScroller
+                })
+              }
+              .width('100%')
+              .justifyContent(FlexAlign.SpaceBetween)
+              .margin({ bottom: 3 })
+              .padding({
+                top: 16,
+                left: 20,
+                right: 20,
+                bottom: 5
+              })
+
+              List({ scroller: this.newestAuthorsScroller, space: 20 }) {
+                ForEach(this.homeData.find(item => item.id === "newest-authors")!.entities, (author: Author, index) => {
+                  ListItem() {
+                    AuthorComponent({
+                      author: author
+                    })
+                      .margin({
+                        left: index === 0 ? 20 : 0,
+                        right: index === this.homeData.find(item => item.id === "newest-authors")!.entities.length - 1 ?
+                          20 : 0
+                      })
+                  }
+                })
+              }
+              .width('100%')
+              .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
+              .listDirection(Axis.Horizontal)
+              .scrollBar(BarState.Off)
+            }
+          }
 
           Column() {
-            Text("继续收听")
-              .fontColor('#F2E4C1')
-              .fontSize(16)
-              .backgroundColor(Color.Black)
-              .width(100)
-              .height(23)
-              .margin({ left: 20 })
-              .textAlign(TextAlign.Center)
-              .border({
-                width: 2,
-                color: '#9E9681'
-              })
+            Text("开始收听")
+              .fontSize(34)
+              .fontColor($r('sys.color.font'))
           }
           .width('100%')
-          .height(25)
-          .alignItems(HorizontalAlign.Start)
+          .height('100%')
+          .padding({ bottom: 155 })
           .justifyContent(FlexAlign.Center)
-          .backgroundColor('#674625')
-          .shadow({
-            offsetX: 0,
-            offsetY: 20,
-            radius: 20,
-            color: '#95000000'
-          })
+          .visibility(this.homeData.length === 0 || this.homeData.every(item => item.entities.length === 0) ?
+            Visibility.Visible : Visibility.None)
         }
-        .width('100%')
-        .height(this.coverWidth + 45)
-        .justifyContent(FlexAlign.End)
-        .visibility(this.libraryItemsInProgress.length > 0 ? Visibility.Visible : Visibility.None)
 
-        Column() {
-          List() {
-            ForEach(this.libraryItemsFinished, (item: LibraryItem, index) => {
-              ListItem() {
-                Stack({ alignContent: Alignment.Bottom }) {
-                  Image(this.server + `/api/items/${item.id}/cover?format=jpeg&width=1024` + `&token=${this.apitoken}`)
-                    .alt($rawfile('nocover.jpg'))
-                    .width('100%')
-                    .aspectRatio(1)
-                    .borderRadius(10)
-                    .objectFit(ImageFit.Fill)
-                    .onClick(async () => {
-                      this.itemTransfer = item
-                      this.PageIndexTransfer = 3
-                      animateTo({
-                        duration: 300,
-                        curve: Curve.EaseOut,
-                      }, () => {
-                        this.sidebarShow = false
-                      })
-                    })
-                  Progress({
-                    value: this.getProgressById(item.id).progress * 100,
-                    total: 100,
-                    type: ProgressType.Linear
-                  })
-                    .size({ width: '100%', height: 'auto' })
-                    .style({ strokeWidth: 5 })
-                    .color(this.getProgressById(item.id).progress * 100 === 100 ?
-                    Color.Green :
-                    Color.Orange)
-                }
-                .width('100%')
-                .height('100%')
-                .borderRadius(10)
-                .clip(true)
-              }
-              .width(this.coverWidth)
-              .height(this.coverWidth)
-              .borderRadius(10)
-              .padding({ left: 20 })
-            })
-          }
-          .listDirection(Axis.Horizontal)
-          .width('100%')
-          .height(this.coverWidth)
-          .scrollBar(BarState.Off)
-
-          Column() {
-            Text("再次收听")
-              .fontColor('#F2E4C1')
-              .fontSize(16)
-              .backgroundColor(Color.Black)
-              .width(100)
-              .height(23)
-              .margin({ left: 20 })
-              .textAlign(TextAlign.Center)
-              .border({
-                width: 2,
-                color: '#9E9681'
-              })
-          }
-          .width('100%')
-          .height(25)
-          .alignItems(HorizontalAlign.Start)
-          .justifyContent(FlexAlign.Center)
-          .backgroundColor('#674625')
-          .shadow({
-            offsetX: 0,
-            offsetY: 20,
-            radius: 20,
-            color: '#95000000'
-          })
-        }
-        .width('100%')
-        .height(this.coverWidth + 45)
-        .justifyContent(FlexAlign.End)
-        .visibility(this.libraryItemsFinished.length > 0 ? Visibility.Visible : Visibility.None)
       }
       .width('100%')
       .height('100%')
+      .padding({ top: 36, bottom: this.isStartPlaying ? 102 : 20 })
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+      .scrollBar(BarState.Off)
+      .align(Alignment.Top)
 
-      Column() {
-        Text("开始收听")
-          .fontColor(Color.White)
-          .fontSize(32)
-          .margin({ top: 200 })
-          .visibility(this.libraryItemsFinished.length === 0 && this.libraryItemsInProgress.length === 0 &&
-            this.showProgressTransfer === false ?
-          Visibility.Visible : Visibility.None)
-      }
-      .width('100%')
-      .height('100%')
-      .hitTestBehavior(HitTestMode.Transparent)
-
-      // Column() {
-      //   Loading()
-      // }
-      // .width('100%')
-      // .height('100%')
-      // .hitTestBehavior(HitTestMode.Transparent)
     }
     .width('100%')
     .height('100%')
+    .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
+
+    // .onClick(() => {
+    //   this.homeData.forEach((data, index) => {
+    //     console.log(data.id)
+    //   })
+    // })
   }
 }

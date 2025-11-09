@@ -3,6 +3,14 @@
     {
       "name": "start_window_background",
       "value": "#FFFFFF"
+    },
+    {
+      "name": "textInput",
+      "value": "#E6E8E9"
+    },
+    {
+      "name": "sliderBlock",
+      "value": "#3A3A3B"
     }
   ]
 }

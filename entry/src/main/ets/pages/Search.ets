@@ -1,146 +1,260 @@
-import { window } from '@kit.ArkUI';
-import { common } from '@kit.AbilityKit';
-import { LibraryItem, Progress } from '../api/Interface'
-import Loading from './Loading'
+import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit';
+import { LengthMetrics } from '@kit.ArkUI';
+import { Author, Library, LibraryItem, LibraryItemSearchResult, SearchResult, Series } from '../utils/Interface';
+import { searchLibrary } from '../utils/Api';
+import { deviceInfo } from '@kit.BasicServicesKit';
 
-let context = getContext(this) as common.UIAbilityContext;
-let filesDir = context.filesDir;
+let deviceTypeInfo: string = deviceInfo.deviceType;
 
-@Component
-export default struct SearchItems {
-  @State displayWidth: number = 0
-  @State columnsTemplate: string = "1fr"
-  @Consume PageIndexTransfer: number
-  @Consume libraryItems: LibraryItem[]
-  @Consume itemTransfer: LibraryItem
-  @Consume allProgress: Progress[]
-  @Consume searchTransfer: LibraryItem[]
-  @Consume backPageIndex: number
-  @Consume sidebarShow: boolean
-  @State mainWindow: window.Window | null = null
-  @Consume server: string
-  @Consume apitoken: string
+@Builder
+export function searchBuilder(name: string, param: Object) {
+  SearchMedia()
+}
 
-  getProgressById(itemId: string): Progress {
-    let progress: Progress = {
-      id: '',
-      libraryItemId: itemId,
-      episodeId: '',
-      duration: 0,
-      progress: 0,
-      currentTime: 0,
-      isFinished: false,
-      hideFromContinueListening: false,
-      lastUpdate: 0,
-      startedAt: 0,
-      finishedAt: null
-    }
-    for (let element of this.allProgress) {
-      if (element.libraryItemId === itemId) {
-        progress = element
-        progress.progress = Math.round(element.progress * 100) / 100
-        break
-      }
-    }
-    return progress
+@ComponentV2
+export struct SearchMedia {
+  private searchScroller: Scroller = new Scroller();
+  @Consumer() displayWidth: number = 0
+  @Consumer() statusBarHeight: number = 0
+  @Consumer() sideBarContentWidth: number = 0
+  @Consumer() pageInfos: NavPathStack = new NavPathStack();
+  @Consumer() library: Library | undefined = undefined
+  @Consumer() libraryItem: LibraryItem | undefined = undefined
+  @Consumer() searchResult: SearchResult | undefined = undefined
+  @Consumer() showSearch: boolean = false
+  @Consumer() baseUrl: string = ""
+  @Consumer() apiToken: string = ""
+  @Consumer() isStartPlaying: boolean = false
+  @Local showLoadingProgress: boolean = false
+
+  aboutToAppear() {
+    this.searchResult = undefined
   }
 
-  async aboutToAppear() {
-    this.mainWindow = await window.getLastWindow(getContext(this))
-    this.displayWidth = px2vp(this.mainWindow.getWindowProperties().windowRect.width)
-    if (this.displayWidth >= 320 && this.displayWidth < 550) {
-      this.columnsTemplate = "1fr 1fr"
-    } else if (this.displayWidth >= 550 && this.displayWidth < 840) {
-      this.columnsTemplate = "1fr 1fr 1fr 1fr"
-    } else if (this.displayWidth >= 840) {
-      this.columnsTemplate = "1fr 1fr 1fr 1fr 1fr"
-    }
-    this.mainWindow.on('windowSizeChange', (size) => {
-      this.displayWidth = px2vp(size.width)
-      if (this.displayWidth >= 320 && this.displayWidth < 550) {
-        this.columnsTemplate = "1fr 1fr"
-      } else if (this.displayWidth >= 550 && this.displayWidth < 840) {
-        this.columnsTemplate = "1fr 1fr 1fr 1fr"
-      } else if (this.displayWidth >= 840) {
-        this.columnsTemplate = "1fr 1fr 1fr 1fr 1fr"
+  @Builder
+  titleBarBuilder() {
+    Row() {
+      Row() {
+        Search()
+          .width('100%')
+          .height(40)
+          .caretStyle({
+            color: $r('sys.color.font')
+          })
+          .searchButton("   搜索   ", {
+            fontColor: $r('sys.color.font'),
+            autoDisable: true
+          })
+          .onSubmit(async (query) => {
+            if (query.length !== 0) {
+              this.showLoadingProgress = true
+              this.searchResult = await searchLibrary(this.library!.id, encodeURIComponent(query))
+              if (this.searchResult) {
+                this.searchResult.tags = undefined
+                this.searchResult.genres = undefined
+                this.searchResult.narrators = undefined
+                this.searchResult.episodes = undefined
+              }
+              this.showLoadingProgress = false
+            }
+          })
       }
-    })
+      .width(deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 184 : this.sideBarContentWidth - 56)
+      .padding({ left: 16, right: 16 })
+      .margin({ left: 56 })
+    }
+    .width('100%')
+    .justifyContent(FlexAlign.Start)
   }
 
   build() {
-    Column() {
-      Text("搜索结果")
-        .fontColor(Color.White)
-        .fontSize(24)
-        .margin({ top: 20 })
-        .width('100%')
-        .textAlign(TextAlign.Center)
-      Grid() {
-        ForEach(this.searchTransfer, (searchItem: LibraryItem, index) => {
-          GridItem() {
-            Stack({ alignContent: Alignment.Bottom }) {
-              Image(this.server + `/api/items/${searchItem.id}/cover?format=jpeg&width=1024` +
-                `&token=${this.apitoken}`)
-                .alt($rawfile('nocover.jpg'))
-                .width('100%')
-                .aspectRatio(1)
-                .borderRadius(10)
-                .objectFit(ImageFit.Fill)
-                .onClick(async () => {
-                  animateTo({
-                    duration: 300,
-                    curve: Curve.EaseOut,
-                  }, () => {
-                    this.sidebarShow = false
-                  })
-                  for (let item of this.libraryItems) {
-                    if (item.id === searchItem.id) {
-                      this.itemTransfer = item
-                      break
+    HdsNavDestination() {
+      Stack() {
+        List({ scroller: this.searchScroller }) {
+          if (this.library?.mediaType === 'book') {
+            if (this.searchResult && this.searchResult.book!.length > 0) {
+              ListItem() {
+                Column() {
+                  Text("图书")
+                    .fontSize(18)
+                    .fontWeight(FontWeight.Medium)
+                }
+                .margin({ top: 66 + this.statusBarHeight })
+              }
+
+              if (this.displayWidth >= 1000) {
+                ListItem() {
+                  Column()
+                    .margin({ top: 66 + this.statusBarHeight })
+                }
+              }
+
+              if (this.displayWidth >= 1400) {
+                ListItem() {
+                  Column()
+                    .margin({ top: 66 + this.statusBarHeight })
+                }
+              }
+
+              ForEach(this.searchResult.book, (libraryItemSearchResult: LibraryItemSearchResult, index) => {
+                ListItem() {
+                  Row() {
+                    Image(this.baseUrl +
+                      `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
+                      .alt($rawfile('nocover.jpg'))
+                      .objectFit(ImageFit.Cover)
+                      .width(60)
+                      .aspectRatio(1)
+                      .borderRadius(8)
+                      .margin({ right: 10 })
+                      .draggable(false)
+
+                    Column() {
+                      Text(libraryItemSearchResult.libraryItem.media.metadata.title)
+                        .fontSize(17)
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        .margin({ bottom: 5 })
+
+                      Text("by " + (libraryItemSearchResult.libraryItem.media.metadata.authorName ?? "-"))
+                        .fontSize(15)
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
                     }
+                    .alignItems(HorizontalAlign.Start)
                   }
-                  this.backPageIndex = 5
-                  this.PageIndexTransfer = 3
-                })
-              Progress({
-                value: this.getProgressById(searchItem.id).progress * 100,
-                total: 100,
-                type: ProgressType.Linear
+                  .width('100%')
+                  .height(70)
+                  .margin({ bottom: index === this.searchResult!.book!.length - 1 ? (this.isStartPlaying ? 97 : 20) : 0 })
+                  .onClick(() => {
+                    this.libraryItem = libraryItemSearchResult.libraryItem
+                    this.pageInfos.pushPathByName('libraryItemDetail', null)
+                  })
+                }
               })
-                .size({ width: '100%', height: 'auto' })
-                .style({ strokeWidth: 5 })
-                .color(this.getProgressById(searchItem.id).progress * 100 === 100 ?
-                Color.Green :
-                Color.Orange)
             }
-            .width('100%')
-            .borderRadius(10)
-            .clip(true)
+          } else if (this.library?.mediaType === 'podcast') {
+            if (this.searchResult && this.searchResult.podcast!.length > 0) {
+              ListItem() {
+                Column() {
+                  Text("播客")
+                    .fontSize(18)
+                    .fontWeight(FontWeight.Medium)
+                }
+                .margin({ top: 66 + this.statusBarHeight })
+              }
+
+              if (this.displayWidth >= 1000) {
+                ListItem() {
+                  Column()
+                    .margin({ top: 66 + this.statusBarHeight })
+                }
+              }
+
+              if (this.displayWidth >= 1400) {
+                ListItem() {
+                  Column()
+                    .margin({ top: 66 + this.statusBarHeight })
+                }
+              }
+
+              ForEach(this.searchResult.podcast, (libraryItemSearchResult: LibraryItemSearchResult, index) => {
+                ListItem() {
+                  Row() {
+                    Image(this.baseUrl +
+                      `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
+                      .alt($rawfile('nocover.jpg'))
+                      .objectFit(ImageFit.Cover)
+                      .width(60)
+                      .aspectRatio(1)
+                      .borderRadius(8)
+                      .margin({ right: 10 })
+                      .draggable(false)
+
+                    Column() {
+                      Text(libraryItemSearchResult.libraryItem.media.metadata.title)
+                        .fontSize(17)
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        .margin({ bottom: 5 })
+
+                      Text("by " + (libraryItemSearchResult.libraryItem.media.metadata.author ?? "-"))
+                        .fontSize(15)
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    }
+                    .alignItems(HorizontalAlign.Start)
+                  }
+                  .width('100%')
+                  .height(70)
+                  .margin({ bottom: index === this.searchResult!.podcast!.length - 1 ? (this.isStartPlaying ? 97 : 20) : 0 })
+                  .onClick(() => {
+                    this.libraryItem = libraryItemSearchResult.libraryItem
+                    this.pageInfos.pushPathByName('libraryItemDetail', null)
+                  })
+                }
+              })
+            }
           }
-          .borderRadius(10)
+        }
+        .width('100%')
+        .height('100%')
+        .padding({
+          left: 20,
+          right: 20
         })
+        .lanes(this.displayWidth >= 1400 ? 3 : (this.displayWidth >= 1000 ? 2 : 1))
+        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+        .scrollBar(BarState.Off)
+        .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
+
+        if (!this.searchResult || Object.values(this.searchResult)
+          .every((arr: LibraryItemSearchResult[] | string[] | Author[] | Series[]) => (arr?.length ?? 0) === 0)) {
+          Column() {
+            Text("没有结果")
+              .fontSize(34)
+          }
+          .width('100%')
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
+          .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
+        }
+
+        Column() {
+          LoadingProgress()
+            .width("100%")
+            .height(72)
+            .color($r('sys.color.loading_progress_focused_color'))
+        }
+        .height('100%')
+        .width('100%')
+        .justifyContent(FlexAlign.Center)
+        .visibility(this.showLoadingProgress === true ? Visibility.Visible : Visibility.None)
       }
-      .columnsTemplate(this.columnsTemplate)
-      .columnsGap(20)
-      .rowsGap(20)
-      .padding({
-        top: 20,
-        bottom: 20,
-        left: 15,
-        right: 15
-      })
       .width('100%')
       .height('100%')
-      .scrollBar(BarState.Off)
-      .visibility(this.searchTransfer.length !== 0 ? Visibility.Visible : Visibility.None)
-
-      Text("没有项目")
-        .fontColor(Color.White)
-        .fontSize(32)
-        .margin({ top: 200 })
-        .visibility(this.searchTransfer.length === 0 ? Visibility.Visible : Visibility.None)
+      .alignContent(Alignment.End)
     }
     .width('100%')
     .height('100%')
+    .titleBar({
+      avoidLayoutSafeArea: true,
+      enableComponentSafeArea: false,
+      padding: {
+        start: LengthMetrics.vp(16),
+        end: LengthMetrics.vp(16)
+      },
+      style: {
+        scrollEffectOpts: {
+          enableScrollEffect: true
+        }
+      },
+      content: {
+        stackBuilder: (): void => this.titleBarBuilder()
+      }
+    })
+    .hideBackButton(false)
+    .backgroundColor($r('sys.color.background_secondary'))
+    .bindToScrollable([this.searchScroller])
   }
 }

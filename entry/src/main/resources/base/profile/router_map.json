@@ -1,0 +1,24 @@
+{
+  "routerMap": [
+    {
+      "name": "search",
+      "pageSourceFile": "src/main/ets/pages/Search.ets",
+      "buildFunction": "searchBuilder"
+    },
+    {
+      "name": "filterItems",
+      "pageSourceFile": "src/main/ets/pages/FilterItems.ets",
+      "buildFunction": "filterItemsBuilder"
+    },
+    {
+      "name": "libraryItemDetail",
+      "pageSourceFile": "src/main/ets/pages/LibraryItemDetail.ets",
+      "buildFunction": "libraryItemDetailBuilder"
+    },
+    {
+      "name": "episodeDetail",
+      "pageSourceFile": "src/main/ets/pages/EpisodeDetail.ets",
+      "buildFunction": "episodeDetailBuilder"
+    }
+  ]
+}

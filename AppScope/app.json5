@@ -1,10 +1,10 @@
 {
   "app": {
     "bundleName": "com.shanyan.harmshelf",
-    "vendor": "shanyan",
-    "versionCode": 1000000,
-    "versionName": "1.1.0",
-    "icon": "$media:app_icon",
+    "vendor": "example",
+    "versionCode": 2000000,
+    "versionName": "2.0.0",
+    "icon": "$media:layered_image",
     "label": "$string:app_name"
   }
 }
