@@ -1,4 +1,4 @@
-import { common, ConfigurationConstant } from "@kit.AbilityKit"
+import { common, ConfigurationConstant, Want } from "@kit.AbilityKit"
 import { PersistenceV2 } from "@kit.ArkUI";
 import { ColorMode, PlaySetting, ServerIndex, ServerSetting } from "../pages/Index";
 import { getLibraries, getLogin, getUser } from "../utils/Api";
@@ -6,6 +6,10 @@ import { env } from "../utils/Class";
 import { Library, LoginInfo, PlayItem, User } from "../utils/Interface";
 import { avSession } from "@kit.AVSessionKit";
 import { BusinessError } from '@kit.BasicServicesKit';
+import { bundleManager } from '@kit.AbilityKit';
+
+let bundleFlags = bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT;
+let bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleFlags)
 
 @ComponentV2
 export struct Setting {
@@ -766,6 +770,7 @@ export struct Setting {
             Button({ type: ButtonType.Circle }) {
               Text(this.playSetting!.skipIntervals + "s")
                 .fontSize(18)
+                .fontColor($r('sys.color.font'))
             }
             .height(40)
             .width(40)
@@ -802,6 +807,53 @@ export struct Setting {
         .borderRadius(8)
         .padding({ left: 20, right: 20, bottom: 10 })
         .margin({ top: 20 })
+
+        Column() {
+          Text("Harmshelf")
+            .fontSize(22)
+            .fontWeight(FontWeight.Bold)
+          Text("Audiobookshelf的鸿蒙原生客户端")
+            .fontSize(18)
+            .fontColor($r('sys.color.font_secondary'))
+            .margin({ top: 10 })
+          Row() {
+            Text("版本号")
+              .fontSize(20)
+            Text('v' + bundleInfo.versionName)
+              .fontSize(18)
+          }
+          .width('100%')
+          .margin({ top: 15 })
+          .justifyContent(FlexAlign.SpaceBetween)
+
+          Row() {
+            Text("项目地址")
+              .fontSize(20)
+            Image($r('app.media.github'))
+              .width(25)
+              .height(25)
+              .draggable(false)
+              .onClick(() => {
+                let want: Want = {
+                  action: 'ohos.want.action.viewData',
+                  entities: ['entity.system.browsable'],
+                  uri: 'https://github.com/shanyan-wcx/Harmshelf'
+                };
+                this.context!.startAbility(want)
+              })
+          }
+          .width('100%')
+          .margin({ top: 12 })
+          .justifyContent(FlexAlign.SpaceBetween)
+        }
+        .width('100%')
+        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
+          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
+          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
+          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
+        .borderRadius(8)
+        .margin({ top: 20 })
+        .padding(20)
       }
     }
     .width('100%')
