@@ -11,6 +11,7 @@ export struct Stats {
   @Consumer() showLoadingProgress: boolean = false
   @Consumer() library: Library | undefined = undefined
   @Consumer() isStartPlaying: boolean = false
+  @Consumer() baseUrl: string = ""
   @Local colorMode: ConfigurationConstant.ColorMode | undefined = env.colorMode
   @Local stats: ListeningStats | undefined = undefined
   @Local chart: UChartsController = new UChartsController()
@@ -97,38 +98,40 @@ export struct Stats {
   }
 
   async aboutToAppear() {
-    this.showLoadingProgress = true
-    this.stats = await getStats()
-    this.finishedNum = (await getUser())?.mediaProgress.filter(p => p.isFinished).length??-1
-    const weekMap: string[] = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
-    if (this.stats && this.stats.days) {
-      const daysObj = this.stats.days
-      const today = new Date()
-      for (let offset = 6; offset >= 0; offset--) {
-        const d = new Date(today.getTime())
-        d.setDate(today.getDate() - offset)
-        const year = d.getFullYear()
-        const month = (d.getMonth() + 1).toString().padStart(2, '0')
-        const day = d.getDate().toString().padStart(2, '0')
-        const dateStr = `${year}-${month}-${day}`
-        let rawValue: number | undefined = daysObj[dateStr]
-        if (rawValue === undefined) {
-          rawValue = 0
+    if (this.baseUrl !== "") {
+      this.showLoadingProgress = true
+      this.stats = await getStats()
+      this.finishedNum = (await getUser())?.mediaProgress.filter(p => p.isFinished).length??-1
+      const weekMap: string[] = ["星期日", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六"]
+      if (this.stats && this.stats.days) {
+        const daysObj = this.stats.days
+        const today = new Date()
+        for (let offset = 6; offset >= 0; offset--) {
+          const d = new Date(today.getTime())
+          d.setDate(today.getDate() - offset)
+          const year = d.getFullYear()
+          const month = (d.getMonth() + 1).toString().padStart(2, '0')
+          const day = d.getDate().toString().padStart(2, '0')
+          const dateStr = `${year}-${month}-${day}`
+          let rawValue: number | undefined = daysObj[dateStr]
+          if (rawValue === undefined) {
+            rawValue = 0
+          }
+          const minuteValue = Math.round(rawValue / 60)
+          this.weekdays.push(weekMap[d.getDay()])
+          this.minutes.push(minuteValue)
         }
-        const minuteValue = Math.round(rawValue / 60)
-        this.weekdays.push(weekMap[d.getDay()])
-        this.minutes.push(minuteValue)
       }
+      this.updateChart()
+      this.timerId = setInterval(() => {
+        const currentMode = env.colorMode
+        if (currentMode !== this.lastMode) {
+          this.lastMode = currentMode
+          this.updateChart()
+        }
+      }, 1000)
+      this.showLoadingProgress = false
     }
-    this.updateChart()
-    this.timerId = setInterval(() => {
-      const currentMode = env.colorMode
-      if (currentMode !== this.lastMode) {
-        this.lastMode = currentMode
-        this.updateChart()
-      }
-    }, 1000)
-    this.showLoadingProgress = false
   }
 
   aboutToDisappear() {
