@@ -549,6 +549,48 @@ export struct Setting {
       .width('100%')
       .margin({ top: 12 })
       .justifyContent(FlexAlign.SpaceBetween)
+
+      Row() {
+        Text("隐私政策")
+          .fontSize(20)
+        Text("访问链接")
+          .fontSize(20)
+          .decoration({
+            type: TextDecorationType.Underline
+          })
+          .onClick(() => {
+            let want: Want = {
+              action: 'ohos.want.action.viewData',
+              entities: ['entity.system.browsable'],
+              uri: 'https://agreement-drcn.hispace.dbankcloud.cn/index.html?lang=zh&agreementId=1805336854753467840'
+            };
+            this.context!.startAbility(want)
+          })
+      }
+      .width('100%')
+      .margin({ top: 12 })
+      .justifyContent(FlexAlign.SpaceBetween)
+
+      Row() {
+        Text("用户协议")
+          .fontSize(20)
+        Text("访问链接")
+          .fontSize(20)
+          .decoration({
+            type: TextDecorationType.Underline
+          })
+          .onClick(() => {
+            let want: Want = {
+              action: 'ohos.want.action.viewData',
+              entities: ['entity.system.browsable'],
+              uri: 'https://harmshelf-user.shanyan.work'
+            };
+            this.context!.startAbility(want)
+          })
+      }
+      .width('100%')
+      .margin({ top: 13, bottom: 5 })
+      .justifyContent(FlexAlign.SpaceBetween)
     }
     .width('100%')
     .padding({ left: 20, right: 20, bottom: 25 })
