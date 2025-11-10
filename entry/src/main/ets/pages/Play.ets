@@ -900,7 +900,7 @@ export struct Play {
                   .width(50)
                   .backgroundColor(Color.Transparent)
                   .onClick(() => {
-                    this.avPlayer!.seek(this.playedTime - this.playSetting!.gobackwardTime > 0 ? (this.playedTime - this.playSetting!.gobackwardTime) * 1000 : 0)
+                    this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ? (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
                   })
                   .visibility(this.lockPlayer ? Visibility.Hidden : Visibility.Visible)
 
@@ -938,7 +938,7 @@ export struct Play {
                   .width(50)
                   .backgroundColor(Color.Transparent)
                   .onClick(() => {
-                    this.avPlayer!.seek(this.playedTime + this.playSetting!.goforwardTime < this.playingItem!.audioTracks[this.playingIndex].duration ? (this.playedTime + this.playSetting!.goforwardTime) * 1000 : this.playingItem!.audioTracks[this.playingIndex].duration * 1000)
+                    this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < this.playingItem!.audioTracks[this.playingIndex].duration ? (this.playedTime + this.playSetting!.skipIntervals) * 1000 : this.playingItem!.audioTracks[this.playingIndex].duration * 1000)
                   })
                   .visibility(this.lockPlayer ? Visibility.Hidden : Visibility.Visible)
 
@@ -1202,8 +1202,8 @@ export struct Play {
           startButtons: [new ActionBarButton({
             baseIcon: this.gobackwardIcon,
             onClick: () => {
-              this.avPlayer!.seek(this.playedTime - this.playSetting!.gobackwardTime > 0 ?
-                (this.playedTime - this.playSetting!.gobackwardTime) * 1000 : 0)
+              this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ?
+                (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
             }
           }), new ActionBarButton({
             baseIcon: $r('sys.symbol.stop_circle'),
@@ -1231,9 +1231,9 @@ export struct Play {
           }), new ActionBarButton({
             baseIcon: this.goforwardIcon,
             onClick: () => {
-              this.avPlayer!.seek(this.playedTime + this.playSetting!.goforwardTime <
+              this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals <
               this.playingItem!.audioTracks[this.playingIndex].duration ?
-                (this.playedTime + this.playSetting!.goforwardTime) * 1000 :
+                (this.playedTime + this.playSetting!.skipIntervals) * 1000 :
                 this.playingItem!.audioTracks[this.playingIndex].duration * 1000)
             }
           })],

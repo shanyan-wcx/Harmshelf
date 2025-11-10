@@ -3,7 +3,9 @@ import { PersistenceV2 } from "@kit.ArkUI";
 import { ColorMode, PlaySetting, ServerIndex, ServerSetting } from "../pages/Index";
 import { getLibraries, getLogin, getUser } from "../utils/Api";
 import { env } from "../utils/Class";
-import { Library, LoginInfo, User } from "../utils/Interface";
+import { Library, LoginInfo, PlayItem, User } from "../utils/Interface";
+import { avSession } from "@kit.AVSessionKit";
+import { BusinessError } from '@kit.BasicServicesKit';
 
 @ComponentV2
 export struct Setting {
@@ -20,6 +22,7 @@ export struct Setting {
   @Consumer() baseUrl: string = ""
   @Consumer() username: string = ""
   @Consumer() password: string = ""
+  @Consumer() apiToken: string = ""
   @Consumer() libraries: Library[] = []
   @Consumer() library: Library | undefined = undefined
   @Consumer() selectLibraryIndex: number = 0
@@ -27,6 +30,10 @@ export struct Setting {
   @Consumer() user: User | undefined = undefined
   @Consumer() isConnect: boolean = false
   @Consumer() isStartPlaying: boolean = false
+  @Consumer() playingItem: PlayItem | undefined = undefined
+  @Consumer() playingTitle: string = "-"
+  @Consumer() playingIndex: number = 0
+  @Consumer() session: avSession.AVSession | undefined = undefined
   @Local showProgress:boolean = false
   @Local showAddServer: boolean = false
   @Local showEditServer: boolean = false
@@ -45,6 +52,22 @@ export struct Setting {
   }, {
     value: "黑暗模式"
   }]
+
+  async setSessionInfo() {
+    let metadata: avSession.AVMetadata = {
+      assetId: this.playingIndex.toString(),
+      title: this.playingTitle,
+      subtitle: this.playingItem!.displayAuthor,
+      duration: this.playingItem!.audioTracks[this.playingIndex].duration * 1000,
+      mediaImage: this.baseUrl + `/api/items/${this.playingItem!.libraryItemId}/cover?token=${this.apiToken}`,
+      skipIntervals: this.playSetting!.skipIntervals
+    };
+    this.session!.setAVMetadata(metadata).then(() => {
+      console.info(`SetAVMetadata successfully`);
+    }).catch((err: BusinessError) => {
+      console.error(`Failed to set AVMetadata. Code: ${err.code}, message: ${err.message}`);
+    });
+  }
 
   @Builder
   AddServerBuilder() {
@@ -735,63 +758,36 @@ export struct Setting {
           .justifyContent(FlexAlign.SpaceBetween)
 
           Row() {
-            Text("快退时间")
+            Text("快进快退时间")
               .fontSize(20)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
             Button({ type: ButtonType.Circle }) {
-              SymbolGlyph(this.gobackwardIcon)
-                .fontSize(30)
-                .fontColor([$r('sys.color.font')])
+              Text(this.playSetting!.skipIntervals + "s")
+                .fontSize(18)
             }
             .height(40)
             .width(40)
             .backgroundColor(Color.Transparent)
-            .onClick(() => {
+            .onClick(async () => {
               if (this.playSetting) {
-                if (this.playSetting.gobackwardTime === 10) {
-                  this.playSetting.gobackwardTime = 15
+                if (this.playSetting.skipIntervals === 10) {
+                  this.playSetting.skipIntervals = 15
                   this.gobackwardIcon = $r('sys.symbol.gobackward_15')
-                } else if (this.playSetting.gobackwardTime === 15) {
-                  this.playSetting.gobackwardTime = 30
-                  this.gobackwardIcon = $r('sys.symbol.gobackward_30')
-                } else {
-                  this.playSetting.gobackwardTime = 10
-                  this.gobackwardIcon = $r('sys.symbol.gobackward_10')
-                }
-              }
-            })
-          }
-          .width('100%')
-          .justifyContent(FlexAlign.SpaceBetween)
-
-          Row() {
-            Text("快进时间")
-              .fontSize(20)
-              .maxLines(1)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-
-            Button({ type: ButtonType.Circle }) {
-              SymbolGlyph(this.goforwardIcon)
-                .fontSize(30)
-                .fontColor([$r('sys.color.font')])
-            }
-            .height(40)
-            .width(40)
-            .backgroundColor(Color.Transparent)
-            .onClick(() => {
-              if (this.playSetting) {
-                if (this.playSetting.goforwardTime === 10) {
-                  this.playSetting.goforwardTime = 15
                   this.goforwardIcon = $r('sys.symbol.goforward_15')
-                } else if (this.playSetting.goforwardTime === 15) {
-                  this.playSetting.goforwardTime = 30
+                } else if (this.playSetting.skipIntervals === 15) {
+                  this.playSetting.skipIntervals = 30
+                  this.gobackwardIcon = $r('sys.symbol.gobackward_30')
                   this.goforwardIcon = $r('sys.symbol.goforward_30')
                 } else {
-                  this.playSetting.goforwardTime = 10
+                  this.playSetting.skipIntervals = 10
+                  this.gobackwardIcon = $r('sys.symbol.gobackward_10')
                   this.goforwardIcon = $r('sys.symbol.goforward_10')
                 }
+              }
+              if (this.isStartPlaying) {
+                await this.setSessionInfo()
               }
             })
           }
@@ -804,7 +800,7 @@ export struct Setting {
           this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
           $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
         .borderRadius(8)
-        .padding({ left: 20, right: 20, bottom: 20 })
+        .padding({ left: 20, right: 20, bottom: 10 })
         .margin({ top: 20 })
       }
     }

@@ -56,8 +56,7 @@ export class ColorMode {
 @ObservedV2
 export class PlaySetting {
   @Trace fadeInOut: boolean = false
-  @Trace gobackwardTime: number = 10
-  @Trace goforwardTime: number = 10
+  @Trace skipIntervals: number = 10
 }
 
 @Entry
@@ -300,7 +299,8 @@ struct Index {
       title: this.playingTitle,
       subtitle: this.playingItem!.displayAuthor,
       duration: this.playingItem!.audioTracks[this.playingIndex].duration * 1000,
-      mediaImage: this.baseUrl + `/api/items/${this.playingItem!.libraryItemId}/cover?token=${this.apiToken}`
+      mediaImage: this.baseUrl + `/api/items/${this.playingItem!.libraryItemId}/cover?token=${this.apiToken}`,
+      skipIntervals: this.playSetting!.skipIntervals
     };
     this.session!.setAVMetadata(metadata).then(() => {
       console.info(`SetAVMetadata successfully`);
@@ -349,10 +349,10 @@ struct Index {
       this.avPlayer!.seek(time)
     });
     this.session!.on('rewind', () => {
-      this.avPlayer!.seek(this.playedTime - this.playSetting!.gobackwardTime > 0 ? (this.playedTime - this.playSetting!.gobackwardTime) * 1000 : 0)
+      this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ? (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
     })
     this.session!.on('fastForward', () => {
-      this.avPlayer!.seek(this.playedTime + this.playSetting!.goforwardTime < this.playingItem!.audioTracks[this.playingIndex].duration ? (this.playedTime + this.playSetting!.goforwardTime) * 1000 : this.playingItem!.audioTracks[this.playingIndex].duration * 1000)
+      this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < this.playingItem!.audioTracks[this.playingIndex].duration ? (this.playedTime + this.playSetting!.skipIntervals) * 1000 : this.playingItem!.audioTracks[this.playingIndex].duration * 1000)
     })
     if (this.playingIndex > 0) {
       this.session!.on('playPrevious', async () => {
@@ -636,18 +636,14 @@ struct Index {
       this.selectThemeIndex = 2
     }
     if (this.playSetting) {
-      if (this.playSetting.gobackwardTime === 10) {
+      if (this.playSetting.skipIntervals === 10) {
         this.gobackwardIcon = $r('sys.symbol.gobackward_10')
-      } else if (this.playSetting.gobackwardTime === 15) {
-        this.gobackwardIcon = $r('sys.symbol.gobackward_15')
-      } else {
-        this.gobackwardIcon = $r('sys.symbol.gobackward_30')
-      }
-      if (this.playSetting.goforwardTime === 10) {
         this.goforwardIcon = $r('sys.symbol.goforward_10')
-      } else if (this.playSetting.goforwardTime === 15) {
+      } else if (this.playSetting.skipIntervals === 15) {
+        this.gobackwardIcon = $r('sys.symbol.gobackward_15')
         this.goforwardIcon = $r('sys.symbol.goforward_15')
       } else {
+        this.gobackwardIcon = $r('sys.symbol.gobackward_30')
         this.goforwardIcon = $r('sys.symbol.goforward_30')
       }
     }
