@@ -125,7 +125,7 @@ export struct SearchMedia {
                   }
                   .width('100%')
                   .height(70)
-                  .margin({ bottom: index === this.searchResult!.book!.length - 1 ? (this.isStartPlaying ? 97 : 20) : 0 })
+                  .margin({ bottom: index === this.searchResult!.book!.length - 1 ? (this.isStartPlaying ? 99 : 20) : 0 })
                   .onClick(() => {
                     this.libraryItem = libraryItemSearchResult.libraryItem
                     this.pageInfos.pushPathByName('libraryItemDetail', null)
@@ -187,7 +187,7 @@ export struct SearchMedia {
                   }
                   .width('100%')
                   .height(70)
-                  .margin({ bottom: index === this.searchResult!.podcast!.length - 1 ? (this.isStartPlaying ? 97 : 20) : 0 })
+                  .margin({ bottom: index === this.searchResult!.podcast!.length - 1 ? (this.isStartPlaying ? 99 : 20) : 0 })
                   .onClick(() => {
                     this.libraryItem = libraryItemSearchResult.libraryItem
                     this.pageInfos.pushPathByName('libraryItemDetail', null)

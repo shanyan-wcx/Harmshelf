@@ -330,7 +330,7 @@ export struct SubHome {
       }
       .width('100%')
       .height('100%')
-      .padding({ top: 36, bottom: this.isStartPlaying ? 102 : 20 })
+      .padding({ top: 36, bottom: this.isStartPlaying ? 104 : 20 })
       .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)

@@ -102,7 +102,7 @@ export struct Add {
               }
               .width('100%')
               .height(70)
-              .margin({ bottom: index === this.searchPodcasts.length - 1 ? (this.isStartPlaying ? 92 : 10) : 0 })
+              .margin({ bottom: index === this.searchPodcasts.length - 1 ? (this.isStartPlaying ? 94 : 10) : 0 })
               .onClick(async () => {
                 this.podcast = await getFeed(searchPodcast.feedUrl)
                 if (this.podcast) {
@@ -144,7 +144,7 @@ export struct Add {
       .width('100%')
       .height('100%')
       .layoutWeight(1)
-      .padding({ top: 36 + 70, bottom: this.isStartPlaying ? 82 : 0 })
+      .padding({ top: 36 + 70, bottom: this.isStartPlaying ? 84 : 0 })
       .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
 

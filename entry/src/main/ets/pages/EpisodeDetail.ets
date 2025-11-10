@@ -290,7 +290,7 @@ export struct EpisodeDetail {
           top: 56 + this.statusBarHeight,
           left: 20,
           right: 20,
-          bottom: this.isStartPlaying ? 87 : 10
+          bottom: this.isStartPlaying ? 89 : 10
         })
         .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
         .scrollBar(BarState.Off)

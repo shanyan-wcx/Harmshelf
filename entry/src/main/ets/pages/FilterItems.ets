@@ -132,7 +132,7 @@ export struct FilterItems {
             left: 20,
             right: 20,
             top: 64 + this.statusBarHeight,
-            bottom: this.isStartPlaying ? 82 : 0
+            bottom: this.isStartPlaying ? 84 : 0
           })
           .onReachEnd(async () => {
 

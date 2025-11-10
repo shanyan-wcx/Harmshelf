@@ -41,7 +41,7 @@ export struct RecentEpisodes {
       }
       .width('100%')
       .height('100%')
-      .padding({ top: 36, left: 20, right: 20, bottom: this.isStartPlaying ? 102 : 20 })
+      .padding({ top: 36, left: 20, right: 20, bottom: this.isStartPlaying ? 104 : 20 })
       .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .onReachEnd(async () => {
@@ -61,7 +61,7 @@ export struct RecentEpisodes {
       }
       .position({
         right: 15,
-        bottom: this.isStartPlaying ? 97 : 15
+        bottom: this.isStartPlaying ? 99 : 15
       })
       .animation({ duration: 510, curve: Curve.EaseInOut })
       .width(36)

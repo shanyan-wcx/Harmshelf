@@ -19,7 +19,7 @@ export struct AllSeries {
               SeriesItemComponent({
                 series: series
               })
-                .margin({ bottom: index === this.series.length - 1 ? (this.isStartPlaying ? 102 : 20 ): 0 })
+                .margin({ bottom: index === this.series.length - 1 ? (this.isStartPlaying ? 104 : 20 ): 0 })
             }
           })
         }
@@ -62,7 +62,7 @@ export struct AllSeries {
       }
       .position({
         right: 15,
-        bottom: this.isStartPlaying ? 97 : 15
+        bottom: this.isStartPlaying ? 99 : 15
       })
       .animation({ duration: 510, curve: Curve.EaseInOut })
       .width(36)

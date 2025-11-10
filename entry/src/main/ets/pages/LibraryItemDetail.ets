@@ -1078,7 +1078,7 @@ export struct LibraryItemDetail {
           top: 76 + this.statusBarHeight,
           left: 20,
           right: 20,
-          bottom: this.isStartPlaying ? 82 : 0
+          bottom: this.isStartPlaying ? 84 : 0
         })
         .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
         .scrollBar(BarState.Off)
@@ -1095,7 +1095,7 @@ export struct LibraryItemDetail {
           }
           .position({
             right: 15,
-            bottom: this.isStartPlaying ? 97 : 15
+            bottom: this.isStartPlaying ? 99 : 15
           })
           .animation({ duration: 510, curve: Curve.EaseInOut })
           .width(36)
