@@ -60,6 +60,8 @@ export struct LibraryItemDetail {
   @Local moreMenus: MenuElement[] = []
   @Local showPlayLoading: boolean = false
   @Local showConfirm: boolean = false
+  @Local tmpPlayingItem: PlayItem | undefined = undefined
+  @Local tmpPlayingIndex: number = 0
   @Monitor('syncTime')
   async refreshProgress(monitor: IMonitor) {
     this.itemProgress = undefined
@@ -215,7 +217,9 @@ export struct LibraryItemDetail {
         .layoutWeight(1)
         .borderRadius(8)
         .onClick(async () => {
-          if (this.playingItem) {
+          if (this.tmpPlayingItem) {
+            this.playingItem = this.tmpPlayingItem
+            this.playingIndex = this.tmpPlayingIndex
             await this.avPlayer!.reset();
             this.isStartPlaying = true
             this.isPlaying = true
@@ -301,11 +305,6 @@ export struct LibraryItemDetail {
                         this.isStartPlaying = true
                         this.isPlaying = true
                         await this.getPlayContent(this.playingItem!)
-                      } else {
-                        this.getUIContext().getPromptAction().showToast({
-                          message: '播放失败，请检查网络！',
-                          duration: 500
-                        });
                       }
                     } else if (this.library?.mediaType === 'podcast') {
                       this.playingItem = await getPlayItem(this.libraryItem!.id, this.libraryItem!.media.episodes![0].id!)
@@ -320,11 +319,6 @@ export struct LibraryItemDetail {
                         console.log("共", this.playingItem!.audioTracks.length, "条音轨")
                         console.log("播放序号为", this.playingIndex)
                         console.log("起始位置为", this.playStartTime)
-                      } else {
-                        this.getUIContext().getPromptAction().showToast({
-                          message: '播放失败，请检查网络！',
-                          duration: 500
-                        });
                       }
                     }
                     this.showPlayLoading = false
@@ -801,15 +795,10 @@ export struct LibraryItemDetail {
                               type: TextDecorationType.Underline
                             })
                             .onClick(async () => {
-                              this.playingItem = await getPlayItem(this.libraryItem!.id)
-                              if (this.playingItem) {
-                                this.playingIndex = index
+                              this.tmpPlayingItem = await getPlayItem(this.libraryItem!.id)
+                              if (this.tmpPlayingItem) {
+                                this.tmpPlayingIndex = index
                                 this.showConfirm = !this.showConfirm;
-                              } else {
-                                this.getUIContext().getPromptAction().showToast({
-                                  message: '未获取到播放项目！',
-                                  duration: 500
-                                });
                               }
                             })
                         }

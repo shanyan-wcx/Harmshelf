@@ -783,11 +783,6 @@ export struct EpisodeComponent {
             console.log("共", this.playingItem!.audioTracks.length, "条音轨")
             console.log("播放序号为", this.playingIndex)
             console.log("起始位置为", this.playStartTime)
-          } else {
-            this.getUIContext().getPromptAction().showToast({
-              message: '播放失败，请检查网络！',
-              duration: 500
-            });
           }
         })
 
@@ -971,11 +966,6 @@ export struct EpisodeComponent1 {
             console.log("共", this.playingItem!.audioTracks.length, "条音轨")
             console.log("播放序号为", this.playingIndex)
             console.log("起始位置为", this.playStartTime)
-          } else {
-            this.getUIContext().getPromptAction().showToast({
-              message: '播放失败，请检查网络！',
-              duration: 500
-            });
           }
         })
 
