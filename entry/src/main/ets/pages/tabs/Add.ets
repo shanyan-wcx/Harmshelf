@@ -125,6 +125,7 @@ export struct Add {
             }
             .width('100%')
             .height('100%')
+            .padding({ bottom: 210 })
             .justifyContent(FlexAlign.Center)
             .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
           }
@@ -144,7 +145,7 @@ export struct Add {
       .width('100%')
       .height('100%')
       .layoutWeight(1)
-      .padding({ top: 36 + 70, bottom: this.isStartPlaying ? 84 : 0 })
+      .padding({ top: 36 + 75, bottom: this.isStartPlaying ? 84 : 0 })
       .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
 

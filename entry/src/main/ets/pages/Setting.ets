@@ -872,7 +872,7 @@ export struct Setting {
               .fontColor($r('sys.color.font'))
 
             SymbolGlyph($r('sys.symbol.chevron_right'))
-              .fontSize(22)
+              .fontSize(26)
               .fontColor([$r('sys.color.font')])
               .hitTestBehavior(HitTestMode.None)
           }

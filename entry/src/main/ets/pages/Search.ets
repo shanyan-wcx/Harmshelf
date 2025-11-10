@@ -59,7 +59,7 @@ export struct SearchMedia {
             }
           })
       }
-      .width(deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 184 : this.sideBarContentWidth - 56)
+      .width(deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 214 : this.sideBarContentWidth - 56)
       .padding({ left: 16, right: 16 })
       .margin({ left: 56 })
     }

@@ -321,7 +321,7 @@ export struct SubHome {
           }
           .width('100%')
           .height('100%')
-          .padding({ bottom: 155 })
+          .padding({ bottom: 115 })
           .justifyContent(FlexAlign.Center)
           .visibility(this.homeData.length === 0 || this.homeData.every(item => item.entities.length === 0) ?
             Visibility.Visible : Visibility.None)

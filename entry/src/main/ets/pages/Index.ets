@@ -668,7 +668,7 @@ struct Index {
           .textOverflow({ overflow: TextOverflow.Ellipsis })
       }
       .width('100%')
-      .margin({ bottom: 20 })
+      .margin({ bottom: 20, top: deviceTypeInfo === '2in1' ? 5 : 0 })
       .padding({ left: 20, right: 20 })
 
       HdsSideMenu({
