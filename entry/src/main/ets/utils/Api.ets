@@ -8,7 +8,6 @@ import {
   LoginUser,
   Library,
   LibraryItem,
-  Chapter,
   Progress,
   PlayItem,
   PlayData,
@@ -148,9 +147,6 @@ export async function getLibraries(): Promise<Library[]> {
     console.log("获取媒体库成功！")
 
     libraries = response.data.libraries
-    //   .filter((item: Library) => {
-    //   return item.mediaType === "book";
-    // });
     libraries.forEach(element => {
       libraryNames.push(element.name)
     });
