@@ -135,6 +135,7 @@ struct Index {
   @Local uiContext: UIContext | undefined = undefined
   @Local mainWindow: window.Window | undefined = undefined
   @Local elapsedTime: number = 0
+  @Local isSyncing: boolean = false
   pages?: HdsSideMenuMainItem[] = [
     new HdsSideMenuMainItem({
       symbol: new SymbolGlyphModifier($r('sys.symbol.house')),
@@ -181,6 +182,7 @@ struct Index {
   }
 
   fadeIn() {
+    this.isPlaying = true
     let duration = 1000
     let volume = 0;
     const step = 50; // 调整间隔时间，单位 ms
@@ -199,6 +201,7 @@ struct Index {
   }
 
   fadeOut() {
+    this.isPlaying = false
     let duration = 1000
     let volume = 1.0; // 假设当前音量是最大值
     const step = 50; // 调整间隔时间，单位 ms
@@ -216,44 +219,49 @@ struct Index {
   }
 
   async syncProgress() {
-    let bundleFlags = bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT;
-    let bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleFlags)
-    let updateSession: UpdateSession = {
-      deviceInfo: {
-        id: deviceInfo.displayVersion,
-        userId: this.playingItem!.userId,
-        deviceName: deviceInfo.marketName,
-        clientName: "Harmshelf",
-        clientVersion: bundleInfo.versionName
-      },
-      mediaPlayer: "avPlayer",
-      currentTime: this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playedTime,
-      timeListened: new Date().getTime() / 1000 - this.syncTime
-    }
-    for (let element of this.progress) {
-      if (this.playingItem!.mediaType === 'book' ? element.libraryItemId === this.playingItem!.libraryItemId : element.episodeId === this.playingItem!.episodeId) {
-        element.duration = this.playingItem!.duration
-        element.currentTime = this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playedTime
-        element.progress = element.currentTime / element.duration
-        element.isFinished = element.progress === 1 ? true : false
-        break
+    if (!this.isSyncing) {
+      this.isSyncing = true
+      let bundleFlags = bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT;
+      let bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleFlags)
+      let updateSession: UpdateSession = {
+        deviceInfo: {
+          id: deviceInfo.displayVersion,
+          userId: this.playingItem!.userId,
+          deviceName: deviceInfo.marketName,
+          clientName: "Harmshelf",
+          clientVersion: bundleInfo.versionName
+        },
+        mediaPlayer: "avPlayer",
+        currentTime: this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playedTime,
+        timeListened: new Date().getTime() / 1000 - this.syncTime
       }
+      for (let element of this.progress) {
+        if (this.playingItem!.mediaType === 'book' ? element.libraryItemId === this.playingItem!.libraryItemId : element.episodeId === this.playingItem!.episodeId) {
+          element.duration = this.playingItem!.duration
+          element.currentTime = this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playedTime
+          element.progress = element.currentTime / element.duration
+          element.isFinished = element.progress === 1 ? true : false
+          break
+        }
+      }
+      let status = await syncSession(this.playingItem!.id, updateSession)
+      if (status) {
+        this.isConnect = true
+        console.log("会话当前时间", updateSession.currentTime)
+        console.log("会话汇报间隔", updateSession.timeListened)
+        this.syncTime = new Date().getTime() / 1000
+        this.user = await getUser()
+        this.progress = this.user?.mediaProgress??[]
+      } else {
+        this.isConnect = false
+        this.getUIContext().getPromptAction().showToast({
+          message: '同步进度失败，请检查网络！',
+          duration: 500
+        });
+      }
+      this.elapsedTime = 0
+      this.isSyncing = false
     }
-    let status = await syncSession(this.playingItem!.id, updateSession)
-    if (status) {
-      console.log("会话当前时间", updateSession.currentTime)
-      console.log("会话汇报间隔", updateSession.timeListened)
-      this.syncTime = new Date().getTime() / 1000
-      this.user = await getUser()
-      this.progress = this.user?.mediaProgress??[]
-    } else {
-      this.isConnect = false
-      this.getUIContext().getPromptAction().showToast({
-        message: '同步进度失败，请检查网络！',
-        duration: 500
-      });
-    }
-    this.elapsedTime = 0
   }
 
   async startContinuousTask() {
@@ -457,6 +465,7 @@ struct Index {
           break;
         case 'prepared':
           console.info('播放器就绪。');
+          this.playedTime = 0
           if (this.session === undefined) {
             this.session = await avSession.createAVSession(this.context!, 'AUDIO_PLAY', 'video');
             await this.setSessionCallback()

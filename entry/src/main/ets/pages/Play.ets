@@ -125,6 +125,7 @@ export struct Play {
   }
 
   fadeIn() {
+    this.isPlaying = true
     let duration = 1000
     let volume = 0;
     const step = 50; // 调整间隔时间，单位 ms
@@ -143,6 +144,7 @@ export struct Play {
   }
 
   fadeOut() {
+    this.isPlaying = false
     let duration = 1000
     let volume = 1.0; // 假设当前音量是最大值
     const step = 50; // 调整间隔时间，单位 ms
