@@ -41,6 +41,7 @@ export struct Setting {
   @Local showProgress:boolean = false
   @Local showAddServer: boolean = false
   @Local showEditServer: boolean = false
+  @Local showAbout: boolean = false
   @Local editServerIndex: number = -1
   @Local tmpServername: string = ""
   @Local tmpBaseurl: string = ""
@@ -208,7 +209,7 @@ export struct Setting {
           .width('100%')
           .height(50)
           .borderRadius(8)
-          .backgroundColor($r('sys.color.comp_background_tertiary'))
+          .backgroundColor($r('sys.color.comp_emphasize_secondary'))
           .borderRadius(8)
           .onClick(async () => {
             if (this.tmpUrl === "") {
@@ -407,7 +408,7 @@ export struct Setting {
             .layoutWeight(1)
             .height(50)
             .borderRadius(8)
-            .backgroundColor($r('sys.color.comp_background_tertiary'))
+            .backgroundColor($r('sys.color.comp_emphasize_secondary'))
             .borderRadius(8)
             .onClick(async () => {
               if (this.tmpUrl === "") {
@@ -506,6 +507,50 @@ export struct Setting {
     }
     .width('100%')
     .height('100%')
+  }
+
+  @Builder
+  AboutBuilder() {
+    Column() {
+      Text("Harmshelf")
+        .fontSize(36)
+        .fontWeight(FontWeight.Bold)
+      Text("Audiobookshelf的鸿蒙原生客户端")
+        .fontSize(18)
+        .fontColor($r('sys.color.font_secondary'))
+        .margin({ top: 5 })
+      Row() {
+        Text("版本号")
+          .fontSize(20)
+        Text('v' + bundleInfo.versionName)
+          .fontSize(20)
+      }
+      .width('100%')
+      .margin({ top: 20 })
+      .justifyContent(FlexAlign.SpaceBetween)
+
+      Row() {
+        Text("项目地址")
+          .fontSize(20)
+        Image($r('app.media.github'))
+          .width(25)
+          .height(25)
+          .draggable(false)
+          .onClick(() => {
+            let want: Want = {
+              action: 'ohos.want.action.viewData',
+              entities: ['entity.system.browsable'],
+              uri: 'https://github.com/shanyan-wcx/Harmshelf'
+            };
+            this.context!.startAbility(want)
+          })
+      }
+      .width('100%')
+      .margin({ top: 12 })
+      .justifyContent(FlexAlign.SpaceBetween)
+    }
+    .width('100%')
+    .padding({ left: 20, right: 20, bottom: 25 })
   }
 
   aboutToAppear() {
@@ -808,52 +853,43 @@ export struct Setting {
         .padding({ left: 20, right: 20, bottom: 10 })
         .margin({ top: 20 })
 
-        Column() {
-          Text("Harmshelf")
-            .fontSize(22)
-            .fontWeight(FontWeight.Bold)
-          Text("Audiobookshelf的鸿蒙原生客户端")
-            .fontSize(18)
-            .fontColor($r('sys.color.font_secondary'))
-            .margin({ top: 10 })
+        Button({ type: ButtonType.Normal }) {
           Row() {
-            Text("版本号")
+            Text("关于")
               .fontSize(20)
-            Text('v' + bundleInfo.versionName)
-              .fontSize(18)
-          }
-          .width('100%')
-          .margin({ top: 15 })
-          .justifyContent(FlexAlign.SpaceBetween)
+              .fontColor($r('sys.color.font'))
 
-          Row() {
-            Text("项目地址")
-              .fontSize(20)
-            Image($r('app.media.github'))
-              .width(25)
-              .height(25)
-              .draggable(false)
-              .onClick(() => {
-                let want: Want = {
-                  action: 'ohos.want.action.viewData',
-                  entities: ['entity.system.browsable'],
-                  uri: 'https://github.com/shanyan-wcx/Harmshelf'
-                };
-                this.context!.startAbility(want)
-              })
+            SymbolGlyph($r('sys.symbol.chevron_right'))
+              .fontSize(22)
+              .fontColor([$r('sys.color.font')])
+              .hitTestBehavior(HitTestMode.None)
           }
           .width('100%')
-          .margin({ top: 12 })
           .justifyContent(FlexAlign.SpaceBetween)
+          .padding({ left: 20, right: 20 })
         }
         .width('100%')
+        .height(60)
         .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
           env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
           this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
           $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
         .borderRadius(8)
-        .margin({ top: 20 })
-        .padding(20)
+        .margin({ left: 20, right: 20 ,top: 20 })
+        .onClick(() => {
+          this.showAbout = !this.showAbout;
+        })
+        .bindSheet(this.showAbout, this.AboutBuilder(), {
+          height: SheetSize.FIT_CONTENT,
+          preferType: SheetType.CENTER,
+          title: {
+            title: "关于"
+          },
+          showClose: false,
+          onDisappear: () => {
+            this.showAbout = false
+          }
+        })
       }
     }
     .width('100%')
