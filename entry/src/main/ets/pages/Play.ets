@@ -1170,7 +1170,8 @@ export struct Play {
     .backgroundColor(Color.Transparent)
     .backgroundBlurStyle(BlurStyle.Thin)
     .shadow({
-      radius: 8
+      radius: 8,
+      color: $r('sys.color.font')
     })
     .bindContentCover(this.showPlay, this.playBuilder(), {
       onDisappear: () => {
