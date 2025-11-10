@@ -121,7 +121,7 @@ export struct Add {
           if (this.searchPodcasts.length === 0) {
             Column() {
               Text("没有结果")
-                .fontSize(34)
+                .fontSize(32)
             }
             .width('100%')
             .height('100%')

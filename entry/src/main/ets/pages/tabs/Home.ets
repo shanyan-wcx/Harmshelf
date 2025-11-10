@@ -316,7 +316,7 @@ export struct SubHome {
 
           Column() {
             Text("开始收听")
-              .fontSize(34)
+              .fontSize(32)
               .fontColor($r('sys.color.font'))
           }
           .width('100%')

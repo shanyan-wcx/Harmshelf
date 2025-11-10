@@ -142,201 +142,214 @@ export struct Stats {
   }
 
   build() {
-    Scroll(this.statsScroller) {
-      GridRow({
-        columns: {
-          xs: 1,
-          sm: 2,
-        },
-        breakpoints: {
-          value: ['1000vp'],
-          reference: BreakpointsReference.WindowSize
-        },
-        gutter: {
-          x: 0
-        }
-      }) {
-        GridCol({ span: this.displayWidth >= 1000 ? 2 : 1 }) {
-          Column() {
-            Text("你的统计数据")
-              .fontSize(20)
-              .fontWeight(FontWeight.Medium)
-              .margin({ bottom: 10 })
-              .width('100%')
-
-            Row() {
-              Column() {
-                Text(this.finishedNum !== -1 ? this.finishedNum.toString() : "0")
-                  .fontSize(this.displayWidth >= 1000 ? 48 : 36)
-                  .fontWeight(FontWeight.Bold)
-                  .margin({ bottom: 5 })
-
-                Text("已完成的项目")
-                  .fontSize(16)
-                  .fontColor($r('sys.color.font_secondary'))
-              }
-
-              Column() {
-                Text(this.stats?.days ? Object.keys(this.stats?.days).length.toString() : "0")
-                  .fontSize(this.displayWidth >= 1000 ? 48 : 36)
-                  .fontWeight(FontWeight.Bold)
-                  .margin({ bottom: 5 })
-
-                Text("收听天数")
-                  .fontSize(16)
-                  .fontColor($r('sys.color.font_secondary'))
-              }
-
-              Column() {
-                Text(this.stats?.totalTime ? (Math.floor(this.stats?.totalTime / 60)).toString() : "0")
-                  .fontSize(this.displayWidth >= 1000 ? 48 : 36)
-                  .fontWeight(FontWeight.Bold)
-                  .margin({ bottom: 5 })
-
-                Text("收听分钟数")
-                  .fontSize(16)
-                  .fontColor($r('sys.color.font_secondary'))
-              }
-            }
-            .width('100%')
-            .justifyContent(this.displayWidth >= 800 ? FlexAlign.SpaceEvenly : (this.displayWidth >= 450 ? FlexAlign.SpaceAround : FlexAlign.SpaceBetween))
+    if (this.baseUrl !== "") {
+      Scroll(this.statsScroller) {
+        GridRow({
+          columns: {
+            xs: 1,
+            sm: 2,
+          },
+          breakpoints: {
+            value: ['1000vp'],
+            reference: BreakpointsReference.WindowSize
+          },
+          gutter: {
+            x: 0
           }
-          .width('100%')
-          .alignItems(HorizontalAlign.Center)
-          .margin({ bottom: 20 })
-        }
-        .padding({ left: this.displayWidth >= 1000 ? 40 : 20, right: this.displayWidth >= 1000 ? 40 : 20 })
+        }) {
+          GridCol({ span: this.displayWidth >= 1000 ? 2 : 1 }) {
+            Column() {
+              Text("你的统计数据")
+                .fontSize(20)
+                .fontWeight(FontWeight.Medium)
+                .margin({ bottom: 10 })
+                .width('100%')
 
-        GridCol({ span: 1 }) {
-          Column() {
-            Text("收听分钟数（最近七天）")
-              .fontSize(20)
-              .fontWeight(FontWeight.Medium)
-              .margin({ bottom: 20, left: 5 })
-              .width('100%')
-
-            UChartsV2({ controller: this.chart, contentHeight: 260 })
-              .margin({ bottom: 20 })
-
-            Blank()
-
-            Row() {
-              Column() {
-                Text("每周收听")
-                  .fontSize(16)
-
-                Text(this.minutes.reduce((acc, cur) => acc + cur, 0).toString())
-                  .fontSize(this.displayWidth >= 1000 ? 48 : 36)
-                  .fontWeight(FontWeight.Bold)
-
-                Text("分钟")
-                  .fontSize(16)
-              }
-
-              Column() {
-                Text("每日平均值")
-                  .fontSize(16)
-
-                Text(this.minutes.length > 0 ?
-                  (Math.floor(this.minutes.reduce((acc, cur) => acc + cur, 0) / this.minutes.length)).toString() : "0")
-                  .fontSize(this.displayWidth >= 1000 ? 48 : 36)
-                  .fontWeight(FontWeight.Bold)
-
-                Text("分钟")
-                  .fontSize(16)
-              }
-
-              Column() {
-                Text("单日最高")
-                  .fontSize(16)
-
-                Text(this.minutes.length > 0 ? Math.max(...this.minutes).toString() : "0")
-                  .fontSize(this.displayWidth >= 1000 ? 48 : 36)
-                  .fontWeight(FontWeight.Bold)
-
-                Text("分钟")
-                  .fontSize(16)
-              }
-
-              Column() {
-                Text("连续")
-                  .fontSize(16)
-
-                Text(this.getConsecutiveDays(this.stats?.days).toString())
-                  .fontSize(this.displayWidth >= 1000 ? 48 : 36)
-                  .fontWeight(FontWeight.Bold)
-
-                Text("天")
-                  .fontSize(16)
-              }
-            }
-            .width('100%')
-            .margin({ left: 5, top: this.displayWidth >= 1000 ? 20 : 0, bottom: 20 })
-            .justifyContent(FlexAlign.SpaceBetween)
-
-            Blank()
-          }
-          .width('100%')
-          .height(this.displayWidth >= 1000 ? this.gridColHeight : 'auto')
-        }
-        .padding({ left: this.displayWidth >= 1000 ? 35 : 15, right: this.displayWidth >= 1000 ? 40 : 20 })
-
-        GridCol({ span: 1 }) {
-          Column() {
-            Text("历史会话")
-              .fontSize(20)
-              .fontWeight(FontWeight.Medium)
-              .margin({ bottom: 6 })
-              .width('100%')
-
-            ForEach(this.stats?.recentSessions, (recentSession: RecentSession, index) => {
               Row() {
-                Text((index + 1) + ".")
-                  .fontSize(16)
-                  .fontColor($r('sys.color.font_secondary'))
-                  .width(40)
+                Column() {
+                  Text(this.finishedNum !== -1 ? this.finishedNum.toString() : "0")
+                    .fontSize(this.displayWidth >= 1000 ? 48 : 36)
+                    .fontWeight(FontWeight.Bold)
+                    .margin({ bottom: 5 })
+
+                  Text("已完成的项目")
+                    .fontSize(16)
+                    .fontColor($r('sys.color.font_secondary'))
+                }
 
                 Column() {
-                  Text(recentSession.mediaMetadata.title)
+                  Text(this.stats?.days ? Object.keys(this.stats?.days).length.toString() : "0")
+                    .fontSize(this.displayWidth >= 1000 ? 48 : 36)
+                    .fontWeight(FontWeight.Bold)
+                    .margin({ bottom: 5 })
+
+                  Text("收听天数")
                     .fontSize(16)
-                    .maxLines(1)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
-
-                  Text(recentSession.date)
-                    .fontSize(15)
                     .fontColor($r('sys.color.font_secondary'))
-                    .maxLines(1)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
                 }
-                .width('100%')
-                .layoutWeight(1)
-                .alignItems(HorizontalAlign.Start)
 
-                Text(this.formatDuration(recentSession.timeListening))
-                  .fontSize(16)
-                  .fontColor($r('sys.color.font_secondary'))
-                  .margin({ left: 20 })
-                  .textAlign(TextAlign.End)
+                Column() {
+                  Text(this.stats?.totalTime ? (Math.floor(this.stats?.totalTime / 60)).toString() : "0")
+                    .fontSize(this.displayWidth >= 1000 ? 48 : 36)
+                    .fontWeight(FontWeight.Bold)
+                    .margin({ bottom: 5 })
+
+                  Text("收听分钟数")
+                    .fontSize(16)
+                    .fontColor($r('sys.color.font_secondary'))
+                }
               }
-              .height(48)
+              .width('100%')
+              .justifyContent(this.displayWidth >= 800 ? FlexAlign.SpaceEvenly :
+                (this.displayWidth >= 450 ? FlexAlign.SpaceAround : FlexAlign.SpaceBetween))
+            }
+            .width('100%')
+            .alignItems(HorizontalAlign.Center)
+            .margin({ bottom: 20 })
+          }
+          .padding({ left: this.displayWidth >= 1000 ? 40 : 20, right: this.displayWidth >= 1000 ? 40 : 20 })
+
+          GridCol({ span: 1 }) {
+            Column() {
+              Text("收听分钟数（最近七天）")
+                .fontSize(20)
+                .fontWeight(FontWeight.Medium)
+                .margin({ bottom: 20, left: 5 })
+                .width('100%')
+
+              UChartsV2({ controller: this.chart, contentHeight: 260 })
+                .margin({ bottom: 20 })
+
+              Blank()
+
+              Row() {
+                Column() {
+                  Text("每周收听")
+                    .fontSize(16)
+
+                  Text(this.minutes.reduce((acc, cur) => acc + cur, 0).toString())
+                    .fontSize(this.displayWidth >= 1000 ? 48 : 36)
+                    .fontWeight(FontWeight.Bold)
+
+                  Text("分钟")
+                    .fontSize(16)
+                }
+
+                Column() {
+                  Text("每日平均值")
+                    .fontSize(16)
+
+                  Text(this.minutes.length > 0 ?
+                    (Math.floor(this.minutes.reduce((acc, cur) => acc + cur, 0) / this.minutes.length)).toString() :
+                    "0")
+                    .fontSize(this.displayWidth >= 1000 ? 48 : 36)
+                    .fontWeight(FontWeight.Bold)
+
+                  Text("分钟")
+                    .fontSize(16)
+                }
+
+                Column() {
+                  Text("单日最高")
+                    .fontSize(16)
+
+                  Text(this.minutes.length > 0 ? Math.max(...this.minutes).toString() : "0")
+                    .fontSize(this.displayWidth >= 1000 ? 48 : 36)
+                    .fontWeight(FontWeight.Bold)
+
+                  Text("分钟")
+                    .fontSize(16)
+                }
+
+                Column() {
+                  Text("连续")
+                    .fontSize(16)
+
+                  Text(this.getConsecutiveDays(this.stats?.days).toString())
+                    .fontSize(this.displayWidth >= 1000 ? 48 : 36)
+                    .fontWeight(FontWeight.Bold)
+
+                  Text("天")
+                    .fontSize(16)
+                }
+              }
+              .width('100%')
+              .margin({ left: 5, top: this.displayWidth >= 1000 ? 20 : 0, bottom: 20 })
+              .justifyContent(FlexAlign.SpaceBetween)
+
+              Blank()
+            }
+            .width('100%')
+            .height(this.displayWidth >= 1000 ? this.gridColHeight : 'auto')
+          }
+          .padding({ left: this.displayWidth >= 1000 ? 35 : 15, right: this.displayWidth >= 1000 ? 40 : 20 })
+
+          GridCol({ span: 1 }) {
+            Column() {
+              Text("历史会话")
+                .fontSize(20)
+                .fontWeight(FontWeight.Medium)
+                .margin({ bottom: 6 })
+                .width('100%')
+
+              ForEach(this.stats?.recentSessions, (recentSession: RecentSession, index) => {
+                Row() {
+                  Text((index + 1) + ".")
+                    .fontSize(16)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .width(40)
+
+                  Column() {
+                    Text(recentSession.mediaMetadata.title)
+                      .fontSize(16)
+                      .maxLines(1)
+                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+                    Text(recentSession.date)
+                      .fontSize(15)
+                      .fontColor($r('sys.color.font_secondary'))
+                      .maxLines(1)
+                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  }
+                  .width('100%')
+                  .layoutWeight(1)
+                  .alignItems(HorizontalAlign.Start)
+
+                  Text(this.formatDuration(recentSession.timeListening))
+                    .fontSize(16)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .margin({ left: 20 })
+                    .textAlign(TextAlign.End)
+                }
+                .height(48)
+              })
+            }
+            .width('100%')
+            .onSizeChange((oldValue, newValue) => {
+              if (newValue.height) {
+                this.gridColHeight = Number(newValue.height)
+              }
             })
           }
-          .width('100%')
-          .onSizeChange((oldValue, newValue) => {
-            if (newValue.height) {
-              this.gridColHeight = Number(newValue.height)
-            }
-          })
+          .padding({ left: this.displayWidth >= 1000 ? 40 : 20, right: this.displayWidth >= 1000 ? 40 : 20 })
         }
-        .padding({ left: this.displayWidth >= 1000 ? 40 : 20, right: this.displayWidth >= 1000 ? 40 : 20 })
       }
+      .width('100%')
+      .height('100%')
+      .padding({ top: this.displayWidth >= 1000 ? 85 : 65, bottom: this.isStartPlaying ? 99 : 20 })
+      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+      .scrollBar(BarState.Off)
+      .align(Alignment.Top)
+      .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
+    } else {
+      Column() {
+        Text("没有服务器")
+          .fontSize(32)
+      }
+      .width('100%')
+      .height('100%')
+      .padding({ bottom: 36 })
+      .justifyContent(FlexAlign.Center)
     }
-    .width('100%')
-    .height('100%')
-    .padding({ top: this.displayWidth >= 1000 ? 85 : 65, bottom: this.isStartPlaying ? 99 : 20 })
-    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
-    .scrollBar(BarState.Off)
-    .align(Alignment.Top)
-    .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
   }
 }

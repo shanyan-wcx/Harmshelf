@@ -212,7 +212,7 @@ export struct SearchMedia {
           .every((arr: LibraryItemSearchResult[] | string[] | Author[] | Series[]) => (arr?.length ?? 0) === 0)) {
           Column() {
             Text("没有结果")
-              .fontSize(34)
+              .fontSize(32)
           }
           .width('100%')
           .height('100%')

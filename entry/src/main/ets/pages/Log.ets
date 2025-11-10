@@ -5,7 +5,7 @@ export struct Log {
     Scroll() {
       Column() {
         Text("暂不支持")
-          .fontSize(34)
+          .fontSize(32)
       }
     }
     .width('100%')

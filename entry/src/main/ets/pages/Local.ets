@@ -7,7 +7,7 @@ export struct LocalMedia {
       Scroll(this.LocalMediaScroller) {
         Column() {
           Text("暂不支持")
-            .fontSize(34)
+            .fontSize(32)
         }
       }
       .width('100%')
