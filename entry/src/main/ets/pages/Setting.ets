@@ -1,7 +1,7 @@
 import { common, ConfigurationConstant, Want } from "@kit.AbilityKit"
 import { PersistenceV2 } from "@kit.ArkUI";
 import { ColorMode, PlaySetting, ServerIndex, ServerSetting } from "../pages/Index";
-import { getLibraries, getLogin, getUser } from "../utils/Api";
+import { getLibraries, getLogin, getLogout, getUser } from "../utils/Api";
 import { env } from "../utils/Class";
 import { Library, LoginInfo, PlayItem, User } from "../utils/Interface";
 import { avSession } from "@kit.AVSessionKit";
@@ -604,16 +604,25 @@ export struct Setting {
               .onClick(async () => {
                 if (this.serverIndex && this.serverSetting) {
                   if (index === this.serverIndex.serverIndex){
-                    this.serverIndex.serverIndex = -1
-                    this.serverName = ""
-                    this.baseUrl = ""
-                    this.username = ""
-                    this.password = ""
-                    this.libraries = []
-                    this.library = undefined
-                    this.selectOptions = []
-                    this.user = undefined
-                    this.isConnect = false
+                    let status = await getLogout()
+                    if (status) {
+                      this.serverIndex.serverIndex = -1
+                      this.serverName = ""
+                      this.baseUrl = ""
+                      this.username = ""
+                      this.password = ""
+                      this.apiToken = ""
+                      this.libraries = []
+                      this.library = undefined
+                      this.selectOptions = []
+                      this.user = undefined
+                      this.isConnect = false
+                    } else {
+                      this.getUIContext().getPromptAction().showToast({
+                        message: '退出登录失败！',
+                        duration: 500
+                      });
+                    }
                   } else {
                     let info = await getLogin({
                       name: this.serverSetting.loginInfos[index].name,

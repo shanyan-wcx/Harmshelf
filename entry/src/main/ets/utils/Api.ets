@@ -88,9 +88,14 @@ export async function getLogout() {
     const response: AxiosResponse = await api.post<string, AxiosResponse<string>>('/logout', {
       timeout: 30000
     })
+    baseUrl = ""
+    authToken = ""
+    userId = ""
     console.log("退出登录！")
+    return true
   } catch (error) {
     console.error(JSON.stringify(error));
+    return false
   }
 }
 
