@@ -1184,48 +1184,66 @@ export struct Play {
 
   build() {
     Column() {
-      HdsActionBar({
-        startButtons: [new ActionBarButton({
-          baseIcon: this.gobackwardIcon,
-          onClick: () => {
-            this.avPlayer!.seek(this.playedTime - this.playSetting!.gobackwardTime > 0 ? (this.playedTime - this.playSetting!.gobackwardTime) * 1000 : 0)
-          }
-        }), new ActionBarButton({
-          baseIcon: $r('sys.symbol.stop_circle'),
-          onClick: () => {
-            this.avPlayer!.stop()
-          }
-        })],
-        endButtons: [new ActionBarButton({
-          baseIcon: this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'),
-          onClick: () => {
-            if (this.isPlaying) {
-              if (this.playSetting?.fadeInOut) {
-                this.fadeOut()
+      Stack() {
+        Column()
+          .width(340)
+          .height(60)
+          .borderRadius(30)
+          .shadow({
+            radius: 8,
+            color: $r('sys.color.font')
+          })
+          .offset({
+            y: 1
+          })
+
+        HdsActionBar({
+          startButtons: [new ActionBarButton({
+            baseIcon: this.gobackwardIcon,
+            onClick: () => {
+              this.avPlayer!.seek(this.playedTime - this.playSetting!.gobackwardTime > 0 ?
+                (this.playedTime - this.playSetting!.gobackwardTime) * 1000 : 0)
+            }
+          }), new ActionBarButton({
+            baseIcon: $r('sys.symbol.stop_circle'),
+            onClick: () => {
+              this.avPlayer!.stop()
+            }
+          })],
+          endButtons: [new ActionBarButton({
+            baseIcon: this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'),
+            onClick: () => {
+              if (this.isPlaying) {
+                if (this.playSetting?.fadeInOut) {
+                  this.fadeOut()
+                } else {
+                  this.avPlayer!.pause()
+                }
               } else {
-                this.avPlayer!.pause()
-              }
-            } else {
-              if (this.playSetting?.fadeInOut) {
-                this.fadeIn()
-              } else {
-                this.avPlayer!.play()
+                if (this.playSetting?.fadeInOut) {
+                  this.fadeIn()
+                } else {
+                  this.avPlayer!.play()
+                }
               }
             }
-          }
-        }), new ActionBarButton({
-          baseIcon: this.goforwardIcon,
-          onClick: () => {
-            this.avPlayer!.seek(this.playedTime + this.playSetting!.goforwardTime < this.playingItem!.audioTracks[this.playingIndex].duration ? (this.playedTime + this.playSetting!.goforwardTime) * 1000 : this.playingItem!.audioTracks[this.playingIndex].duration * 1000)
-          }
-        })],
-        primaryButtonBuilder: (): void => this.primaryButtonBuilder(),
-        primaryButtonBuilderWidth: LengthMetrics.vp(70),
-        isExpand: true
-      })
-        .height(0)
-        .hitTestBehavior(HitTestMode.BLOCK_HIERARCHY)
-        .margin({ bottom: 106 })
+          }), new ActionBarButton({
+            baseIcon: this.goforwardIcon,
+            onClick: () => {
+              this.avPlayer!.seek(this.playedTime + this.playSetting!.goforwardTime <
+              this.playingItem!.audioTracks[this.playingIndex].duration ?
+                (this.playedTime + this.playSetting!.goforwardTime) * 1000 :
+                this.playingItem!.audioTracks[this.playingIndex].duration * 1000)
+            }
+          })],
+          primaryButtonBuilder: (): void => this.primaryButtonBuilder(),
+          primaryButtonBuilderWidth: LengthMetrics.vp(70),
+          isExpand: true
+        })
+          .height(0)
+          .hitTestBehavior(HitTestMode.BLOCK_HIERARCHY)
+          .margin({ bottom: 106 })
+      }
     }
     .width('100%')
     .height('100%')
