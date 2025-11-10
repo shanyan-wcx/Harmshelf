@@ -433,6 +433,7 @@ export struct Setting {
                   this.baseUrl = loginInfo.server
                   this.username = loginInfo.username
                   this.password = loginInfo.password
+                  this.apiToken = info[0]
                   this.libraries = await getLibraries()
                   this.selectOptions = []
                   if (this.libraries.length > 0) {
@@ -624,6 +625,7 @@ export struct Setting {
                       });
                     }
                   } else {
+                    await getLogout()
                     let info = await getLogin({
                       name: this.serverSetting.loginInfos[index].name,
                       server: this.serverSetting.loginInfos[index].server,
@@ -637,6 +639,7 @@ export struct Setting {
                       this.baseUrl = this.serverSetting.loginInfos[index].server
                       this.username = this.serverSetting.loginInfos[index].username
                       this.password = this.serverSetting.loginInfos[index].password
+                      this.apiToken = info[0]
                       this.libraries = await getLibraries()
                       this.selectOptions = []
                       if (this.libraries.length > 0) {
