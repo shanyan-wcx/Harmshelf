@@ -32,7 +32,7 @@ Audiobookshelf的鸿蒙原生客户端，适配手机、平板、PC/2in1。
 
 将以下链接复制到华为浏览器打开：
 
-https://appgallery.huawei.com/link/invite-test-wap?taskId=336af871deef169cfbdacf59b901b766&invitationCode=97yFZtvRXuL
+https://appgallery.huawei.com/link/invite-test-wap?taskId=35b68a6c580db1719bd4be6c67214385&invitationCode=97yFZtvRXuL
 
 ### 自行侧载
 
