@@ -14,6 +14,8 @@ import { Stats } from "../pages/Stat";
 import { getItem, getPlayItem, getUser, updateProgress } from "./Api";
 import { Author, Series, LibraryItem, Library, Book, Progress, Episode, Filter1, UpdateProgress, PlayItem } from "./Interface"
 import { media } from "@kit.MediaKit";
+import { ConfigurationConstant } from "@kit.AbilityKit";
+import { env } from "./Class";
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -353,22 +355,39 @@ export struct SeriesItemComponent {
     Stack() {
       Button({ type: ButtonType.Normal }) {
         Stack({ alignContent: Alignment.Bottom }) {
-          ForEach(this.series.books.slice().reverse(), (book: Book, index) => {
-            Image(this.baseUrl + `/api/items/${book.id}/cover?token=${this.apiToken}`)
-              .alt($rawfile('nocover.jpg'))
-              .objectFit(ImageFit.Cover)
-              .height('100%')
-              .aspectRatio(1)
-              .clip(true)
-              .objectFit(ImageFit.Fill)
-              .position({ x: this.getPosition(this.series, index) })
-              .shadow({
-                offsetX: 10,
-                offsetY: 0,
-                radius: 10,
-                color: $r('sys.color.ohos_id_shadow_default_lg_dark')
-              })
-          })
+          if (this.series.books.length === 1) {
+            Column() {
+              Image(this.baseUrl + `/api/items/${this.series.books[0].id}/cover?token=${this.apiToken}`)
+                .alt($rawfile('nocover.jpg'))
+                .objectFit(ImageFit.Cover)
+                .height('100%')
+                .aspectRatio(1)
+                .clip(true)
+                .objectFit(ImageFit.Fill)
+            }
+            .width('100%')
+            .height('100%')
+            .backgroundImage(this.baseUrl + `/api/items/${this.series.books[0].id}/cover?token=${this.apiToken}`)
+            .backgroundImageSize(ImageSize.FILL)
+            .backgroundBlurStyle(BlurStyle.BACKGROUND_THICK)
+          } else {
+            ForEach(this.series.books.slice().reverse(), (book: Book, index) => {
+              Image(this.baseUrl + `/api/items/${book.id}/cover?token=${this.apiToken}`)
+                .alt($rawfile('nocover.jpg'))
+                .objectFit(ImageFit.Cover)
+                .height('100%')
+                .aspectRatio(1)
+                .clip(true)
+                .objectFit(ImageFit.Fill)
+                .position({ x: this.getPosition(this.series, index) })
+                .shadow({
+                  offsetX: 10,
+                  offsetY: 0,
+                  radius: 10,
+                  color: $r('sys.color.ohos_id_shadow_default_lg_dark')
+                })
+            })
+          }
         }
         .width('100%')
         .height('100%')
