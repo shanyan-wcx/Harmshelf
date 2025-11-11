@@ -144,7 +144,7 @@ export struct Home {
 
   build() {
     Stack() {
-      if (this.baseUrl !== "") {
+      if (this.baseUrl !== "" && this.library) {
         if (this.library?.mediaType === 'book') {
           HdsTabs({ controller: this.tabsController, index: this.topTabIndex }) {
             TabContent() {
@@ -438,5 +438,6 @@ export struct Home {
     }
     .alignContent(Alignment.Top)
     .margin({ top: 56 })
+    .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
   }
 }
