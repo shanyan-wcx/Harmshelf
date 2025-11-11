@@ -43,7 +43,7 @@ export struct RecentEpisodes {
       .width('100%')
       .height('100%')
       .padding({ top: 36, left: 20, right: 20, bottom: this.isStartPlaying ? 104 : 20 })
-      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+      .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .onReachEnd(async () => {
         let tmpEpisodes: Episode[] = await getRecentEpisodes(this.library!.id, this.recentEpisodesPage + 1)

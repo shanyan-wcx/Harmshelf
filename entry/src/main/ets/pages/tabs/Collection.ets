@@ -24,14 +24,11 @@ export struct AllCollections {
         }
         .width('100%')
         .height('100%')
-        .columnsTemplate(this.displayWidth >= 1400 ? "1fr 1fr 1fr 1fr 1fr" :
-          (this.displayWidth >= 1000 ? "1fr 1fr 1fr 1fr" :
-            (this.displayWidth >= 800 ? "1fr 1fr 1fr" :
-              (this.displayWidth >= 400 ? "1fr 1fr" : "1fr"))))
+        .columnsTemplate(this.displayWidth >= 1200 ? "1fr 1fr 1fr" : (this.displayWidth >= 800 ? "1fr 1fr" : "1fr"))
         .columnsGap(20)
         .rowsGap(15)
         .scrollBar(BarState.Off)
-        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+        .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .padding({
           left: 20,
           right: 20,

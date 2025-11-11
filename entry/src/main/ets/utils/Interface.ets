@@ -175,7 +175,7 @@ export interface Media {
 export interface LibraryItem {
   id: string;
   ino: string;
-  oldLibraryItemId: string | null;
+  oldLibraryItemId?: string | null;
   libraryId: string;
   folderId: string;
   path: string;
@@ -482,7 +482,8 @@ export interface AudioTrack {
 export interface PlaylistItem {
   libraryItemId: string;
   episodeId: string | null;
-  libraryItem: LibraryItem;
+  libraryItem?: LibraryItem;
+  episode?: Episode;
 }
 
 export interface Playlist {
@@ -490,7 +491,7 @@ export interface Playlist {
   libraryId: string;
   userId: string;
   name: string;
-  description: string | null;
+  description?: string | null;
   coverPath: string | null;
   items: PlaylistItem[];
   lastUpdate: number;

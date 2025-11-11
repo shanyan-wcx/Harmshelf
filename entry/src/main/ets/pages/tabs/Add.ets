@@ -146,7 +146,7 @@ export struct Add {
       .height('100%')
       .layoutWeight(1)
       .padding({ top: 36 + 75, bottom: this.isStartPlaying ? 84 : 0 })
-      .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+      .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
 
       Search()

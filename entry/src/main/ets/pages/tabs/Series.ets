@@ -29,7 +29,7 @@ export struct AllSeries {
         .columnsGap(20)
         .rowsGap(15)
         .scrollBar(BarState.Off)
-        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+        .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .padding({
           left: 20,
           right: 20,

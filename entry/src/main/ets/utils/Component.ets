@@ -465,6 +465,7 @@ export struct CollectionItemComponent {
                 .aspectRatio(1)
                 .clip(true)
                 .objectFit(ImageFit.Fill)
+                .draggable(false)
             }
             .width('100%')
             .height('100%')
@@ -480,6 +481,7 @@ export struct CollectionItemComponent {
                 .aspectRatio(1)
                 .clip(true)
                 .objectFit(ImageFit.Fill)
+                .draggable(false)
                 .position({ x: this.getPosition(this.collection, index) })
                 .shadow({
                   offsetX: 10,
@@ -567,6 +569,7 @@ export struct PlaylistItemComponent {
               .aspectRatio(1)
               .clip(true)
               .objectFit(ImageFit.Fill)
+              .draggable(false)
           } else {
             ForEach([0, 1], (row: number) => {
               Row() {
@@ -578,6 +581,7 @@ export struct PlaylistItemComponent {
                     .aspectRatio(1)
                     .clip(true)
                     .objectFit(ImageFit.Fill)
+                    .draggable(false)
                 })
               }
             })
@@ -829,6 +833,7 @@ export struct EpisodeComponent {
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() episode: Episode | undefined = undefined
   @Consumer() libraryItem: LibraryItem | undefined = undefined
+  @Consumer() libraryItems: LibraryItem[] = []
   @Consumer() progress: Progress[] = []
   @Consumer() isPlaying: boolean = false
   @Consumer() isStartPlaying: boolean = false
@@ -893,7 +898,7 @@ export struct EpisodeComponent {
               type: TextDecorationType.Underline
             })
             .onClick(async () => {
-              this.libraryItem = await getItem(this.item.libraryItemId!)
+              this.libraryItem = this.libraryItems.find(item => item.id === this.item.libraryItemId!)
               this.pageInfos.pushPathByName('libraryItemDetail', null)
             })
 

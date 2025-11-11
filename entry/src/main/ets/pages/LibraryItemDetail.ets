@@ -1070,7 +1070,7 @@ export struct LibraryItemDetail {
           right: 20,
           bottom: this.isStartPlaying ? 84 : 0
         })
-        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+        .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .scrollBar(BarState.Off)
         .align(Alignment.Top)
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)

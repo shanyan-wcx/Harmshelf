@@ -1,9 +1,14 @@
-import { Playlist, PlaylistItem } from '../utils/Interface';
+import { Episode, Library, LibraryItem, PlayItem, Playlist, PlaylistItem, Progress } from '../utils/Interface';
 import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit';
-import { LengthMetrics, PersistenceV2 } from '@kit.ArkUI';
+import { LengthMetrics, PersistenceV2, RectShape } from '@kit.ArkUI';
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import { env } from '../utils/Class';
 import { ColorMode } from "../pages/Index";
+import { getPlayItem } from '../utils/Api';
+import { media } from '@kit.MediaKit';
+import { deviceInfo } from '@kit.BasicServicesKit';
+
+let deviceTypeInfo: string = deviceInfo.deviceType;
 
 @Builder
 export function playlistDetailBuilder(name: string, param: Object) {
@@ -14,22 +19,57 @@ export function playlistDetailBuilder(name: string, param: Object) {
 export struct PlaylistDetail {
   private PlaylistDetailScroller: Scroller = new Scroller();
   @Consumer() colorMode: ColorMode | undefined = PersistenceV2.connect(ColorMode, () => new ColorMode());
+  @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() playlist1: Playlist | undefined = undefined
+  @Consumer() libraryItem: LibraryItem | undefined = undefined
+  @Consumer() library: Library | undefined = undefined
+  @Consumer() episode: Episode | undefined = undefined
+  @Consumer() libraryItems: LibraryItem[] = []
+  @Consumer() progress: Progress[] = []
   @Consumer() statusBarHeight: number = 0
+  @Consumer() sideBarContentWidth: number = 0
   @Consumer() isStartPlaying: boolean = false
+  @Consumer() isPlaying: boolean = false
+  @Consumer() playingItem: PlayItem | undefined = undefined
+  @Consumer() playingTitle: string = "-"
+  @Consumer() playingIndex: number = 0
+  @Consumer() playStartTime: number = 0
+  @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Consumer() baseUrl: string = ""
   @Consumer() apiToken: string = ""
   @Local showLoadingProgress: boolean = false
-  @Local imageWidth: Length = 0
   @Local showPlayLoading: boolean = false
+  @Local topHeight: Length = 0
+
+  async getPlayContent(playItem: PlayItem) {
+    let index: number = 0
+    for (let track of playItem.audioTracks) {
+      if (track.startOffset > playItem.currentTime) {
+        index = track.index - 2
+        break
+      }
+    }
+    this.playingIndex = index
+    this.playingTitle = this.playingItem!.chapters[this.playingIndex].title
+    this.playStartTime = playItem.currentTime - playItem.audioTracks[index].startOffset
+    this.avPlayer!.url =
+      this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+    console.log("共", playItem.audioTracks.length, "条音轨")
+    console.log("播放序号为", this.playingIndex)
+    console.log("起始位置为", this.playStartTime)
+  }
 
   get totalDuration(): string {
     if (!this.playlist1) {
       return '0s'
     }
     let totalSec = 0
-    const items = this.playlist1.items ?? [] // <--- safe default
-    totalSec = items.map(item => item?.libraryItem?.media?.duration ?? 0).reduce((a, b) => a + b, 0)
+    const items = this.playlist1.items ?? []
+    if (this.library?.mediaType === 'book') {
+      totalSec = items.map(item => item?.libraryItem?.media?.duration ?? 0).reduce((a, b) => a + b, 0)
+    } else {
+      totalSec = items.map(item => item?.episode?.duration ?? 0).reduce((a, b) => a + b, 0)
+    }
     const days = Math.floor(totalSec / 86400)
     const hours = Math.floor((totalSec % 86400) / 3600)
     const minutes = Math.floor((totalSec % 3600) / 60)
@@ -45,6 +85,17 @@ export struct PlaylistDetail {
     } else {
       return `${seconds}s`
     }
+  }
+
+  formatDuration(seconds: number): string {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    let formattedTime = '';
+    if (hours > 0) {
+      formattedTime += `${hours} hr `;
+    }
+    formattedTime += `${minutes} min`;
+    return formattedTime;
   }
 
   get displayImages(): PlaylistItem[] {
@@ -68,50 +119,71 @@ export struct PlaylistDetail {
         Scroll(this.PlaylistDetailScroller) {
           Column() {
             Column() {
-              if ((this.playlist1!.items ?? []).length === 1) {
-                Image(this.baseUrl +
-                  `/api/items/${this.playlist1!.items[0].libraryItemId}/cover?token=${this.apiToken}`)
-                  .alt($rawfile('nocover.jpg'))
-                  .objectFit(ImageFit.Cover)
-                  .width('100%')
-                  .aspectRatio(1)
-                  .clip(true)
-                  .objectFit(ImageFit.Fill)
-              } else {
-                ForEach([0, 1], (row: number) => {
-                  Row() {
-                    ForEach([0, 1], (col: number) => {
-                      Image(this.baseUrl +
-                        `/api/items/${this.displayImages[row * 2 + col].libraryItemId}/cover?token=${this.apiToken}`)
-                        .alt($rawfile('nocover.jpg'))
-                        .objectFit(ImageFit.Cover)
-                        .width('50%')
-                        .aspectRatio(1)
-                        .clip(true)
-                        .objectFit(ImageFit.Fill)
-                    })
-                  }
-                })
+              Column() {
+                if ((this.playlist1!.items ?? []).length === 1) {
+                  Image(this.baseUrl +
+                    `/api/items/${this.playlist1!.items[0].libraryItemId}/cover?token=${this.apiToken}`)
+                    .alt($rawfile('nocover.jpg'))
+                    .objectFit(ImageFit.Cover)
+                    .width('100%')
+                    .aspectRatio(1)
+                    .clip(true)
+                    .objectFit(ImageFit.Fill)
+                    .draggable(false)
+                } else {
+                  ForEach([0, 1], (row: number) => {
+                    Row() {
+                      ForEach([0, 1], (col: number) => {
+                        Image(this.baseUrl +
+                          `/api/items/${this.displayImages[row * 2 + col].libraryItemId}/cover?token=${this.apiToken}`)
+                          .alt($rawfile('nocover.jpg'))
+                          .objectFit(ImageFit.Cover)
+                          .width('50%')
+                          .aspectRatio(1)
+                          .clip(true)
+                          .objectFit(ImageFit.Fill)
+                          .draggable(false)
+                      })
+                    }
+                  })
+                }
+              }
+              .width((this.sideBarContentWidth - 40) / 2 >= 250 ? 250 : (this.sideBarContentWidth - 40) / 2)
+              .aspectRatio(1)
+              .borderRadius(10)
+              .margin({ bottom: 5 })
+              .clip(true)
+
+              if (this.playlist1!.description && this.playlist1!.description.length > 0) {
+                Text(this.playlist1!.description)
+                  .fontSize(18)
+                  .margin({ top: 10 })
+                  .padding({ left: 20 , right: 20 })
               }
             }
-            .height(160)
-            .aspectRatio(1)
-            .borderRadius(10)
-            .clip(true)
+            .onAreaChange((oldArea, newArea) => {
+              this.topHeight = newArea.height
+            })
 
             Column() {
               Row() {
                 Column() {
                   Text("播放列表项目 " + this.playlist1!.items.length)
                     .fontSize(18)
-                    .margin({ bottom: 5 })
+                    .fontWeight(FontWeight.Medium)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    .margin({ top: 3 })
 
                   Text(this.totalDuration)
-                    .fontSize(17)
+                    .fontSize(15)
                     .fontColor($r('sys.color.font_secondary'))
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
                 }
                 .width('100%')
                 .layoutWeight(1)
+                .margin({ right: 10 })
                 .alignItems(HorizontalAlign.Start)
 
                 Button({ type: ButtonType.Normal }) {
@@ -145,45 +217,206 @@ export struct PlaylistDetail {
                 .borderRadius(8)
                 .onClick(async () => {
                   this.showPlayLoading = true
-
+                  let id: string | undefined = undefined
+                  let id1: string | undefined = undefined
+                  if (this.library?.mediaType === 'book') {
+                    for (let playlistItem of this.playlist1!.items) {
+                      let isFinished =
+                        this.progress.find(p => p.libraryItemId === playlistItem.libraryItemId)?.isFinished ?? false
+                      if (!isFinished) {
+                        id = playlistItem.libraryItemId
+                        break
+                      }
+                    }
+                  } else if (this.library?.mediaType === 'podcast') {
+                    for (let playlistItem of this.playlist1!.items) {
+                      let isFinished =
+                        this.progress.find(p => p.episodeId === playlistItem.episodeId)?.isFinished ?? false
+                      if (!isFinished) {
+                        id = playlistItem.libraryItemId
+                        id1 = playlistItem.episodeId!
+                        break
+                      }
+                    }
+                  }
+                  if (id) {
+                    if (this.library?.mediaType === 'book') {
+                      this.playingItem = await getPlayItem(id)
+                      if (this.playingItem) {
+                        await this.avPlayer!.reset();
+                        this.isStartPlaying = true
+                        this.isPlaying = true
+                        await this.getPlayContent(this.playingItem!)
+                      }
+                    } else if (this.library?.mediaType === 'podcast') {
+                      this.playingItem = await getPlayItem(id, id1)
+                      if (this.playingItem) {
+                        await this.avPlayer!.reset();
+                        this.isStartPlaying = true
+                        this.isPlaying = true
+                        this.playingIndex = 0
+                        this.playingTitle = this.playingItem!.displayTitle.trim()
+                        this.playStartTime =
+                          this.playingItem!.currentTime - this.playingItem!.audioTracks[0].startOffset
+                        this.avPlayer!.url =
+                          this.baseUrl + this.playingItem!.audioTracks[0].contentUrl + "?token=" + this.apiToken
+                        console.log("共", this.playingItem!.audioTracks.length, "条音轨")
+                        console.log("播放序号为", this.playingIndex)
+                        console.log("起始位置为", this.playStartTime)
+                      }
+                    }
+                  }
                   this.showPlayLoading = false
                 })
               }
               .width('100%')
               .padding({ top: 10, bottom: 10 })
+              .alignItems(VerticalAlign.Center)
 
-              ForEach(this.playlist1!.items, (item: Playlist, index) => {
-                Row() {
+              ForEach(this.playlist1!.items, (item: PlaylistItem, index) => {
+                Stack() {
+                  Row() {
+                    Image(this.baseUrl + `/api/items/${item.libraryItemId}/cover?token=${this.apiToken}`)
+                      .alt($rawfile('nocover.jpg'))
+                      .objectFit(ImageFit.Cover)
+                      .width(55)
+                      .aspectRatio(1)
+                      .borderRadius(8)
+                      .margin({ right: 10 })
+                      .draggable(false)
 
+                    Column() {
+                      Text(this.library?.mediaType === 'book' ? item.libraryItem!.media.metadata.title :
+                        item.episode!.title)
+                        .fontSize(16)
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+                      Text(this.library?.mediaType === 'book' ? (item.libraryItem!.media.metadata.authorName ?? "-") :
+                        (this.libraryItems.find(item1 => item1.id === item.libraryItemId)?.media.metadata.author ??
+                          "-"))
+                        .fontSize(14)
+                        .fontColor($r('sys.color.font_secondary'))
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+                      Text(this.formatDuration(this.library?.mediaType === 'book' ? item.libraryItem!.media.duration :
+                        item.episode!.duration))
+                        .fontSize(12)
+                        .fontColor($r('sys.color.font_secondary'))
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    }
+                    .width('100%')
+                    .layoutWeight(1)
+                    .margin({ right: 10 })
+                    .alignItems(HorizontalAlign.Start)
+
+                    Button({ type: ButtonType.Circle }) {
+                      SymbolGlyph($r('sys.symbol.play_fill'))
+                        .fontWeight(FontWeight.Normal)
+                        .fontSize(18)
+                        .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                        .hitTestBehavior(HitTestMode.None)
+                        .margin({ bottom: 1 })
+                    }
+                    .height(40)
+                    .width(40)
+                    .backgroundColor($r('sys.color.comp_background_tertiary'))
+                    .onClick(async () => {
+                      if (this.library?.mediaType === 'book') {
+                        this.playingItem = await getPlayItem(item.libraryItemId)
+                        if (this.playingItem) {
+                          await this.avPlayer!.reset();
+                          this.isStartPlaying = true
+                          this.isPlaying = true
+                          await this.getPlayContent(this.playingItem!)
+                        }
+                      } else if (this.library?.mediaType === 'podcast') {
+                        this.playingItem = await getPlayItem(item.libraryItemId, item.episodeId!)
+                        if (this.playingItem) {
+                          await this.avPlayer!.reset();
+                          this.isStartPlaying = true
+                          this.isPlaying = true
+                          this.playingIndex = 0
+                          this.playingTitle = this.playingItem!.displayTitle.trim()
+                          this.playStartTime =
+                            this.playingItem!.currentTime - this.playingItem!.audioTracks[0].startOffset
+                          this.avPlayer!.url =
+                            this.baseUrl + this.playingItem!.audioTracks[0].contentUrl + "?token=" + this.apiToken
+                          console.log("共", this.playingItem!.audioTracks.length, "条音轨")
+                          console.log("播放序号为", this.playingIndex)
+                          console.log("起始位置为", this.playStartTime)
+                        }
+                      }
+                    })
+                  }
+                  .padding(10)
+
+                  Progress({
+                    value: this.library?.mediaType === 'book' ?
+                      (this.progress.find(p => p.libraryItemId === item.libraryItemId)?.progress ?? 0) * 100 :
+                      (this.progress.find(p => p.episodeId === item.episodeId)?.progress ?? 0) * 100,
+                    total: 100,
+                    type: ProgressType.Linear
+                  })
+                    .width('100%')
+                    .color(this.progress.find(p => p.libraryItemId === item.libraryItemId)?.progress === 1 ?
+                      $r('sys.color.ohos_id_color_palette4') :
+                      $r('sys.color.multi_color_11'))
+                    .backgroundColor(Color.Transparent)
+                    .style({
+                      strokeWidth: 8,
+                      strokeRadius: 8
+                    })
+                    .offset({
+                      y: 0.5
+                    })
+                    .clipShape(new RectShape({
+                      width: '100%',
+                      height: '4'
+                    }).position({
+                      y: 4
+                    }))
                 }
+                .clip(true)
                 .width('100%')
-                .height(80)
                 .backgroundColor($r('sys.color.background_secondary'))
                 .borderRadius(8)
-                .margin({ top: index === 0 ? 0 : 5 })
+                .margin({ top: index === 0 ? 0 : 10 })
+                .alignContent(Alignment.Bottom)
+                .onClick(() => {
+                  if (this.library?.mediaType === 'book') {
+                    this.libraryItem = item.libraryItem
+                    this.pageInfos.pushPathByName('libraryItemDetail', null)
+                  } else {
+                    this.episode = item.episode
+                    this.pageInfos.pushPathByName('episodeDetail', null)
+                  }
+                })
               })
             }
             .width('100%')
-            .margin({ top: 20 })
-            .padding({ left: 10, right: 10, bottom: 10 })
-            .borderRadius(8)
+            .margin({ top: 15 })
+            .padding({ left: 20, right: 20, bottom: this.isStartPlaying ? 104 : deviceTypeInfo === '2in1' ? 20 : 25 })
+            .borderRadius({ topLeft: 32, topRight: 32 })
             .clip(true)
             .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
               env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
               this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
               $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
+            .constraintSize({
+              minHeight: `calc(100% - ${Number(this.topHeight) + 20}vp)`
+            })
           }
           .width('100%')
         }
         .width('100%')
         .height('100%')
         .padding({
-          top: 56 + this.statusBarHeight,
-          left: 20,
-          right: 20,
-          bottom: this.isStartPlaying ? 89 : 10
+          top: 66 + this.statusBarHeight
         })
-        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+        .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .scrollBar(BarState.Off)
         .align(Alignment.Top)
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)

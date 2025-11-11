@@ -954,7 +954,7 @@ export struct Setting {
     }
     .width('100%')
     .height('100%')
-    .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+    .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
     .scrollBar(BarState.Off)
     .padding({ left: 20, right: 20, top: 56, bottom: this.isStartPlaying ? 104 : 20 })
     .align(Alignment.Top)

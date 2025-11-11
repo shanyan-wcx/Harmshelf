@@ -204,7 +204,7 @@ export struct SearchMedia {
           right: 20
         })
         .lanes(this.displayWidth >= 1400 ? 3 : (this.displayWidth >= 1000 ? 2 : 1))
-        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+        .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .scrollBar(BarState.Off)
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
 

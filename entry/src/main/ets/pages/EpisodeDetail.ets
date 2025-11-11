@@ -298,7 +298,7 @@ export struct EpisodeDetail {
           right: 20,
           bottom: this.isStartPlaying ? 89 : 10
         })
-        .edgeEffect(EdgeEffect.Spring, { alwaysEnabled: false })
+        .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .scrollBar(BarState.Off)
         .align(Alignment.Top)
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
