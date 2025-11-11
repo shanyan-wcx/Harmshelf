@@ -411,6 +411,7 @@ export struct Home {
         .height('100%')
         .padding({ bottom: 92 })
         .justifyContent(FlexAlign.Center)
+        .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
       }
 
       // Row() {
@@ -438,6 +439,5 @@ export struct Home {
     }
     .alignContent(Alignment.Top)
     .margin({ top: 56 })
-    .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
   }
 }
