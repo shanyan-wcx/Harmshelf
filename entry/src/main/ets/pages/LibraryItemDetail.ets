@@ -641,7 +641,7 @@ export struct LibraryItemDetail {
 
                   Column() {
                     Text(
-                      this.libraryItem!.media.metadata.description
+                      this.libraryItem!.media.metadata.description??""
                       // 段落与换行
                         .replace(/<p[^>]*>/gi, '')
                         .replace(/<\/p>/gi, '\n\n')
@@ -700,6 +700,7 @@ export struct LibraryItemDetail {
                         this.maxIntroLine = 99999
                       }
                     })
+                    .visibility((this.libraryItem!.media.metadata.description??"").length > 0 ? Visibility.Visible : Visibility.None)
                   }
                   .width('100%')
                   .height('auto')
@@ -710,7 +711,7 @@ export struct LibraryItemDetail {
                 .width('100%')
                 .margin({ top: 15 })
               }
-              .padding({ bottom: this.displayWidth < 1000 ? 15 : 20 })
+              .padding({ bottom: this.displayWidth < 1000 ? ((this.libraryItem!.media.metadata.description??"").length > 0 ? 15 : 0) : 20 })
               .onSizeChange((oldValue, newValue) => {
                 if (newValue.height) {
                   if (this.displayWidth < 1000) {
