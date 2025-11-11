@@ -12,10 +12,9 @@ import { Log } from "../pages/Log";
 import { Setting } from "../pages/Setting";
 import { Stats } from "../pages/Stat";
 import { getItem, getPlayItem, getUser, updateProgress } from "./Api";
-import { Author, Series, LibraryItem, Library, Book, Progress, Episode, Filter1, UpdateProgress, PlayItem } from "./Interface"
+import { Author, Series, LibraryItem, Library, Book, Progress, Episode, Filter1, UpdateProgress, PlayItem, Collection, Playlist,
+  PlaylistItem} from "./Interface"
 import { media } from "@kit.MediaKit";
-import { ConfigurationConstant } from "@kit.AbilityKit";
-import { env } from "./Class";
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -430,6 +429,189 @@ export struct SeriesItemComponent {
     .alignContent(Alignment.Bottom)
     .onAreaChange((oldArea, newArea) => {
       this.seriesWidth = newArea.width
+    })
+  }
+}
+
+@ComponentV2
+export struct CollectionItemComponent {
+  @Require @Param collection: Collection
+  @Consumer() pageInfos: NavPathStack = new NavPathStack();
+  @Consumer() collection1: Collection | undefined = undefined
+  @Consumer() baseUrl: string = ""
+  @Consumer() apiToken: string = ""
+  @Local imageWidth: Length = 0
+  @Local collectionWidth: Length = 0
+
+  private getPosition(collection: Collection, index: number): number {
+    const gap = Number(this.imageWidth) / (collection.books.length - 1) / 2;
+    if (collection.books.length == 1) {
+      return Number(this.imageWidth) / 2
+    } else {
+      return (collection.books.length - 1 - index) * gap
+    }
+  }
+
+  build() {
+    Stack() {
+      Button({ type: ButtonType.Normal }) {
+        Stack({ alignContent: Alignment.Bottom }) {
+          if (this.collection.books.length === 1) {
+            Column() {
+              Image(this.baseUrl + `/api/items/${this.collection.books[0].id}/cover?token=${this.apiToken}`)
+                .alt($rawfile('nocover.jpg'))
+                .objectFit(ImageFit.Cover)
+                .height('100%')
+                .aspectRatio(1)
+                .clip(true)
+                .objectFit(ImageFit.Fill)
+            }
+            .width('100%')
+            .height('100%')
+            .backgroundImage(this.baseUrl + `/api/items/${this.collection.books[0].id}/cover?token=${this.apiToken}`)
+            .backgroundImageSize(ImageSize.FILL)
+            .backgroundBlurStyle(BlurStyle.BACKGROUND_THICK)
+          } else {
+            ForEach(this.collection.books.slice().reverse(), (book: Book, index) => {
+              Image(this.baseUrl + `/api/items/${book.id}/cover?token=${this.apiToken}`)
+                .alt($rawfile('nocover.jpg'))
+                .objectFit(ImageFit.Cover)
+                .height('100%')
+                .aspectRatio(1)
+                .clip(true)
+                .objectFit(ImageFit.Fill)
+                .position({ x: this.getPosition(this.collection, index) })
+                .shadow({
+                  offsetX: 10,
+                  offsetY: 0,
+                  radius: 10,
+                  color: $r('sys.color.ohos_id_shadow_default_lg_dark')
+                })
+            })
+          }
+        }
+        .width('100%')
+        .height('100%')
+        .borderRadius(10)
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
+        .clip(true)
+      }
+      .width('100%')
+      .height('auto')
+      .layoutWeight(1)
+      .aspectRatio(2)
+      .backgroundColor(Color.Transparent)
+      .onAreaChange((oldArea, newArea) => {
+        this.imageWidth = newArea.width
+      })
+      .onClick(() => {
+        this.collection1 = this.collection
+        this.pageInfos.pushPathByName('collectionDetail', null)
+      })
+
+      Column() {
+        Text(this.collection.name)
+          .fontSize(17)
+          .fontWeight(FontWeight.Medium)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      }
+      .width(this.collectionWidth)
+      .padding(4)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+    }
+    .borderRadius(10)
+    .clip(true)
+    .width('100%')
+    .height('auto')
+    .alignContent(Alignment.Bottom)
+    .onAreaChange((oldArea, newArea) => {
+      this.collectionWidth = newArea.width
+    })
+  }
+}
+
+@ComponentV2
+export struct PlaylistItemComponent {
+  @Require @Param playlist: Playlist
+  @Consumer() pageInfos: NavPathStack = new NavPathStack();
+  @Consumer() playlist1: Playlist | undefined = undefined
+  @Consumer() baseUrl: string = ""
+  @Consumer() apiToken: string = ""
+  @Local playlistWidth: Length = 0
+
+  get displayImages(): PlaylistItem[] {
+    const len = this.playlist.items.length;
+    if (len === 0) {
+      return [];
+    } else if (len === 1) {
+      return [this.playlist.items[0], this.playlist.items[0], this.playlist.items[0], this.playlist.items[0]];
+    } else if (len === 2) {
+      return [this.playlist.items[0], this.playlist.items[1], this.playlist.items[1], this.playlist.items[0]];
+    } else if (len === 3) {
+      return [this.playlist.items[0], this.playlist.items[1], this.playlist.items[2], this.playlist.items[0]];
+    } else {
+      return this.playlist.items.slice(0, 4);
+    }
+  }
+
+  build() {
+    Stack() {
+      Button({ type: ButtonType.Normal }) {
+        Column() {
+          if (this.playlist.items.length === 1) {
+            Image(this.baseUrl + `/api/items/${this.playlist.items[0].libraryItemId}/cover?token=${this.apiToken}`)
+              .alt($rawfile('nocover.jpg'))
+              .objectFit(ImageFit.Cover)
+              .width('100%')
+              .aspectRatio(1)
+              .clip(true)
+              .objectFit(ImageFit.Fill)
+          } else {
+            ForEach([0, 1], (row: number) => {
+              Row() {
+                ForEach([0, 1], (col: number) => {
+                  Image(this.baseUrl + `/api/items/${this.displayImages[row * 2 + col].libraryItemId}/cover?token=${this.apiToken}`)
+                    .alt($rawfile('nocover.jpg'))
+                    .objectFit(ImageFit.Cover)
+                    .width('50%')
+                    .aspectRatio(1)
+                    .clip(true)
+                    .objectFit(ImageFit.Fill)
+                })
+              }
+            })
+          }
+        }
+      }
+      .width('100%')
+      .height('auto')
+      .layoutWeight(1)
+      .aspectRatio(1)
+      .backgroundColor(Color.Transparent)
+      .onClick(() => {
+        this.playlist1 = this.playlist
+        this.pageInfos.pushPathByName('playlistDetail', null)
+      })
+
+      Column() {
+        Text(this.playlist.name)
+          .fontSize(17)
+          .fontWeight(FontWeight.Medium)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      }
+      .width(this.playlistWidth)
+      .padding(4)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+    }
+    .borderRadius(10)
+    .clip(true)
+    .width('100%')
+    .height('auto')
+    .alignContent(Alignment.Bottom)
+    .onAreaChange((oldArea, newArea) => {
+      this.playlistWidth = newArea.width
     })
   }
 }

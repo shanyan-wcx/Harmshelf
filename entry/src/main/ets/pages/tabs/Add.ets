@@ -9,8 +9,8 @@ export struct Add {
   @Consumer() displayWidth: number = 0
   @Consumer() showLoadingProgress: boolean = false
   @Consumer() isStartPlaying: boolean = false
+  @Consumer() searchPodcasts: SearchPodcast[] = []
   @Local term: string = ""
-  @Local searchPodcasts: SearchPodcast[] = []
   @Local showConfirm: boolean = false
   @Local podcast: Podcast | undefined = undefined
 

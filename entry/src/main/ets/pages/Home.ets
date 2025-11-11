@@ -7,7 +7,8 @@ import { Author, Collection,
   Library, LibraryItem, Progress,
   Playlist,
   Series,
-  User} from "../utils/Interface";
+  User,
+  SearchPodcast} from "../utils/Interface";
 import { SubHome } from "./tabs/Home";
 import { MediaLibrary } from "./tabs/Library";
 import { AllSeries } from "./tabs/Series";
@@ -37,6 +38,7 @@ export struct Home {
   @Provider() collections: Collection[] = []
   @Provider() authors: Author[] = []
   @Provider() playlists: Playlist[] = []
+  @Provider() searchPodcasts: SearchPodcast[] = []
   @Provider() recentEpisodesPage: number = 0
   @Consumer() user: User | undefined = undefined
   @Consumer() libraryItems: LibraryItem[] = []
@@ -96,10 +98,14 @@ export struct Home {
       this.user = await getUser()
       this.progress = this.user?.mediaProgress??[]
       this.libraryItems = await getLibraryItems(this.library!.id)
+      this.playlists = await getPlaylists(this.library.id)
       if (this.library.mediaType === 'book') {
         switch (this.topTabIndex) {
           case 0:
             this.homeData = await getHome(this.library.id)
+            break;
+          case 1:
+            this.libraryItems = await getLibraryItems(this.library!.id)
             break;
           case 2:
             this.series = await getSeries(this.library.id)
@@ -125,7 +131,11 @@ export struct Home {
             this.recentEpisodesPage = 0
             this.recentEpisodes = await getRecentEpisodes(this.library.id, this.recentEpisodesPage)
             break
+          case 2:
+            this.libraryItems = await getLibraryItems(this.library!.id)
+            break;
           case 3:
+            this.searchPodcasts = []
             break
           case 4:
             this.playlists = await getPlaylists(this.library.id)

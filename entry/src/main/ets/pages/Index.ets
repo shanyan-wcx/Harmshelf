@@ -14,7 +14,9 @@ import {
   LoginInfo,
   User,
   Bookmark,
-  UpdateSession
+  UpdateSession,
+  Playlist,
+  Collection
 } from '../utils/Interface';
 import { Play } from './Play';
 import { deviceInfo } from '@kit.BasicServicesKit';
@@ -91,6 +93,8 @@ struct Index {
   @Provider() libraryItem: LibraryItem | undefined = undefined
   @Provider() bookmarks: Bookmark[] = []
   @Provider() series1: Series | undefined = undefined
+  @Provider() collection1: Collection | undefined = undefined
+  @Provider() playlist1: Playlist | undefined = undefined
   @Provider() episode: Episode | undefined = undefined
   @Provider() searchResult: SearchResult | undefined = undefined
   @Provider() showLoadingProgress: boolean = false

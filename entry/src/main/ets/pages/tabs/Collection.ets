@@ -1,3 +1,4 @@
+import { CollectionItemComponent } from "../../utils/Component";
 import { Collection } from "../../utils/Interface"
 
 @ComponentV2
@@ -6,7 +7,7 @@ export struct AllCollections {
   @Consumer() displayWidth: number = 0
   @Consumer() showLoadingProgress: boolean = false
   @Consumer() isStartPlaying: boolean = false
-  @Local collections: Collection[] = []
+  @Consumer() collections: Collection[] = []
 
   build() {
     Stack() {
@@ -14,11 +15,10 @@ export struct AllCollections {
         Grid(this.collectionScroller) {
           ForEach(this.collections, (collection: Collection, index) => {
             GridItem() {
-              // LibraryItemComponent({
-              //   libraryItem: libraryItem,
-              //   progress: progress[index].progress
-              // })
-              // .margin({ bottom: index === this.collections.length - 1 ? (this.isStartPlaying ? 104 : 20) : 0 })
+              CollectionItemComponent({
+                collection: collection
+              })
+                .margin({ bottom: index === this.collections.length - 1 ? (this.isStartPlaying ? 104 : 20 ): 0 })
             }
           })
         }
