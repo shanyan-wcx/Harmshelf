@@ -80,11 +80,14 @@ export struct Home {
         this.libraries = await getLibraries()
         this.selectOptions = []
         if (this.libraries.length > 0) {
-          this.library = this.library ? this.libraries.find(library => library.id === this.library!.id) : this.libraries[0]
+          this.library = this.library ? this.libraries.find(library => library.id === this.library!.id)??this.libraries[0] : this.libraries[0]
           this.libraries.forEach((library, index) => {
             this.selectOptions.push({ value: library.name })
           })
           this.selectLibraryIndex = this.libraries.findIndex(library => library.id === this.library!.id)
+          if (this.selectLibraryIndex === -1) {
+            this.selectLibraryIndex = 0
+          }
         }
       }
       this.firstAppear = false
