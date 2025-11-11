@@ -34,6 +34,7 @@ export struct EpisodeDetail {
   @Local podcast: LibraryItem | undefined = undefined
   @Local showLoadingProgress: boolean = false
   @Local moreMenus: MenuElement[] = []
+  @Local showPlayLoading: boolean = false
   @Monitor('syncTime')
   async refreshProgress(monitor: IMonitor) {
     this.itemProgress = undefined
@@ -188,19 +189,28 @@ export struct EpisodeDetail {
 
             Row() {
               Button({ type: ButtonType.Normal }) {
-                Row() {
-                  SymbolGlyph($r('sys.symbol.play_fill'))
-                    .fontWeight(FontWeight.Normal)
-                    .fontSize(18)
-                    .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
-                    .hitTestBehavior(HitTestMode.None)
-                    .margin({ bottom: 1 })
+                if (this.showPlayLoading) {
+                  Column() {
+                    LoadingProgress()
+                      .width(30)
+                      .height(30)
+                      .color($r('sys.color.ohos_id_color_titlebar_icon'))
+                  }
+                } else {
+                  Row() {
+                    SymbolGlyph($r('sys.symbol.play_fill'))
+                      .fontWeight(FontWeight.Normal)
+                      .fontSize(18)
+                      .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                      .hitTestBehavior(HitTestMode.None)
+                      .margin({ bottom: 1 })
 
-                  Text(" 播放")
-                    .fontSize(18)
-                    .fontWeight(FontWeight.Medium)
-                    .maxLines(1)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    Text(" 播放")
+                      .fontSize(18)
+                      .fontWeight(FontWeight.Medium)
+                      .maxLines(1)
+                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  }
                 }
               }
               .backgroundColor($r('sys.color.comp_emphasize_secondary'))
@@ -209,6 +219,7 @@ export struct EpisodeDetail {
               .layoutWeight(1)
               .borderRadius(8)
               .onClick(async () => {
+                this.showPlayLoading = true
                 this.playingItem = await getPlayItem(this.episode!.libraryItemId!, this.episode!.id!)
                 if (this.playingItem) {
                   await this.avPlayer!.reset();
@@ -222,6 +233,7 @@ export struct EpisodeDetail {
                   console.log("播放序号为", this.playingIndex)
                   console.log("起始位置为", this.playStartTime)
                 }
+                this.showPlayLoading = false
               })
 
               Button({ type: ButtonType.Normal }) {

@@ -641,6 +641,7 @@ export struct EpisodeComponent {
   @Consumer() syncTime: number = 0
   @Consumer() isIndex: boolean = true
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.episodeId === this.item.id)
+  @Local showPlayLoading: boolean = false
   @Monitor('syncTime')
   async refreshProgress(monitor: IMonitor) {
     this.itemProgress = undefined
@@ -752,18 +753,28 @@ export struct EpisodeComponent {
       Row() {
         Button({ type: ButtonType.Normal }) {
           Row() {
-            SymbolGlyph($r('sys.symbol.play_fill'))
-              .fontWeight(FontWeight.Normal)
-              .fontSize(18)
-              .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
-              .hitTestBehavior(HitTestMode.None)
-              .margin({ right: 5, bottom: 1 })
+            if (this.showPlayLoading) {
+              Column() {
+                LoadingProgress()
+                  .width(18)
+                  .height(18)
+                  .color($r('sys.color.ohos_id_color_titlebar_icon'))
+              }
+            } else {
+              SymbolGlyph($r('sys.symbol.play_fill'))
+                .fontWeight(FontWeight.Normal)
+                .fontSize(18)
+                .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                .hitTestBehavior(HitTestMode.None)
+                .margin({ bottom: 1 })
+            }
 
             Text(this.formatDuration(this.item.duration))
               .fontSize(18)
               .fontWeight(FontWeight.Medium)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .margin({ left: 5 })
           }
         }
         .backgroundColor($r('sys.color.comp_emphasize_secondary'))
@@ -771,6 +782,7 @@ export struct EpisodeComponent {
         .padding({ left: 10, right: 10 })
         .borderRadius(8)
         .onClick(async () => {
+          this.showPlayLoading = true
           this.playingItem = await getPlayItem(this.item.libraryItemId!, this.item.id)
           if (this.playingItem) {
             await this.avPlayer!.reset();
@@ -784,6 +796,7 @@ export struct EpisodeComponent {
             console.log("播放序号为", this.playingIndex)
             console.log("起始位置为", this.playStartTime)
           }
+          this.showPlayLoading = false
         })
 
         Button({ type: ButtonType.Normal }) {
@@ -859,6 +872,7 @@ export struct EpisodeComponent1 {
   @Consumer() syncTime: number = 0
   @Consumer() isIndex: boolean = true
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.episodeId === this.item.id)
+  @Local showPlayLoading: boolean = false
   @Monitor('syncTime')
   async refreshProgress(monitor: IMonitor) {
     this.itemProgress = undefined
@@ -935,18 +949,28 @@ export struct EpisodeComponent1 {
       Row() {
         Button({ type: ButtonType.Normal }) {
           Row() {
-            SymbolGlyph($r('sys.symbol.play_fill'))
-              .fontWeight(FontWeight.Normal)
-              .fontSize(18)
-              .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
-              .hitTestBehavior(HitTestMode.None)
-              .margin({ right: 5, bottom: 1 })
+            if (this.showPlayLoading) {
+              Column() {
+                LoadingProgress()
+                  .width(18)
+                  .height(18)
+                  .color($r('sys.color.ohos_id_color_titlebar_icon'))
+              }
+            } else {
+              SymbolGlyph($r('sys.symbol.play_fill'))
+                .fontWeight(FontWeight.Normal)
+                .fontSize(18)
+                .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                .hitTestBehavior(HitTestMode.None)
+                .margin({ bottom: 1 })
+            }
 
             Text(this.formatDuration(this.item.duration))
               .fontSize(18)
               .fontWeight(FontWeight.Medium)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .margin({ left: 5 })
           }
         }
         .backgroundColor($r('sys.color.comp_emphasize_secondary'))
@@ -954,6 +978,7 @@ export struct EpisodeComponent1 {
         .padding({ left: 10, right: 10 })
         .borderRadius(8)
         .onClick(async () => {
+          this.showPlayLoading = true
           this.playingItem = await getPlayItem(this.item.libraryItemId!, this.item.id)
           if (this.playingItem) {
             await this.avPlayer!.reset();
@@ -967,6 +992,7 @@ export struct EpisodeComponent1 {
             console.log("播放序号为", this.playingIndex)
             console.log("起始位置为", this.playStartTime)
           }
+          this.showPlayLoading = false
         })
 
         Button({ type: ButtonType.Normal }) {
