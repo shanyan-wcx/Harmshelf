@@ -222,7 +222,7 @@ export struct LibraryItemDetail {
   @Builder
   confirmBuilder() {
     Column() {
-      Text("确认从" + this.libraryItem?.media.metadata.title + "的" + this.formatSeconds(this.playingItem?.chapters[this.playingIndex].start) + "开始播放？")
+      Text("确认从" + this.libraryItem?.media.metadata.title + "的" + this.formatSeconds(this.tmpPlayingItem?.chapters![this.tmpPlayingIndex].start) + "开始播放？")
         .fontSize(19)
         .margin({ bottom: 20 })
 
