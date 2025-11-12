@@ -242,8 +242,8 @@ struct Index {
         if (this.playingItem!.mediaType === 'book' ? element.libraryItemId === this.playingItem!.libraryItemId : element.episodeId === this.playingItem!.episodeId) {
           element.duration = this.playingItem!.duration
           element.currentTime = this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playedTime
-          element.progress = element.currentTime / element.duration
-          element.isFinished = element.progress === 1 ? true : false
+          element.progress = element.currentTime / (Math.trunc(element.duration * 1000) / 1000)
+          element.isFinished = element.progress >= 1 ? true : false
           break
         }
       }
@@ -514,6 +514,7 @@ struct Index {
           break;
         case 'completed':
           console.info('播放完毕。');
+          this.syncProgress()
           if (this.playingIndex < this.playingItem!.audioTracks.length - 1) {
             await this.avPlayer!.reset()
             this.playingIndex++

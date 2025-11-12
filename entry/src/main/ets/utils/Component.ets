@@ -11,7 +11,7 @@ import { LocalMedia } from "../pages/Local";
 import { Log } from "../pages/Log";
 import { Setting } from "../pages/Setting";
 import { Stats } from "../pages/Stat";
-import { getItem, getPlayItem, getUser, updateProgress } from "./Api";
+import { getPlayItem, getUser, updateProgress } from "./Api";
 import { Author, Series, LibraryItem, Library, Book, Progress, Episode, Filter1, UpdateProgress, PlayItem, Collection, Playlist,
   PlaylistItem} from "./Interface"
 import { media } from "@kit.MediaKit";
@@ -189,7 +189,7 @@ export struct LibraryItemComponent {
           if (this.library?.mediaType === 'book') {
             Progress({ value: (this.progress?.progress ?? 0) * 100, total: 100, type: ProgressType.Linear })
               .width('100%')
-              .color(this.progress?.progress === 1 ? $r('sys.color.ohos_id_color_palette4') :
+              .color(this.progress?.progress === 1 || this.progress?.isFinished ? $r('sys.color.ohos_id_color_palette4') :
                 $r('sys.color.multi_color_11'))
               .backgroundColor(Color.Transparent)
               .style({
@@ -274,7 +274,7 @@ export struct LibraryItemComponent1 {
           if (this.library?.mediaType === 'book') {
             Progress({ value: (this.progress?.progress ?? 0) * 100, total: 100, type: ProgressType.Linear })
               .width('100%')
-              .color(this.progress?.progress === 1 ? $r('sys.color.ohos_id_color_palette4') :
+              .color(this.progress?.progress === 1 || this.progress?.isFinished ? $r('sys.color.ohos_id_color_palette4') :
                 $r('sys.color.multi_color_11'))
               .backgroundColor(Color.Transparent)
               .style({
@@ -762,7 +762,7 @@ export struct RecentEpisodeComponent {
 
           Progress({ value: (this.progress?.progress ?? 0) * 100, total: 100, type: ProgressType.Linear })
             .width('100%')
-            .color(this.progress?.progress === 1 ? $r('sys.color.ohos_id_color_palette4') :
+            .color(this.progress?.progress === 1 || this.progress?.isFinished ? $r('sys.color.ohos_id_color_palette4') :
               $r('sys.color.multi_color_11'))
             .backgroundColor(Color.Transparent)
             .style({
