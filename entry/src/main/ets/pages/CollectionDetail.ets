@@ -63,7 +63,7 @@ export struct CollectionDetail {
       return '0s'
     }
     let totalSec = 0
-    const books = this.collection1.books ?? [] // <--- safe default
+    const books = this.collection1.books ?? []
     totalSec = books.map(item => item?.media?.duration ?? 0).reduce((a, b) => a + b, 0)
     const days = Math.floor(totalSec / 86400)
     const hours = Math.floor((totalSec % 86400) / 3600)
@@ -253,19 +253,19 @@ export struct CollectionDetail {
                       .draggable(false)
 
                     Column() {
-                      Text(book.media.metadata.title)
+                      Text(book.media!.metadata.title)
                         .fontSize(16)
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                      Text(book.mediaType === 'book' ? (book.media.metadata.authorName ?? "-") :
-                        (book.media.metadata.author ?? "-"))
+                      Text(book.mediaType === 'book' ? (book.media!.metadata.authorName ?? "-") :
+                        (book.media!.metadata.author ?? "-"))
                         .fontSize(14)
                         .fontColor($r('sys.color.font_secondary'))
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                      Text(this.formatDuration(book.media.duration))
+                      Text(this.formatDuration(book.media!.duration))
                         .fontSize(12)
                         .fontColor($r('sys.color.font_secondary'))
                         .maxLines(1)

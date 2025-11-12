@@ -304,7 +304,6 @@ export interface Book {
   numFiles: number;
   size: number;
   sequence: string;
-  progress?: number //  自己临时加的
 }
 
 export interface Book1 {
@@ -327,10 +326,17 @@ export interface Collection {
   libraryId: string;
   userId: string;
   name: string;
-  description?: string | null;
+  description: string | null;
   books: Book[];
   lastUpdate: number;
   createdAt: number;
+}
+
+export interface Collection1 {
+  libraryId: string;
+  name: string;
+  description?: string | null;
+  books: string[];
 }
 
 export interface ListeningStats {

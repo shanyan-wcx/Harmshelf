@@ -125,7 +125,7 @@ export struct EpisodeDetail {
       })
     }
     this.moreMenus.push({
-      symbolIcon: new SymbolGlyphModifier($r('sys.symbol.list_interrupt')),
+      symbolIcon: new SymbolGlyphModifier($r('sys.symbol.music_note_list')),
       value: "添加到播放列表",
       action: async () => {
         this.showPlaylists = true

@@ -10,13 +10,20 @@ import {
   Filter1,
   Series,
   UpdateProgress,
-  Playlist
+  Playlist,
+  Collection,
+  Collection1
 } from "../utils/Interface";
 import { HdsNavDestination, HdsNavDestinationAttribute } from "@kit.UIDesignKit";
 import { LengthMetrics, SymbolGlyphModifier } from "@kit.ArkUI";
-import { addToPlaylist,
+import {
+  addToCollection,
+  addToPlaylist,
+  createCollection,
   createPlaylist,
+  getCollections,
   getItem, getPlayItem, getPlaylists, getUser,
+  removeFromCollection,
   removeFromPlaylist,
   updateProgress } from "../utils/Api";
 import { EpisodeComponent1 } from "../utils/Component";
@@ -38,6 +45,7 @@ export struct LibraryItemDetail {
   @Consumer() library: Library | undefined = undefined
   @Consumer() libraryItem: LibraryItem | undefined = undefined
   @Consumer() playlists: Playlist[] = []
+  @Consumer() collections: Collection[] = []
   @Consumer() progress: Progress[] = []
   @Consumer() episode: Episode | undefined = undefined
   @Consumer() baseUrl: string = ""
@@ -72,6 +80,10 @@ export struct LibraryItemDetail {
   @Local tmpPlaylistName: string = ""
   @Local tmpPlayingItem: PlayItem | undefined = undefined
   @Local tmpPlayingIndex: number = 0
+  @Local showCollections: boolean = false
+  @Local showCreateCollection: boolean = false
+  @Local tmpCollectionName: string = ""
+  @Local tmpCollectionItem: PlayItem | undefined = undefined
   @Monitor('syncTime')
   async refreshProgress(monitor: IMonitor) {
     this.itemProgress = undefined
@@ -175,7 +187,14 @@ export struct LibraryItemDetail {
         })
       }
       this.moreMenus.push({
-        symbolIcon: new SymbolGlyphModifier($r('sys.symbol.list_interrupt')),
+        symbolIcon: new SymbolGlyphModifier($r('sys.symbol.star')),
+        value: "添加到收藏",
+        action: async () => {
+          this.showCollections = true
+        }
+      })
+      this.moreMenus.push({
+        symbolIcon: new SymbolGlyphModifier($r('sys.symbol.music_note_list')),
         value: "添加到播放列表",
         action: async () => {
           this.showPlaylists = true
@@ -416,6 +435,174 @@ export struct LibraryItemDetail {
             } else {
               this.getUIContext().getPromptAction().showToast({
                 message: '创建播放列表失败，请检查网络！',
+                duration: 500
+              });
+            }
+          }
+        })
+      }
+    }
+    .padding({ left: 20, right: 20, bottom: 25 })
+  }
+
+  @Builder
+  collectionsBuilder() {
+    Column() {
+      Stack() {
+        List() {
+          ForEach(this.collections, (collection: Collection, index) => {
+            ListItem() {
+              Row() {
+                Text(collection.name)
+                  .fontSize(18)
+                  .width('100%')
+                  .layoutWeight(1)
+                  .maxLines(1)
+                  .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+                Button({ type: ButtonType.Normal }) {
+                  Text(collection.books.find(b => b.id === this.libraryItem!.id) ? "移除" : "添加")
+                }
+                .width(80)
+                .height(40)
+                .borderRadius(8)
+                .backgroundColor($r('sys.color.comp_background_tertiary'))
+                .onClick(async () => {
+                  let tmpCollection: Collection | undefined = undefined
+                  let book = collection.books.find(b => b.id === this.libraryItem!.id)
+                  if (!book) {
+                    tmpCollection = await addToCollection(collection.id!, this.libraryItem!.id)
+                  } else {
+                    tmpCollection = await removeFromCollection(collection.id!, this.libraryItem!.id)
+                  }
+                  if (tmpCollection) {
+                    this.showCollections = false
+                    collection = tmpCollection
+                  }
+                })
+              }
+              .height(60)
+            }
+          })
+        }
+        .width('100%')
+        .height('100%')
+        .padding({ left: 20, right: 20, bottom: 25 })
+        .scrollBar(BarState.Off)
+        .borderRadius(8)
+        .clip(true)
+        .visibility(!this.showProgress ? Visibility.Visible : Visibility.None)
+
+        Column() {
+          LoadingProgress()
+            .width("100%")
+            .height(72)
+        }
+        .width('100%')
+        .height('100%')
+        .padding({ bottom: 80 })
+        .justifyContent(FlexAlign.Center)
+        .visibility(this.showProgress ? Visibility.Visible : Visibility.None)
+      }
+      .width('100%')
+      .height('100%')
+      .layoutWeight(1)
+
+      Column() {
+        Button({ type: ButtonType.Normal }) {
+          Text("新建收藏")
+            .fontSize(18)
+        }
+        .height(45)
+        .width('100%')
+        .borderRadius(8)
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .onClick(async () => {
+          if (this.showProgress) {
+            this.getUIContext().getPromptAction().showToast({
+              message: '正在加载收藏',
+              duration: 500
+            });
+          } else {
+            this.tmpCollectionName = ""
+            this.showCollections = false
+            this.showCreateCollection = true
+          }
+        })
+      }
+      .width('100%')
+      .padding({ left: 20, right: 20 })
+      .margin({ bottom: 25 })
+    }
+  }
+
+  @Builder
+  createCollectionBuilder() {
+    Column() {
+      TextInput({
+        placeholder: "收藏名称"
+      })
+        .width("100%")
+        .height(45)
+        .borderRadius(8)
+        .margin({ bottom: 20 })
+        .caretColor($r('sys.color.font_secondary'))
+        .fontSize(18)
+        .placeholderFont({
+          size: 18
+        })
+        .type(InputType.Normal)
+        .enterKeyType(EnterKeyType.Done)
+        .onChange((value) => {
+          this.tmpCollectionName = value
+        })
+
+      Row({ space: 20 }) {
+        Button({ type: ButtonType.Normal }) {
+          Text("取消")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(() => {
+          this.showCreateCollection = false
+        })
+
+        Button({ type: ButtonType.Normal }) {
+          Text("确认")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(async () => {
+          if (this.tmpCollectionName.length === 0) {
+            this.getUIContext().getPromptAction().showToast({
+              message: '收藏名称不能为空！',
+              duration: 500
+            });
+          } else {
+            let collection: Collection1 = {
+              libraryId: this.library!.id,
+              name: this.tmpCollectionName,
+              books: [this.libraryItem!.id]
+            }
+            let newCollection = await createCollection(collection)
+            if (newCollection) {
+              this.showCreateCollection = false
+              this.getUIContext().getPromptAction().showToast({
+                message: '创建收藏成功！',
+                duration: 500
+              });
+              this.collections.push(newCollection)
+            } else {
+              this.getUIContext().getPromptAction().showToast({
+                message: '创建收藏失败，请检查网络！',
                 duration: 500
               });
             }
@@ -926,6 +1113,22 @@ export struct LibraryItemDetail {
                 }
                 .width('100%')
                 .margin({ top: 15 })
+                .bindSheet(this.showCollections, this.collectionsBuilder(), {
+                  height: SheetSize.MEDIUM,
+                  preferType: SheetType.CENTER,
+                  title: {
+                    title: "收藏"
+                  },
+                  showClose: false,
+                  onWillAppear: async () => {
+                    this.showProgress = true
+                    this.collections = await getCollections(this.library!.id)
+                    this.showProgress = false
+                  },
+                  onDisappear: () => {
+                    this.showCollections = false
+                  }
+                })
               }
               .padding({ bottom: this.displayWidth < 1000 ? ((this.libraryItem!.media.metadata.description??"").length > 0 ? 15 : 0) : 20 })
               .onSizeChange((oldValue, newValue) => {
@@ -942,6 +1145,17 @@ export struct LibraryItemDetail {
                         this.library?.mediaType === 'book' ? Number(newValue.height) - 25 : Number(newValue.height)
                     }
                   }
+                }
+              })
+              .bindSheet(this.showCreateCollection, this.createCollectionBuilder(), {
+                height: SheetSize.FIT_CONTENT,
+                preferType: SheetType.CENTER,
+                title: {
+                  title: "新建收藏"
+                },
+                showClose: false,
+                onDisappear: () => {
+                  this.showCreateCollection = false
                 }
               })
             }

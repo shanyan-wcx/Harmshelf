@@ -1224,7 +1224,7 @@ export struct EpisodeComponent {
         })
 
         Button({ type: ButtonType.Normal }) {
-          SymbolGlyph($r('sys.symbol.list_interrupt'))
+          SymbolGlyph($r('sys.symbol.music_note_list'))
             .fontSize(20)
             .fontColor([$r('sys.color.font')])
         }

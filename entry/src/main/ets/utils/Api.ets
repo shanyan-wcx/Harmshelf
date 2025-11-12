@@ -25,6 +25,8 @@ import {
   Episode,
   User,
   PlaylistItem,
+  Book,
+  Collection1,
   Book1
 } from './Interface'
 import { JSON } from '@kit.ArkTS';
@@ -534,11 +536,11 @@ export async function removeFromCollection(collectionId: string, bookId: string)
   }
 }
 
-export async function createCollection(collection: Collection): Promise<Collection | undefined> {
+export async function createCollection(collection: Collection1): Promise<Collection | undefined> {
   const api: Axios = createApi()
   let collection1: Collection | undefined = undefined
   try {
-    const response: AxiosResponse = await api.post<string, AxiosResponse<string>, Collection>(`/api/collections`, collection, {
+    const response: AxiosResponse = await api.post<string, AxiosResponse<string>, Collection1>(`/api/collections`, collection, {
       timeout: 30000,
       readTimeout: 30000,
       connectTimeout: 30000
