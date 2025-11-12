@@ -89,6 +89,7 @@ struct Index {
   @Provider() progress: Progress[] = []
   @Provider() libraries: Library[] = []
   @Provider() playlists: Playlist[] = []
+  @Provider() collections: Collection[] = []
   @Provider() library: Library | undefined = undefined
   @Provider() libraryItems: LibraryItem[] = []
   @Provider() libraryItem: LibraryItem | undefined = undefined

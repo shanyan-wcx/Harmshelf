@@ -53,6 +53,7 @@ export struct EpisodeDetail {
   @Local showProgress: boolean = false
   @Local showCreatePlaylist: boolean = false
   @Local tmpPlaylistName: string = ""
+  @Local tmpPlaylistDescription: string = ""
 
   @Monitor('syncTime')
   async refreshProgress(monitor: IMonitor) {
@@ -224,6 +225,7 @@ export struct EpisodeDetail {
             });
           } else {
             this.tmpPlaylistName = ""
+            this.tmpPlaylistDescription = ""
             this.showPlaylists = false
             this.showCreatePlaylist = true
           }
@@ -254,6 +256,24 @@ export struct EpisodeDetail {
         .enterKeyType(EnterKeyType.Done)
         .onChange((value) => {
           this.tmpPlaylistName = value
+        })
+
+      TextArea({
+        placeholder: "播放列表描述"
+      })
+        .width("100%")
+        .height(120)
+        .borderRadius(8)
+        .margin({ bottom: 20 })
+        .caretColor($r('sys.color.font_secondary'))
+        .fontSize(18)
+        .placeholderFont({
+          size: 18
+        })
+        .type(TextAreaType.NORMAL)
+        .enterKeyType(EnterKeyType.Done)
+        .onChange((value) => {
+          this.tmpPlaylistDescription = value
         })
 
       Row({ space: 20 }) {
@@ -289,6 +309,7 @@ export struct EpisodeDetail {
             let playlist: Playlist = {
               libraryId: this.library!.id,
               name: this.tmpPlaylistName,
+              description: this.tmpPlaylistDescription.length > 0 ? this.tmpPlaylistDescription : null,
               items: [{
                 libraryItemId: this.episode!.libraryItemId!,
                 episodeId: this.episode!.id!,

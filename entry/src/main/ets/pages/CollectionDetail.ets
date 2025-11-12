@@ -1,10 +1,10 @@
-import { Book, Collection, LibraryItem, PlayItem, Progress } from '../utils/Interface';
+import { Book, Collection, Collection1, Library, LibraryItem, PlayItem, Progress } from '../utils/Interface';
 import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit';
 import { LengthMetrics, PersistenceV2, RectShape } from '@kit.ArkUI';
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import { env } from '../utils/Class';
 import { ColorMode } from "../pages/Index";
-import { getPlayItem } from '../utils/Api';
+import { deleteCollection, getPlayItem, updateCollection } from '../utils/Api';
 import { media } from '@kit.MediaKit';
 import { deviceInfo } from '@kit.BasicServicesKit';
 
@@ -23,6 +23,7 @@ export struct CollectionDetail {
   @Consumer() displayHeight: number = 0
   @Consumer() collection1: Collection | undefined = undefined
   @Consumer() libraryItem: LibraryItem | undefined = undefined
+  @Consumer() collections: Collection[] = []
   @Consumer() libraryItems: LibraryItem[] = []
   @Consumer() progress: Progress[] = []
   @Consumer() statusBarHeight: number = 0
@@ -36,9 +37,13 @@ export struct CollectionDetail {
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Consumer() baseUrl: string = ""
   @Consumer() apiToken: string = ""
+  @Consumer() library: Library | undefined = undefined
   @Local showLoadingProgress: boolean = false
   @Local showPlayLoading: boolean = false
   @Local topHeight: Length = 0
+  @Local showEditCollection: boolean = false
+  @Local tmpCollectionName: string = ""
+  @Local tmpCollectionDescription: string = ""
 
   async getPlayContent(playItem: PlayItem) {
     let index: number = 0
@@ -95,12 +100,125 @@ export struct CollectionDetail {
 
   private getPosition(collection: Collection, index: number): number {
     const gap =
-      (this.sideBarContentWidth - 40 >= 500 ? 500 : this.sideBarContentWidth - 40) / (collection.books.length - 1) / 2;
-    if (collection.books.length == 1) {
+      (this.sideBarContentWidth - 40 >= 500 ? 500 : this.sideBarContentWidth - 40) / (collection.books!.length - 1) / 2;
+    if (collection.books!.length == 1) {
       return (this.sideBarContentWidth - 40 >= 500 ? 500 : this.sideBarContentWidth - 40) / 2
     } else {
-      return (collection.books.length - 1 - index) * gap
+      return (collection.books!.length - 1 - index) * gap
     }
+  }
+
+  @Builder
+  editCollectionBuilder() {
+    Column() {
+      TextInput({
+        placeholder: "收藏名称",
+        text: this.tmpCollectionName
+      })
+        .width("100%")
+        .height(45)
+        .borderRadius(8)
+        .margin({ bottom: 20 })
+        .caretColor($r('sys.color.font_secondary'))
+        .fontSize(18)
+        .placeholderFont({
+          size: 18
+        })
+        .type(InputType.Normal)
+        .enterKeyType(EnterKeyType.Done)
+        .onChange((value) => {
+          this.tmpCollectionName = value
+        })
+
+      TextArea({
+        placeholder: "收藏描述",
+        text: this.tmpCollectionDescription
+      })
+        .width("100%")
+        .height(120)
+        .borderRadius(8)
+        .margin({ bottom: 20 })
+        .caretColor($r('sys.color.font_secondary'))
+        .fontSize(18)
+        .placeholderFont({
+          size: 18
+        })
+        .type(TextAreaType.NORMAL)
+        .enterKeyType(EnterKeyType.Done)
+        .onChange((value) => {
+          this.tmpCollectionDescription = value
+        })
+
+      Row({ space: 20 }) {
+        Button({ type: ButtonType.Normal }) {
+          Text("删除")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.warning'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(async () => {
+          let status = await deleteCollection(this.collection1!.id!)
+          if (status) {
+            let index = this.collections.findIndex(c => c.id === this.collection1!.id)
+            if (index !== -1) {
+              this.collections.splice(index, 1);
+            }
+            this.pageInfos.pop()
+            this.showEditCollection = false
+            this.getUIContext().getPromptAction().showToast({
+              message: '删除成功！',
+              duration: 500
+            });
+          } else {
+            this.getUIContext().getPromptAction().showToast({
+              message: '删除失败，请检查网络！',
+              duration: 500
+            });
+          }
+        })
+
+        Button({ type: ButtonType.Normal }) {
+          Text("确认")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(async () => {
+          if (this.tmpCollectionName.length === 0) {
+            this.getUIContext().getPromptAction().showToast({
+              message: '收藏名称不能为空！',
+              duration: 500
+            });
+          } else {
+            let newCollection = await updateCollection(this.collection1!.id!, this.tmpCollectionName, this.tmpCollectionDescription)
+            if (newCollection) {
+              this.showEditCollection = false
+              this.getUIContext().getPromptAction().showToast({
+                message: '编辑收藏成功！',
+                duration: 500
+              });
+              let index = this.collections.findIndex(c => c.id === newCollection!.id)
+              if (index !== -1) {
+                this.collections[index] = newCollection
+              }
+              this.collection1 = newCollection
+            } else {
+              this.getUIContext().getPromptAction().showToast({
+                message: '编辑收藏失败，请检查网络！',
+                duration: 500
+              });
+            }
+          }
+        })
+      }
+    }
+    .padding({ left: 20, right: 20, bottom: 25 })
   }
 
   build() {
@@ -110,9 +228,9 @@ export struct CollectionDetail {
           Column() {
             Column() {
               Stack({ alignContent: Alignment.Bottom }) {
-                if (this.collection1!.books.length === 1) {
+                if (this.collection1!.books!.length === 1) {
                   Column() {
-                    Image(this.baseUrl + `/api/items/${this.collection1!.books[0].id}/cover?token=${this.apiToken}`)
+                    Image(this.baseUrl + `/api/items/${this.collection1!.books![0].id}/cover?token=${this.apiToken}`)
                       .alt($rawfile('nocover.jpg'))
                       .objectFit(ImageFit.Cover)
                       .height('100%')
@@ -124,11 +242,11 @@ export struct CollectionDetail {
                   .width('100%')
                   .height('100%')
                   .backgroundImage(this.baseUrl +
-                    `/api/items/${this.collection1!.books[0].id}/cover?token=${this.apiToken}`)
+                    `/api/items/${this.collection1!.books![0].id}/cover?token=${this.apiToken}`)
                   .backgroundImageSize(ImageSize.FILL)
                   .backgroundBlurStyle(BlurStyle.BACKGROUND_THICK)
                 } else {
-                  ForEach(this.collection1!.books.slice().reverse(), (book: Book, index) => {
+                  ForEach(this.collection1!.books!.slice().reverse(), (book: Book, index) => {
                     Image(this.baseUrl + `/api/items/${book.id}/cover?token=${this.apiToken}`)
                       .alt($rawfile('nocover.jpg'))
                       .objectFit(ImageFit.Cover)
@@ -167,7 +285,7 @@ export struct CollectionDetail {
             Column() {
               Row() {
                 Column() {
-                  Text("收藏项目 " + this.collection1!.books.length)
+                  Text("收藏项目 " + this.collection1!.books!.length)
                     .fontSize(18)
                     .fontWeight(FontWeight.Medium)
                     .maxLines(1)
@@ -217,7 +335,7 @@ export struct CollectionDetail {
                 .onClick(async () => {
                   this.showPlayLoading = true
                   let id: string | undefined = undefined
-                  for (let book of this.collection1!.books) {
+                  for (let book of this.collection1!.books!) {
                     let isFinished = this.progress.find(p => p.libraryItemId === book.id)?.isFinished ?? false
                     if (!isFinished) {
                       id = book.id
@@ -387,6 +505,19 @@ export struct CollectionDetail {
       content: {
         title: {
           mainTitle: this.collection1!.name
+        },
+        menu: {
+          value: [{
+            content: {
+              icon: $r('sys.symbol.square_and_pencil'),
+              label: "编辑",
+              action: () => {
+                this.tmpCollectionName = this.collection1!.name
+                this.tmpCollectionDescription = this.collection1!.description??""
+                this.showEditCollection = true
+              }
+            }
+          }]
         }
       },
       style: {
@@ -399,5 +530,16 @@ export struct CollectionDetail {
     .hideBackButton(false)
     .backgroundColor($r('sys.color.background_secondary'))
     .bindToScrollable([this.PlaylistDetailScroller])
+    .bindSheet(this.showEditCollection, this.editCollectionBuilder(), {
+      height: SheetSize.FIT_CONTENT,
+      preferType: SheetType.CENTER,
+      title: {
+        title: "编辑收藏"
+      },
+      showClose: false,
+      onDisappear: () => {
+        this.showEditCollection = false
+      }
+    })
   }
 }

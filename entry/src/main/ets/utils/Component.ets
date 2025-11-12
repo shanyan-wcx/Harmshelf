@@ -446,11 +446,11 @@ export struct CollectionItemComponent {
   @Local collectionWidth: Length = 0
 
   private getPosition(collection: Collection, index: number): number {
-    const gap = Number(this.imageWidth) / (collection.books.length - 1) / 2;
-    if (collection.books.length == 1) {
+    const gap = Number(this.imageWidth) / (collection.books!.length - 1) / 2;
+    if (collection.books!.length == 1) {
       return Number(this.imageWidth) / 2
     } else {
-      return (collection.books.length - 1 - index) * gap
+      return (collection.books!.length - 1 - index) * gap
     }
   }
 
@@ -458,9 +458,9 @@ export struct CollectionItemComponent {
     Stack() {
       Button({ type: ButtonType.Normal }) {
         Stack({ alignContent: Alignment.Bottom }) {
-          if (this.collection.books.length === 1) {
+          if (this.collection.books!.length === 1) {
             Column() {
-              Image(this.baseUrl + `/api/items/${this.collection.books[0].id}/cover?token=${this.apiToken}`)
+              Image(this.baseUrl + `/api/items/${this.collection.books![0].id}/cover?token=${this.apiToken}`)
                 .alt($rawfile('nocover.jpg'))
                 .objectFit(ImageFit.Cover)
                 .height('100%')
@@ -471,11 +471,11 @@ export struct CollectionItemComponent {
             }
             .width('100%')
             .height('100%')
-            .backgroundImage(this.baseUrl + `/api/items/${this.collection.books[0].id}/cover?token=${this.apiToken}`)
+            .backgroundImage(this.baseUrl + `/api/items/${this.collection.books![0].id}/cover?token=${this.apiToken}`)
             .backgroundImageSize(ImageSize.FILL)
             .backgroundBlurStyle(BlurStyle.BACKGROUND_THICK)
           } else {
-            ForEach(this.collection.books.slice().reverse(), (book: Book, index) => {
+            ForEach(this.collection.books!.slice().reverse(), (book: Book, index) => {
               Image(this.baseUrl + `/api/items/${book.id}/cover?token=${this.apiToken}`)
                 .alt($rawfile('nocover.jpg'))
                 .objectFit(ImageFit.Cover)
@@ -856,6 +856,7 @@ export struct EpisodeComponent {
   @Local showProgress: boolean = false
   @Local showCreatePlaylist: boolean = false
   @Local tmpPlaylistName: string = ""
+  @Local tmpPlaylistDescription: string = ""
   @Monitor('syncTime')
   async refreshProgress(monitor: IMonitor) {
     this.itemProgress = undefined
@@ -963,6 +964,7 @@ export struct EpisodeComponent {
             });
           } else {
             this.tmpPlaylistName = ""
+            this.tmpPlaylistDescription = ""
             this.showPlaylists = false
             this.showCreatePlaylist = true
           }
@@ -993,6 +995,24 @@ export struct EpisodeComponent {
         .enterKeyType(EnterKeyType.Done)
         .onChange((value) => {
           this.tmpPlaylistName = value
+        })
+
+      TextArea({
+        placeholder: "播放列表描述"
+      })
+        .width("100%")
+        .height(120)
+        .borderRadius(8)
+        .margin({ bottom: 20 })
+        .caretColor($r('sys.color.font_secondary'))
+        .fontSize(18)
+        .placeholderFont({
+          size: 18
+        })
+        .type(TextAreaType.NORMAL)
+        .enterKeyType(EnterKeyType.Done)
+        .onChange((value) => {
+          this.tmpPlaylistDescription = value
         })
 
       Row({ space: 20 }) {
@@ -1028,6 +1048,7 @@ export struct EpisodeComponent {
             let playlist: Playlist = {
               libraryId: this.library!.id,
               name: this.tmpPlaylistName,
+              description: this.tmpPlaylistDescription.length > 0 ? this.tmpPlaylistDescription : null,
               items: [{
                 libraryItemId: this.episode!.libraryItemId!,
                 episodeId: this.episode!.id!,
@@ -1194,7 +1215,7 @@ export struct EpisodeComponent {
         .width(38)
         .height(38)
         .borderRadius(8)
-        .margin({ left: 5 })
+        .margin({ left: 10 })
         .onClick(async () => {
           if (this.itemProgress?.isFinished) {
             let tmpProgress: UpdateProgress = {
@@ -1232,7 +1253,6 @@ export struct EpisodeComponent {
         .width(38)
         .height(38)
         .borderRadius(8)
-        .margin({ left: 5 })
         .onClick(async () => {
           this.showPlaylists = true
         })

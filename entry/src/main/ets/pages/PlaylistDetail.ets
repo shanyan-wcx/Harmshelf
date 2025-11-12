@@ -4,7 +4,7 @@ import { LengthMetrics, PersistenceV2, RectShape } from '@kit.ArkUI';
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import { env } from '../utils/Class';
 import { ColorMode } from "../pages/Index";
-import { getPlayItem } from '../utils/Api';
+import { deletePlaylist, getPlayItem, updatePlaylist } from '../utils/Api';
 import { media } from '@kit.MediaKit';
 import { deviceInfo } from '@kit.BasicServicesKit';
 
@@ -24,6 +24,7 @@ export struct PlaylistDetail {
   @Consumer() libraryItem: LibraryItem | undefined = undefined
   @Consumer() library: Library | undefined = undefined
   @Consumer() episode: Episode | undefined = undefined
+  @Consumer() playlists: Playlist[] = []
   @Consumer() libraryItems: LibraryItem[] = []
   @Consumer() progress: Progress[] = []
   @Consumer() statusBarHeight: number = 0
@@ -40,6 +41,9 @@ export struct PlaylistDetail {
   @Local showLoadingProgress: boolean = false
   @Local showPlayLoading: boolean = false
   @Local topHeight: Length = 0
+  @Local showEditPlaylist: boolean = false
+  @Local tmpPlaylistName: string = ""
+  @Local tmpPlaylistDescription: string = ""
 
   async getPlayContent(playItem: PlayItem) {
     let index: number = 0
@@ -111,6 +115,119 @@ export struct PlaylistDetail {
     } else {
       return this.playlist1!.items.slice(0, 4);
     }
+  }
+
+  @Builder
+  editPlaylistBuilder() {
+    Column() {
+      TextInput({
+        placeholder: "播放列表名称",
+        text: this.tmpPlaylistName
+      })
+        .width("100%")
+        .height(45)
+        .borderRadius(8)
+        .margin({ bottom: 20 })
+        .caretColor($r('sys.color.font_secondary'))
+        .fontSize(18)
+        .placeholderFont({
+          size: 18
+        })
+        .type(InputType.Normal)
+        .enterKeyType(EnterKeyType.Done)
+        .onChange((value) => {
+          this.tmpPlaylistName = value
+        })
+
+      TextArea({
+        placeholder: "播放列表描述",
+        text: this.tmpPlaylistDescription
+      })
+        .width("100%")
+        .height(120)
+        .borderRadius(8)
+        .margin({ bottom: 20 })
+        .caretColor($r('sys.color.font_secondary'))
+        .fontSize(18)
+        .placeholderFont({
+          size: 18
+        })
+        .type(TextAreaType.NORMAL)
+        .enterKeyType(EnterKeyType.Done)
+        .onChange((value) => {
+          this.tmpPlaylistDescription = value
+        })
+
+      Row({ space: 20 }) {
+        Button({ type: ButtonType.Normal }) {
+          Text("删除")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.warning'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(async () => {
+          let status = await deletePlaylist(this.playlist1!.id!)
+          if (status) {
+            let index = this.playlists.findIndex(c => c.id === this.playlist1!.id)
+            if (index !== -1) {
+              this.playlists.splice(index, 1);
+            }
+            this.pageInfos.pop()
+            this.showEditPlaylist = false
+            this.getUIContext().getPromptAction().showToast({
+              message: '删除成功！',
+              duration: 500
+            });
+          } else {
+            this.getUIContext().getPromptAction().showToast({
+              message: '删除失败，请检查网络！',
+              duration: 500
+            });
+          }
+        })
+
+        Button({ type: ButtonType.Normal }) {
+          Text("确认")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(async () => {
+          if (this.tmpPlaylistName.length === 0) {
+            this.getUIContext().getPromptAction().showToast({
+              message: '播放列表名称不能为空！',
+              duration: 500
+            });
+          } else {
+            let newPlaylist = await updatePlaylist(this.playlist1!.id!, this.tmpPlaylistName, this.tmpPlaylistDescription)
+            if (newPlaylist) {
+              this.showEditPlaylist = false
+              this.getUIContext().getPromptAction().showToast({
+                message: '编辑播放列表成功！',
+                duration: 500
+              });
+              let index = this.playlists.findIndex(c => c.id === newPlaylist!.id)
+              if (index !== -1) {
+                this.playlists[index] = newPlaylist
+              }
+              this.playlist1 = newPlaylist
+            } else {
+              this.getUIContext().getPromptAction().showToast({
+                message: '编辑播放列表失败，请检查网络！',
+                duration: 500
+              });
+            }
+          }
+        })
+      }
+    }
+    .padding({ left: 20, right: 20, bottom: 25 })
   }
 
   build() {
@@ -448,6 +565,19 @@ export struct PlaylistDetail {
       content: {
         title: {
           mainTitle: this.playlist1!.name
+        },
+        menu: {
+          value: [{
+            content: {
+              icon: $r('sys.symbol.square_and_pencil'),
+              label: "编辑",
+              action: () => {
+                this.tmpPlaylistName = this.playlist1!.name
+                this.tmpPlaylistDescription = this.playlist1!.description??""
+                this.showEditPlaylist = true
+              }
+            }
+          }]
         }
       },
       style: {
@@ -460,5 +590,16 @@ export struct PlaylistDetail {
     .hideBackButton(false)
     .backgroundColor($r('sys.color.background_secondary'))
     .bindToScrollable([this.PlaylistDetailScroller])
+    .bindSheet(this.showEditPlaylist, this.editPlaylistBuilder(), {
+      height: SheetSize.FIT_CONTENT,
+      preferType: SheetType.CENTER,
+      title: {
+        title: "编辑播放列表"
+      },
+      showClose: false,
+      onDisappear: () => {
+        this.showEditPlaylist = false
+      }
+    })
   }
 }

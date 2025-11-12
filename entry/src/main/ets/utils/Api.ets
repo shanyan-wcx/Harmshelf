@@ -1,4 +1,4 @@
-import axios, { Axios, AxiosResponse } from '@ohos/axios'
+import axios, { Axios, AxiosResponse, FormData } from '@ohos/axios'
 import { promptAction } from '@kit.ArkUI';
 import { bundleManager } from '@kit.AbilityKit';
 import { rcp } from '@kit.RemoteCommunicationKit';
@@ -29,7 +29,7 @@ import {
   Collection1,
   Book1
 } from './Interface'
-import { JSON } from '@kit.ArkTS';
+import { JSON, util } from '@kit.ArkTS';
 
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 
@@ -554,6 +554,55 @@ export async function createCollection(collection: Collection1): Promise<Collect
   }
 }
 
+export async function updateCollection(collectionId: string, name: string, description: string): Promise<Collection | undefined> {
+  let collection: Collection | undefined = undefined
+  let req = new rcp.Request(baseUrl + `/api/collections/${collectionId}`, 'PATCH')
+  req.content = JSON.stringify({
+    name: name,
+    description: description.length > 0 ? description : null
+  })
+  req.headers = {
+    'Authorization': `Bearer ${authToken}`,
+    'Content-Type': 'application/json'
+  }
+  const timeout: rcp.Timeout = {
+    inactivityMs: 500,
+  };
+  req.configuration = {
+    transfer: {
+      timeout: timeout,
+    }
+  };
+  try {
+    const response: rcp.Response = await session.fetch(req)
+    if (response.body) {
+      const decoder = new util.TextDecoder();
+      const uint8Array = new Uint8Array(response.body);
+      const bodyString = decoder.decodeWithStream(uint8Array);
+      const parsed = JSON.parse(bodyString) as Collection;
+      collection = parsed;
+      console.log("更新成功");
+    }
+    return collection
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return undefined
+  }
+}
+
+export async function deleteCollection(collectionId: string): Promise<boolean> {
+  const api: Axios = createApi()
+  try {
+    const response: AxiosResponse =
+      await api.delete<string, AxiosResponse<string>, null>(`/api/collections/${collectionId}`)
+    console.log("删除成功");
+    return true
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return false
+  }
+}
+
 export async function getPlaylists(libraryId: string): Promise<Playlist[]> {
   const api: Axios = createApi()
   let playlists: Playlist[] = []
@@ -645,6 +694,56 @@ export async function createPlaylist(playlist: Playlist): Promise<Playlist | und
   } catch (error) {
     console.error(JSON.stringify(error));
     return undefined
+  }
+}
+
+export async function updatePlaylist(playlistId: string, name: string, description: string): Promise<Playlist | undefined> {
+  let playlist: Playlist | undefined = undefined
+  let req = new rcp.Request(baseUrl + `/api/playlists/${playlistId}`, 'PATCH')
+  req.content = JSON.stringify({
+    name: name,
+    description: description.length > 0 ? description : null
+  })
+  console.log(req.content)
+  req.headers = {
+    'Authorization': `Bearer ${authToken}`,
+    'Content-Type': 'application/json'
+  }
+  const timeout: rcp.Timeout = {
+    inactivityMs: 500,
+  };
+  req.configuration = {
+    transfer: {
+      timeout: timeout,
+    }
+  };
+  try {
+    const response: rcp.Response = await session.fetch(req)
+    if (response.body) {
+      const decoder = new util.TextDecoder();
+      const uint8Array = new Uint8Array(response.body);
+      const bodyString = decoder.decodeWithStream(uint8Array);
+      const parsed = JSON.parse(bodyString) as Playlist;
+      playlist = parsed;
+      console.log("更新成功");
+    }
+    return playlist
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return undefined
+  }
+}
+
+export async function deletePlaylist(playlistId: string): Promise<boolean> {
+  const api: Axios = createApi()
+  try {
+    const response: AxiosResponse =
+      await api.delete<string, AxiosResponse<string>, null>(`/api/playlists/${playlistId}`)
+    console.log("删除成功");
+    return true
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return false
   }
 }
 

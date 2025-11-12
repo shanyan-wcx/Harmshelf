@@ -78,11 +78,13 @@ export struct LibraryItemDetail {
   @Local showProgress: boolean = false
   @Local showCreatePlaylist: boolean = false
   @Local tmpPlaylistName: string = ""
+  @Local tmpPlaylistDescription: string = ""
   @Local tmpPlayingItem: PlayItem | undefined = undefined
   @Local tmpPlayingIndex: number = 0
   @Local showCollections: boolean = false
   @Local showCreateCollection: boolean = false
   @Local tmpCollectionName: string = ""
+  @Local tmpCollectionDescription: string = ""
   @Local tmpCollectionItem: PlayItem | undefined = undefined
   @Monitor('syncTime')
   async refreshProgress(monitor: IMonitor) {
@@ -353,6 +355,7 @@ export struct LibraryItemDetail {
             });
           } else {
             this.tmpPlaylistName = ""
+            this.tmpPlaylistDescription = ""
             this.showPlaylists = false
             this.showCreatePlaylist = true
           }
@@ -383,6 +386,24 @@ export struct LibraryItemDetail {
         .enterKeyType(EnterKeyType.Done)
         .onChange((value) => {
           this.tmpPlaylistName = value
+        })
+
+      TextArea({
+        placeholder: "播放列表描述"
+      })
+        .width("100%")
+        .height(120)
+        .borderRadius(8)
+        .margin({ bottom: 20 })
+        .caretColor($r('sys.color.font_secondary'))
+        .fontSize(18)
+        .placeholderFont({
+          size: 18
+        })
+        .type(TextAreaType.NORMAL)
+        .enterKeyType(EnterKeyType.Done)
+        .onChange((value) => {
+          this.tmpPlaylistDescription = value
         })
 
       Row({ space: 20 }) {
@@ -418,6 +439,7 @@ export struct LibraryItemDetail {
             let playlist: Playlist = {
               libraryId: this.library!.id,
               name: this.tmpPlaylistName,
+              description: this.tmpPlaylistDescription.length > 0 ? this.tmpPlaylistDescription : null,
               items: [{
                 libraryItemId: this.libraryItem!.id,
                 episodeId: null,
@@ -461,7 +483,7 @@ export struct LibraryItemDetail {
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                 Button({ type: ButtonType.Normal }) {
-                  Text(collection.books.find(b => b.id === this.libraryItem!.id) ? "移除" : "添加")
+                  Text(collection.books!.find(b => b.id === this.libraryItem!.id) ? "移除" : "添加")
                 }
                 .width(80)
                 .height(40)
@@ -469,7 +491,7 @@ export struct LibraryItemDetail {
                 .backgroundColor($r('sys.color.comp_background_tertiary'))
                 .onClick(async () => {
                   let tmpCollection: Collection | undefined = undefined
-                  let book = collection.books.find(b => b.id === this.libraryItem!.id)
+                  let book = collection.books!.find(b => b.id === this.libraryItem!.id)
                   if (!book) {
                     tmpCollection = await addToCollection(collection.id!, this.libraryItem!.id)
                   } else {
@@ -525,6 +547,7 @@ export struct LibraryItemDetail {
             });
           } else {
             this.tmpCollectionName = ""
+            this.tmpCollectionDescription = ""
             this.showCollections = false
             this.showCreateCollection = true
           }
@@ -555,6 +578,24 @@ export struct LibraryItemDetail {
         .enterKeyType(EnterKeyType.Done)
         .onChange((value) => {
           this.tmpCollectionName = value
+        })
+
+      TextArea({
+        placeholder: "收藏描述"
+      })
+        .width("100%")
+        .height(120)
+        .borderRadius(8)
+        .margin({ bottom: 20 })
+        .caretColor($r('sys.color.font_secondary'))
+        .fontSize(18)
+        .placeholderFont({
+          size: 18
+        })
+        .type(TextAreaType.NORMAL)
+        .enterKeyType(EnterKeyType.Done)
+        .onChange((value) => {
+          this.tmpCollectionDescription = value
         })
 
       Row({ space: 20 }) {
@@ -590,6 +631,7 @@ export struct LibraryItemDetail {
             let collection: Collection1 = {
               libraryId: this.library!.id,
               name: this.tmpCollectionName,
+              description: this.tmpCollectionDescription.length > 0 ? this.tmpCollectionDescription : null,
               books: [this.libraryItem!.id]
             }
             let newCollection = await createCollection(collection)

@@ -322,20 +322,20 @@ export interface Series {
 }
 
 export interface Collection {
-  id: string;
-  libraryId: string;
-  userId: string;
+  id?: string;
+  libraryId?: string;
+  userId?: string;
   name: string;
   description: string | null;
-  books: Book[];
-  lastUpdate: number;
-  createdAt: number;
+  books?: Book[];
+  lastUpdate?: number;
+  createdAt?: number;
 }
 
 export interface Collection1 {
   libraryId: string;
   name: string;
-  description?: string | null;
+  description: string | null;
   books: string[];
 }
 

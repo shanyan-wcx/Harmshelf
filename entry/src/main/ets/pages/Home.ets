@@ -35,13 +35,13 @@ export struct Home {
   private tabsController: HdsTabsController = new HdsTabsController()
   @Provider() homeData: HomeSection[] = []
   @Provider() recentEpisodes: Episode[] = []
-  @Provider() collections: Collection[] = []
   @Provider() authors: Author[] = []
   @Provider() searchPodcasts: SearchPodcast[] = []
   @Provider() recentEpisodesPage: number = 0
   @Consumer() user: User | undefined = undefined
   @Consumer() libraryItems: LibraryItem[] = []
   @Consumer() playlists: Playlist[] = []
+  @Consumer() collections: Collection[] = []
   @Consumer() showLoadingProgress: boolean = false
   @Consumer() needUpdate: boolean = false
   @Consumer() statusBarHeight: number = 0
