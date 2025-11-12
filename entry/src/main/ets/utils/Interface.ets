@@ -307,6 +307,10 @@ export interface Book {
   progress?: number //  自己临时加的
 }
 
+export interface Book1 {
+  id: string;
+}
+
 export interface Series {
   id: string;
   name: string;

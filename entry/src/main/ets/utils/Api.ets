@@ -24,7 +24,8 @@ import {
   HomeSection,
   Episode,
   User,
-  PlaylistItem
+  PlaylistItem,
+  Book1
 } from './Interface'
 import { JSON } from '@kit.ArkTS';
 
@@ -481,6 +482,73 @@ export async function getCollections(libraryId: string): Promise<Collection[]> {
       duration: 500
     });
     return []
+  }
+}
+
+export async function addToCollection(collectionId: string, bookId: string): Promise<Collection | undefined> {
+  const api: Axios = createApi()
+  let collection: Collection | undefined = undefined
+  try {
+    const response: AxiosResponse = await api.post<string, AxiosResponse<string>, Book1>(`api/collections/${collectionId}/book`, {
+      id: bookId
+    }, {
+      timeout: 30000,
+      readTimeout: 30000,
+      connectTimeout: 30000
+    })
+    collection = response.data
+    console.log("添加成功");
+    promptAction.showToast({
+      message: '添加成功！',
+      duration: 500
+    });
+    return collection
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    promptAction.showToast({
+      message: '添加失败，请检查网络！',
+      duration: 500
+    });
+    return undefined
+  }
+}
+
+export async function removeFromCollection(collectionId: string, bookId: string): Promise<Collection | undefined> {
+  const api: Axios = createApi()
+  try {
+    const response: AxiosResponse =
+      await api.delete<string, AxiosResponse<string>, null>(`/api/collections/${collectionId}/book/${bookId}`)
+    console.log("移除成功");
+    promptAction.showToast({
+      message: '移除成功！',
+      duration: 500
+    });
+    return response.data
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    promptAction.showToast({
+      message: '移除失败，请检查网络！',
+      duration: 500
+    });
+    return undefined
+  }
+}
+
+export async function createCollection(collection: Collection): Promise<Collection | undefined> {
+  const api: Axios = createApi()
+  let collection1: Collection | undefined = undefined
+  try {
+    const response: AxiosResponse = await api.post<string, AxiosResponse<string>, Collection>(`/api/collections`, collection, {
+      timeout: 30000,
+      readTimeout: 30000,
+      connectTimeout: 30000
+    })
+    collection1 = response.data
+    console.log("创建成功");
+    return collection1
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return undefined
   }
 }
 
