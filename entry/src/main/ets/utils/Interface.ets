@@ -487,15 +487,15 @@ export interface PlaylistItem {
 }
 
 export interface Playlist {
-  id: string;
+  id?: string;
   libraryId: string;
-  userId: string;
+  userId?: string;
   name: string;
   description?: string | null;
-  coverPath: string | null;
+  coverPath?: string | null;
   items: PlaylistItem[];
-  lastUpdate: number;
-  createdAt: number;
+  lastUpdate?: number;
+  createdAt?: number;
 }
 
 export interface Response {

@@ -23,7 +23,8 @@ import {
   SearchResult,
   HomeSection,
   Episode,
-  User
+  User,
+  PlaylistItem
 } from './Interface'
 import { JSON } from '@kit.ArkTS';
 
@@ -506,6 +507,74 @@ export async function getPlaylists(libraryId: string): Promise<Playlist[]> {
       duration: 500
     });
     return []
+  }
+}
+
+export async function addToPlaylist(playlistId: string, libraryItemId: string, episodeId?: string): Promise<Playlist | undefined> {
+  const api: Axios = createApi()
+  let playlist: Playlist | undefined = undefined
+  try {
+    const response: AxiosResponse = await api.post<string, AxiosResponse<string>, PlaylistItem>(`/api/playlists/${playlistId}/item`, {
+      libraryItemId: libraryItemId,
+      episodeId: episodeId??null
+    }, {
+      timeout: 30000,
+      readTimeout: 30000,
+      connectTimeout: 30000
+    })
+    playlist = response.data
+    console.log("添加成功");
+    promptAction.showToast({
+      message: '添加成功！',
+      duration: 500
+    });
+    return playlist
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    promptAction.showToast({
+      message: '添加失败，请检查网络！',
+      duration: 500
+    });
+    return undefined
+  }
+}
+
+export async function removeFromPlaylist(playlistId: string, libraryItemId: string, episodeId?: string): Promise<Playlist | undefined> {
+  const api: Axios = createApi()
+  try {
+    const response: AxiosResponse =
+      await api.delete<string, AxiosResponse<string>, null>(`/api/playlists/${playlistId}/item/${libraryItemId}` + (episodeId ? `/${episodeId}` : ""))
+    console.log("移除成功");
+    promptAction.showToast({
+      message: '移除成功！',
+      duration: 500
+    });
+    return response.data
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    promptAction.showToast({
+      message: '移除失败，请检查网络！',
+      duration: 500
+    });
+    return undefined
+  }
+}
+
+export async function createPlaylist(playlist: Playlist): Promise<Playlist | undefined> {
+  const api: Axios = createApi()
+  let playlist1: Playlist | undefined = undefined
+  try {
+    const response: AxiosResponse = await api.post<string, AxiosResponse<string>, Playlist>(`/api/playlists`, playlist, {
+      timeout: 30000,
+      readTimeout: 30000,
+      connectTimeout: 30000
+    })
+    playlist1 = response.data
+    console.log("创建成功");
+    return playlist1
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return undefined
   }
 }
 
