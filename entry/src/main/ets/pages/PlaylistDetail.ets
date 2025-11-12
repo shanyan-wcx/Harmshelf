@@ -4,7 +4,7 @@ import { LengthMetrics, PersistenceV2, RectShape } from '@kit.ArkUI';
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import { env } from '../utils/Class';
 import { ColorMode } from "../pages/Index";
-import { deletePlaylist, getPlayItem, updatePlaylist } from '../utils/Api';
+import { deletePlaylist, getPlayItem, getPlaylists, removeFromPlaylist, updatePlaylist } from '../utils/Api';
 import { media } from '@kit.MediaKit';
 import { deviceInfo } from '@kit.BasicServicesKit';
 
@@ -118,6 +118,47 @@ export struct PlaylistDetail {
   }
 
   @Builder
+  playlistEnd(index: number) {
+    Button({ type: ButtonType.Circle }) {
+      SymbolGlyph($r('sys.symbol.trash'))
+        .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+        .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+    }
+    .width(40)
+    .height(40)
+    .margin({ left: 10, right: 10 })
+    .backgroundColor($r('sys.color.warning'))
+    .border({
+      width: deviceTypeInfo === '2in1' ? 1 : 0,
+      color: $r('sys.color.ohos_id_shadow_default_lg_dark')
+    })
+    .shadow({
+      radius: 6,
+      color: $r('sys.color.ohos_id_shadow_default_lg_dark')
+    })
+    .onClick(async () => {
+      let playlist: Playlist | undefined = undefined
+      if (this.library!.mediaType === 'book') {
+        playlist = await removeFromPlaylist(this.playlist1!.id!, this.playlist1!.items![index].libraryItemId)
+      } else if (this.library!.mediaType === 'podcast') {
+        playlist = await removeFromPlaylist(this.playlist1!.id!, this.playlist1!.items![index].libraryItemId, this.playlist1!.items![index].episodeId!)
+      }
+      if (playlist) {
+        this.playlist1 = playlist
+        if (playlist.items.length === 0) {
+          this.pageInfos.pop()
+        }
+        this.playlists = await getPlaylists(this.library!.id)
+      } else {
+        this.getUIContext().getPromptAction().showToast({
+          message: '移除失败，请检查网络！',
+          duration: 500
+        });
+      }
+    })
+  }
+
+  @Builder
   editPlaylistBuilder() {
     Column() {
       TextInput({
@@ -171,16 +212,13 @@ export struct PlaylistDetail {
         .onClick(async () => {
           let status = await deletePlaylist(this.playlist1!.id!)
           if (status) {
-            let index = this.playlists.findIndex(c => c.id === this.playlist1!.id)
-            if (index !== -1) {
-              this.playlists.splice(index, 1);
-            }
-            this.pageInfos.pop()
             this.showEditPlaylist = false
             this.getUIContext().getPromptAction().showToast({
               message: '删除成功！',
               duration: 500
             });
+            this.pageInfos.pop()
+            this.playlists = await getPlaylists(this.library!.id)
           } else {
             this.getUIContext().getPromptAction().showToast({
               message: '删除失败，请检查网络！',
@@ -212,11 +250,8 @@ export struct PlaylistDetail {
                 message: '编辑播放列表成功！',
                 duration: 500
               });
-              let index = this.playlists.findIndex(c => c.id === newPlaylist!.id)
-              if (index !== -1) {
-                this.playlists[index] = newPlaylist
-              }
               this.playlist1 = newPlaylist
+              this.playlists = await getPlaylists(this.library!.id)
             } else {
               this.getUIContext().getPromptAction().showToast({
                 message: '编辑播放列表失败，请检查网络！',
@@ -247,7 +282,7 @@ export struct PlaylistDetail {
                     .clip(true)
                     .objectFit(ImageFit.Fill)
                     .draggable(false)
-                } else {
+                } else if ((this.playlist1!.items ?? []).length > 1) {
                   ForEach([0, 1], (row: number) => {
                     Row() {
                       ForEach([0, 1], (col: number) => {
@@ -390,128 +425,141 @@ export struct PlaylistDetail {
               .padding({ top: 10, bottom: 10 })
               .alignItems(VerticalAlign.Center)
 
-              ForEach(this.playlist1!.items, (item: PlaylistItem, index) => {
-                Stack() {
-                  Row() {
-                    Image(this.baseUrl + `/api/items/${item.libraryItemId}/cover?token=${this.apiToken}`)
-                      .alt($rawfile('nocover.jpg'))
-                      .objectFit(ImageFit.Cover)
-                      .width(55)
-                      .aspectRatio(1)
-                      .borderRadius(8)
-                      .margin({ right: 10 })
-                      .draggable(false)
+              List() {
+                ForEach(this.playlist1!.items, (item: PlaylistItem, index) => {
+                  ListItem() {
+                    Stack() {
+                      Row() {
+                        Image(this.baseUrl + `/api/items/${item.libraryItemId}/cover?token=${this.apiToken}`)
+                          .alt($rawfile('nocover.jpg'))
+                          .objectFit(ImageFit.Cover)
+                          .width(55)
+                          .aspectRatio(1)
+                          .borderRadius(8)
+                          .margin({ right: 10 })
+                          .draggable(false)
 
-                    Column() {
-                      Text(this.library?.mediaType === 'book' ? item.libraryItem!.media.metadata.title :
-                        item.episode!.title)
-                        .fontSize(16)
-                        .maxLines(1)
-                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        Column() {
+                          Text(this.library?.mediaType === 'book' ? item.libraryItem!.media.metadata.title :
+                            item.episode!.title)
+                            .fontSize(16)
+                            .maxLines(1)
+                            .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                      Text(this.library?.mediaType === 'book' ? (item.libraryItem!.media.metadata.authorName ?? "-") :
-                        (this.libraryItems.find(item1 => item1.id === item.libraryItemId)?.media.metadata.author ??
-                          "-"))
-                        .fontSize(14)
-                        .fontColor($r('sys.color.font_secondary'))
-                        .maxLines(1)
-                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                          Text(this.library?.mediaType === 'book' ?
+                            (item.libraryItem!.media.metadata.authorName ?? "-") :
+                            (this.libraryItems.find(item1 => item1.id === item.libraryItemId)?.media.metadata.author ??
+                              "-"))
+                            .fontSize(14)
+                            .fontColor($r('sys.color.font_secondary'))
+                            .maxLines(1)
+                            .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                      Text(this.formatDuration(this.library?.mediaType === 'book' ? item.libraryItem!.media.duration :
-                        item.episode!.duration))
-                        .fontSize(12)
-                        .fontColor($r('sys.color.font_secondary'))
-                        .maxLines(1)
-                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                          Text(this.formatDuration(this.library?.mediaType === 'book' ?
+                            item.libraryItem!.media.duration :
+                            item.episode!.duration))
+                            .fontSize(12)
+                            .fontColor($r('sys.color.font_secondary'))
+                            .maxLines(1)
+                            .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        }
+                        .width('100%')
+                        .layoutWeight(1)
+                        .margin({ right: 10 })
+                        .alignItems(HorizontalAlign.Start)
+
+                        Button({ type: ButtonType.Circle }) {
+                          SymbolGlyph($r('sys.symbol.play_fill'))
+                            .fontWeight(FontWeight.Normal)
+                            .fontSize(18)
+                            .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                            .hitTestBehavior(HitTestMode.None)
+                            .margin({ bottom: 1 })
+                        }
+                        .height(40)
+                        .width(40)
+                        .backgroundColor($r('sys.color.comp_background_tertiary'))
+                        .onClick(async () => {
+                          if (this.library?.mediaType === 'book') {
+                            this.playingItem = await getPlayItem(item.libraryItemId)
+                            if (this.playingItem) {
+                              await this.avPlayer!.reset();
+                              this.isStartPlaying = true
+                              this.isPlaying = true
+                              await this.getPlayContent(this.playingItem!)
+                            }
+                          } else if (this.library?.mediaType === 'podcast') {
+                            this.playingItem = await getPlayItem(item.libraryItemId, item.episodeId!)
+                            if (this.playingItem) {
+                              await this.avPlayer!.reset();
+                              this.isStartPlaying = true
+                              this.isPlaying = true
+                              this.playingIndex = 0
+                              this.playingTitle = this.playingItem!.displayTitle.trim()
+                              this.playStartTime =
+                                this.playingItem!.currentTime - this.playingItem!.audioTracks[0].startOffset
+                              this.avPlayer!.url =
+                                this.baseUrl + this.playingItem!.audioTracks[0].contentUrl + "?token=" + this.apiToken
+                              console.log("共", this.playingItem!.audioTracks.length, "条音轨")
+                              console.log("播放序号为", this.playingIndex)
+                              console.log("起始位置为", this.playStartTime)
+                            }
+                          }
+                        })
+                      }
+                      .padding(10)
+
+                      Progress({
+                        value: this.library?.mediaType === 'book' ?
+                          (this.progress.find(p => p.libraryItemId === item.libraryItemId)?.progress ?? 0) * 100 :
+                          (this.progress.find(p => p.episodeId === item.episodeId)?.progress ?? 0) * 100,
+                        total: 100,
+                        type: ProgressType.Linear
+                      })
+                        .width('100%')
+                        .color(this.progress.find(p => p.libraryItemId === item.libraryItemId)?.progress === 1 ?
+                          $r('sys.color.ohos_id_color_palette4') :
+                          $r('sys.color.multi_color_11'))
+                        .backgroundColor(Color.Transparent)
+                        .style({
+                          strokeWidth: 8,
+                          strokeRadius: 8
+                        })
+                        .offset({
+                          y: 0.5
+                        })
+                        .clipShape(new RectShape({
+                          width: '100%',
+                          height: '4'
+                        }).position({
+                          y: 4
+                        }))
                     }
+                    .clip(true)
                     .width('100%')
-                    .layoutWeight(1)
-                    .margin({ right: 10 })
-                    .alignItems(HorizontalAlign.Start)
-
-                    Button({ type: ButtonType.Circle }) {
-                      SymbolGlyph($r('sys.symbol.play_fill'))
-                        .fontWeight(FontWeight.Normal)
-                        .fontSize(18)
-                        .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
-                        .hitTestBehavior(HitTestMode.None)
-                        .margin({ bottom: 1 })
-                    }
-                    .height(40)
-                    .width(40)
-                    .backgroundColor($r('sys.color.comp_background_tertiary'))
-                    .onClick(async () => {
+                    .backgroundColor($r('sys.color.background_secondary'))
+                    .borderRadius(8)
+                    .margin({ top: index === 0 ? 0 : 10 })
+                    .alignContent(Alignment.Bottom)
+                    .onClick(() => {
                       if (this.library?.mediaType === 'book') {
-                        this.playingItem = await getPlayItem(item.libraryItemId)
-                        if (this.playingItem) {
-                          await this.avPlayer!.reset();
-                          this.isStartPlaying = true
-                          this.isPlaying = true
-                          await this.getPlayContent(this.playingItem!)
-                        }
-                      } else if (this.library?.mediaType === 'podcast') {
-                        this.playingItem = await getPlayItem(item.libraryItemId, item.episodeId!)
-                        if (this.playingItem) {
-                          await this.avPlayer!.reset();
-                          this.isStartPlaying = true
-                          this.isPlaying = true
-                          this.playingIndex = 0
-                          this.playingTitle = this.playingItem!.displayTitle.trim()
-                          this.playStartTime =
-                            this.playingItem!.currentTime - this.playingItem!.audioTracks[0].startOffset
-                          this.avPlayer!.url =
-                            this.baseUrl + this.playingItem!.audioTracks[0].contentUrl + "?token=" + this.apiToken
-                          console.log("共", this.playingItem!.audioTracks.length, "条音轨")
-                          console.log("播放序号为", this.playingIndex)
-                          console.log("起始位置为", this.playStartTime)
-                        }
+                        this.libraryItem = item.libraryItem
+                        this.pageInfos.pushPathByName('libraryItemDetail', null)
+                      } else {
+                        this.episode = item.episode
+                        this.pageInfos.pushPathByName('episodeDetail', null)
                       }
                     })
                   }
-                  .padding(10)
-
-                  Progress({
-                    value: this.library?.mediaType === 'book' ?
-                      (this.progress.find(p => p.libraryItemId === item.libraryItemId)?.progress ?? 0) * 100 :
-                      (this.progress.find(p => p.episodeId === item.episodeId)?.progress ?? 0) * 100,
-                    total: 100,
-                    type: ProgressType.Linear
+                  .swipeAction({
+                    end: {
+                      builder: () => {
+                        this.playlistEnd(index)
+                      }
+                    }
                   })
-                    .width('100%')
-                    .color(this.progress.find(p => p.libraryItemId === item.libraryItemId)?.progress === 1 ?
-                      $r('sys.color.ohos_id_color_palette4') :
-                      $r('sys.color.multi_color_11'))
-                    .backgroundColor(Color.Transparent)
-                    .style({
-                      strokeWidth: 8,
-                      strokeRadius: 8
-                    })
-                    .offset({
-                      y: 0.5
-                    })
-                    .clipShape(new RectShape({
-                      width: '100%',
-                      height: '4'
-                    }).position({
-                      y: 4
-                    }))
-                }
-                .clip(true)
-                .width('100%')
-                .backgroundColor($r('sys.color.background_secondary'))
-                .borderRadius(8)
-                .margin({ top: index === 0 ? 0 : 10 })
-                .alignContent(Alignment.Bottom)
-                .onClick(() => {
-                  if (this.library?.mediaType === 'book') {
-                    this.libraryItem = item.libraryItem
-                    this.pageInfos.pushPathByName('libraryItemDetail', null)
-                  } else {
-                    this.episode = item.episode
-                    this.pageInfos.pushPathByName('episodeDetail', null)
-                  }
                 })
-              })
+              }
             }
             .width('100%')
             .margin({ top: 15 })

@@ -704,7 +704,6 @@ export async function updatePlaylist(playlistId: string, name: string, descripti
     name: name,
     description: description.length > 0 ? description : null
   })
-  console.log(req.content)
   req.headers = {
     'Authorization': `Bearer ${authToken}`,
     'Content-Type': 'application/json'
