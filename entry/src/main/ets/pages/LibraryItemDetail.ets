@@ -21,6 +21,7 @@ import {
   addToPlaylist,
   createCollection,
   createPlaylist,
+  downloadEpisodes,
   getCollections,
   getFeed,
   getItem, getPlayItem, getPlaylists, getUser,
@@ -87,6 +88,7 @@ export struct LibraryItemDetail {
   @Local loadingFeed: boolean = false
   @Local showFeedEpisodes: boolean = false
   @Local feedEpisodes: Episode[] = []
+  @Local addToServer: boolean[] = []
   @Local tmpCollectionName: string = ""
   @Local tmpCollectionDescription: string = ""
   @Local tmpCollectionItem: PlayItem | undefined = undefined
@@ -231,19 +233,33 @@ export struct LibraryItemDetail {
           ListItem() {
             Column() {
               Row() {
-                if (this.libraryItem!.episodes?.find(e => e.id === episode.id)) {
-
-                } else {
-
+                Column() {
+                  if (this.episodes.find(e => e.enclosure.url === episode.enclosure.url)) {
+                    SymbolGlyph($r('sys.symbol.checkmark'))
+                      .fontWeight(FontWeight.Bold)
+                      .fontSize(20)
+                      .fontColor([$r('sys.color.comp_emphasize_secondary')])
+                      .margin({ left: 4, right: 4 })
+                  } else {
+                    Checkbox()
+                      .width(20)
+                      .select(this.addToServer[index])
+                      .selectedColor($r('sys.color.comp_emphasize_secondary'))
+                      .onClick(() => {
+                        this.addToServer[index] = !this.addToServer[index]
+                      })
+                  }
                 }
+                .margin({ left: 10, right: 10 })
 
                 Column() {
                   Text(episode.title)
                     .fontSize(16)
                     .margin({ bottom: 5 })
 
-                  Text(episode.pubDate)
+                  Text(this.formatTime(episode.publishedAt??0))
                     .fontSize(12)
+                    .fontColor($r('sys.color.font_secondary'))
                 }
                 .width('100%')
                 .layoutWeight(1)
@@ -277,7 +293,32 @@ export struct LibraryItemDetail {
       .borderRadius(8)
       .margin({ top: 20 })
       .onClick(async () => {
-        this.showFeedEpisodes = false
+        if (this.addToServer.every(v => v === false)) {
+          this.getUIContext().getPromptAction().showToast({
+            message: '未选择任何剧集！',
+            duration: 500
+          });
+        } else {
+          let episodes: Episode[] = []
+          this.feedEpisodes.forEach((episode: Episode, index) => {
+            if (this.addToServer[index]) {
+              episodes.push(episode)
+            }
+          })
+          let status = await downloadEpisodes(this.libraryItem!.id, episodes)
+          if (status) {
+            this.getUIContext().getPromptAction().showToast({
+              message: '添加成功！',
+              duration: 500
+            });
+            this.showFeedEpisodes = false
+          } else {
+            this.getUIContext().getPromptAction().showToast({
+              message: '添加失败，请检查网络！',
+              duration: 500
+            });
+          }
+        }
       })
     }
     .padding({ left: 20, right: 20, bottom: 25 })
@@ -1497,11 +1538,12 @@ export struct LibraryItemDetail {
                       .onClick(async () => {
                         this.loadingFeed = true
                         this.feedEpisodes = []
+                        this.addToServer = []
                         let podcast = await getFeed(this.libraryItem!.media.metadata.feedUrl!)
                         if (podcast) {
                           this.feedEpisodes = podcast.episodes
-                          this.loadingFeed = false
                           this.showFeedEpisodes = true
+                          this.loadingFeed = false
                         } else {
                           this.getUIContext().getPromptAction().showToast({
                             message: '获取剧集失败，请检查网络！',

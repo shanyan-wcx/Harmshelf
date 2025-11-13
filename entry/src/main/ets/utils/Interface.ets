@@ -453,7 +453,7 @@ export interface Episode {
   publishedAt?: number;
   addedAt?: number;
   updatedAt?: number;
-  duration: number;
+  duration?: number;
   size?: number;
   podcast?: Podcast;
   author?: string;

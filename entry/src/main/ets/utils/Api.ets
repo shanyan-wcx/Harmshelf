@@ -924,3 +924,15 @@ export async function getRecentEpisodes(libraryId: string, page: number) {
     return []
   }
 }
+
+export async function downloadEpisodes(podcastId: string, episodes: Episode[]): Promise<boolean> {
+  const api: Axios = createApi()
+  try {
+    const response: AxiosResponse =
+      await api.post<string, AxiosResponse<string>, Episode[]>(`/api/podcasts/${podcastId}/download-episodes`, episodes)
+    return true
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return false
+  }
+}

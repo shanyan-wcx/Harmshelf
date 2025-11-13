@@ -1177,7 +1177,7 @@ export struct EpisodeComponent {
                 .margin({ bottom: 1 })
             }
 
-            Text(this.formatDuration(this.item.duration))
+            Text(this.formatDuration(this.item.duration!))
               .fontSize(18)
               .fontWeight(FontWeight.Medium)
               .maxLines(1)
@@ -1220,7 +1220,7 @@ export struct EpisodeComponent {
         .onClick(async () => {
           if (this.itemProgress?.isFinished) {
             let tmpProgress: UpdateProgress = {
-              duration: this.item.duration,
+              duration: this.item.duration!,
               currentTime: 0,
               progress: 0,
               isFinished: false
@@ -1232,8 +1232,8 @@ export struct EpisodeComponent {
             }
           } else {
             let tmpProgress: UpdateProgress = {
-              duration: this.item.duration,
-              currentTime: this.item.duration,
+              duration: this.item.duration!,
+              currentTime: this.item.duration!,
               progress: 1,
               isFinished: true
             }
@@ -1413,7 +1413,7 @@ export struct EpisodeComponent1 {
                 .margin({ bottom: 1 })
             }
 
-            Text(this.formatDuration(this.item.duration))
+            Text(this.formatDuration(this.item.duration!))
               .fontSize(18)
               .fontWeight(FontWeight.Medium)
               .maxLines(1)
@@ -1456,7 +1456,7 @@ export struct EpisodeComponent1 {
         .onClick(async () => {
           if (this.itemProgress?.isFinished) {
             let tmpProgress: UpdateProgress = {
-              duration: this.item.duration,
+              duration: this.item.duration!,
               currentTime: 0,
               progress: 0,
               isFinished: false
@@ -1468,8 +1468,8 @@ export struct EpisodeComponent1 {
             }
           } else {
             let tmpProgress: UpdateProgress = {
-              duration: this.item.duration,
-              currentTime: this.item.duration,
+              duration: this.item.duration!,
+              currentTime: this.item.duration!,
               progress: 1,
               isFinished: true
             }

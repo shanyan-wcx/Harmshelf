@@ -91,8 +91,8 @@ export struct EpisodeDetail {
         value: "标记为已听完",
         action: async () => {
           let tmpProgress: UpdateProgress = {
-            duration: this.episode!.duration,
-            currentTime: this.episode!.duration,
+            duration: this.episode!.duration!,
+            currentTime: this.episode!.duration!,
             progress: 1,
             isFinished: true
           }
@@ -111,7 +111,7 @@ export struct EpisodeDetail {
         value: "放弃进度",
         action: async () => {
           let tmpProgress: UpdateProgress = {
-            duration: this.episode!.duration,
+            duration: this.episode!.duration!,
             currentTime: 0,
             progress: 0,
             isFinished: false

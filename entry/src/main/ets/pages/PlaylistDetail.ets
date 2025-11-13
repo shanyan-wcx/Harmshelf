@@ -458,7 +458,7 @@ export struct PlaylistDetail {
 
                           Text(this.formatDuration(this.library?.mediaType === 'book' ?
                             item.libraryItem!.media.duration :
-                            item.episode!.duration))
+                            item.episode!.duration!))
                             .fontSize(12)
                             .fontColor($r('sys.color.font_secondary'))
                             .maxLines(1)
