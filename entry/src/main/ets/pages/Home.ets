@@ -356,25 +356,27 @@ export struct Home {
                 color: this.isOnFocus ? $r('sys.color.comp_emphasize_secondary') : $r('sys.color.ohos_id_color_hover')
               }))
 
-            TabContent() {
-              Add()
+            if (this.user?.type === "root" || this.user?.type === "admin") {
+              TabContent() {
+                Add()
+              }
+              .tabBar(new SubTabBarStyle('添加')
+                .selectedMode(SelectedMode.BOARD)
+                .padding(0)
+                .board({
+                  borderRadius: 5
+                })
+                .labelStyle({
+                  font: {
+                    size: 14,
+                    weight: this.topTabIndex === 3 ? FontWeight.Bold : FontWeight.Medium
+                  },
+                  selectedColor: $r('sys.color.select_font_color')
+                })
+                .indicator({
+                  color: this.isOnFocus ? $r('sys.color.comp_emphasize_secondary') : $r('sys.color.ohos_id_color_hover')
+                }))
             }
-            .tabBar(new SubTabBarStyle('添加')
-              .selectedMode(SelectedMode.BOARD)
-              .padding(0)
-              .board({
-                borderRadius: 5
-              })
-              .labelStyle({
-                font: {
-                  size: 14,
-                  weight: this.topTabIndex === 3 ? FontWeight.Bold : FontWeight.Medium
-                },
-                selectedColor: $r('sys.color.select_font_color')
-              })
-              .indicator({
-                color: this.isOnFocus ? $r('sys.color.comp_emphasize_secondary') : $r('sys.color.ohos_id_color_hover')
-              }))
 
             if (this.playlists.length > 0) {
               TabContent() {

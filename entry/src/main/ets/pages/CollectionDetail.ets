@@ -1,4 +1,4 @@
-import { Book, Collection, Collection1, Library, LibraryItem, PlayItem, Progress } from '../utils/Interface';
+import { Book, Collection, Collection1, Library, LibraryItem, PlayItem, Progress, User } from '../utils/Interface';
 import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit';
 import { LengthMetrics, PersistenceV2, RectShape } from '@kit.ArkUI';
 import { ConfigurationConstant } from '@kit.AbilityKit';
@@ -38,6 +38,7 @@ export struct CollectionDetail {
   @Consumer() baseUrl: string = ""
   @Consumer() apiToken: string = ""
   @Consumer() library: Library | undefined = undefined
+  @Consumer() user: User | undefined = undefined
   @Local showLoadingProgress: boolean = false
   @Local showPlayLoading: boolean = false
   @Local topHeight: Length = 0
@@ -128,13 +129,20 @@ export struct CollectionDetail {
       color: $r('sys.color.ohos_id_shadow_default_lg_dark')
     })
     .onClick(async () => {
-      let collection = await removeFromCollection(this.collection1!.id!, this.collection1!.books![index].id)
-      if (collection) {
-        this.collection1 = collection
-        this.collections = await getCollections(this.library!.id)
+      if (this.user?.type === "root" || this.user?.type === "admin") {
+        let collection = await removeFromCollection(this.collection1!.id!, this.collection1!.books![index].id)
+        if (collection) {
+          this.collection1 = collection
+          this.collections = await getCollections(this.library!.id)
+        } else {
+          this.getUIContext().getPromptAction().showToast({
+            message: '移除失败，请检查网络！',
+            duration: 500
+          });
+        }
       } else {
         this.getUIContext().getPromptAction().showToast({
-          message: '移除失败，请检查网络！',
+          message: '当前用户没有权限！',
           duration: 500
         });
       }

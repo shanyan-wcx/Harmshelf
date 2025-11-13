@@ -12,7 +12,8 @@ import {
   UpdateProgress,
   Playlist,
   Collection,
-  Collection1
+  Collection1,
+  User
 } from "../utils/Interface";
 import { HdsNavDestination, HdsNavDestinationAttribute } from "@kit.UIDesignKit";
 import { LengthMetrics, SymbolGlyphModifier } from "@kit.ArkUI";
@@ -62,6 +63,7 @@ export struct LibraryItemDetail {
   @Consumer() playStartTime: number = 0
   @Consumer() syncTime: number = 0
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
+  @Consumer() user: User | undefined = undefined
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.libraryItemId === this.libraryItem!.id)
   @Local maxIntroLine: number = 5
   @Local showMoreIntro: boolean = false
@@ -198,13 +200,15 @@ export struct LibraryItemDetail {
           }
         })
       }
-      this.moreMenus.push({
-        symbolIcon: new SymbolGlyphModifier($r('sys.symbol.star')),
-        value: "添加到收藏",
-        action: async () => {
-          this.showCollections = true
-        }
-      })
+      if (this.user?.type === "root" || this.user?.type === "admin") {
+        this.moreMenus.push({
+          symbolIcon: new SymbolGlyphModifier($r('sys.symbol.star')),
+          value: "添加到收藏",
+          action: async () => {
+            this.showCollections = true
+          }
+        })
+      }
       this.moreMenus.push({
         symbolIcon: new SymbolGlyphModifier($r('sys.symbol.music_note_list')),
         value: "添加到播放列表",
@@ -867,7 +871,12 @@ export struct LibraryItemDetail {
                     .width(40)
                     .borderRadius(8)
                     .onClick(() => {
-
+                      if (!this.user?.permissions.download) {
+                        this.getUIContext().getPromptAction().showToast({
+                          message: '当前用户没有下载权限！',
+                          duration: 500
+                        });
+                      }
                     })
                   }
 

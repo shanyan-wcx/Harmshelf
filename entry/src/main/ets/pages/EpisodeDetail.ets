@@ -12,7 +12,8 @@ import {
 } from '../utils/Api'
 import { Episode, Library, LibraryItem, PlayItem, Playlist,
   PlaylistItem,
-  Progress, UpdateProgress } from '../utils/Interface'
+  Progress, UpdateProgress,
+  User } from '../utils/Interface'
 import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI'
 import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit'
 import { HmParseHTML, Node } from '@wuyan/html_parse'
@@ -46,6 +47,7 @@ export struct EpisodeDetail {
   @Consumer() playingTitle: string = "-"
   @Consumer() syncTime: number = 0
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
+  @Consumer() user: User | undefined = undefined
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.episodeId === this.episode!.id)
   @Local podcast: LibraryItem | undefined = undefined
   @Local showLoadingProgress: boolean = false
@@ -135,13 +137,15 @@ export struct EpisodeDetail {
         this.showPlaylists = true
       }
     })
-    this.moreMenus.push({
-      symbolIcon: new SymbolGlyphModifier($r('sys.symbol.trash')),
-      value: "从服务器中删除",
-      action: async () => {
-        this.showDeleteConfirm = true
-      }
-    })
+    if (this.user?.permissions.delete) {
+      this.moreMenus.push({
+        symbolIcon: new SymbolGlyphModifier($r('sys.symbol.trash')),
+        value: "从服务器中删除",
+        action: async () => {
+          this.showDeleteConfirm = true
+        }
+      })
+    }
   }
 
   async aboutToAppear() {
@@ -536,7 +540,12 @@ export struct EpisodeDetail {
               .width(40)
               .borderRadius(8)
               .onClick(() => {
-
+                if (!this.user?.permissions.download) {
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '当前用户没有下载权限！',
+                    duration: 500
+                  });
+                }
               })
 
               Button({ type: ButtonType.Normal }) {
