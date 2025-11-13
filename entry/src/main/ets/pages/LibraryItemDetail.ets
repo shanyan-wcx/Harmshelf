@@ -1560,7 +1560,7 @@ export struct LibraryItemDetail {
                         height: SheetSize.MEDIUM,
                         preferType: SheetType.CENTER,
                         title: {
-                          title: "剧集"
+                          title: "剧集 " + this.feedEpisodes.length
                         },
                         showClose: false,
                         onDisappear: () => {
