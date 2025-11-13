@@ -136,7 +136,7 @@ export struct EpisodeDetail {
       }
     })
     this.moreMenus.push({
-      symbolIcon: new SymbolGlyphModifier($r('sys.symbol.music_note_list')),
+      symbolIcon: new SymbolGlyphModifier($r('sys.symbol.trash')),
       value: "从服务器中删除",
       action: async () => {
         this.showDeleteConfirm = true
