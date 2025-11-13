@@ -545,3 +545,33 @@ export interface Filter1 {
   criteria: string;
   type: string;
 }
+
+export interface CreatePodcast {
+  path: string;
+  folderId?: string;
+  libraryId: string;
+  media: NewPodcast;
+  episodesToDownload?: Episode[]
+}
+
+export interface NewPodcast {
+  metadata: NewPodcastMetadata;
+  coverPath?: string | null;
+  autoDownloadEpisodes: boolean;
+  autoDownloadSchedule?: string;
+}
+
+export interface NewPodcastMetadata {
+  title: string | null;
+  author: string | null;
+  description: string | null;
+  releaseDate: string | null;
+  genres: string[];
+  feedUrl: string | null;
+  imageUrl: string | null;
+  itunesPageUrl: string | null;
+  itunesId: number | null;
+  itunesArtistId: string | null;
+  explicit: boolean
+  language: string | null;
+}

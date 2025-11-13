@@ -24,7 +24,6 @@ import {
   getLibraryItems,
   getLogin,
   getPlaylists,
-  getProgress,
   getRecentEpisodes,
   getSeries,
   getUser} from "../utils/Api";
@@ -38,6 +37,7 @@ export struct Home {
   @Provider() authors: Author[] = []
   @Provider() searchPodcasts: SearchPodcast[] = []
   @Provider() recentEpisodesPage: number = 0
+  @Provider() term: string = ""
   @Consumer() user: User | undefined = undefined
   @Consumer() libraryItems: LibraryItem[] = []
   @Consumer() playlists: Playlist[] = []
@@ -95,6 +95,8 @@ export struct Home {
       this.firstAppear = false
     }
     if (this.baseUrl !== "" && this.library) {
+      this.searchPodcasts = []
+      this.term = ""
       this.user = await getUser()
       this.progress = this.user?.mediaProgress??[]
       this.libraryItems = await getLibraryItems(this.library!.id)
@@ -135,7 +137,6 @@ export struct Home {
             this.libraryItems = await getLibraryItems(this.library!.id)
             break;
           case 3:
-            this.searchPodcasts = []
             break
           case 4:
             this.playlists = await getPlaylists(this.library.id)

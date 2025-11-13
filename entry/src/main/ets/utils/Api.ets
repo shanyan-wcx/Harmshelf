@@ -27,7 +27,10 @@ import {
   PlaylistItem,
   Book,
   Collection1,
-  Book1
+  Book1,
+  Podcast,
+  CreatePodcast,
+  SearchPodcast
 } from './Interface'
 import { JSON, util } from '@kit.ArkTS';
 
@@ -856,7 +859,7 @@ export async function searchPodcasts(term: string) {
   }
 }
 
-export async function getFeed(feed: string) {
+export async function getFeed(feed: string): Promise<Podcast | undefined> {
   const api: Axios = createApi()
   let rssFeed: RssFeed = {
     rssFeed: feed
@@ -867,10 +870,41 @@ export async function getFeed(feed: string) {
     return response.data.podcast
   } catch (error) {
     console.error(JSON.stringify(error));
-    promptAction.showToast({
-      message: '获取剧集失败，请检查网络！',
-      duration: 500
-    });
+    return undefined
+  }
+}
+
+export async function addPodcast(libraryId: string, folderId: string, path:string, searchPodcast: SearchPodcast, podcast: Podcast, autoDownload: boolean): Promise<Podcast | undefined> {
+  const api: Axios = createApi()
+  let data: CreatePodcast = {
+    libraryId: libraryId,
+    folderId: folderId,
+    path: path,
+    media: {
+      metadata: {
+        title: searchPodcast.title,
+        author: searchPodcast.artistName,
+        description: podcast.metadata.description,
+        genres: searchPodcast.genres,
+        feedUrl: searchPodcast.feedUrl,
+        imageUrl: searchPodcast.cover,
+        explicit: searchPodcast.explicit,
+        language: podcast.metadata.language,
+        itunesPageUrl: searchPodcast.pageUrl,
+        itunesId: searchPodcast.id,
+        itunesArtistId: searchPodcast.title,
+        releaseDate: searchPodcast.releaseDate,
+      },
+      autoDownloadEpisodes: autoDownload
+    },
+    episodesToDownload: podcast.episodes
+  }
+  try {
+    const response: AxiosResponse =
+      await api.post<string, AxiosResponse<string>, CreatePodcast>(`/api/podcasts`, data)
+    return response.data
+  } catch (error) {
+    console.error(JSON.stringify(error));
     return undefined
   }
 }
