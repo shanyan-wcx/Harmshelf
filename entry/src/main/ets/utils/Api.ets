@@ -936,3 +936,16 @@ export async function downloadEpisodes(podcastId: string, episodes: Episode[]): 
     return false
   }
 }
+
+export async function deleteFromServer(podcastId: string, episodeId: string): Promise<boolean> {
+  const api: Axios = createApi()
+  try {
+    const response: AxiosResponse =
+      await api.delete<string, AxiosResponse<string>, null>(`/api/podcasts/${podcastId}/episode/${episodeId}`)
+    console.log("删除剧集成功");
+    return true
+  } catch (error) {
+    console.error(JSON.stringify(error));
+    return false
+  }
+}

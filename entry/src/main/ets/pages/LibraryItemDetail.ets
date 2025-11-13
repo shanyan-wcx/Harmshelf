@@ -98,6 +98,10 @@ export struct LibraryItemDetail {
     this.itemProgress = this.progress.find(p => p.libraryItemId === this.libraryItem!.id)
     this.updateMoreMenus()
   }
+  @Monitor('libraryItem')
+  async refreshLibraryItem(monitor: IMonitor) {
+    this.episodes = this.libraryItem?.media.episodes!
+  }
 
   formatDuration(seconds: number): string {
     const hours = Math.floor(seconds / 3600);
@@ -223,7 +227,6 @@ export struct LibraryItemDetail {
     }
     this.updateMoreMenus()
     this.showLoadingProgress = false
-    // console.log(JSON.stringify(this.episodes[0].enclosure))
   }
 
   @Builder

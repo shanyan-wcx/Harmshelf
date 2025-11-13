@@ -1,6 +1,7 @@
 import {
   addToPlaylist,
   createPlaylist,
+  deleteFromServer,
   getEpisode,
   getItem,
   getPlayItem,
@@ -28,6 +29,7 @@ export function episodeDetailBuilder(name: string, param: Object) {
 export struct EpisodeDetail {
   private episodeDetailScroller: Scroller = new Scroller();
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
+  @Consumer() displayWidth: number = 0
   @Consumer() statusBarHeight: number = 0
   @Consumer() episode: Episode | undefined = undefined
   @Consumer() progress: Progress[] = []
@@ -52,6 +54,7 @@ export struct EpisodeDetail {
   @Local showPlaylists: boolean = false
   @Local showProgress: boolean = false
   @Local showCreatePlaylist: boolean = false
+  @Local showDeleteConfirm: boolean = false
   @Local tmpPlaylistName: string = ""
   @Local tmpPlaylistDescription: string = ""
 
@@ -132,6 +135,13 @@ export struct EpisodeDetail {
         this.showPlaylists = true
       }
     })
+    this.moreMenus.push({
+      symbolIcon: new SymbolGlyphModifier($r('sys.symbol.music_note_list')),
+      value: "从服务器中删除",
+      action: async () => {
+        this.showDeleteConfirm = true
+      }
+    })
   }
 
   async aboutToAppear() {
@@ -143,6 +153,63 @@ export struct EpisodeDetail {
     this.podcast = await getItem(this.episode!.libraryItemId!)
     this.updateMoreMenus()
     this.showLoadingProgress = false
+  }
+
+  @Builder
+  deleteConfirmBuilder() {
+    Column() {
+      Text("确认从服务器删除" + this.episode!.title + "？")
+        .fontSize(19)
+        .margin({ bottom: 20 })
+
+      if (this.displayWidth >= 600) {
+        Blank()
+          .height(160)
+      }
+
+      Row({ space: 20 }) {
+        Button({ type: ButtonType.Normal }) {
+          Text("取消")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(() => {
+          this.showDeleteConfirm = false
+        })
+
+        Button({ type: ButtonType.Normal }) {
+          Text("确认")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(async () => {
+          let status = await deleteFromServer(this.episode!.libraryItemId!, this.episode!.id!)
+          if (status) {
+            this.showDeleteConfirm = false
+            this.getUIContext().getPromptAction().showToast({
+              message: '删除成功！',
+              duration: 500
+            });
+            this.pageInfos.pop()
+            this.libraryItem = await getItem(this.libraryItem!.id)
+          } else {
+            this.getUIContext().getPromptAction().showToast({
+              message: '删除失败，请检查网络！',
+              duration: 500
+            });
+          }
+        })
+      }
+    }
+    .padding({ left: 20, right: 20, bottom: 25 })
   }
 
   @Builder
@@ -564,6 +631,17 @@ export struct EpisodeDetail {
       .width('100%')
       .height('100%')
       .alignContent(Alignment.End)
+      .bindSheet(this.showDeleteConfirm, this.deleteConfirmBuilder(), {
+        height: SheetSize.FIT_CONTENT,
+        preferType: SheetType.CENTER,
+        title: {
+          title: "确认删除"
+        },
+        showClose: false,
+        onDisappear: () => {
+          this.showDeleteConfirm = false
+        }
+      })
     }
     .width('100%')
     .height('100%')
