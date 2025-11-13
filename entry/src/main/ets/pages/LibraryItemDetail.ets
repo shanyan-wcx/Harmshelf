@@ -843,30 +843,34 @@ export struct LibraryItemDetail {
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                     if (this.library?.mediaType === 'book') {
-                      Row() {
+                      Flex({ wrap: FlexWrap.Wrap }) {
                         ForEach(this.libraryItem!.media.metadata.authors, (author: Author, index) => {
-                          Text(author.name)
-                            .fontSize(17)
-                            .decoration({
-                              type: TextDecorationType.Underline
-                            })
-                            .onClick(() => {
-                              let filter: Filter1 = {
-                                criteria: author.name,
-                                type: "author"
-                              }
-                              this.pageInfos.pushPathByName('filterItems', filter)
-                            })
-
-                          if (this.libraryItem!.media.metadata.authors &&
-                            index < this.libraryItem!.media.metadata.authors.length - 1) {
-                            Text(", ")
+                          Row() {
+                            Text(author.name)
                               .fontSize(17)
+                              .decoration({
+                                type: TextDecorationType.Underline
+                              })
+                              .onClick(() => {
+                                let filter: Filter1 = {
+                                  criteria: author.name,
+                                  type: "author"
+                                }
+                                this.pageInfos.pushPathByName('filterItems', filter)
+                              })
+
+                            if (this.libraryItem!.media.metadata.authors &&
+                              index < this.libraryItem!.media.metadata.authors.length - 1) {
+                              Text(", ")
+                                .fontSize(17)
+                            }
                           }
+                          .margin({ top: 5 })
                         })
                       }
                       .width('100%')
                       .layoutWeight(1)
+                      .margin({ top: -5 })
                     } else if (this.library?.mediaType === 'podcast') {
                       Text(this.libraryItem!.media.metadata.author)
                         .fontSize(17)
@@ -948,39 +952,43 @@ export struct LibraryItemDetail {
                     Row() {
                       Text("演播者")
                         .fontSize(17)
-                        .margin({ right: 20 })
+                        .margin({ top: 5, right: 20 })
                         .fontColor($r('sys.color.font_secondary'))
                         .width(68)
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                      Row() {
+                      Flex({ wrap: FlexWrap.Wrap }) {
                         ForEach(this.libraryItem!.media.metadata.narrators, (narrator: string, index) => {
-                          Text(narrator)
-                            .fontSize(17)
-                            .decoration({
-                              type: TextDecorationType.Underline
-                            })
-                            .onClick(() => {
-                              let filter: Filter1 = {
-                                criteria: narrator,
-                                type: "narrator"
-                              }
-                              this.pageInfos.pushPathByName('filterItems', filter)
-                            })
-
-                          if (this.libraryItem!.media.metadata.narrators &&
-                            index < this.libraryItem!.media.metadata.narrators.length - 1) {
-                            Text(", ")
+                          Row() {
+                            Text(narrator)
                               .fontSize(17)
+                              .decoration({
+                                type: TextDecorationType.Underline
+                              })
+                              .onClick(() => {
+                                let filter: Filter1 = {
+                                  criteria: narrator,
+                                  type: "narrator"
+                                }
+                                this.pageInfos.pushPathByName('filterItems', filter)
+                              })
+
+                            if (this.libraryItem!.media.metadata.narrators &&
+                              index < this.libraryItem!.media.metadata.narrators.length - 1) {
+                              Text(", ")
+                                .fontSize(17)
+                            }
                           }
+                          .margin({ top: 5 })
                         })
                       }
                       .width('100%')
                       .layoutWeight(1)
                     }
                     .width('100%')
-                    .margin({ top: 10 })
+                    .margin({ top: 5 })
+                    .alignItems(VerticalAlign.Top)
                     .clip(true)
                   }
 
@@ -988,38 +996,42 @@ export struct LibraryItemDetail {
                     Row() {
                       Text("流派")
                         .fontSize(17)
-                        .margin({ right: 20 })
+                        .margin({ top: 5, right: 20 })
                         .fontColor($r('sys.color.font_secondary'))
                         .width(this.library?.mediaType === 'book' ? 68 : 34)
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                      Row() {
+                      Flex({ wrap: FlexWrap.Wrap }) {
                         ForEach(this.libraryItem!.media.metadata.genres, (genre: string, index) => {
-                          Text(genre)
-                            .fontSize(17)
-                            .decoration({
-                              type: TextDecorationType.Underline
-                            })
-                            .onClick(() => {
-                              let filter: Filter1 = {
-                                criteria: genre,
-                                type: "genre"
-                              }
-                              this.pageInfos.pushPathByName('filterItems', filter)
-                            })
-
-                          if (index < this.libraryItem!.media.metadata.genres.length - 1) {
-                            Text(", ")
+                          Row() {
+                            Text(genre)
                               .fontSize(17)
+                              .decoration({
+                                type: TextDecorationType.Underline
+                              })
+                              .onClick(() => {
+                                let filter: Filter1 = {
+                                  criteria: genre,
+                                  type: "genre"
+                                }
+                                this.pageInfos.pushPathByName('filterItems', filter)
+                              })
+
+                            if (index < this.libraryItem!.media.metadata.genres.length - 1) {
+                              Text(", ")
+                                .fontSize(17)
+                            }
                           }
+                          .margin({ top: 5 })
                         })
                       }
                       .width('100%')
                       .layoutWeight(1)
                     }
                     .width('100%')
-                    .margin({ top: 10 })
+                    .margin({ top: 5 })
+                    .alignItems(VerticalAlign.Top)
                     .clip(true)
                   }
 
@@ -1027,38 +1039,42 @@ export struct LibraryItemDetail {
                     Row() {
                       Text("标签")
                         .fontSize(17)
-                        .margin({ right: 20 })
+                        .margin({ top: 5, right: 20 })
                         .fontColor($r('sys.color.font_secondary'))
                         .width(this.library?.mediaType === 'book' ? 68 : 34)
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                      Row() {
+                      Flex({ wrap: FlexWrap.Wrap }) {
                         ForEach(this.libraryItem!.media.tags, (tag: string, index) => {
-                          Text(tag)
-                            .fontSize(17)
-                            .decoration({
-                              type: TextDecorationType.Underline
-                            })
-                            .onClick(() => {
-                              let filter: Filter1 = {
-                                criteria: tag,
-                                type: "tag"
-                              }
-                              this.pageInfos.pushPathByName('filterItems', filter)
-                            })
-
-                          if (index < this.libraryItem!.media.tags.length - 1) {
-                            Text(", ")
+                          Row() {
+                            Text(tag)
                               .fontSize(17)
+                              .decoration({
+                                type: TextDecorationType.Underline
+                              })
+                              .onClick(() => {
+                                let filter: Filter1 = {
+                                  criteria: tag,
+                                  type: "tag"
+                                }
+                                this.pageInfos.pushPathByName('filterItems', filter)
+                              })
+
+                            if (index < this.libraryItem!.media.tags.length - 1) {
+                              Text(", ")
+                                .fontSize(17)
+                            }
                           }
+                          .margin({ top: 5 })
                         })
                       }
                       .width('100%')
                       .layoutWeight(1)
                     }
                     .width('100%')
-                    .margin({ top: 10 })
+                    .margin({ top: 5 })
+                    .alignItems(VerticalAlign.Top)
                     .clip(true)
                   }
 
@@ -1086,7 +1102,7 @@ export struct LibraryItemDetail {
 
                   Column() {
                     Text(
-                      this.libraryItem!.media.metadata.description??""
+                      (this.libraryItem!.media.metadata.description??"")
                       // 段落与换行
                         .replace(/<p[^>]*>/gi, '')
                         .replace(/<\/p>/gi, '\n\n')
