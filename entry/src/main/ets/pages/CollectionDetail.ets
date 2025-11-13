@@ -17,7 +17,7 @@ export function collectionDetailBuilder(name: string, param: Object) {
 
 @ComponentV2
 export struct CollectionDetail {
-  private PlaylistDetailScroller: Scroller = new Scroller();
+  private CollectionDetailScroller: Scroller = new Scroller();
   @Consumer() colorMode: ColorMode | undefined = PersistenceV2.connect(ColorMode, () => new ColorMode());
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() displayHeight: number = 0
@@ -251,7 +251,7 @@ export struct CollectionDetail {
   build() {
     HdsNavDestination() {
       Stack() {
-        Scroll(this.PlaylistDetailScroller) {
+        Scroll(this.CollectionDetailScroller) {
           Column() {
             Column() {
               Stack({ alignContent: Alignment.Bottom }) {
@@ -567,7 +567,7 @@ export struct CollectionDetail {
     })
     .hideBackButton(false)
     .backgroundColor($r('sys.color.background_secondary'))
-    .bindToScrollable([this.PlaylistDetailScroller])
+    .bindToScrollable([this.CollectionDetailScroller])
     .bindSheet(this.showEditCollection, this.editCollectionBuilder(), {
       height: SheetSize.FIT_CONTENT,
       preferType: SheetType.CENTER,
