@@ -128,6 +128,7 @@ export struct Add {
             })
             .type(TextAreaType.NORMAL)
             .enterKeyType(EnterKeyType.Done)
+            .barState(BarState.Off)
             .onChange((value) => {
               podcast.metadata.description = value
             })

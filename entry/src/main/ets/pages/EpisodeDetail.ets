@@ -272,6 +272,7 @@ export struct EpisodeDetail {
         })
         .type(TextAreaType.NORMAL)
         .enterKeyType(EnterKeyType.Done)
+        .barState(BarState.Off)
         .onChange((value) => {
           this.tmpPlaylistDescription = value
         })

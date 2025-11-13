@@ -22,6 +22,7 @@ import {
   createCollection,
   createPlaylist,
   getCollections,
+  getFeed,
   getItem, getPlayItem, getPlaylists, getUser,
   removeFromCollection,
   removeFromPlaylist,
@@ -83,6 +84,9 @@ export struct LibraryItemDetail {
   @Local tmpPlayingIndex: number = 0
   @Local showCollections: boolean = false
   @Local showCreateCollection: boolean = false
+  @Local loadingFeed: boolean = false
+  @Local showFeedEpisodes: boolean = false
+  @Local feedEpisodes: Episode[] = []
   @Local tmpCollectionName: string = ""
   @Local tmpCollectionDescription: string = ""
   @Local tmpCollectionItem: PlayItem | undefined = undefined
@@ -217,6 +221,66 @@ export struct LibraryItemDetail {
     }
     this.updateMoreMenus()
     this.showLoadingProgress = false
+  }
+
+  @Builder
+  feedEpisodesBuilder() {
+    Column() {
+      List() {
+        ForEach(this.feedEpisodes, (episode: Episode, index) => {
+          ListItem() {
+            Column() {
+              Row() {
+                if (this.libraryItem!.episodes?.find(e => e.id === episode.id)) {
+
+                } else {
+
+                }
+
+                Column() {
+                  Text(episode.title)
+                    .fontSize(16)
+                    .margin({ bottom: 5 })
+
+                  Text(episode.pubDate)
+                    .fontSize(12)
+                }
+                .width('100%')
+                .layoutWeight(1)
+                .alignItems(HorizontalAlign.Start)
+              }
+              .width('100%')
+              .margin({ bottom: 10 })
+
+              if (index !== this.feedEpisodes.length - 1) {
+                Divider()
+                  .width('100%')
+                  .strokeWidth(1)
+                  .margin({ bottom: 10 })
+              }
+            }
+          }
+        })
+      }
+      .width('100%')
+      .height('100%')
+      .layoutWeight(1)
+      .scrollBar(BarState.Off)
+
+      Button({ type: ButtonType.Normal }) {
+        Text("添加到服务器")
+          .fontSize(18)
+      }
+      .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+      .height(40)
+      .width('100%')
+      .borderRadius(8)
+      .margin({ top: 20 })
+      .onClick(async () => {
+        this.showFeedEpisodes = false
+      })
+    }
+    .padding({ left: 20, right: 20, bottom: 25 })
   }
 
   @Builder
@@ -402,6 +466,7 @@ export struct LibraryItemDetail {
         })
         .type(TextAreaType.NORMAL)
         .enterKeyType(EnterKeyType.Done)
+        .barState(BarState.Off)
         .onChange((value) => {
           this.tmpPlaylistDescription = value
         })
@@ -594,6 +659,7 @@ export struct LibraryItemDetail {
         })
         .type(TextAreaType.NORMAL)
         .enterKeyType(EnterKeyType.Done)
+        .barState(BarState.Off)
         .onChange((value) => {
           this.tmpCollectionDescription = value
         })
@@ -1411,125 +1477,171 @@ export struct LibraryItemDetail {
                       .fontSize(20)
                       .fontWeight(FontWeight.Medium)
 
-                    Button({ type: ButtonType.Normal }) {
-                      Row() {
-                        Text(this.sortByStr)
-                          .fontSize(15)
-                          .fontWeight(FontWeight.Medium)
+                    Row() {
+                      Button({ type: ButtonType.Normal }) {
+                        if (this.loadingFeed) {
+                          LoadingProgress()
+                            .width(20)
+                            .height(20)
+                            .color($r('sys.color.ohos_id_color_titlebar_icon'))
+                        } else {
+                          SymbolGlyph($r('sys.symbol.magnifyingglass'))
+                            .fontSize(20)
+                        }
+                      }
+                      .width(31)
+                      .height(31)
+                      .borderRadius(8)
+                      .margin({ right: 10, left: 10 })
+                      .backgroundColor(Color.Transparent)
+                      .onClick(async () => {
+                        this.loadingFeed = true
+                        this.feedEpisodes = []
+                        let podcast = await getFeed(this.libraryItem!.media.metadata.feedUrl!)
+                        if (podcast) {
+                          this.feedEpisodes = podcast.episodes
+                          this.loadingFeed = false
+                          this.showFeedEpisodes = true
+                        } else {
+                          this.getUIContext().getPromptAction().showToast({
+                            message: '获取剧集失败，请检查网络！',
+                            duration: 500
+                          });
+                        }
+                      })
+                      .bindSheet(this.showFeedEpisodes, this.feedEpisodesBuilder(), {
+                        height: SheetSize.MEDIUM,
+                        preferType: SheetType.CENTER,
+                        title: {
+                          title: "剧集"
+                        },
+                        showClose: false,
+                        onDisappear: () => {
+                          this.showFeedEpisodes = false
+                        }
+                      })
 
-                        SymbolGlyph(this.order ? $r('sys.symbol.text_and_arrow_down') : $r('sys.symbol.text_and_arrow_up') )
-                          .margin({ left: 6 })
+                      Button({ type: ButtonType.Normal }) {
+                        Row() {
+                          Text(this.sortByStr)
+                            .fontSize(15)
+                            .fontWeight(FontWeight.Medium)
+
+                          SymbolGlyph(this.order ? $r('sys.symbol.text_and_arrow_down') :
+                            $r('sys.symbol.text_and_arrow_up'))
+                            .margin({ left: 6 })
+                        }
                       }
+                      .height(31)
+                      .padding(8)
+                      .borderRadius(8)
+                      .backgroundColor($r('sys.color.comp_background_tertiary'))
+                      .bindMenu([
+                        {
+                          value: "出版日期",
+                          action: () => {
+                            if (this.sortBy === 0) {
+                              this.order = !this.order
+                            } else {
+                              this.sortBy = 0
+                              this.sortByStr = "出版日期"
+                              this.order = true
+                            }
+                            if (this.order) {
+                              this.episodes.sort((a, b) => (b.publishedAt ?? 0) - (a.publishedAt ?? 0))
+                            } else {
+                              this.episodes.sort((a, b) => (a.publishedAt ?? 0) - (b.publishedAt ?? 0))
+                            }
+                          }
+                        },
+                        {
+                          value: "标题",
+                          action: () => {
+                            if (this.sortBy === 1) {
+                              this.order = !this.order
+                            } else {
+                              this.sortBy = 1
+                              this.sortByStr = "标题"
+                              this.order = true
+                            }
+                            if (this.order) {
+                              this.episodes.sort((a, b) => String(b.title)
+                                .localeCompare(String(a.title), 'en', { numeric: true }))
+                            } else {
+                              this.episodes.sort((a, b) => String(a.title)
+                                .localeCompare(String(b.title), 'en', { numeric: true }))
+                            }
+                          }
+                        },
+                        {
+                          value: "季",
+                          action: () => {
+                            if (this.sortBy === 2) {
+                              this.order = !this.order
+                            } else {
+                              this.sortBy = 2
+                              this.sortByStr = "季"
+                              this.order = true
+                            }
+                            if (this.order) {
+                              this.episodes.sort((a, b) => String(b.season)
+                                .localeCompare(String(a.season), 'en', { numeric: true }))
+                            } else {
+                              this.episodes.sort((a, b) => String(a.season)
+                                .localeCompare(String(b.season), 'en', { numeric: true }))
+                            }
+                          }
+                        },
+                        {
+                          value: "剧集",
+                          action: () => {
+                            if (this.sortBy === 3) {
+                              this.order = !this.order
+                            } else {
+                              this.sortBy = 3
+                              this.sortByStr = "剧集"
+                              this.order = true
+                            }
+                            if (this.order) {
+                              this.episodes.sort((a, b) => String(b.episode)
+                                .localeCompare(String(a.episode), 'en', { numeric: true }))
+                            } else {
+                              this.episodes.sort((a, b) => String(a.episode)
+                                .localeCompare(String(b.episode), 'en', { numeric: true }))
+                            }
+                          }
+                        },
+                        {
+                          value: "文件名",
+                          action: () => {
+                            if (this.sortBy === 4) {
+                              this.order = !this.order
+                            } else {
+                              this.sortBy = 4
+                              this.sortByStr = "文件名"
+                              this.order = true
+                            }
+                            if (this.order) {
+                              this.episodes.sort((a, b) =>
+                              String(b.audioFile?.metadata?.filename ?? '').localeCompare(
+                                String(a.audioFile?.metadata?.filename ?? ''),
+                                'en',
+                                { numeric: true }
+                              )
+                              )
+                            } else {
+                              this.episodes.sort((a, b) =>
+                              String(a.audioFile?.metadata?.filename ?? '').localeCompare(
+                                String(b.audioFile?.metadata?.filename ?? ''),
+                                'en',
+                                { numeric: true }
+                              )
+                              )
+                            }
+                          }
+                        }
+                      ])
                     }
-                    .height(31)
-                    .padding(8)
-                    .borderRadius(8)
-                    .backgroundColor($r('sys.color.comp_background_tertiary'))
-                    .bindMenu([
-                      {
-                        value: "出版日期",
-                        action: () => {
-                          if (this.sortBy === 0) {
-                            this.order = !this.order
-                          } else {
-                            this.sortBy = 0
-                            this.sortByStr = "出版日期"
-                            this.order = true
-                          }
-                          if (this.order) {
-                            this.episodes.sort((a, b) => (b.publishedAt ?? 0) - (a.publishedAt ?? 0))
-                          } else {
-                            this.episodes.sort((a, b) => (a.publishedAt ?? 0) - (b.publishedAt ?? 0))
-                          }
-                        }
-                      },
-                      {
-                        value: "标题",
-                        action: () => {
-                          if (this.sortBy === 1) {
-                            this.order = !this.order
-                          } else {
-                            this.sortBy = 1
-                            this.sortByStr = "标题"
-                            this.order = true
-                          }
-                          if (this.order) {
-                            this.episodes.sort((a, b) => String(b.title)
-                              .localeCompare(String(a.title), 'en', { numeric: true }))
-                          } else {
-                            this.episodes.sort((a, b) => String(a.title)
-                              .localeCompare(String(b.title), 'en', { numeric: true }))
-                          }
-                        }
-                      },
-                      {
-                        value: "季",
-                        action: () => {
-                          if (this.sortBy === 2) {
-                            this.order = !this.order
-                          } else {
-                            this.sortBy = 2
-                            this.sortByStr = "季"
-                            this.order = true
-                          }
-                          if (this.order) {
-                            this.episodes.sort((a, b) => String(b.season)
-                              .localeCompare(String(a.season), 'en', { numeric: true }))
-                          } else {
-                            this.episodes.sort((a, b) => String(a.season)
-                              .localeCompare(String(b.season), 'en', { numeric: true }))
-                          }
-                        }
-                      },
-                      {
-                        value: "剧集",
-                        action: () => {
-                          if (this.sortBy === 3) {
-                            this.order = !this.order
-                          } else {
-                            this.sortBy = 3
-                            this.sortByStr = "剧集"
-                            this.order = true
-                          }
-                          if (this.order) {
-                            this.episodes.sort((a, b) => String(b.episode)
-                              .localeCompare(String(a.episode), 'en', { numeric: true }))
-                          } else {
-                            this.episodes.sort((a, b) => String(a.episode)
-                              .localeCompare(String(b.episode), 'en', { numeric: true }))
-                          }
-                        }
-                      },
-                      {
-                        value: "文件名",
-                        action: () => {
-                          if (this.sortBy === 4) {
-                            this.order = !this.order
-                          } else {
-                            this.sortBy = 4
-                            this.sortByStr = "文件名"
-                            this.order = true
-                          }
-                          if (this.order) {
-                            this.episodes.sort((a, b) =>
-                            String(b.audioFile?.metadata?.filename ?? '').localeCompare(
-                              String(a.audioFile?.metadata?.filename ?? ''),
-                              'en',
-                              { numeric: true }
-                            )
-                            )
-                          } else {
-                            this.episodes.sort((a, b) =>
-                            String(a.audioFile?.metadata?.filename ?? '').localeCompare(
-                              String(b.audioFile?.metadata?.filename ?? ''),
-                              'en',
-                              { numeric: true }
-                            )
-                            )
-                          }
-                        }
-                      }
-                    ])
                   }
                   .width('100%')
                   .height(18)
