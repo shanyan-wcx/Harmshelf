@@ -223,6 +223,7 @@ export struct LibraryItemDetail {
     }
     this.updateMoreMenus()
     this.showLoadingProgress = false
+    // console.log(JSON.stringify(this.episodes[0].enclosure))
   }
 
   @Builder
@@ -234,7 +235,7 @@ export struct LibraryItemDetail {
             Column() {
               Row() {
                 Column() {
-                  if (this.episodes.find(e => e.enclosure.url === episode.enclosure.url)) {
+                  if (this.episodes.find(e => e.enclosure && e.enclosure.url === episode.enclosure.url)) {
                     SymbolGlyph($r('sys.symbol.checkmark'))
                       .fontWeight(FontWeight.Bold)
                       .fontSize(20)
@@ -1528,6 +1529,7 @@ export struct LibraryItemDetail {
                         } else {
                           SymbolGlyph($r('sys.symbol.magnifyingglass'))
                             .fontSize(20)
+                            .fontColor([$r('sys.color.font')])
                         }
                       }
                       .width(31)
@@ -1571,6 +1573,7 @@ export struct LibraryItemDetail {
 
                           SymbolGlyph(this.order ? $r('sys.symbol.text_and_arrow_down') :
                             $r('sys.symbol.text_and_arrow_up'))
+                            .fontColor([$r('sys.color.font')])
                             .margin({ left: 6 })
                         }
                       }

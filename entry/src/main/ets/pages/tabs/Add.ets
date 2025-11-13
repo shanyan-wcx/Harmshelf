@@ -222,6 +222,7 @@ export struct Add {
 
                     Text(searchPodcast.trackCount + " 剧集")
                       .fontSize(13)
+                      .fontColor($r('sys.color.font_secondary'))
                   }
                   .alignItems(HorizontalAlign.Start)
                 }
