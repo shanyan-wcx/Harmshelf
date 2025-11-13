@@ -4,7 +4,7 @@ export struct Log {
   build() {
     Scroll() {
       Column() {
-        Text("暂不支持")
+        Text("没有日志")
           .fontSize(32)
       }
     }

@@ -6,7 +6,7 @@ export struct LocalMedia {
     Stack() {
       Scroll(this.LocalMediaScroller) {
         Column() {
-          Text("暂不支持")
+          Text("没有本地媒体")
             .fontSize(32)
         }
       }
