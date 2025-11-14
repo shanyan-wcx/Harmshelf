@@ -609,7 +609,7 @@ export struct PlaylistDetail {
       enableComponentSafeArea: false,
       padding: {
         start: LengthMetrics.vp(16),
-        end: LengthMetrics.vp(16)
+        end: deviceTypeInfo === '2in1' ? LengthMetrics.vp(4) : LengthMetrics.vp(16)
       },
       content: {
         title: {

@@ -111,7 +111,7 @@ export struct MyNavigation {
       avoidLayoutSafeArea:true,
       enableComponentSafeArea: false,
       padding: {
-        end: deviceTypeInfo === '2in1' ? LengthMetrics.vp(168)  : LengthMetrics.vp(16)
+        end: deviceTypeInfo === '2in1' ? LengthMetrics.vp(168) : LengthMetrics.vp(16)
       },
       style: {
         scrollEffectOpts: {
