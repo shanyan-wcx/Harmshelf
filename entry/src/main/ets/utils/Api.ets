@@ -25,7 +25,6 @@ import {
   Episode,
   User,
   PlaylistItem,
-  Book,
   Collection1,
   Book1,
   Podcast,
@@ -470,9 +469,9 @@ export async function getCollections(libraryId: string): Promise<Collection[]> {
   let itemTitles: string[] = []
   try {
     const response: AxiosResponse = await api.get<string, AxiosResponse<string>, null>(`/api/libraries/${libraryId}/collections`, {
-      timeout: 30000,
-      readTimeout: 30000,
-      connectTimeout: 30000
+      timeout: 90000,
+      readTimeout: 90000,
+      connectTimeout: 90000
     })
     collections = response.data.results
     collections.forEach((element: Collection) => {
@@ -522,7 +521,11 @@ export async function removeFromCollection(collectionId: string, bookId: string)
   const api: Axios = createApi()
   try {
     const response: AxiosResponse =
-      await api.delete<string, AxiosResponse<string>, null>(`/api/collections/${collectionId}/book/${bookId}`)
+      await api.delete<string, AxiosResponse<string>, null>(`/api/collections/${collectionId}/book/${bookId}`, {
+        timeout: 30000,
+        readTimeout: 30000,
+        connectTimeout: 30000
+      })
     console.log("移除成功");
     promptAction.showToast({
       message: '移除成功！',
@@ -597,7 +600,11 @@ export async function deleteCollection(collectionId: string): Promise<boolean> {
   const api: Axios = createApi()
   try {
     const response: AxiosResponse =
-      await api.delete<string, AxiosResponse<string>, null>(`/api/collections/${collectionId}`)
+      await api.delete<string, AxiosResponse<string>, null>(`/api/collections/${collectionId}`, {
+        timeout: 30000,
+        readTimeout: 30000,
+        connectTimeout: 30000
+      })
     console.log("删除成功");
     return true
   } catch (error) {
@@ -665,7 +672,11 @@ export async function removeFromPlaylist(playlistId: string, libraryItemId: stri
   const api: Axios = createApi()
   try {
     const response: AxiosResponse =
-      await api.delete<string, AxiosResponse<string>, null>(`/api/playlists/${playlistId}/item/${libraryItemId}` + (episodeId ? `/${episodeId}` : ""))
+      await api.delete<string, AxiosResponse<string>, null>(`/api/playlists/${playlistId}/item/${libraryItemId}` + (episodeId ? `/${episodeId}` : ""), {
+        timeout: 30000,
+        readTimeout: 30000,
+        connectTimeout: 30000
+      })
     console.log("移除成功");
     promptAction.showToast({
       message: '移除成功！',
@@ -740,7 +751,11 @@ export async function deletePlaylist(playlistId: string): Promise<boolean> {
   const api: Axios = createApi()
   try {
     const response: AxiosResponse =
-      await api.delete<string, AxiosResponse<string>, null>(`/api/playlists/${playlistId}`)
+      await api.delete<string, AxiosResponse<string>, null>(`/api/playlists/${playlistId}`, {
+        timeout: 30000,
+        readTimeout: 30000,
+        connectTimeout: 30000
+      })
     console.log("删除成功");
     return true
   } catch (error) {
@@ -754,7 +769,9 @@ export async function syncSession(sessionId: string, updateSession: UpdateSessio
   try {
     const response: AxiosResponse =
       await api.post<string, AxiosResponse<string>, UpdateSession>(`api/session/${sessionId}/sync`, updateSession, {
-        timeout: 500
+        timeout: 5000,
+        readTimeout: 5000,
+        connectTimeout: 5000
       })
     console.log("同步会话", response.data);
     return true
@@ -768,7 +785,11 @@ export async function closeSession(sessionId: string, updateSession: UpdateSessi
   const api: Axios = createApi()
   try {
     const response: AxiosResponse =
-      await api.post<string, AxiosResponse<string>, UpdateSession>(`api/session/${sessionId}/close`, updateSession)
+      await api.post<string, AxiosResponse<string>, UpdateSession>(`api/session/${sessionId}/close`, updateSession, {
+        timeout: 5000,
+        readTimeout: 5000,
+        connectTimeout: 5000
+      })
     console.log("关闭会话成功", response.data);
   } catch (error) {
     console.error(JSON.stringify(error));
@@ -784,7 +805,11 @@ export async function getStats(): Promise<ListeningStats | undefined> {
   const api: Axios = createApi()
   try {
     const response: AxiosResponse =
-      await api.get<string, AxiosResponse<string>, UpdateSession>('/api/me/listening-stats')
+      await api.get<string, AxiosResponse<string>, UpdateSession>('/api/me/listening-stats', {
+        timeout: 30000,
+        readTimeout: 30000,
+        connectTimeout: 30000
+      })
     listeningStats = response.data
     console.log("获取统计数据成功");
     return listeningStats
@@ -803,7 +828,11 @@ export async function getBookmarks(userId: string): Promise<Bookmark[]> {
   let bookmarks: Bookmark[] = []
   try {
     const response: AxiosResponse =
-      await api.get<string, AxiosResponse<string>, null>(`/api/users/${userId}`)
+      await api.get<string, AxiosResponse<string>, null>(`/api/users/${userId}`, {
+        timeout: 30000,
+        readTimeout: 30000,
+        connectTimeout: 30000
+      })
     bookmarks = response.data.bookmarks
     return bookmarks
   } catch (error) {
@@ -820,7 +849,11 @@ export async function createBookmark(itemId: string, bookmark: Bookmark): Promis
   const api: Axios = createApi()
   try {
     const response: AxiosResponse =
-      await api.post<string, AxiosResponse<string>, Bookmark>(`/api/me/item/${itemId}/bookmark`, bookmark)
+      await api.post<string, AxiosResponse<string>, Bookmark>(`/api/me/item/${itemId}/bookmark`, bookmark, {
+        timeout: 30000,
+        readTimeout: 30000,
+        connectTimeout: 30000
+      })
     console.log("创建书签成功", JSON.stringify(response.data));
     return true
   } catch (error) {
@@ -833,7 +866,11 @@ export async function deleteBookmark(itemId: string, time: number): Promise<bool
   const api: Axios = createApi()
   try {
     const response: AxiosResponse =
-      await api.delete<string, AxiosResponse<string>, null>(`/api/me/item/${itemId}/bookmark/${time}`)
+      await api.delete<string, AxiosResponse<string>, null>(`/api/me/item/${itemId}/bookmark/${time}`, {
+        timeout: 30000,
+        readTimeout: 30000,
+        connectTimeout: 30000
+      })
     console.log("删除书签成功", JSON.stringify(response.data));
     return true
   } catch (error) {
@@ -846,7 +883,11 @@ export async function searchPodcasts(term: string) {
   const api: Axios = createApi()
   try {
     const response: AxiosResponse =
-      await api.get<string, AxiosResponse<string>, null>(`/api/search/podcast?term=${encodeURIComponent(term)}`)
+      await api.get<string, AxiosResponse<string>, null>(`/api/search/podcast?term=${encodeURIComponent(term)}`, {
+        timeout: 30000,
+        readTimeout: 30000,
+        connectTimeout: 30000
+      })
     console.log("搜索播客成功，共" + response.data.length + "个结果");
     return response.data
   } catch (error) {
@@ -866,7 +907,11 @@ export async function getFeed(feed: string): Promise<Podcast | undefined> {
   }
   try {
     const response: AxiosResponse =
-      await api.post<string, AxiosResponse<string>, RssFeed>(`/api/podcasts/feed`, rssFeed)
+      await api.post<string, AxiosResponse<string>, RssFeed>(`/api/podcasts/feed`, rssFeed, {
+        timeout: 30000,
+        readTimeout: 30000,
+        connectTimeout: 30000
+      })
     return response.data.podcast
   } catch (error) {
     console.error(JSON.stringify(error));
@@ -901,7 +946,11 @@ export async function addPodcast(libraryId: string, folderId: string, path:strin
   }
   try {
     const response: AxiosResponse =
-      await api.post<string, AxiosResponse<string>, CreatePodcast>(`/api/podcasts`, data)
+      await api.post<string, AxiosResponse<string>, CreatePodcast>(`/api/podcasts`, data, {
+        timeout: 30000,
+        readTimeout: 30000,
+        connectTimeout: 30000
+      })
     return response.data
   } catch (error) {
     console.error(JSON.stringify(error));
@@ -913,7 +962,11 @@ export async function getRecentEpisodes(libraryId: string, page: number) {
   const api: Axios = createApi()
   try {
     const response: AxiosResponse =
-      await api.get<string, AxiosResponse<string>>(`/api/libraries/${libraryId}/recent-episodes?limit=50&page=${page}`)
+      await api.get<string, AxiosResponse<string>>(`/api/libraries/${libraryId}/recent-episodes?limit=50&page=${page}`, {
+        timeout: 30000,
+        readTimeout: 30000,
+        connectTimeout: 30000
+      })
     return response.data.episodes
   } catch (error) {
     console.error(JSON.stringify(error));
@@ -929,7 +982,11 @@ export async function downloadEpisodes(podcastId: string, episodes: Episode[]): 
   const api: Axios = createApi()
   try {
     const response: AxiosResponse =
-      await api.post<string, AxiosResponse<string>, Episode[]>(`/api/podcasts/${podcastId}/download-episodes`, episodes)
+      await api.post<string, AxiosResponse<string>, Episode[]>(`/api/podcasts/${podcastId}/download-episodes`, episodes, {
+        timeout: 30000,
+        readTimeout: 30000,
+        connectTimeout: 30000
+      })
     return true
   } catch (error) {
     console.error(JSON.stringify(error));
@@ -941,7 +998,11 @@ export async function deleteFromServer(podcastId: string, episodeId: string): Pr
   const api: Axios = createApi()
   try {
     const response: AxiosResponse =
-      await api.delete<string, AxiosResponse<string>, null>(`/api/podcasts/${podcastId}/episode/${episodeId}`)
+      await api.delete<string, AxiosResponse<string>, null>(`/api/podcasts/${podcastId}/episode/${episodeId}`, {
+        timeout: 30000,
+        readTimeout: 30000,
+        connectTimeout: 30000
+      })
     console.log("删除剧集成功");
     return true
   } catch (error) {
