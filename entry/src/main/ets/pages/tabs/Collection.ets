@@ -47,7 +47,6 @@ export struct AllCollections {
         .padding({ bottom: 100 })
         .justifyContent(FlexAlign.Center)
         .visibility(this.collections.length === 0 ? Visibility.Visible : Visibility.None)
-
       }
       .width('100%')
       .height('100%')
