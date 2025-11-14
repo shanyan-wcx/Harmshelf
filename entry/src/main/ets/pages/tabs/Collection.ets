@@ -34,9 +34,6 @@ export struct AllCollections {
           right: 20,
           top: 56
         })
-        .onReachEnd(async () => {
-
-        })
         .visibility(this.collections.length > 0 ? Visibility.Visible : Visibility.None)
 
 
