@@ -520,7 +520,7 @@ export struct Setting {
       Text("Harmshelf")
         .fontSize(36)
         .fontWeight(FontWeight.Bold)
-      Text("Audiobookshelf的鸿蒙原生客户端")
+      Text("您的私人鸿蒙有声书架")
         .fontSize(18)
         .fontColor($r('sys.color.font_secondary'))
         .margin({ top: 5 })
