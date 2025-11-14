@@ -1,13 +1,12 @@
 import { HdsActionBar, ActionBarButton, HdsListItem } from '@kit.UIDesignKit'
-import { Author, Bookmark, Chapter, Library, PlayItem, User } from '../utils/Interface'
+import { Bookmark, Chapter, PlayItem, User } from '../utils/Interface'
 import { CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier } from '@kit.ArkUI'
-import { common, ConfigurationConstant, Want } from '@kit.AbilityKit';
+import { ConfigurationConstant } from '@kit.AbilityKit';
 import { CountdownTimer, env } from '../utils/Class';
 import { deviceInfo } from "@kit.BasicServicesKit";
 import { createBookmark, deleteBookmark, getBookmarks } from '../utils/Api';
 import { PlaySetting } from './Index';
 import { media } from '@kit.MediaKit';
-import { HmParseHTML, Node } from '@wuyan/html_parse';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -21,7 +20,6 @@ export struct Play {
   @Consumer() isPlaying: boolean = false
   @Consumer() isStartPlaying: boolean = false
   @Consumer() showPlay: boolean = false
-  @Consumer() library: Library | undefined = undefined
   @Consumer() playingItem: PlayItem | undefined = undefined
   @Consumer() baseUrl: string = ""
   @Consumer() apiToken: string = ""
@@ -804,7 +802,7 @@ export struct Play {
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                Text(this.library?.mediaType === 'book' ?
+                Text(this.playingItem?.mediaType === 'book' ?
                   this.playingItem?.mediaMetadata.authors?.map(item => item.name).join(", ") :
                   this.playingItem!.displayAuthor)
                   .width('100%')
@@ -972,7 +970,7 @@ export struct Play {
                   .height(45)
                   .width(45)
                   .backgroundColor(Color.Transparent)
-                  .enabled(this.library?.mediaType === 'book' ? true : false)
+                  .enabled(this.playingItem?.mediaType === 'book' ? true : false)
                   .onClick(() => {
                     this.tmpBookmarkTitle = ""
                     this.showBookmark = !this.showBookmark;
@@ -1049,7 +1047,7 @@ export struct Play {
                   .height(45)
                   .width(45)
                   .backgroundColor(Color.Transparent)
-                  .enabled(this.library?.mediaType === 'book' ? true : false)
+                  .enabled(this.playingItem?.mediaType === 'book' ? true : false)
                   .onClick(() => {
                     this.showChapter = !this.showChapter;
                   })
