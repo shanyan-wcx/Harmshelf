@@ -129,6 +129,7 @@ struct Index {
   @Provider() goforwardIcon: Resource = $r('sys.symbol.goforward_10')
   @Provider() statsScroller: Scroller = new Scroller()
   @Provider() LocalMediaScroller: Scroller = new Scroller()
+  @Provider() logScroller: Scroller = new Scroller()
   @Provider() playStartTime: number = 0
   @Provider() playedTime: number = 0
   @Provider() playedPercent: number = 0
@@ -139,6 +140,7 @@ struct Index {
   @Provider() sleepController: CountdownTimer | undefined = undefined
   @Provider() syncTime: number = 0
   @Provider() filesDir: string = ""
+  @Provider() logs: string[] = []
   @Local uiContext: UIContext | undefined = undefined
   @Local mainWindow: window.Window | undefined = undefined
   @Local elapsedTime: number = 0

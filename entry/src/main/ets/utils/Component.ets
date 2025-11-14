@@ -23,7 +23,8 @@ let deviceTypeInfo: string = deviceInfo.deviceType;
 @ComponentV2
 export struct MyNavigation {
   @Consumer() statsScroller: Scroller = new Scroller();
-  @Provider() LocalMediaScroller: Scroller = new Scroller()
+  @Consumer() LocalMediaScroller: Scroller = new Scroller()
+  @Consumer() logScroller: Scroller = new Scroller()
   @Consumer() displayWidth: number = 0
   @Consumer() sideBarWidth: number = 240
   @Consumer() statusBarHeight: number = 0
@@ -154,7 +155,7 @@ export struct MyNavigation {
     })
     .titleMode(HdsNavigationTitleMode.MINI)
     .hideBackButton(true)
-    .bindToScrollable([this.statsScroller, this.LocalMediaScroller])
+    .bindToScrollable([this.statsScroller, this.LocalMediaScroller, this.logScroller])
     .onSizeChange((oldValue, newValue) => {
       if (newValue.width) {
         this.sideBarContentWidth = Number(newValue.width)
