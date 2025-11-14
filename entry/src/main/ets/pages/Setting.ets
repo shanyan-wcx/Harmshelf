@@ -249,6 +249,7 @@ export struct Setting {
       }
       .width('100%')
       .height('100%')
+      .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
 
