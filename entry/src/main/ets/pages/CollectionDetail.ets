@@ -112,22 +112,14 @@ export struct CollectionDetail {
   @Builder
   collectionEnd(index: number) {
     Button({ type: ButtonType.Circle }) {
-      SymbolGlyph($r('sys.symbol.trash'))
-        .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-        .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+      SymbolGlyph($r('sys.symbol.trash_fill'))
+        .fontSize($r('sys.float.ohos_id_text_size_headline8'))
+        .fontColor([$r('sys.color.white')])
     }
     .width(40)
     .height(40)
     .margin({ left: 10, right: 10 })
     .backgroundColor($r('sys.color.warning'))
-    .border({
-      width: deviceTypeInfo === '2in1' ? 1 : 0,
-      color: $r('sys.color.ohos_id_shadow_default_lg_dark')
-    })
-    .shadow({
-      radius: 6,
-      color: $r('sys.color.ohos_id_shadow_default_lg_dark')
-    })
     .onClick(async () => {
       if (this.user?.type === "root" || this.user?.type === "admin") {
         let collection = await removeFromCollection(this.collection1!.id!, this.collection1!.books![index].id)
@@ -394,7 +386,7 @@ export struct CollectionDetail {
               .padding({ top: 10, bottom: 10 })
               .alignItems(VerticalAlign.Center)
 
-              List() {
+              List({ space: 10 }) {
                 ForEach(this.collection1!.books, (book: Book, index) => {
                   ListItem() {
                     Stack() {
@@ -483,7 +475,6 @@ export struct CollectionDetail {
                     .width('100%')
                     .backgroundColor($r('sys.color.background_secondary'))
                     .borderRadius(8)
-                    .margin({ top: index === 0 ? 0 : 10 })
                     .alignContent(Alignment.Bottom)
                     .onClick(() => {
                       this.libraryItem = this.libraryItems.find(item => item.id === book.id)
@@ -559,9 +550,16 @@ export struct CollectionDetail {
               icon: $r('sys.symbol.square_and_pencil'),
               label: "编辑",
               action: () => {
-                this.tmpCollectionName = this.collection1!.name
-                this.tmpCollectionDescription = this.collection1!.description??""
-                this.showEditCollection = true
+                if (this.user?.type === "root" || this.user?.type === "admin") {
+                  this.tmpCollectionName = this.collection1!.name
+                  this.tmpCollectionDescription = this.collection1!.description??""
+                  this.showEditCollection = true
+                } else {
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '当前用户没有权限！',
+                    duration: 500
+                  });
+                }
               }
             }
           }]

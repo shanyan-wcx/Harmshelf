@@ -120,22 +120,14 @@ export struct PlaylistDetail {
   @Builder
   playlistEnd(index: number) {
     Button({ type: ButtonType.Circle }) {
-      SymbolGlyph($r('sys.symbol.trash'))
+      SymbolGlyph($r('sys.symbol.trash_fill'))
         .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-        .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+        .fontColor([$r('sys.color.white')])
     }
     .width(40)
     .height(40)
     .margin({ left: 10, right: 10 })
     .backgroundColor($r('sys.color.warning'))
-    .border({
-      width: deviceTypeInfo === '2in1' ? 1 : 0,
-      color: $r('sys.color.ohos_id_shadow_default_lg_dark')
-    })
-    .shadow({
-      radius: 6,
-      color: $r('sys.color.ohos_id_shadow_default_lg_dark')
-    })
     .onClick(async () => {
       let playlist: Playlist | undefined = undefined
       if (this.library!.mediaType === 'book') {
@@ -426,7 +418,7 @@ export struct PlaylistDetail {
               .padding({ top: 10, bottom: 10 })
               .alignItems(VerticalAlign.Center)
 
-              List() {
+              List({ space: 10 }) {
                 ForEach(this.playlist1!.items, (item: PlaylistItem, index) => {
                   ListItem() {
                     Stack() {
@@ -540,7 +532,6 @@ export struct PlaylistDetail {
                     .width('100%')
                     .backgroundColor($r('sys.color.background_secondary'))
                     .borderRadius(8)
-                    .margin({ top: index === 0 ? 0 : 10 })
                     .alignContent(Alignment.Bottom)
                     .onClick(() => {
                       if (this.library?.mediaType === 'book') {
