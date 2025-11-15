@@ -828,7 +828,7 @@ export async function getBookmarks(userId: string): Promise<Bookmark[]> {
   let bookmarks: Bookmark[] = []
   try {
     const response: AxiosResponse =
-      await api.get<string, AxiosResponse<string>, null>(`/api/users/${userId}`, {
+      await api.get<string, AxiosResponse<string>, null>(`/api/me`, {
         timeout: 30000,
         readTimeout: 30000,
         connectTimeout: 30000
