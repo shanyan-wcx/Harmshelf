@@ -113,13 +113,16 @@ export struct Home {
             this.series = await getSeries(this.library.id)
             break;
           case 3:
-            this.collections = await getCollections(this.library.id)
+            if (this.user?.type === "root" || this.user?.type === "admin") {
+              this.collections = await getCollections(this.library.id)
+            } else {
+              this.authors = await getAuthors(this.library.id)
+            }
             break;
           case 4:
-            this.authors = await getAuthors(this.library.id)
-            break;
-          case 5:
-            this.playlists = await getPlaylists(this.library.id)
+            if (this.user?.type === "root" || this.user?.type === "admin") {
+              this.authors = await getAuthors(this.library.id)
+            }
             break;
           default :
             break;
@@ -136,11 +139,6 @@ export struct Home {
           case 2:
             this.libraryItems = await getLibraryItems(this.library!.id)
             break;
-          case 3:
-            break
-          case 4:
-            this.playlists = await getPlaylists(this.library.id)
-            break
           default :
             break;
         }
@@ -218,25 +216,27 @@ export struct Home {
                 color: this.isOnFocus ? $r('sys.color.comp_emphasize_secondary') : $r('sys.color.ohos_id_color_hover')
               }))
 
-            TabContent() {
-              AllCollections()
+            if (this.user?.type === "root" || this.user?.type === "admin") {
+              TabContent() {
+                AllCollections()
+              }
+              .tabBar(new SubTabBarStyle('收藏')
+                .selectedMode(SelectedMode.BOARD)
+                .padding(0)
+                .board({
+                  borderRadius: 5
+                })
+                .labelStyle({
+                  font: {
+                    size: 14,
+                    weight: this.topTabIndex === 3 ? FontWeight.Bold : FontWeight.Medium
+                  },
+                  selectedColor: $r('sys.color.select_font_color')
+                })
+                .indicator({
+                  color: this.isOnFocus ? $r('sys.color.comp_emphasize_secondary') : $r('sys.color.ohos_id_color_hover')
+                }))
             }
-            .tabBar(new SubTabBarStyle('收藏')
-              .selectedMode(SelectedMode.BOARD)
-              .padding(0)
-              .board({
-                borderRadius: 5
-              })
-              .labelStyle({
-                font: {
-                  size: 14,
-                  weight: this.topTabIndex === 3 ? FontWeight.Bold : FontWeight.Medium
-                },
-                selectedColor: $r('sys.color.select_font_color')
-              })
-              .indicator({
-                color: this.isOnFocus ? $r('sys.color.comp_emphasize_secondary') : $r('sys.color.ohos_id_color_hover')
-              }))
 
             TabContent() {
               AllAuthors()
