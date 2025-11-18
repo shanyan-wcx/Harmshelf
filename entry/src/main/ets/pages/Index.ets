@@ -661,8 +661,7 @@ struct Index {
     this.registerInterception()
     this.avPlayer = await media.createAVPlayer();
     this.setAVPlayerCallback(this.avPlayer!);
-    let applicationContext = this.context.getApplicationContext();
-    this.filesDir = applicationContext.filesDir;
+    this.filesDir = this.context.filesDir;
     if (!fs.accessSync( this.filesDir + "/有声书")) {
       fs.mkdir(this.filesDir + "/有声书")
     }

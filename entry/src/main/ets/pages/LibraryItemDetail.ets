@@ -13,7 +13,8 @@ import {
   Playlist,
   Collection,
   Collection1,
-  User
+  User,
+  Track
 } from "../utils/Interface";
 import { HdsNavDestination, HdsNavDestinationAttribute } from "@kit.UIDesignKit";
 import { LengthMetrics, SymbolGlyphModifier } from "@kit.ArkUI";
@@ -31,6 +32,9 @@ import {
   updateProgress } from "../utils/Api";
 import { EpisodeComponent1 } from "../utils/Component";
 import { media } from "@kit.MediaKit";
+import { DownloadManager, DownloadTaskInfo } from '../utils/Download';
+import { common } from "@kit.AbilityKit";
+import { fileIo as fs } from '@kit.CoreFileKit';
 
 @Builder
 export function libraryItemDetailBuilder(name: string, param: Object) {
@@ -40,6 +44,8 @@ export function libraryItemDetailBuilder(name: string, param: Object) {
 @ComponentV2
 export struct LibraryItemDetail {
   private libraryDetailScroller: Scroller = new Scroller();
+  @Consumer() context: common.UIAbilityContext | undefined = undefined
+  private downloadManager: DownloadManager = new DownloadManager(this.context!);
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() displayWidth: number = 0
   @Consumer() displayHeight: number = 0
@@ -94,6 +100,7 @@ export struct LibraryItemDetail {
   @Local tmpCollectionName: string = ""
   @Local tmpCollectionDescription: string = ""
   @Local tmpCollectionItem: PlayItem | undefined = undefined
+  @Local downloadTasks: DownloadTaskInfo[] = [];
   @Monitor('syncTime')
   async refreshProgress(monitor: IMonitor) {
     this.itemProgress = undefined
@@ -876,6 +883,35 @@ export struct LibraryItemDetail {
                           message: '当前用户没有下载权限！',
                           duration: 500
                         });
+                      } else {
+                        this.libraryItem?.media.tracks?.forEach((track: Track, index) => {
+                          let dir = this.context!.filesDir + (this.libraryItem?.mediaType === 'book' ? "/有声书/" : "/播客/") + this.libraryItem?.media.metadata.title
+                          let filePath = dir + "/" + track.metadata.filename
+                          const existsDir = fs.accessSync(dir)
+                          if (!existsDir) {
+                            fs.mkdirSync(dir);
+                          }
+                          const existsFile = fs.accessSync(filePath)
+                          if (existsFile) {
+                           fs.unlinkSync(filePath);
+                          }
+                          this.downloadManager.add(
+                            track.index + track.title,
+                            track.title,
+                            this.baseUrl + track.contentUrl + "?token=" + this.apiToken,
+                            filePath,
+                            (info) => {
+                              // 下载进度回调
+                              console.info('Progress:', info.title, Math.floor(info.receivedSize / info.totalSize * 100) + "%");
+                              this.downloadTasks = this.downloadManager.getAllTaskInfo();
+                            },
+                            (info) => {
+                              // 状态变化回调
+                              console.info('Status changed:', info.title, info.status, info.error?.message??"");
+                              this.downloadTasks = this.downloadManager.getAllTaskInfo();
+                            }
+                          );
+                        })
                       }
                     })
                   }
