@@ -13,6 +13,8 @@ export enum DownloadStatus {
 }
 
 export interface DownloadTaskInfo {
+  mediaType: string,
+  folder: string,
   id: string;
   title: string;
   url: string;
@@ -46,6 +48,8 @@ export class DownloadManager {
 
   // 添加任务
   add(
+    mediaType: string,
+    folder: string,
     id: string,
     title: string,
     url: string,
@@ -58,6 +62,8 @@ export class DownloadManager {
       return;
     }
     const info: DownloadTaskInfo = {
+      mediaType,
+      folder,
       id,
       title,
       url,
@@ -126,11 +132,18 @@ export class DownloadManager {
       const transferFile = () => {
         const documentSaveOptions = new picker.DocumentSaveOptions();
         documentSaveOptions.pickerMode = picker.DocumentPickerMode.DOWNLOAD
-        const documentViewPicker = new picker.DocumentViewPicker;
+        const documentViewPicker = new picker.DocumentViewPicker(this.context);
         documentViewPicker.save(documentSaveOptions)
           .then(async (documentSaveResult) => {
             let uri = documentSaveResult[0];
             let path: string = new fileUri.FileUri(uri).path
+            let subPath = task.info.mediaType === 'book' ?  "/有声书" : "/播客"
+            if (!fs.accessSync(path + subPath)) {
+              fs.mkdirSync(path + subPath)
+            }
+            if (!fs.accessSync(path + subPath + "/" + task.info.folder)) {
+              fs.mkdirSync(path + subPath + "/" + task.info.folder)
+            }
             let filePath: string = path + task.info.filePath.slice(this.context.filesDir.length)
             let sanFile = fs.openSync(task.info.filePath, fs.OpenMode.READ_ONLY)
             let pubFile = fs.openSync(filePath, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE | fs.OpenMode.TRUNC)
@@ -265,6 +278,8 @@ export class DownloadManager {
       const task = this.tasks.get(id);
       if (task != undefined) {
         const info: DownloadTaskInfo = {
+          mediaType: task.info.mediaType,
+          folder: task.info.folder,
           id: task.info.id,
           title: task.info.title,
           url: task.info.url,

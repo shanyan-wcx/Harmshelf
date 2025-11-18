@@ -896,6 +896,8 @@ export struct LibraryItemDetail {
                            fs.unlinkSync(filePath);
                           }
                           this.downloadManager.add(
+                            this.libraryItem!.mediaType,
+                            this.libraryItem!.media.metadata.title,
                             track.index + track.title,
                             track.title,
                             this.baseUrl + track.contentUrl + "?token=" + this.apiToken,
