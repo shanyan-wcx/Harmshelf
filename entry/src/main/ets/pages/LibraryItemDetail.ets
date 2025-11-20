@@ -34,7 +34,8 @@ import { EpisodeComponent1 } from "../utils/Component";
 import { media } from "@kit.MediaKit";
 import { DownloadManager, DownloadTaskInfo } from '../utils/Download';
 import { common } from "@kit.AbilityKit";
-import { fileIo as fs } from '@kit.CoreFileKit';
+import { fileIo as fs, fileUri, picker } from '@kit.CoreFileKit';
+import { BusinessError, request } from '@kit.BasicServicesKit';
 
 @Builder
 export function libraryItemDetailBuilder(name: string, param: Object) {
@@ -46,6 +47,8 @@ export struct LibraryItemDetail {
   private libraryDetailScroller: Scroller = new Scroller();
   @Consumer() context: common.UIAbilityContext | undefined = undefined
   private downloadManager: DownloadManager = new DownloadManager(this.context!);
+  private documentViewPicker = new picker.DocumentViewPicker(this.context!);
+  documentSaveOptions = new picker.DocumentSaveOptions();
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() displayWidth: number = 0
   @Consumer() displayHeight: number = 0
@@ -70,6 +73,7 @@ export struct LibraryItemDetail {
   @Consumer() syncTime: number = 0
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Consumer() user: User | undefined = undefined
+  @Consumer() downloadPath: string = ""
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.libraryItemId === this.libraryItem!.id)
   @Local maxIntroLine: number = 5
   @Local showMoreIntro: boolean = false
@@ -228,6 +232,7 @@ export struct LibraryItemDetail {
 
   async aboutToAppear() {
     this.showLoadingProgress = true
+    this.documentSaveOptions.pickerMode = picker.DocumentPickerMode.DOWNLOAD;
     let tmpLibraryItem = await getItem(this.libraryItem!.id)
     if (tmpLibraryItem) {
       this.libraryItem = tmpLibraryItem
@@ -877,42 +882,97 @@ export struct LibraryItemDetail {
                     .height(40)
                     .width(40)
                     .borderRadius(8)
-                    .onClick(() => {
+                    .onClick(async () => {
                       if (!this.user?.permissions.download) {
                         this.getUIContext().getPromptAction().showToast({
                           message: '当前用户没有下载权限！',
                           duration: 500
                         });
                       } else {
-                        this.libraryItem?.media.tracks?.forEach((track: Track, index) => {
-                          let dir = this.context!.filesDir + (this.libraryItem?.mediaType === 'book' ? "/有声书/" : "/播客/") + this.libraryItem?.media.metadata.title
-                          let filePath = dir + "/" + track.metadata.filename
-                          const existsDir = fs.accessSync(dir)
-                          if (!existsDir) {
-                            fs.mkdirSync(dir);
+                        let dir = this.downloadPath + "/有声书/" + this.libraryItem?.media.metadata.title
+                        const existsDir = fs.accessSync(dir)
+                        if (!existsDir) {
+                          fs.mkdirSync(dir);
+                        }
+                        this.libraryItem?.media.tracks?.forEach(async (track: Track, index) => {
+                          // 创建文件管理器选项实例。
+                          try {
+                            let uri: string = '';
+                            const documentViewPicker = new picker.DocumentViewPicker(this.context!);
+                            const documentSaveOptions = new picker.DocumentSaveOptions();
+                            documentSaveOptions.pickerMode = picker.DocumentPickerMode.DOWNLOAD;
+                            documentSaveOptions.newFileNames = [track.metadata.filename]
+                            await documentViewPicker.save(documentSaveOptions).then(async (documentSaveResult: Array<string>) => {
+                              uri = documentSaveResult[0];
+                              console.info('documentViewPicker.save succeed and uri is:' + uri);
+                              const filePath = new fileUri.FileUri(uri + "/有声书/" + this.libraryItem?.media.metadata.title + "/" + track.metadata.filename).path;
+                              const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
+                              if (uri != '') {
+                                let config: request.agent.Config = {
+                                  action: request.agent.Action.DOWNLOAD,
+                                  url: this.baseUrl + track.contentUrl + "?token=" + this.apiToken,
+                                  // saveas字段是DocumentViewPicker保存的文件的uri
+                                  saveas: fileUri.getUriFromPath(filePath),
+                                  gauge: true,
+                                  // overwrite字段必须为true
+                                  overwrite: true,
+                                  network: request.agent.Network.ANY,
+                                  // mode字段必须为request.agent.Mode.FOREGROUND
+                                  mode: request.agent.Mode.FOREGROUND,
+                                };
+                                try {
+                                  request.agent.create(this.context!, config).then((task: request.agent.Task) => {
+                                    task.start((err: BusinessError) => {
+                                      if (err) {
+                                        console.error(`Failed to start the download task, Code: ${err.code}  message: ${err.message}`);
+                                        return;
+                                      }
+                                    });
+                                    task.on('progress', async (progress) => {
+                                      console.warn(`Request download status ${progress.state}, downloaded ${progress.processed}`);
+                                    })
+                                    task.on('completed', async (progress) => {
+                                      console.warn('Request download completed, ' + JSON.stringify(progress));
+                                      // 该方法需用户管理任务生命周期，任务结束后调用remove释放task对象
+                                      request.agent.remove(task.tid);
+                                    })
+                                  }).catch((err: BusinessError) => {
+                                    console.error(`Failed to operate a download task, Code: ${err.code}, message: ${err.message}`);
+                                  });
+                                } catch (err) {
+                                  console.error(`Failed to create a download task, err: ${err}`);
+                                }
+                              }
+                              fs.closeSync(file.fd);
+                            }).catch((err: BusinessError) => {
+                              console.error(`Invoke documentViewPicker.save failed, code is ${err.code}, message is ${err.message}`);
+                            })
+                          } catch (err) {
+                            console.error(`Failed to create a documentSaveOptions, err: ${err}`);
+                            return;
                           }
-                          const existsFile = fs.accessSync(filePath)
-                          if (existsFile) {
-                           fs.unlinkSync(filePath);
-                          }
-                          this.downloadManager.add(
-                            this.libraryItem!.mediaType,
-                            this.libraryItem!.media.metadata.title,
-                            track.index + track.title,
-                            track.title,
-                            this.baseUrl + track.contentUrl + "?token=" + this.apiToken,
-                            filePath,
-                            (info) => {
-                              // 下载进度回调
-                              console.info('Progress:', info.title, Math.floor(info.receivedSize / info.totalSize * 100) + "%");
-                              this.downloadTasks = this.downloadManager.getAllTaskInfo();
-                            },
-                            (info) => {
-                              // 状态变化回调
-                              console.info('Status changed:', info.title, info.status, info.error?.message??"");
-                              this.downloadTasks = this.downloadManager.getAllTaskInfo();
-                            }
-                          );
+                          // const existsFile = fs.accessSync(filePath)
+                          // if (existsFile) {
+                          //  fs.unlinkSync(filePath);
+                          // }
+                          // this.downloadManager.add(
+                          //   this.libraryItem!.mediaType,
+                          //   this.libraryItem!.media.metadata.title,
+                          //   track.index + track.title,
+                          //   track.title,
+                          //   this.baseUrl + track.contentUrl + "?token=" + this.apiToken,
+                          //   filePath,
+                          //   (info) => {
+                          //     // 下载进度回调
+                          //     console.info('Progress:', info.title, Math.floor(info.receivedSize / info.totalSize * 100) + "%");
+                          //     this.downloadTasks = this.downloadManager.getAllTaskInfo();
+                          //   },
+                          //   (info) => {
+                          //     // 状态变化回调
+                          //     console.info('Status changed:', info.title, info.status, info.error?.message??"");
+                          //     this.downloadTasks = this.downloadManager.getAllTaskInfo();
+                          //   }
+                          // );
                         })
                       }
                     })

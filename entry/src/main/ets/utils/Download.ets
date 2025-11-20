@@ -129,38 +129,38 @@ export class DownloadManager {
         this._checkQueue(); // 完成后检查队列启动新任务
       };
 
-      const transferFile = () => {
-        const documentSaveOptions = new picker.DocumentSaveOptions();
-        documentSaveOptions.pickerMode = picker.DocumentPickerMode.DOWNLOAD
-        const documentViewPicker = new picker.DocumentViewPicker(this.context);
-        documentViewPicker.save(documentSaveOptions)
-          .then(async (documentSaveResult) => {
-            let uri = documentSaveResult[0];
-            let path: string = new fileUri.FileUri(uri).path
-            let subPath = task.info.mediaType === 'book' ?  "/有声书" : "/播客"
-            if (!fs.accessSync(path + subPath)) {
-              fs.mkdirSync(path + subPath)
-            }
-            if (!fs.accessSync(path + subPath + "/" + task.info.folder)) {
-              fs.mkdirSync(path + subPath + "/" + task.info.folder)
-            }
-            let filePath: string = path + task.info.filePath.slice(this.context.filesDir.length)
-            let sanFile = fs.openSync(task.info.filePath, fs.OpenMode.READ_ONLY)
-            let pubFile = fs.openSync(filePath, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE | fs.OpenMode.TRUNC)
-            fs.copyFileSync(sanFile.fd, pubFile.fd)
-            fs.closeSync(sanFile.fd)
-            fs.closeSync(pubFile.fd)
-            fs.unlinkSync(task.info.filePath);
-          }).catch((err: Error) => {
-          console.error(`调用documentPicker.select失败, message is ${err.message}`);
-        })
-      }
+      // const transferFile = () => {
+      //   const documentSaveOptions = new picker.DocumentSaveOptions();
+      //   documentSaveOptions.pickerMode = picker.DocumentPickerMode.DOWNLOAD
+      //   const documentViewPicker = new picker.DocumentViewPicker(this.context);
+      //   documentViewPicker.save(documentSaveOptions)
+      //     .then(async (documentSaveResult) => {
+      //       let uri = documentSaveResult[0];
+      //       let path: string = new fileUri.FileUri(uri).path
+      //       let subPath = task.info.mediaType === 'book' ?  "/有声书" : "/播客"
+      //       if (!fs.accessSync(path + subPath)) {
+      //         fs.mkdirSync(path + subPath)
+      //       }
+      //       if (!fs.accessSync(path + subPath + "/" + task.info.folder)) {
+      //         fs.mkdirSync(path + subPath + "/" + task.info.folder)
+      //       }
+      //       let filePath: string = path + task.info.filePath.slice(this.context.filesDir.length)
+      //       let sanFile = fs.openSync(task.info.filePath, fs.OpenMode.READ_ONLY)
+      //       let pubFile = fs.openSync(filePath, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE | fs.OpenMode.TRUNC)
+      //       fs.copyFileSync(sanFile.fd, pubFile.fd)
+      //       fs.closeSync(sanFile.fd)
+      //       fs.closeSync(pubFile.fd)
+      //       fs.unlinkSync(task.info.filePath);
+      //     }).catch((err: Error) => {
+      //     console.error(`调用documentPicker.select失败, message is ${err.message}`);
+      //   })
+      // }
 
       downloadTask.on('complete', () => {
         task.info.status = DownloadStatus.Completed;
         task.onStatusChange?.(task.info);
         finishHandler();
-        transferFile();
+        // transferFile();
       });
 
       downloadTask.on('fail', (err: number | BusinessError) => {

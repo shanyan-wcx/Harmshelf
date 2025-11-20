@@ -28,7 +28,7 @@ import { audio } from '@kit.AudioKit';
 import { CountdownTimer } from '../utils/Class';
 import { getUser, syncSession } from '../utils/Api';
 import { bundleManager } from '@kit.AbilityKit';
-import { fileIo as fs } from '@kit.CoreFileKit';
+import { fileIo as fs, fileUri, picker } from '@kit.CoreFileKit';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -141,6 +141,7 @@ struct Index {
   @Provider() syncTime: number = 0
   @Provider() filesDir: string = ""
   @Provider() logs: string[] = []
+  @Provider() downloadPath: string = ""
   @Local uiContext: UIContext | undefined = undefined
   @Local mainWindow: window.Window | undefined = undefined
   @Local elapsedTime: number = 0
@@ -661,13 +662,22 @@ struct Index {
     this.registerInterception()
     this.avPlayer = await media.createAVPlayer();
     this.setAVPlayerCallback(this.avPlayer!);
-    this.filesDir = this.context.filesDir;
-    if (!fs.accessSync( this.filesDir + "/有声书")) {
-      fs.mkdir(this.filesDir + "/有声书")
-    }
-    if (!fs.accessSync( this.filesDir + "/播客")) {
-      fs.mkdir(this.filesDir + "/播客")
-    }
+    const documentSaveOptions = new picker.DocumentSaveOptions();
+    documentSaveOptions.pickerMode = picker.DocumentPickerMode.DOWNLOAD
+    const documentViewPicker = new picker.DocumentViewPicker(this.context);
+    documentViewPicker.save(documentSaveOptions)
+      .then(async (documentSaveResult) => {
+        let uri = documentSaveResult[0];
+        this.downloadPath = new fileUri.FileUri(uri).path
+        if (!fs.accessSync(this.downloadPath + "/有声书")) {
+          fs.mkdirSync(this.downloadPath + "/有声书")
+        }
+        if (!fs.accessSync(this.downloadPath + "/播客")) {
+          fs.mkdirSync(this.downloadPath + "/播客")
+        }
+      }).catch((err: Error) => {
+      console.error(`调用documentPicker.select失败, message is ${err.message}`);
+    })
   }
 
   aboutToDisappear() {
