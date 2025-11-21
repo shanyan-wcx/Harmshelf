@@ -131,6 +131,7 @@ struct Index {
   @Provider() statsScroller: Scroller = new Scroller()
   @Provider() LocalMediaScroller: Scroller = new Scroller()
   @Provider() logScroller: Scroller = new Scroller()
+  @Provider() settingScroller: Scroller = new Scroller()
   @Provider() playStartTime: number = 0
   @Provider() playedTime: number = 0
   @Provider() playedPercent: number = 0
@@ -140,7 +141,6 @@ struct Index {
   @Provider() sliderMoving: boolean = false
   @Provider() sleepController: CountdownTimer | undefined = undefined
   @Provider() syncTime: number = 0
-  @Provider() filesDir: string = ""
   @Provider() logs: string[] = []
   @Provider() downloadUri: string = ""
   @Provider() downloadTasks: DownloadTaskInfo[] = [

@@ -23,13 +23,14 @@ let deviceTypeInfo: string = deviceInfo.deviceType;
 
 @ComponentV2
 export struct MyNavigation {
-  @Consumer() statsScroller: Scroller = new Scroller();
+  @Consumer() statsScroller: Scroller = new Scroller()
   @Consumer() LocalMediaScroller: Scroller = new Scroller()
   @Consumer() logScroller: Scroller = new Scroller()
+  @Consumer() settingScroller: Scroller = new Scroller()
   @Consumer() displayWidth: number = 0
   @Consumer() sideBarWidth: number = 240
   @Consumer() statusBarHeight: number = 0
-  @Consumer() pageInfos: NavPathStack = new NavPathStack();
+  @Consumer() pageInfos: NavPathStack = new NavPathStack()
   @Consumer() pageIndex: number = 0;
   @Consumer() firstAppear: boolean = false
   @Consumer() baseUrl: string = ""
@@ -118,7 +119,7 @@ export struct MyNavigation {
       style: {
         scrollEffectOpts: {
           enableScrollEffect: this.pageIndex === 0 ? false : true,
-          blurEffectiveStartOffset: LengthMetrics.vp(20)
+          blurEffectiveStartOffset: LengthMetrics.vp(12)
         }
       },
       content: {
@@ -205,7 +206,7 @@ export struct MyNavigation {
     })
     .titleMode(HdsNavigationTitleMode.MINI)
     .hideBackButton(true)
-    .bindToScrollable([this.statsScroller, this.LocalMediaScroller, this.logScroller])
+    .bindToScrollable([this.statsScroller, this.LocalMediaScroller, this.logScroller, this.settingScroller])
     .onSizeChange((oldValue, newValue) => {
       if (newValue.width) {
         this.sideBarContentWidth = Number(newValue.width)

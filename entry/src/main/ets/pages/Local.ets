@@ -1,4 +1,4 @@
-import { fileIo as fs } from '@kit.CoreFileKit';
+import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { env } from '../utils/Class';
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import { PersistenceV2 } from '@kit.ArkUI';
@@ -10,7 +10,6 @@ import { media } from '@kit.MediaKit';
 export struct LocalMedia {
   @Consumer() LocalMediaScroller: Scroller = new Scroller()
   @Consumer() colorMode: ColorMode | undefined = PersistenceV2.connect(ColorMode, () => new ColorMode());
-  @Consumer() filesDir: string = ""
   @Consumer() isStartPlaying: boolean = false
   @Consumer() isPlaying: boolean = false
   @Consumer() playingItem: PlayItem | undefined = undefined
@@ -18,6 +17,7 @@ export struct LocalMedia {
   @Consumer() playingIndex: number = 0
   @Consumer() playStartTime: number = 0
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
+  @Consumer() downloadUri: string = ""
   @Local folderList: string[] = []
   @Local subFolderList: string[] = []
   @Local audioFolderList: string[] = []
@@ -26,6 +26,7 @@ export struct LocalMedia {
   @Local metadata: string | undefined = undefined
   @Local folderIdx: number = 0
   @Local subFolderIdx: number = 0
+  @Local downloadPath: string = ""
   private audioExts = ['mp3', 'flac', 'wav', 'aac', 'm4a', 'm4b', 'ogg'];
 
   isAudioFile(fileName: string): boolean {
@@ -37,14 +38,13 @@ export struct LocalMedia {
   }
 
   async aboutToAppear() {
-    const entries = await fs.listFile(this.filesDir);
+    this.downloadPath = new fileUri.FileUri(this.downloadUri).path
+    const entries = await fs.listFile(this.downloadPath);
     for (let name of entries) {
-      if (name !== "hiappevent") {
-        const fullPath = `${this.filesDir}/${name}`;
-        const stat = await fs.stat(fullPath);
-        if (stat.isDirectory()) {
-          this.folderList.push(name);
-        }
+      const fullPath = `${this.downloadPath}/${name}`;
+      const stat = await fs.stat(fullPath);
+      if (stat.isDirectory()) {
+        this.folderList.push(name);
       }
     }
   }
@@ -54,10 +54,10 @@ export struct LocalMedia {
       Scroll(this.LocalMediaScroller) {
         Column() {
           Column() {
-            Text("本地目录")
+            Text("本地媒体")
               .fontSize(20)
               .fontWeight(FontWeight.Bold)
-              .margin({ top: 20, bottom: 15 })
+              .margin({ top: 15, bottom: 15 })
 
             if (this.folderDeep === 0) {
               ForEach(this.folderList, (folder: string, index) => {
@@ -79,14 +79,14 @@ export struct LocalMedia {
                 .width('100%')
                 .height(60)
                 .borderRadius(8)
-                .margin({ bottom: index !== this.folderList.length -1 ? 10 : 0 })
+                .margin({ bottom: index !== this.folderList.length - 1 ? 10 : 0 })
                 .padding({ left: 20, right: 20 })
                 .backgroundColor($r('sys.color.comp_background_tertiary'))
                 .onClick(async () => {
                   this.subFolderList = []
-                  const entries = await fs.listFile(this.filesDir + "/" + folder);
+                  const entries = await fs.listFile(this.downloadPath + "/" + folder);
                   for (let name of entries) {
-                    const fullPath = `${this.filesDir}/${name}`;
+                    const fullPath = `${this.downloadPath}/${folder}/${name}`;
                     const stat = await fs.stat(fullPath);
                     if (stat.isDirectory()) {
                       this.subFolderList.push(name);
@@ -100,8 +100,8 @@ export struct LocalMedia {
                   this.folderIdx = index
                   this.folderDeep = 1
                   this.metadata = undefined
-                  if (fs.accessSync(this.filesDir + "/" + folder + "/metadata.json")) {
-                    this.metadata = await fs.readText(this.filesDir + "/" + folder + "/metadata.json")
+                  if (fs.accessSync(this.downloadPath + "/" + folder + "/metadata.json")) {
+                    this.metadata = await fs.readText(this.downloadPath + "/" + folder + "/metadata.json")
                   }
                 })
               })
@@ -132,7 +132,7 @@ export struct LocalMedia {
               })
 
               if (this.subFolderList.length > 0) {
-                ForEach(this.subFolderList, (folder: string, index) => {
+                ForEach(this.subFolderList.sort((a, b) => a.localeCompare(b)), (folder: string, index) => {
                   Button({ type: ButtonType.Normal }) {
                     Row() {
                       Text(folder)
@@ -151,14 +151,14 @@ export struct LocalMedia {
                   .width('100%')
                   .height(60)
                   .borderRadius(8)
-                  .margin({ bottom: index !== this.folderList.length -1 ? 10 : 0 })
+                  .margin({ bottom: index !== this.subFolderList.length - 1 ? 10 : 0 })
                   .padding({ left: 20, right: 20 })
                   .backgroundColor($r('sys.color.comp_background_tertiary'))
                   .onClick(async () => {
                     this.audioFolderList = []
-                    const entries = await fs.listFile(this.filesDir + "/" + folder);
+                    const entries = await fs.listFile(this.downloadPath + "/" + this.folderList[this.folderIdx] + "/" + folder);
                     for (let name of entries) {
-                      const fullPath = `${this.filesDir}/${name}`;
+                      const fullPath = `${this.downloadPath}/${this.folderList[this.folderIdx]}/${folder}/${name}`;
                       const stat = await fs.stat(fullPath);
                       if (stat.isFile() && this.isAudioFile(name)) {
                         this.audioFolderList.push(name);
@@ -205,7 +205,7 @@ export struct LocalMedia {
               })
 
               if (this.audioFolderList.length > 0) {
-                ForEach(this.audioFolderList, (file: string, index) => {
+                ForEach(this.audioFolderList.sort((a, b) => a.localeCompare(b)), (file: string, index) => {
                   Button({ type: ButtonType.Normal }) {
                     Row() {
                       Text(file)
@@ -220,100 +220,11 @@ export struct LocalMedia {
                   .width('100%')
                   .height(60)
                   .borderRadius(8)
-                  .margin({ bottom: index !== this.folderList.length -1 ? 10 : 0 })
+                  .margin({ bottom: index !== this.audioFolderList.length - 1 ? 10 : 0 })
                   .padding({ left: 20, right: 20 })
                   .backgroundColor($r('sys.color.comp_background_tertiary'))
                   .onClick(async () => {
-                    let duration = 0
-                    let avMetadataExtractor: media.AVMetadataExtractor = await media.createAVMetadataExtractor();
-                    let audio = await fs.open(this.filesDir + "/" + this.folderList[this.folderIdx] + "/" + this.subFolderList[this.subFolderIdx] + "/" + file)
-                    avMetadataExtractor.fdSrc = {
-                      fd: audio.fd
-                    }
-                    avMetadataExtractor.fetchMetadata((error, metadata) => {
-                      if (error) {
-                        console.error(`Failed to fetch Metadata, err = ${JSON.stringify(error)}`);
-                        return;
-                      }
-                      duration = Number(metadata.duration)
-                    });
-                    avMetadataExtractor.release((error) => {
 
-                    })
-                    await this.avPlayer!.reset();
-                    this.playingItem = {
-                      id: "",
-                      userId: "",
-                      libraryId: "",
-                      libraryItemId: "",
-                      bookId: null,
-                      episodeId: null,
-                      mediaType: this.mediaType,
-                      mediaMetadata: {
-                        title: "",
-                        titleIgnorePrefix: "",
-                        subtitle: "",
-                        author: JSON.parse(this.metadata??"").author??undefined,
-                        authors: JSON.parse(this.metadata??"").authors??[],
-                        genres: [],
-                        description: "",
-                        language: "",
-                        explicit: false
-                      },
-                      chapters: [JSON.parse(this.metadata??"").chapter[index]]??[],
-                      displayTitle: "",
-                      displayAuthor: "",
-                      coverPath: "",
-                      duration: 0,
-                      playMethod: 0,
-                      mediaPlayer: "",
-                      deviceInfo: {
-                        id: "",
-                        userId: "",
-                        deviceName: "",
-                        clientVersion: "",
-                        clientName: "",
-                      },
-                      serverVersion: "",
-                      date: "",
-                      dayOfWeek: "",
-                      timeListening: 0,
-                      startTime: 0,
-                      currentTime: 0,
-                      startedAt: 0,
-                      updatedAt: 0,
-                      audioTracks: [{
-                        index: 0,
-                        startOffset: 0,
-                        duration: duration,
-                        title: file,
-                        contentUrl: "",
-                        mimeType: "",
-                        codec: "",
-                        metadata: {
-                          filename: file,
-                          ext: "",
-                          path: "",
-                          relPath: "",
-                          size: 0,
-                          mtimeMs: 0,
-                          ctimeMs: 0,
-                          birthtimeMs: 0
-                        }
-                      }],
-                      videoTrack: null
-                    }
-                    this.isStartPlaying = true
-                    this.isPlaying = true
-                    this.playingIndex = index
-                    this.playingTitle = file
-                    this.playStartTime = 0
-                    this.avPlayer!.fdSrc = {
-                      fd: audio.fd,
-                    }
-                    fs.close(audio)
-                    console.log("共", this.playingItem!.audioTracks.length, "条音轨")
-                    console.log("播放序号为", this.playingIndex)
                   })
                 })
               } else {
@@ -339,7 +250,7 @@ export struct LocalMedia {
       }
       .width('100%')
       .height('100%')
-      .padding({ left: 20, right: 20, top: 72, bottom: this.isStartPlaying ? 109 : 25 })
+      .padding({ left: 20, right: 20, top: 69, bottom: this.isStartPlaying ? 109 : 25 })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)

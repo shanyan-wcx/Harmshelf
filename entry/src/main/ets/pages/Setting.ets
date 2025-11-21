@@ -13,6 +13,7 @@ let bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleFlags)
 
 @ComponentV2
 export struct Setting {
+  @Consumer() settingScroller: Scroller = new Scroller();
   @Consumer() selectThemeIndex: number = 0
   @Consumer() serverIndex: ServerIndex | undefined = PersistenceV2.connect(ServerIndex, () => new ServerIndex());
   @Consumer() serverSetting: ServerSetting | undefined = PersistenceV2.connect(ServerSetting, () => new ServerSetting());
@@ -607,7 +608,7 @@ export struct Setting {
   }
 
   build() {
-    Scroll() {
+    Scroll(this.settingScroller) {
       Column() {
         Column() {
           Text("服务器设置")
@@ -769,7 +770,7 @@ export struct Setting {
           $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
         .borderRadius(8)
         .padding({ left: 20, right: 20, bottom: 20 })
-        .margin({ top: 14 })
+        .margin({ top: 13 })
         .bindSheet(this.showEditServer, this.EditServerBuilder(), {
           height: 380,
           preferType: SheetType.CENTER,

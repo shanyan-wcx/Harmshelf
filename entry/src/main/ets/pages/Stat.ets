@@ -336,7 +336,7 @@ export struct Stats {
       }
       .width('100%')
       .height('100%')
-      .padding({ top: this.displayWidth >= 1000 ? 85 : 65, bottom: this.isStartPlaying ? 99 : 20 })
+      .padding({ top: this.displayWidth >= 1000 ? 86 : 66, bottom: this.isStartPlaying ? 99 : 20 })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
