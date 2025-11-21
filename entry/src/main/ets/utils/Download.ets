@@ -18,11 +18,8 @@ export interface DownloadTaskInfo {
   id: string;
   title: string;
   url: string;
-  filePath: string;
   status: DownloadStatus;
-  receivedSize: number;
-  totalSize: number;
-  error?: BusinessError;
+  progress: number;
   background?: boolean;
 }
 
@@ -31,7 +28,7 @@ type StatusCallback = (info: DownloadTaskInfo) => void;
 
 interface InternalTask {
   info: DownloadTaskInfo;
-  downloadTask?: request.DownloadTask;
+  downloadTask?: request.agent.Task;
   onProgress?: ProgressCallback;
   onStatusChange?: StatusCallback;
 }
@@ -41,9 +38,24 @@ export class DownloadManager {
   private tasks: Map<string, InternalTask> = new Map();
   private activeDownloads: Set<string> = new Set(); // 正在下载的任务 id
   private MAX_CONCURRENT_DOWNLOADS = 1;
+  private uri: string = ""
 
   constructor(context: common.UIAbilityContext) {
     this.context = context;
+    try {
+      const documentViewPicker = new picker.DocumentViewPicker(this.context!);
+      const documentSaveOptions = new picker.DocumentSaveOptions();
+      documentSaveOptions.pickerMode = picker.DocumentPickerMode.DOWNLOAD;
+      documentViewPicker.save(documentSaveOptions).then(async (documentSaveResult: Array<string>) => {
+        this.uri = documentSaveResult[0];
+        console.info('documentViewPicker.save succeed and uri is:' + this.uri);
+      }).catch((err: BusinessError) => {
+        console.error(`Invoke documentViewPicker.save failed, code is ${err.code}, message is ${err.message}`);
+      })
+    } catch (err) {
+      console.error(`Failed to create a documentSaveOptions, err: ${err}`);
+      return;
+    }
   }
 
   // 添加任务
@@ -53,7 +65,6 @@ export class DownloadManager {
     id: string,
     title: string,
     url: string,
-    filePath: string,
     onProgress?: ProgressCallback,
     onStatusChange?: StatusCallback
   ): void {
@@ -67,10 +78,8 @@ export class DownloadManager {
       id,
       title,
       url,
-      filePath,
       status: DownloadStatus.Idle,
-      receivedSize: 0,
-      totalSize: 0,
+      progress: 0,
       background: true,
     };
     this.tasks.set(id, { info, onProgress, onStatusChange });
@@ -112,15 +121,30 @@ export class DownloadManager {
       task.onStatusChange?.(task.info);
       this.activeDownloads.add(id);
 
-      const downloadTask = await request.downloadFile(this.context, {
+      const filePath = new fileUri.FileUri(this.uri + "/有声书/" + task.info.folder + "/" + task.info.title).path;
+      const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
+      fs.closeSync(file.fd);
+      let config: request.agent.Config = {
+        action: request.agent.Action.DOWNLOAD,
         url: task.info.url,
-        filePath: task.info.filePath,
+        saveas: fileUri.getUriFromPath(filePath),
+        gauge: true,
+        overwrite: true,
+        network: request.agent.Network.ANY,
+        mode: request.agent.Mode.FOREGROUND,
+      };
+
+      const downloadTask = await request.agent.create(this.context!, config)
+      downloadTask.start((err: BusinessError) => {
+        if (err) {
+          console.error(`Failed to start the download task, Code: ${err.code}  message: ${err.message}`);
+          return;
+        }
       });
       task.downloadTask = downloadTask;
 
-      downloadTask.on('progress', (received: number, total: number) => {
-        task.info.receivedSize = received;
-        task.info.totalSize = total;
+      downloadTask.on('progress', async (progress) => {
+        task.info.progress = progress.processed / progress.sizes[0] * 100;
         task.onProgress?.(task.info);
       });
 
@@ -129,50 +153,15 @@ export class DownloadManager {
         this._checkQueue(); // 完成后检查队列启动新任务
       };
 
-      // const transferFile = () => {
-      //   const documentSaveOptions = new picker.DocumentSaveOptions();
-      //   documentSaveOptions.pickerMode = picker.DocumentPickerMode.DOWNLOAD
-      //   const documentViewPicker = new picker.DocumentViewPicker(this.context);
-      //   documentViewPicker.save(documentSaveOptions)
-      //     .then(async (documentSaveResult) => {
-      //       let uri = documentSaveResult[0];
-      //       let path: string = new fileUri.FileUri(uri).path
-      //       let subPath = task.info.mediaType === 'book' ?  "/有声书" : "/播客"
-      //       if (!fs.accessSync(path + subPath)) {
-      //         fs.mkdirSync(path + subPath)
-      //       }
-      //       if (!fs.accessSync(path + subPath + "/" + task.info.folder)) {
-      //         fs.mkdirSync(path + subPath + "/" + task.info.folder)
-      //       }
-      //       let filePath: string = path + task.info.filePath.slice(this.context.filesDir.length)
-      //       let sanFile = fs.openSync(task.info.filePath, fs.OpenMode.READ_ONLY)
-      //       let pubFile = fs.openSync(filePath, fs.OpenMode.READ_WRITE | fs.OpenMode.CREATE | fs.OpenMode.TRUNC)
-      //       fs.copyFileSync(sanFile.fd, pubFile.fd)
-      //       fs.closeSync(sanFile.fd)
-      //       fs.closeSync(pubFile.fd)
-      //       fs.unlinkSync(task.info.filePath);
-      //     }).catch((err: Error) => {
-      //     console.error(`调用documentPicker.select失败, message is ${err.message}`);
-      //   })
-      // }
-
-      downloadTask.on('complete', () => {
+      downloadTask.on('completed', async (progress) => {
         task.info.status = DownloadStatus.Completed;
+        request.agent.remove(downloadTask.tid);
         task.onStatusChange?.(task.info);
         finishHandler();
-        // transferFile();
       });
 
-      downloadTask.on('fail', (err: number | BusinessError) => {
+      downloadTask.on('failed', () => {
         task.info.status = DownloadStatus.Failed;
-        if (typeof err === 'object') {
-          task.info.error = err;
-        } else {
-          task.info.error = {
-            code: err as number,
-            message: `Download failed with code ${err}`,
-          } as BusinessError;
-        }
         task.onStatusChange?.(task.info);
         finishHandler();
       });
@@ -190,7 +179,6 @@ export class DownloadManager {
       });
     } catch (err) {
       task.info.status = DownloadStatus.Failed;
-      task.info.error = err as BusinessError;
       task.onStatusChange?.(task.info);
       this.activeDownloads.delete(id);
       this._checkQueue();
@@ -237,7 +225,7 @@ export class DownloadManager {
     }
 
     if (task.downloadTask) {
-      task.downloadTask.remove();
+      request.agent.remove(task.downloadTask.tid);
     }
 
     this.activeDownloads.delete(id);
@@ -251,7 +239,7 @@ export class DownloadManager {
     for (const id of Array.from(this.tasks.keys())) {
       const task = this.tasks.get(id);
       if (task?.downloadTask) {
-        task.downloadTask.remove();
+        request.agent.remove(task.downloadTask.tid);
       }
       this.activeDownloads.delete(id);
       this.tasks.delete(id);
@@ -283,11 +271,8 @@ export class DownloadManager {
           id: task.info.id,
           title: task.info.title,
           url: task.info.url,
-          filePath: task.info.filePath,
           status: task.info.status,
-          receivedSize: task.info.receivedSize,
-          totalSize: task.info.totalSize,
-          error: task.info.error,
+          progress: task.info.progress,
           background: task.info.background
         };
         infos.push(info);
