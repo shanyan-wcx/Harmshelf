@@ -17,6 +17,7 @@ import { addToPlaylist,
 import { Author, Series, LibraryItem, Library, Book, Progress, Episode, Filter1, UpdateProgress, PlayItem, Collection, Playlist,
   PlaylistItem} from "./Interface"
 import { media } from "@kit.MediaKit";
+import { DownloadTaskInfo } from "./Download";
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -42,6 +43,7 @@ export struct MyNavigation {
   @Consumer() sideBarContentWidth: number = 0
   @Consumer() libraries: Library[] = []
   @Consumer() library: Library | undefined = undefined
+  @Consumer() downloadTasks: DownloadTaskInfo[] = [];
 
   aboutToAppear() {
     this.firstAppear = true
@@ -123,6 +125,7 @@ export struct MyNavigation {
         stackBuilder: (): void => this.titleBarBuilder(),
         menu: {
           value: this.sidebarType === SideBarContainerType.Embed ?
+            (this.downloadTasks.length === 0 ?
             [{
               content: {
                 icon: $r('sys.symbol.magnifyingglass'),
@@ -132,7 +135,55 @@ export struct MyNavigation {
                 }
               }
             }] :
-            [{
+              [{
+                content: {
+                  icon: $r('sys.symbol.download'),
+                  label: 'download',
+                  action: () => {
+                    this.pageInfos.pushPathByName('downloadTask', null)
+                  }
+                },
+                badge: {
+                  count: this.downloadTasks.length
+                }
+              }, {
+                content: {
+                  icon: $r('sys.symbol.magnifyingglass'),
+                  label: 'search',
+                  action: () => {
+                    this.pageInfos.pushPathByName('search', null)
+                  }
+                }
+              }]) : (this.downloadTasks.length === 0 ?
+              [{
+                content: {
+                  icon: $r('sys.symbol.magnifyingglass'),
+                  label: 'search',
+                  action: () => {
+                    this.pageInfos.pushPathByName('search', null)
+                  }
+                }
+              }, {
+                content: {
+                  icon: $r('sys.symbol.open_sidebar'),
+                  label: 'sidebar',
+                  action: () => {
+                    this.isShowSidebar = !this.isShowSidebar
+                  }
+                }
+              }] :
+              [{
+              content: {
+                icon: $r('sys.symbol.download'),
+                label: 'download',
+                action: () => {
+                  this.pageInfos.pushPathByName('downloadTask', null)
+                }
+              },
+              badge: {
+                count: this.downloadTasks.length
+              }
+            }, {
               content: {
                 icon: $r('sys.symbol.magnifyingglass'),
                 label: 'search',
@@ -140,8 +191,7 @@ export struct MyNavigation {
                   this.pageInfos.pushPathByName('search', null)
                 }
               }
-            },
-            {
+            }, {
               content: {
                 icon: $r('sys.symbol.open_sidebar'),
                 label: 'sidebar',
@@ -149,7 +199,7 @@ export struct MyNavigation {
                   this.isShowSidebar = !this.isShowSidebar
                 }
               }
-            }]
+            }])
         }
       }
     })

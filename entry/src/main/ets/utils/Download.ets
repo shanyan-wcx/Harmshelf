@@ -13,8 +13,8 @@ export enum DownloadStatus {
 }
 
 export interface DownloadTaskInfo {
-  mediaType: string,
-  folder: string,
+  mediaType: string;
+  folder: string;
   id: string;
   title: string;
   url: string;

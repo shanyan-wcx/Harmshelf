@@ -71,6 +71,7 @@ export struct LibraryItemDetail {
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Consumer() user: User | undefined = undefined
   @Consumer() downloadUri: string = ""
+  @Consumer() downloadTasks: DownloadTaskInfo[] = [];
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.libraryItemId === this.libraryItem!.id)
   @Local maxIntroLine: number = 5
   @Local showMoreIntro: boolean = false
@@ -101,7 +102,6 @@ export struct LibraryItemDetail {
   @Local tmpCollectionName: string = ""
   @Local tmpCollectionDescription: string = ""
   @Local tmpCollectionItem: PlayItem | undefined = undefined
-  @Local downloadTasks: DownloadTaskInfo[] = [];
   @Monitor('syncTime')
   async refreshProgress(monitor: IMonitor) {
     this.itemProgress = undefined

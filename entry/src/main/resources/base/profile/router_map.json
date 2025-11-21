@@ -29,6 +29,11 @@
       "name": "collectionDetail",
       "pageSourceFile": "src/main/ets/pages/CollectionDetail.ets",
       "buildFunction": "collectionDetailBuilder"
+    },
+    {
+      "name": "downloadTask",
+      "pageSourceFile": "src/main/ets/pages/Download.ets",
+      "buildFunction": "downloadTaskBuilder"
     }
   ]
 }
