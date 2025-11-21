@@ -34,7 +34,7 @@ import { EpisodeComponent1 } from "../utils/Component";
 import { media } from "@kit.MediaKit";
 import { DownloadManager, DownloadTaskInfo } from '../utils/Download';
 import { common } from "@kit.AbilityKit";
-import { fileIo as fs, picker } from '@kit.CoreFileKit';
+import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 
 @Builder
 export function libraryItemDetailBuilder(name: string, param: Object) {
@@ -70,7 +70,7 @@ export struct LibraryItemDetail {
   @Consumer() syncTime: number = 0
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Consumer() user: User | undefined = undefined
-  @Consumer() downloadPath: string = ""
+  @Consumer() downloadUri: string = ""
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.libraryItemId === this.libraryItem!.id)
   @Local maxIntroLine: number = 5
   @Local showMoreIntro: boolean = false
@@ -885,7 +885,12 @@ export struct LibraryItemDetail {
                           duration: 500
                         });
                       } else {
-                        let dir = this.downloadPath + "/有声书/" + this.libraryItem?.media.metadata.title
+                        this.getUIContext().getPromptAction().showToast({
+                          message: '开始下载！',
+                          duration: 500
+                        });
+                        const downloadPath = new fileUri.FileUri(this.downloadUri).path
+                        const dir = downloadPath + "/有声书/" + this.libraryItem?.media.metadata.title
                         const existsDir = fs.accessSync(dir)
                         if (!existsDir) {
                           fs.mkdirSync(dir);
@@ -897,6 +902,7 @@ export struct LibraryItemDetail {
                             this.libraryItem!.media.metadata.title + track.index,
                             track.metadata.filename,
                             this.baseUrl + track.contentUrl + "?token=" + this.apiToken,
+                            dir + "/" + track.metadata.filename,
                             (info) => {
                               // 下载进度回调
                               console.info('Progress:', info.title, Math.floor(info.progress) + "%");

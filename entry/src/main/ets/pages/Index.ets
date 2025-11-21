@@ -141,7 +141,7 @@ struct Index {
   @Provider() syncTime: number = 0
   @Provider() filesDir: string = ""
   @Provider() logs: string[] = []
-  @Provider() downloadPath: string = ""
+  @Provider() downloadUri: string = ""
   @Local uiContext: UIContext | undefined = undefined
   @Local mainWindow: window.Window | undefined = undefined
   @Local elapsedTime: number = 0
@@ -662,22 +662,27 @@ struct Index {
     this.registerInterception()
     this.avPlayer = await media.createAVPlayer();
     this.setAVPlayerCallback(this.avPlayer!);
-    const documentSaveOptions = new picker.DocumentSaveOptions();
-    documentSaveOptions.pickerMode = picker.DocumentPickerMode.DOWNLOAD
-    const documentViewPicker = new picker.DocumentViewPicker(this.context);
-    documentViewPicker.save(documentSaveOptions)
-      .then(async (documentSaveResult) => {
-        let uri = documentSaveResult[0];
-        this.downloadPath = new fileUri.FileUri(uri).path
-        if (!fs.accessSync(this.downloadPath + "/有声书")) {
-          fs.mkdirSync(this.downloadPath + "/有声书")
+    try {
+      const documentViewPicker = new picker.DocumentViewPicker(this.context!);
+      const documentSaveOptions = new picker.DocumentSaveOptions();
+      documentSaveOptions.pickerMode = picker.DocumentPickerMode.DOWNLOAD;
+      documentViewPicker.save(documentSaveOptions).then(async (documentSaveResult: Array<string>) => {
+        this.downloadUri = documentSaveResult[0];
+        console.info('documentViewPicker.save succeed and uri is:' + this.downloadUri);
+        const downloadPath = new fileUri.FileUri(this.downloadUri).path
+        if (!fs.accessSync(downloadPath + "/有声书")) {
+          fs.mkdirSync(downloadPath + "/有声书")
         }
-        if (!fs.accessSync(this.downloadPath + "/播客")) {
-          fs.mkdirSync(this.downloadPath + "/播客")
+        if (!fs.accessSync(downloadPath + "/播客")) {
+          fs.mkdirSync(downloadPath + "/播客")
         }
-      }).catch((err: Error) => {
-      console.error(`调用documentPicker.select失败, message is ${err.message}`);
-    })
+      }).catch((err: BusinessError) => {
+        console.error(`Invoke documentViewPicker.save failed, code is ${err.code}, message is ${err.message}`);
+      })
+    } catch (err) {
+      console.error(`Failed to create a documentSaveOptions, err: ${err}`);
+      return;
+    }
   }
 
   aboutToDisappear() {

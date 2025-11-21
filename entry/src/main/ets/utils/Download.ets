@@ -1,7 +1,7 @@
 import request from '@ohos.request';
 import common from '@ohos.app.ability.common';  // 假设这样拿 context 类型
 import { BusinessError } from '@ohos.base';
-import { fileUri, picker, fileIo as fs } from '@kit.CoreFileKit';
+import { fileUri, fileIo as fs } from '@kit.CoreFileKit';
 
 export enum DownloadStatus {
   Idle = 'Idle',
@@ -18,6 +18,7 @@ export interface DownloadTaskInfo {
   id: string;
   title: string;
   url: string;
+  filePath: string;
   status: DownloadStatus;
   progress: number;
   background?: boolean;
@@ -38,24 +39,9 @@ export class DownloadManager {
   private tasks: Map<string, InternalTask> = new Map();
   private activeDownloads: Set<string> = new Set(); // 正在下载的任务 id
   private MAX_CONCURRENT_DOWNLOADS = 1;
-  private uri: string = ""
 
   constructor(context: common.UIAbilityContext) {
     this.context = context;
-    try {
-      const documentViewPicker = new picker.DocumentViewPicker(this.context!);
-      const documentSaveOptions = new picker.DocumentSaveOptions();
-      documentSaveOptions.pickerMode = picker.DocumentPickerMode.DOWNLOAD;
-      documentViewPicker.save(documentSaveOptions).then(async (documentSaveResult: Array<string>) => {
-        this.uri = documentSaveResult[0];
-        console.info('documentViewPicker.save succeed and uri is:' + this.uri);
-      }).catch((err: BusinessError) => {
-        console.error(`Invoke documentViewPicker.save failed, code is ${err.code}, message is ${err.message}`);
-      })
-    } catch (err) {
-      console.error(`Failed to create a documentSaveOptions, err: ${err}`);
-      return;
-    }
   }
 
   // 添加任务
@@ -65,6 +51,7 @@ export class DownloadManager {
     id: string,
     title: string,
     url: string,
+    filePath: string,
     onProgress?: ProgressCallback,
     onStatusChange?: StatusCallback
   ): void {
@@ -78,6 +65,7 @@ export class DownloadManager {
       id,
       title,
       url,
+      filePath,
       status: DownloadStatus.Idle,
       progress: 0,
       background: true,
@@ -121,13 +109,12 @@ export class DownloadManager {
       task.onStatusChange?.(task.info);
       this.activeDownloads.add(id);
 
-      const filePath = new fileUri.FileUri(this.uri + "/有声书/" + task.info.folder + "/" + task.info.title).path;
-      const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
+      const file = fs.openSync(task.info.filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
       fs.closeSync(file.fd);
       let config: request.agent.Config = {
         action: request.agent.Action.DOWNLOAD,
         url: task.info.url,
-        saveas: fileUri.getUriFromPath(filePath),
+        saveas: fileUri.getUriFromPath(task.info.filePath),
         gauge: true,
         overwrite: true,
         network: request.agent.Network.ANY,
@@ -271,6 +258,7 @@ export class DownloadManager {
           id: task.info.id,
           title: task.info.title,
           url: task.info.url,
+          filePath: task.info.filePath,
           status: task.info.status,
           progress: task.info.progress,
           background: task.info.background
