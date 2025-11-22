@@ -55,7 +55,7 @@ export struct LocalMedia {
         Column() {
           Column() {
             Text("本地媒体")
-              .fontSize(20)
+              .fontSize(18)
               .fontWeight(FontWeight.Bold)
               .margin({ top: 15, bottom: 15 })
 
@@ -64,20 +64,20 @@ export struct LocalMedia {
                 Button({ type: ButtonType.Normal }) {
                   Row() {
                     Text(folder)
-                      .fontSize(20)
+                      .fontSize(18)
                       .fontWeight(FontWeight.Medium)
                       .maxLines(1)
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                     SymbolGlyph($r('sys.symbol.chevron_right'))
-                      .fontSize(20)
+                      .fontSize(18)
                       .fontColor([$r('sys.color.font_secondary')])
                   }
                   .width('100%')
                   .justifyContent(FlexAlign.SpaceBetween)
                 }
                 .width('100%')
-                .height(60)
+                .height(50)
                 .borderRadius(8)
                 .margin({ bottom: index !== this.folderList.length - 1 ? 10 : 0 })
                 .padding({ left: 20, right: 20 })
@@ -109,20 +109,20 @@ export struct LocalMedia {
               Button({ type: ButtonType.Normal }) {
                 Row() {
                   Text("返回上一级")
-                    .fontSize(20)
+                    .fontSize(18)
                     .fontWeight(FontWeight.Medium)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                   SymbolGlyph($r('sys.symbol.chevron_right'))
-                    .fontSize(20)
+                    .fontSize(18)
                     .fontColor([$r('sys.color.font_secondary')])
                 }
                 .width('100%')
                 .justifyContent(FlexAlign.SpaceBetween)
               }
               .width('100%')
-              .height(60)
+              .height(50)
               .borderRadius(8)
               .margin({ bottom: 10 })
               .padding({ left: 20, right: 20 })
@@ -136,20 +136,20 @@ export struct LocalMedia {
                   Button({ type: ButtonType.Normal }) {
                     Row() {
                       Text(folder)
-                        .fontSize(20)
+                        .fontSize(18)
                         .fontWeight(FontWeight.Medium)
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                       SymbolGlyph($r('sys.symbol.chevron_right'))
-                        .fontSize(20)
+                        .fontSize(18)
                         .fontColor([$r('sys.color.font_secondary')])
                     }
                     .width('100%')
                     .justifyContent(FlexAlign.SpaceBetween)
                   }
                   .width('100%')
-                  .height(60)
+                  .height(50)
                   .borderRadius(8)
                   .margin({ bottom: index !== this.subFolderList.length - 1 ? 10 : 0 })
                   .padding({ left: 20, right: 20 })
@@ -171,10 +171,10 @@ export struct LocalMedia {
               } else {
                 Row() {
                   Text("没有项目")
-                    .fontSize(20)
+                    .fontSize(18)
                     .fontWeight(FontWeight.Medium)
                 }
-                .height(60)
+                .height(50)
                 .borderRadius(8)
                 .padding({ left: 20, right: 20 })
               }
@@ -182,20 +182,20 @@ export struct LocalMedia {
               Button({ type: ButtonType.Normal }) {
                 Row() {
                   Text("返回上一级")
-                    .fontSize(20)
+                    .fontSize(18)
                     .fontWeight(FontWeight.Medium)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                   SymbolGlyph($r('sys.symbol.chevron_right'))
-                    .fontSize(20)
+                    .fontSize(18)
                     .fontColor([$r('sys.color.font_secondary')])
                 }
                 .width('100%')
                 .justifyContent(FlexAlign.SpaceBetween)
               }
               .width('100%')
-              .height(60)
+              .height(50)
               .borderRadius(8)
               .margin({ bottom: 10 })
               .padding({ left: 20, right: 20 })
@@ -209,7 +209,7 @@ export struct LocalMedia {
                   Button({ type: ButtonType.Normal }) {
                     Row() {
                       Text(file)
-                        .fontSize(20)
+                        .fontSize(18)
                         .fontWeight(FontWeight.Medium)
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -218,7 +218,7 @@ export struct LocalMedia {
                     .justifyContent(FlexAlign.SpaceBetween)
                   }
                   .width('100%')
-                  .height(60)
+                  .height(50)
                   .borderRadius(8)
                   .margin({ bottom: index !== this.audioFolderList.length - 1 ? 10 : 0 })
                   .padding({ left: 20, right: 20 })
@@ -230,10 +230,10 @@ export struct LocalMedia {
               } else {
                 Row() {
                   Text("没有文件")
-                    .fontSize(20)
+                    .fontSize(18)
                     .fontWeight(FontWeight.Medium)
                 }
-                .height(60)
+                .height(50)
                 .borderRadius(8)
                 .padding({ left: 20, right: 20 })
               }
