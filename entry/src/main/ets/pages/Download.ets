@@ -53,7 +53,7 @@ export struct DownloadTask {
                 Progress({ value: task.status === DownloadStatus.Failed ? 100 : task.progress, total: 100, type: ProgressType.Linear })
                   .width('100%')
                   .margin({ top: 12, bottom: 17 })
-                  .style({ strokeWidth: 6, enableSmoothEffect: true })
+                  .style({ strokeWidth: 6, enableSmoothEffect: false })
                   .color(task.status === DownloadStatus.Failed ? $r('sys.color.warning') : (task.status === DownloadStatus.Paused ? $r('sys.color.comp_background_tertiary') : $r('sys.color.comp_emphasize_secondary')))
               }
               .width('100%')

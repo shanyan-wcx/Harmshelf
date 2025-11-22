@@ -583,24 +583,12 @@ export struct EpisodeDetail {
                     (info) => {
                       // 下载进度回调
                       console.info('Progress:', info.title, Math.floor(info.progress) + "%");
-                      const task = this.downloadTasks.find(t => t.id === this.episode!.id!);
-                      if (task) {
-                        task.progress = info.progress;
-                      }
+                      this.downloadTasks = this.downloadManager.getAllTaskInfo()
                     },
                     (info) => {
                       // 状态变化回调
                       console.info('Status changed:', info.title, info.status);
-                      const index = this.downloadTasks.findIndex(t => t.id === this.episode!.id!);
-                      if (index >= 0) {
-                        this.downloadTasks[index].status = info.status;
-                        if (info.status === DownloadStatus.Completed) {
-                          this.downloadTasks.splice(index, 1);
-                          if (this.downloadTasks.length === 0) {
-                            this.downloadTasks = []
-                          }
-                        }
-                      }
+                      this.downloadTasks = this.downloadManager.getAllTaskInfo()
                     }
                   );
                 }
