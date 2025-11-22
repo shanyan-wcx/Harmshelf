@@ -243,30 +243,6 @@ export class DownloadManager {
 
   // 查询所有任务状态
   getAllTaskInfo(): DownloadTaskInfo[] {
-    const infos: DownloadTaskInfo[] = [];
-    const keyIterator = this.tasks.keys(); // 返回 IterableIterator<string>
-    while (true) {
-      const next = keyIterator.next();
-      if (next.done) {
-        break;
-      }
-      const id = next.value;
-      const task = this.tasks.get(id);
-      if (task != undefined) {
-        const info: DownloadTaskInfo = {
-          mediaType: task.info.mediaType,
-          folder: task.info.folder,
-          id: task.info.id,
-          title: task.info.title,
-          url: task.info.url,
-          filePath: task.info.filePath,
-          status: task.info.status,
-          progress: task.info.progress,
-          background: task.info.background
-        };
-        infos.push(info);
-      }
-    }
-    return infos;
+    return Array.from(this.tasks.values(), t => t.info);
   }
 }
