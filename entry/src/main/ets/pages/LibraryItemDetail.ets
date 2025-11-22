@@ -233,7 +233,7 @@ export struct LibraryItemDetail {
     if (tmpLibraryItem) {
       this.libraryItem = tmpLibraryItem
     }
-    this.episodes = this.libraryItem?.media.episodes!
+    this.episodes = this.libraryItem?.media.episodes?.sort((a, b) => b.publishedAt! - a.publishedAt!)??[]
     if (this.displayWidth >= 1000) {
       this.showChapters = true
     }
