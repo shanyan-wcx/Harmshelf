@@ -1,6 +1,7 @@
 import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit';
 import { LengthMetrics } from '@kit.ArkUI';
-import { DownloadTaskInfo } from '../utils/Download';
+import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Download';
+import { common } from '@kit.AbilityKit';
 
 @Builder
 export function downloadTaskBuilder(name: string, param: Object) {
@@ -10,6 +11,8 @@ export function downloadTaskBuilder(name: string, param: Object) {
 @ComponentV2
 export struct DownloadTask {
   private downloadTaskScroller: Scroller = new Scroller();
+  @Consumer() context: common.UIAbilityContext | undefined = undefined
+  private downloadManager: DownloadManager = new DownloadManager(this.context!);
   @Consumer() displayWidth: number = 0
   @Consumer() statusBarHeight: number = 0
   @Consumer() sideBarContentWidth: number = 0
@@ -29,36 +32,49 @@ export struct DownloadTask {
         List({ scroller: this.downloadTaskScroller }) {
           ForEach(this.downloadTasks, (task: DownloadTaskInfo, index) => {
             ListItem() {
-              Row() {
-                Text((index + 1).toString())
-                  .fontSize(18)
-                  .width(60)
-                  .textAlign(TextAlign.Center)
-                  .margin({ right: 15 })
+              Column() {
+                Row() {
+                  Text(task.title)
+                    .fontSize(18)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    .width('100%')
+                    .layoutWeight(1)
 
-                Text(task.title)
-                  .fontSize(18)
-                  .maxLines(1)
-                  .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  Text(Math.floor(task.progress) + "%")
+                    .fontSize(18)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .margin({ left: 15 })
+                }
+                .width('100%')
+                .justifyContent(FlexAlign.SpaceBetween)
+                .margin({ top: 15 })
+
+                Progress({ value: task.status === DownloadStatus.Failed ? 100 : task.progress, total: 100, type: ProgressType.Linear })
+                  .width('100%')
+                  .margin({ top: 12, bottom: 17 })
+                  .style({ strokeWidth: 6, enableSmoothEffect: true })
+                  .color(task.status === DownloadStatus.Failed ? $r('sys.color.warning') : (task.status === DownloadStatus.Paused ? $r('sys.color.comp_background_tertiary') : $r('sys.color.comp_emphasize_secondary')))
               }
               .width('100%')
-              .height(60)
-              .margin({ bottom: index === this.downloadTasks.length - 1 ? (this.isStartPlaying ? 99 : 20) : 0 })
-              .onClick(() => {
-
+              .padding({
+                left: 20,
+                right: 20
               })
             }
+            .margin({ top: index === 0 ? this.statusBarHeight + 49 : 0, bottom: index === this.downloadTasks.length - 1 ? (this.isStartPlaying ? 89 : 10) : 0 })
           })
         }
         .width('100%')
         .height('100%')
-        .padding({
-          left: 20,
-          right: 20,
-          top: 56 + this.statusBarHeight
-        })
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .scrollBar(BarState.Off)
+        .divider({
+          strokeWidth: 1,
+          startMargin: 20,
+          endMargin: 20,
+          color: $r('sys.color.comp_divider')
+        })
       }
       .width('100%')
       .height('100%')
@@ -75,7 +91,8 @@ export struct DownloadTask {
       },
       style: {
         scrollEffectOpts: {
-          enableScrollEffect: true
+          enableScrollEffect: true,
+          blurEffectiveStartOffset: LengthMetrics.vp(8)
         }
       },
       content: {
@@ -85,35 +102,11 @@ export struct DownloadTask {
         menu: {
           value: [{
             content: {
-              icon: $r('sys.symbol.pause'),
-              label: 'pause',
+              icon: $r('sys.symbol.clean'),
+              label: "clean",
               action: () => {
-                this.getUIContext().getPromptAction().showToast({
-                  message: '下载队列全部暂停！',
-                  duration: 500
-                });
-              }
-            }
-          }, {
-            content: {
-              icon: $r('sys.symbol.play'),
-              label: 'start',
-              action: () => {
-                this.getUIContext().getPromptAction().showToast({
-                  message: '下载队列全部开始！',
-                  duration: 500
-                });
-              }
-            }
-          }, {
-            content: {
-              icon: $r('sys.symbol.trash'),
-              label: 'clear',
-              action: () => {
-                this.getUIContext().getPromptAction().showToast({
-                  message: '下载队列清空！',
-                  duration: 500
-                });
+                this.downloadManager.clearAll()
+                // this.downloadTasks = []
               }
             }
           }]

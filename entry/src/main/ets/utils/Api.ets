@@ -283,7 +283,7 @@ export async function getEpisode(itemId: string, EpisodeId: string): Promise<Epi
   const api: Axios = createApi()
   try {
     const response: AxiosResponse =
-      await api.get<string, AxiosResponse<string>, null>(`/api/podcasts/${itemId}/episode/${EpisodeId}`, {
+      await api.get<string, AxiosResponse<string>, null>(`/api/podcasts/${itemId}/episode/${EpisodeId}?expanded=1`, {
         timeout: 30000,
         readTimeout: 30000,
         connectTimeout: 30000

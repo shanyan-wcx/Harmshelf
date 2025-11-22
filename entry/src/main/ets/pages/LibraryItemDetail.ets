@@ -32,7 +32,7 @@ import {
   updateProgress } from "../utils/Api";
 import { EpisodeComponent1 } from "../utils/Component";
 import { media } from "@kit.MediaKit";
-import { DownloadManager, DownloadTaskInfo } from '../utils/Download';
+import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Download';
 import { common } from "@kit.AbilityKit";
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 
@@ -896,22 +896,45 @@ export struct LibraryItemDetail {
                           fs.mkdirSync(dir);
                         }
                         this.libraryItem?.media.tracks?.forEach(async (track: Track, index) => {
+                          this.downloadTasks.push({
+                            mediaType: this.libraryItem!.mediaType,
+                            folder: this.libraryItem!.media.metadata.title,
+                            id: this.libraryItem!.id + "_" + track.index,
+                            title: track.metadata.filename,
+                            url: this.baseUrl + track.contentUrl + "?token=" + this.apiToken,
+                            filePath: dir + "/" + track.metadata.filename,
+                            status: DownloadStatus.Idle,
+                            progress: 0,
+                            background: true,
+                          })
                           this.downloadManager.add(
                             this.libraryItem!.mediaType,
                             this.libraryItem!.media.metadata.title,
-                            this.libraryItem!.media.metadata.title + track.index,
+                            this.libraryItem!.id + "_" + track.index,
                             track.metadata.filename,
                             this.baseUrl + track.contentUrl + "?token=" + this.apiToken,
                             dir + "/" + track.metadata.filename,
                             (info) => {
                               // 下载进度回调
                               console.info('Progress:', info.title, Math.floor(info.progress) + "%");
-                              this.downloadTasks = this.downloadManager.getAllTaskInfo();
+                              const task = this.downloadTasks.find(t => t.id === this.libraryItem!.id + "_" + track.index);
+                              if (task) {
+                                task.progress = info.progress;
+                              }
                             },
                             (info) => {
                               // 状态变化回调
                               console.info('Status changed:', info.title, info.status);
-                              this.downloadTasks = this.downloadManager.getAllTaskInfo();
+                              const index = this.downloadTasks.findIndex(t => t.id === this.libraryItem!.id + "_" + track.index);
+                              if (index >= 0) {
+                                this.downloadTasks[index].status = info.status;
+                                if (info.status === DownloadStatus.Completed) {
+                                  this.downloadTasks.splice(index, 1);
+                                  if (this.downloadTasks.length === 0) {
+                                    this.downloadTasks = []
+                                  }
+                                }
+                              }
                             }
                           );
                         })

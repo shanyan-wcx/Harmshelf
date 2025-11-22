@@ -10,16 +10,15 @@ import {
   removeFromPlaylist,
   updateProgress
 } from '../utils/Api'
-import { Episode, Library, LibraryItem, PlayItem, Playlist,
-  PlaylistItem,
-  Progress, UpdateProgress,
-  User } from '../utils/Interface'
+import { Episode, Library, LibraryItem, PlayItem, Playlist, Progress, UpdateProgress, User } from '../utils/Interface'
 import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI'
 import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit'
 import { HmParseHTML, Node } from '@wuyan/html_parse'
 import { common, ConfigurationConstant, Want } from '@kit.AbilityKit'
 import { env } from '../utils/Class'
 import { media } from '@kit.MediaKit'
+import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
+import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Download';
 
 @Builder
 export function episodeDetailBuilder(name: string, param: Object) {
@@ -29,6 +28,8 @@ export function episodeDetailBuilder(name: string, param: Object) {
 @ComponentV2
 export struct EpisodeDetail {
   private episodeDetailScroller: Scroller = new Scroller();
+  @Consumer() context: common.UIAbilityContext | undefined = undefined
+  private downloadManager: DownloadManager = new DownloadManager(this.context!);
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() displayWidth: number = 0
   @Consumer() statusBarHeight: number = 0
@@ -48,6 +49,8 @@ export struct EpisodeDetail {
   @Consumer() syncTime: number = 0
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Consumer() user: User | undefined = undefined
+  @Consumer() downloadUri: string = ""
+  @Consumer() downloadTasks: DownloadTaskInfo[] = [];
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.episodeId === this.episode!.id)
   @Local podcast: LibraryItem | undefined = undefined
   @Local showLoadingProgress: boolean = false
@@ -155,6 +158,9 @@ export struct EpisodeDetail {
       this.episode = tmpEpisode
     }
     this.podcast = await getItem(this.episode!.libraryItemId!)
+    if (this.podcast) {
+      this.episode!.audioTrack = this.podcast!.media.episodes!.find(e => e.id === this.episode!.id)?.audioTrack
+    }
     this.updateMoreMenus()
     this.showLoadingProgress = false
   }
@@ -545,6 +551,58 @@ export struct EpisodeDetail {
                     message: '当前用户没有下载权限！',
                     duration: 500
                   });
+                } else {
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '开始下载！',
+                    duration: 500
+                  });
+                  const downloadPath = new fileUri.FileUri(this.downloadUri).path
+                  const dir = downloadPath + "/播客/" + this.podcast!.media.metadata.title
+                  const existsDir = fs.accessSync(dir)
+                  if (!existsDir) {
+                    fs.mkdirSync(dir);
+                  }
+                  this.downloadTasks.push({
+                    mediaType: this.library!.mediaType,
+                    folder: this.podcast!.media.metadata.title,
+                    id: this.episode!.id!,
+                    title: this.episode!.audioFile!.metadata.filename,
+                    url: this.baseUrl + this.episode!.audioTrack?.contentUrl + "?token=" + this.apiToken,
+                    filePath: dir + "/" + this.episode!.audioFile!.metadata.filename,
+                    status: DownloadStatus.Idle,
+                    progress: 0,
+                    background: true,
+                  })
+                  this.downloadManager.add(
+                    this.library!.mediaType,
+                    this.podcast!.media.metadata.title,
+                    this.episode!.id!,
+                    this.episode!.audioFile!.metadata.filename,
+                    this.baseUrl + this.episode!.audioTrack?.contentUrl + "?token=" + this.apiToken,
+                    dir + "/" + this.episode!.audioFile!.metadata.filename,
+                    (info) => {
+                      // 下载进度回调
+                      console.info('Progress:', info.title, Math.floor(info.progress) + "%");
+                      const task = this.downloadTasks.find(t => t.id === this.episode!.id!);
+                      if (task) {
+                        task.progress = info.progress;
+                      }
+                    },
+                    (info) => {
+                      // 状态变化回调
+                      console.info('Status changed:', info.title, info.status);
+                      const index = this.downloadTasks.findIndex(t => t.id === this.episode!.id!);
+                      if (index >= 0) {
+                        this.downloadTasks[index].status = info.status;
+                        if (info.status === DownloadStatus.Completed) {
+                          this.downloadTasks.splice(index, 1);
+                          if (this.downloadTasks.length === 0) {
+                            this.downloadTasks = []
+                          }
+                        }
+                      }
+                    }
+                  );
                 }
               })
 

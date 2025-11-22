@@ -38,7 +38,7 @@ export class DownloadManager {
   private context: common.UIAbilityContext;
   private tasks: Map<string, InternalTask> = new Map();
   private activeDownloads: Set<string> = new Set(); // 正在下载的任务 id
-  private MAX_CONCURRENT_DOWNLOADS = 1;
+  private MAX_CONCURRENT_DOWNLOADS = 6;
 
   constructor(context: common.UIAbilityContext) {
     this.context = context;
@@ -137,6 +137,7 @@ export class DownloadManager {
 
       const finishHandler = () => {
         this.activeDownloads.delete(id);
+        this.tasks.delete(id);
         this._checkQueue(); // 完成后检查队列启动新任务
       };
 
