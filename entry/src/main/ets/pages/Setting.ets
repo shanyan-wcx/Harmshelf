@@ -931,7 +931,7 @@ export struct Setting {
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-            Toggle({ type: ToggleType.Switch, isOn: this.playSetting?.fadeInOut })
+            Toggle({ type: ToggleType.Switch, isOn: this.otherSetting!.hideReport })
               .selectedColor($r('sys.color.comp_emphasize_secondary'))
               .onClick(() => {
                 if (this.otherSetting) {
