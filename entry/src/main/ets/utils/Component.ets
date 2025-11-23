@@ -2089,7 +2089,7 @@ export default struct reportBuilder {
       }
       .width('100%')
       .height('100%')
-      .backgroundColor($r('app.color.start_window_background'))
+      .backgroundColor($r('sys.color.background_secondary'))
       .padding({ left: 20, right: 20 })
 
       Column() {
