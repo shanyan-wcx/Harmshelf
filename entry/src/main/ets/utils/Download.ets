@@ -68,7 +68,7 @@ export class DownloadManager {
       filePath,
       status: DownloadStatus.Idle,
       progress: 0,
-      background: true,
+      background: false,
     };
     this.tasks.set(id, { info, onProgress, onStatusChange });
     this._checkQueue(); // 尝试启动下载
@@ -137,7 +137,6 @@ export class DownloadManager {
 
       const finishHandler = () => {
         this.activeDownloads.delete(id);
-        this.tasks.delete(id);
         this._checkQueue(); // 完成后检查队列启动新任务
       };
 
@@ -146,6 +145,7 @@ export class DownloadManager {
         request.agent.remove(downloadTask.tid);
         task.onStatusChange?.(task.info);
         finishHandler();
+        this.tasks.delete(id);
       });
 
       downloadTask.on('failed', () => {
@@ -164,6 +164,7 @@ export class DownloadManager {
         task.info.status = DownloadStatus.Removed;
         task.onStatusChange?.(task.info);
         finishHandler();
+        this.tasks.delete(id);
       });
     } catch (err) {
       task.info.status = DownloadStatus.Failed;
@@ -184,9 +185,7 @@ export class DownloadManager {
   async resume(id: string): Promise<void> {
     const task = this.tasks.get(id);
     if (!task) return;
-
     if (task.info.status === DownloadStatus.Downloading) return;
-
     await this._checkQueue();
   }
 
@@ -211,20 +210,15 @@ export class DownloadManager {
       console.log(`不存在任务 ${id}`);
       return;
     }
-
     if (task.downloadTask) {
       request.agent.remove(task.downloadTask.tid);
     }
-
-    this.activeDownloads.delete(id);
-    this.tasks.delete(id);
-
-    this._checkQueue();
   }
 
   // 清除所有任务
-  clearAll(): void {
-    for (const id of Array.from(this.tasks.keys())) {
+  async clearAll() {
+    let ids = Array.from(this.tasks.keys())
+    for (const id of ids) {
       const task = this.tasks.get(id);
       if (task?.downloadTask) {
         request.agent.remove(task.downloadTask.tid);
@@ -232,7 +226,6 @@ export class DownloadManager {
       this.activeDownloads.delete(id);
       this.tasks.delete(id);
     }
-    this._checkQueue();
   }
 
   // 查询单个任务状态

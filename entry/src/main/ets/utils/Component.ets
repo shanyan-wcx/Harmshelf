@@ -21,7 +21,6 @@ import { Author, Series, LibraryItem, Library, Book, Progress, Episode, Filter1,
 import { media } from "@kit.MediaKit";
 import { DownloadStatus, DownloadTaskInfo, DownloadManager } from "./Download";
 import { fileUri, fileIo as fs } from "@kit.CoreFileKit";
-import { common } from "@kit.AbilityKit";
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -888,8 +887,7 @@ export struct RecentEpisodeComponent {
 @ComponentV2
 export struct EpisodeComponent {
   @Require @Param item: Episode
-  @Consumer() context: common.UIAbilityContext | undefined = undefined
-  private downloadManager: DownloadManager = new DownloadManager(this.context!);
+  @Consumer() downloadManager: DownloadManager | undefined = undefined
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() episode: Episode | undefined = undefined
   @Consumer() libraryItem: LibraryItem | undefined = undefined
@@ -1377,7 +1375,7 @@ export struct EpisodeComponent {
               progress: 0,
               background: true,
             })
-            this.downloadManager.add(
+            this.downloadManager!.add(
               this.library!.mediaType,
               this.podcast!.media.metadata.title,
               this.item!.id!,
@@ -1387,12 +1385,12 @@ export struct EpisodeComponent {
               (info) => {
                 // 下载进度回调
                 console.info('Progress:', info.title, Math.floor(info.progress) + "%");
-                this.downloadTasks = this.downloadManager.getAllTaskInfo()
+                this.downloadTasks = this.downloadManager!.getAllTaskInfo()
               },
               (info) => {
                 // 状态变化回调
                 console.info('Status changed:', info.title, info.status);
-                this.downloadTasks = this.downloadManager.getAllTaskInfo()
+                this.downloadTasks = this.downloadManager!.getAllTaskInfo()
               }
             );
           }
@@ -1428,8 +1426,7 @@ export struct EpisodeComponent {
 @ComponentV2
 export struct EpisodeComponent1 {
   @Require @Param item: Episode
-  @Consumer() context: common.UIAbilityContext | undefined = undefined
-  private downloadManager: DownloadManager = new DownloadManager(this.context!);
+  @Consumer() downloadManager: DownloadManager | undefined = undefined
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() episode: Episode | undefined = undefined
   @Consumer() libraryItem: LibraryItem | undefined = undefined
@@ -1882,7 +1879,7 @@ export struct EpisodeComponent1 {
               progress: 0,
               background: true,
             })
-            this.downloadManager.add(
+            this.downloadManager!.add(
               this.library!.mediaType,
               this.podcast!.media.metadata.title,
               this.item!.id!,
@@ -1892,12 +1889,12 @@ export struct EpisodeComponent1 {
               (info) => {
                 // 下载进度回调
                 console.info('Progress:', info.title, Math.floor(info.progress) + "%");
-                this.downloadTasks = this.downloadManager.getAllTaskInfo()
+                this.downloadTasks = this.downloadManager!.getAllTaskInfo()
               },
               (info) => {
                 // 状态变化回调
                 console.info('Status changed:', info.title, info.status);
-                this.downloadTasks = this.downloadManager.getAllTaskInfo()
+                this.downloadTasks = this.downloadManager!.getAllTaskInfo()
               }
             );
           }

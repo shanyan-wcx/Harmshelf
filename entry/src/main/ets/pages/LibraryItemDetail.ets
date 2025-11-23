@@ -33,7 +33,6 @@ import {
 import reportBuilder, { EpisodeComponent1 } from "../utils/Component";
 import { media } from "@kit.MediaKit";
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Download';
-import { common } from "@kit.AbilityKit";
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { OtherSetting } from "./Index";
 
@@ -46,8 +45,7 @@ export function libraryItemDetailBuilder(name: string, param: Object) {
 export struct LibraryItemDetail {
   private libraryDetailScroller: Scroller = new Scroller();
   @Consumer() otherSetting: OtherSetting | undefined = PersistenceV2.connect(OtherSetting, () => new OtherSetting());
-  @Consumer() context: common.UIAbilityContext | undefined = undefined
-  private downloadManager: DownloadManager = new DownloadManager(this.context!);
+  @Consumer() downloadManager: DownloadManager | undefined = undefined
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() displayWidth: number = 0
   @Consumer() displayHeight: number = 0
@@ -924,7 +922,7 @@ export struct LibraryItemDetail {
                             progress: 0,
                             background: true,
                           })
-                          this.downloadManager.add(
+                          this.downloadManager!.add(
                             this.libraryItem!.mediaType,
                             this.libraryItem!.media.metadata.title,
                             this.libraryItem!.id + "_" + track.index,
@@ -934,12 +932,12 @@ export struct LibraryItemDetail {
                             (info) => {
                               // 下载进度回调
                               console.info('Progress:', info.title, Math.floor(info.progress) + "%");
-                              this.downloadTasks = this.downloadManager.getAllTaskInfo()
+                              this.downloadTasks = this.downloadManager!.getAllTaskInfo()
                             },
                             (info) => {
                               // 状态变化回调
                               console.info('Status changed:', info.title, info.status);
-                              this.downloadTasks = this.downloadManager.getAllTaskInfo()
+                              this.downloadTasks = this.downloadManager!.getAllTaskInfo()
                             }
                           );
                         })

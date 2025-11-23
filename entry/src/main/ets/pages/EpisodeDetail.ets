@@ -31,8 +31,7 @@ export function episodeDetailBuilder(name: string, param: Object) {
 export struct EpisodeDetail {
   private episodeDetailScroller: Scroller = new Scroller();
   @Consumer() otherSetting: OtherSetting | undefined = PersistenceV2.connect(OtherSetting, () => new OtherSetting());
-  @Consumer() context: common.UIAbilityContext | undefined = undefined
-  private downloadManager: DownloadManager = new DownloadManager(this.context!);
+  @Consumer() downloadManager: DownloadManager | undefined = undefined
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() displayWidth: number = 0
   @Consumer() statusBarHeight: number = 0
@@ -590,7 +589,7 @@ export struct EpisodeDetail {
                     progress: 0,
                     background: true,
                   })
-                  this.downloadManager.add(
+                  this.downloadManager!.add(
                     this.library!.mediaType,
                     this.podcast!.media.metadata.title,
                     this.episode!.id!,
@@ -600,12 +599,12 @@ export struct EpisodeDetail {
                     (info) => {
                       // 下载进度回调
                       console.info('Progress:', info.title, Math.floor(info.progress) + "%");
-                      this.downloadTasks = this.downloadManager.getAllTaskInfo()
+                      this.downloadTasks = this.downloadManager!.getAllTaskInfo()
                     },
                     (info) => {
                       // 状态变化回调
                       console.info('Status changed:', info.title, info.status);
-                      this.downloadTasks = this.downloadManager.getAllTaskInfo()
+                      this.downloadTasks = this.downloadManager!.getAllTaskInfo()
                     }
                   );
                 }

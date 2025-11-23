@@ -1,7 +1,6 @@
 import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit';
 import { LengthMetrics } from '@kit.ArkUI';
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Download';
-import { common } from '@kit.AbilityKit';
 
 @Builder
 export function downloadTaskBuilder(name: string, param: Object) {
@@ -11,8 +10,7 @@ export function downloadTaskBuilder(name: string, param: Object) {
 @ComponentV2
 export struct DownloadTask {
   private downloadTaskScroller: Scroller = new Scroller();
-  @Consumer() context: common.UIAbilityContext | undefined = undefined
-  private downloadManager: DownloadManager = new DownloadManager(this.context!);
+  @Consumer() downloadManager: DownloadManager | undefined = undefined
   @Consumer() displayWidth: number = 0
   @Consumer() statusBarHeight: number = 0
   @Consumer() sideBarContentWidth: number = 0
@@ -107,9 +105,12 @@ export struct DownloadTask {
             content: {
               icon: $r('sys.symbol.clean'),
               label: "clean",
-              action: () => {
-                this.downloadManager.clearAll()
-                // this.downloadTasks = []
+              action: async () => {
+                await this.downloadManager!.clearAll()
+                this.getUIContext().getPromptAction().showToast({
+                  message: '清除全部下载任务！',
+                  duration: 500
+                });
               }
             }
           }]

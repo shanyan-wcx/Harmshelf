@@ -29,7 +29,7 @@ import { CountdownTimer } from '../utils/Class';
 import { getUser, syncSession } from '../utils/Api';
 import { bundleManager } from '@kit.AbilityKit';
 import { fileIo as fs, fileUri, picker } from '@kit.CoreFileKit';
-import { DownloadStatus, DownloadTaskInfo } from '../utils/Download';
+import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Download';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -84,6 +84,7 @@ struct Index {
   @Provider() pageInfos: NavPathStack = new NavPathStack();
   @Provider() statusBarHeight: number = 0;
   @Provider() context: common.UIAbilityContext | undefined = undefined
+  @Provider() downloadManager: DownloadManager | undefined = undefined
   @Provider() sideBarWidth: number = 240
   @Provider() sidebarType: number = deviceTypeInfo === '2in1' ? SideBarContainerType.Embed : SideBarContainerType.Overlay
   @Provider() pageIndex: number = 0;
@@ -670,6 +671,7 @@ struct Index {
     this.registerInterception()
     this.avPlayer = await media.createAVPlayer();
     this.setAVPlayerCallback(this.avPlayer!);
+    this.downloadManager = new DownloadManager(this.context!);
     try {
       const documentViewPicker = new picker.DocumentViewPicker(this.context!);
       const documentSaveOptions = new picker.DocumentSaveOptions();
