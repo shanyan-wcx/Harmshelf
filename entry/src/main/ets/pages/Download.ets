@@ -28,19 +28,18 @@ export struct DownloadTask {
     HdsNavDestination() {
       Stack() {
         List({ scroller: this.downloadTaskScroller }) {
-          Repeat<DownloadTaskInfo>(this.downloadTasks)
-            .each((task: RepeatItem<DownloadTaskInfo>) => {
+          ForEach(this.downloadTasks, (task: DownloadTaskInfo, index) => {
             ListItem() {
               Column() {
                 Row() {
-                  Text(task.item.title)
+                  Text(task.title)
                     .fontSize(18)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
                     .width('100%')
                     .layoutWeight(1)
 
-                  Text(Math.floor(task.item.progress) + "%")
+                  Text(Math.floor(task.progress) + "%")
                     .fontSize(18)
                     .fontColor($r('sys.color.font_secondary'))
                     .margin({ left: 15 })
@@ -49,11 +48,11 @@ export struct DownloadTask {
                 .justifyContent(FlexAlign.SpaceBetween)
                 .margin({ top: 15 })
 
-                Progress({ value: task.item.status === DownloadStatus.Failed ? 100 : task.item.progress, total: 100, type: ProgressType.Linear })
+                Progress({ value: task.status === DownloadStatus.Failed ? 100 : task.progress, total: 100, type: ProgressType.Linear })
                   .width('100%')
                   .margin({ top: 12, bottom: 17 })
                   .style({ strokeWidth: 6, enableSmoothEffect: false })
-                  .color(task.item.status === DownloadStatus.Failed ? $r('sys.color.warning') : (task.item.status === DownloadStatus.Paused ? $r('sys.color.comp_background_tertiary') : $r('sys.color.comp_emphasize_secondary')))
+                  .color(task.status === DownloadStatus.Failed ? $r('sys.color.warning') : (task.status === DownloadStatus.Paused ? $r('sys.color.comp_background_tertiary') : $r('sys.color.comp_emphasize_secondary')))
               }
               .width('100%')
               .padding({
@@ -61,9 +60,8 @@ export struct DownloadTask {
                 right: 20
               })
             }
-            .margin({ top: task.index === 0 ? this.statusBarHeight + 49 : 0, bottom: task.index === this.downloadTasks.length - 1 ? (this.isStartPlaying ? 89 : 10) : 0 })
+            .margin({ top: index === 0 ? this.statusBarHeight + 49 : 0, bottom: index === this.downloadTasks.length - 1 ? (this.isStartPlaying ? 89 : 10) : 0 })
           })
-            .key((task, index)=> index + task.status + task.progress)
         }
         .cachedCount(2)
         .width('100%')
