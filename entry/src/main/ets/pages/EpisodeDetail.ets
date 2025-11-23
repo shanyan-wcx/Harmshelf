@@ -11,7 +11,7 @@ import {
   updateProgress
 } from '../utils/Api'
 import { Episode, Library, LibraryItem, PlayItem, Playlist, Progress, UpdateProgress, User } from '../utils/Interface'
-import { LengthMetrics, SymbolGlyphModifier } from '@kit.ArkUI'
+import { LengthMetrics, PersistenceV2, SymbolGlyphModifier } from '@kit.ArkUI'
 import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit'
 import { HmParseHTML, Node } from '@wuyan/html_parse'
 import { common, ConfigurationConstant, Want } from '@kit.AbilityKit'
@@ -19,6 +19,8 @@ import { env } from '../utils/Class'
 import { media } from '@kit.MediaKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Download';
+import reportBuilder from '../utils/Component'
+import { OtherSetting } from './Index'
 
 @Builder
 export function episodeDetailBuilder(name: string, param: Object) {
@@ -28,6 +30,7 @@ export function episodeDetailBuilder(name: string, param: Object) {
 @ComponentV2
 export struct EpisodeDetail {
   private episodeDetailScroller: Scroller = new Scroller();
+  @Consumer() otherSetting: OtherSetting | undefined = PersistenceV2.connect(OtherSetting, () => new OtherSetting());
   @Consumer() context: common.UIAbilityContext | undefined = undefined
   private downloadManager: DownloadManager = new DownloadManager(this.context!);
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
@@ -62,13 +65,18 @@ export struct EpisodeDetail {
   @Local showDeleteConfirm: boolean = false
   @Local tmpPlaylistName: string = ""
   @Local tmpPlaylistDescription: string = ""
-
   @Monitor('syncTime')
   async refreshProgress(monitor: IMonitor) {
     this.itemProgress = undefined
     this.itemProgress = this.progress.find(p => p.episodeId === this.episode!.id)
     this.updateMoreMenus()
   }
+  report: CustomDialogController = new CustomDialogController({
+    builder: reportBuilder(),
+    width: 350,
+    height: 330,
+    backgroundColor: $r('sys.color.background_tertiary')
+  })
 
   formatDuration(seconds: number): string {
     const hours = Math.floor(seconds / 3600);
@@ -146,6 +154,15 @@ export struct EpisodeDetail {
         value: "从服务器中删除",
         action: async () => {
           this.showDeleteConfirm = true
+        }
+      })
+    }
+    if (!this.otherSetting?.hideReport) {
+      this.moreMenus.push({
+        symbolIcon: new SymbolGlyphModifier($r('sys.symbol.exclamationmark_triangle')),
+        value: "举报内容",
+        action: async () => {
+          this.report.open()
         }
       })
     }

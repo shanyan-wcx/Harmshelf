@@ -63,6 +63,11 @@ export class PlaySetting {
   @Trace skipIntervals: number = 10
 }
 
+@ObservedV2
+export class OtherSetting {
+  @Trace hideReport: boolean = false
+}
+
 @Entry
 @ComponentV2
 struct Index {
@@ -70,6 +75,7 @@ struct Index {
   @Provider() serverSetting: ServerSetting | undefined = PersistenceV2.connect(ServerSetting, () => new ServerSetting());
   @Provider() colorMode: ColorMode | undefined = PersistenceV2.connect(ColorMode, () => new ColorMode());
   @Provider() playSetting: PlaySetting | undefined = PersistenceV2.connect(PlaySetting, () => new PlaySetting());
+  @Provider() otherSetting: OtherSetting | undefined = PersistenceV2.connect(OtherSetting, () => new OtherSetting());
   @Provider() displayWidth: number = 0
   @Provider() displayHeight: number = 0
   @Provider() selectThemeIndex: number = 0

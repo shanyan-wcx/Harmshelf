@@ -1968,3 +1968,144 @@ export struct pageUpDown {
     .visibility(deviceTypeInfo === '2in1' ? Visibility.Visible : Visibility.None)
   }
 }
+
+@CustomDialog
+export default struct reportBuilder {
+  @StorageLink('baseURL') baseURL: string = ''
+  @StorageLink('username') username: string = ''
+  @StorageLink('password') password: string = ''
+  // 被举报的对象信息
+  @State targetId: string | undefined = undefined
+  @State targetType: string | undefined  = undefined
+  // 用户输入状态
+  @State reason: string = ''
+  @State description: string = ''
+  @State showProgress: boolean = false
+  reportDialog: CustomDialogController = new CustomDialogController({
+    builder: reportBuilder({})
+  })
+
+  build() {
+    Stack() {
+      Column() {
+        Text("举报内容")
+          .width('100%')
+          .height(60)
+          .textAlign(TextAlign.Center)
+          .fontSize(20)
+          .fontWeight(FontWeight.Bold)
+
+        Row() {
+          Text("举报原因")
+            .fontSize(18)
+          TextInput({
+            placeholder: '请输入举报原因（如违规内容）',
+            text: $$this.reason
+          })
+            .width("100%")
+            .height(40)
+            .layoutWeight(1)
+            .borderRadius(10)
+            .margin({ left: 15 })
+            .caretColor($r('sys.color.font_secondary'))
+            .fontSize(18)
+            .placeholderFont({ size: 18 })
+            .enterKeyType(EnterKeyType.Next)
+        }
+        .width('100%')
+        .margin({ bottom: 20 })
+
+        Row() {
+          Text("详细描述")
+            .fontSize(18)
+            .margin({ top: 5 })
+          TextArea({
+            placeholder: '请描述具体情况（可选）',
+            text: $$this.description
+          })
+            .width("100%")
+            .height(120)
+            .layoutWeight(1)
+            .borderRadius(10)
+            .margin({ left: 15 })
+            .caretColor($r('sys.color.font_secondary'))
+            .fontSize(18)
+            .placeholderFont({ size: 18 })
+            .enterKeyType(EnterKeyType.Next)
+        }
+        .width('100%')
+        .margin({ bottom: 20 })
+        .alignItems(VerticalAlign.Top)
+
+        Row({ space: 20 }) {
+          Button({ type: ButtonType.Normal }) {
+            Text("取消")
+              .fontSize(18)
+          }
+          .width('50%')
+          .layoutWeight(1)
+          .height(50)
+          .borderRadius(10)
+          .backgroundColor($r('sys.color.comp_background_tertiary'))
+          .onClick(() => {
+            this.reportDialog.close()
+          })
+
+          Button({ type: ButtonType.Normal }) {
+            Text("提交")
+              .fontSize(18)
+          }
+          .width('50%')
+          .layoutWeight(1)
+          .height(50)
+          .borderRadius(10)
+          .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+          .onClick(async () => {
+            if (!this.reason.trim()) {
+              this.getUIContext().getPromptAction().showToast({
+                message: '请填写举报原因！',
+                duration: 800
+              })
+              return
+            }
+
+            this.showProgress = true
+            let success = true
+            this.showProgress = false
+
+            if (success === true) {
+              this.reportDialog.close()
+              this.getUIContext().getPromptAction().showToast({
+                message: '举报已提交，感谢反馈！',
+                duration: 1000
+              });
+            } else {
+              this.getUIContext().getPromptAction().showToast({
+                message: '提交失败，请检查网络！',
+                duration: 1000
+              });
+            }
+          })
+        }
+        .width('100%')
+        .justifyContent(FlexAlign.SpaceBetween)
+      }
+      .width('100%')
+      .height('100%')
+      .backgroundColor($r('app.color.start_window_background'))
+      .padding({ left: 20, right: 20 })
+
+      Column() {
+        LoadingProgress()
+          .width("100%")
+          .height(72)
+      }
+      .width('100%')
+      .height('100%')
+      .justifyContent(FlexAlign.Center)
+      .visibility(this.showProgress ? Visibility.Visible : Visibility.None)
+    }
+    .width('100%')
+    .height('100%')
+  }
+}

@@ -17,7 +17,7 @@ import {
   Track
 } from "../utils/Interface";
 import { HdsNavDestination, HdsNavDestinationAttribute } from "@kit.UIDesignKit";
-import { LengthMetrics, SymbolGlyphModifier } from "@kit.ArkUI";
+import { LengthMetrics, PersistenceV2, SymbolGlyphModifier } from "@kit.ArkUI";
 import {
   addToCollection,
   addToPlaylist,
@@ -30,11 +30,12 @@ import {
   removeFromCollection,
   removeFromPlaylist,
   updateProgress } from "../utils/Api";
-import { EpisodeComponent1 } from "../utils/Component";
+import reportBuilder, { EpisodeComponent1 } from "../utils/Component";
 import { media } from "@kit.MediaKit";
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Download';
 import { common } from "@kit.AbilityKit";
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
+import { OtherSetting } from "./Index";
 
 @Builder
 export function libraryItemDetailBuilder(name: string, param: Object) {
@@ -44,6 +45,7 @@ export function libraryItemDetailBuilder(name: string, param: Object) {
 @ComponentV2
 export struct LibraryItemDetail {
   private libraryDetailScroller: Scroller = new Scroller();
+  @Consumer() otherSetting: OtherSetting | undefined = PersistenceV2.connect(OtherSetting, () => new OtherSetting());
   @Consumer() context: common.UIAbilityContext | undefined = undefined
   private downloadManager: DownloadManager = new DownloadManager(this.context!);
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
@@ -112,6 +114,12 @@ export struct LibraryItemDetail {
   async refreshLibraryItem(monitor: IMonitor) {
     this.episodes = this.libraryItem?.media.episodes!
   }
+  report: CustomDialogController = new CustomDialogController({
+    builder: reportBuilder(),
+    width: 350,
+    height: 330,
+    backgroundColor: $r('sys.color.background_tertiary')
+  })
 
   formatDuration(seconds: number): string {
     const hours = Math.floor(seconds / 3600);
@@ -222,6 +230,15 @@ export struct LibraryItemDetail {
         value: "添加到播放列表",
         action: async () => {
           this.showPlaylists = true
+        }
+      })
+    }
+    if (!this.otherSetting?.hideReport) {
+      this.moreMenus.push({
+        symbolIcon: new SymbolGlyphModifier($r('sys.symbol.exclamationmark_triangle')),
+        value: "举报内容",
+        action: async () => {
+          this.report.open()
         }
       })
     }

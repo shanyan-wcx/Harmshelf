@@ -1,6 +1,6 @@
 import { common, ConfigurationConstant, Want } from "@kit.AbilityKit"
 import { PersistenceV2 } from "@kit.ArkUI";
-import { ColorMode, PlaySetting, ServerIndex, ServerSetting } from "../pages/Index";
+import { ColorMode, OtherSetting, PlaySetting, ServerIndex, ServerSetting } from "../pages/Index";
 import { getLibraries, getLogin, getLogout, getUser } from "../utils/Api";
 import { env } from "../utils/Class";
 import { Library, LoginInfo, PlayItem, User } from "../utils/Interface";
@@ -19,6 +19,7 @@ export struct Setting {
   @Consumer() serverSetting: ServerSetting | undefined = PersistenceV2.connect(ServerSetting, () => new ServerSetting());
   @Consumer() colorMode: ColorMode | undefined = PersistenceV2.connect(ColorMode, () => new ColorMode());
   @Consumer() playSetting: PlaySetting | undefined = PersistenceV2.connect(PlaySetting, () => new PlaySetting());
+  @Consumer() otherSetting: OtherSetting | undefined = PersistenceV2.connect(OtherSetting, () => new OtherSetting());
   @Consumer() themeIcon: Resource = $r('sys.symbol.circle_righthalf_inset_filled')
   @Consumer() gobackwardIcon: Resource = $r('sys.symbol.gobackward_10')
   @Consumer() goforwardIcon: Resource = $r('sys.symbol.goforward_10')
@@ -913,6 +914,41 @@ export struct Setting {
           $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
         .borderRadius(8)
         .padding({ left: 20, right: 20, bottom: 10 })
+        .margin({ top: 20 })
+
+        Column() {
+          Text("其他设置")
+            .width('100%')
+            .fontSize(20)
+            .fontWeight(FontWeight.Bold)
+            .padding({ left: 20, right: 20 })
+            .margin({ top: 20, bottom: 15 })
+            .textAlign(TextAlign.Center)
+
+          Row() {
+            Text("隐藏举报功能")
+              .fontSize(20)
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+            Toggle({ type: ToggleType.Switch, isOn: this.playSetting?.fadeInOut })
+              .selectedColor($r('sys.color.comp_emphasize_secondary'))
+              .onClick(() => {
+                if (this.otherSetting) {
+                  this.otherSetting.hideReport = !this.otherSetting.hideReport
+                }
+              })
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.SpaceBetween)
+        }
+        .width('100%')
+        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
+          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
+          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
+          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
+        .borderRadius(8)
+        .padding({ left: 20, right: 20, bottom: 15 })
         .margin({ top: 20 })
 
         Button({ type: ButtonType.Normal }) {
