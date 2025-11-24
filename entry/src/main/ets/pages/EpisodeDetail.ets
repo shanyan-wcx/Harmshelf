@@ -578,17 +578,14 @@ export struct EpisodeDetail {
                   if (!existsDir) {
                     fs.mkdirSync(dir);
                   }
-                  this.downloadTasks.push({
-                    mediaType: this.library!.mediaType,
-                    folder: this.podcast!.media.metadata.title,
-                    id: this.episode!.id!,
-                    title: this.episode!.audioFile!.metadata.filename,
-                    url: this.baseUrl + this.episode!.audioTrack?.contentUrl + "?token=" + this.apiToken,
-                    filePath: dir + "/" + this.episode!.audioFile!.metadata.filename,
-                    status: DownloadStatus.Idle,
-                    progress: 0,
-                    background: true,
-                  })
+                  const task = new DownloadTaskInfo()
+                  task.mediaType = this.library!.mediaType
+                  task.folder = this.podcast!.media.metadata.title
+                  task.id = this.episode!.id!
+                  task.title = this.episode!.audioFile!.metadata.filename
+                  task.url = this.baseUrl + this.episode!.audioTrack?.contentUrl + "?token=" + this.apiToken
+                  task.filePath = dir + "/" + this.episode!.audioFile!.metadata.filename
+                  this.downloadTasks.push(task)
                   this.downloadManager!.add(
                     this.library!.mediaType,
                     this.podcast!.media.metadata.title,
@@ -599,12 +596,24 @@ export struct EpisodeDetail {
                     (info) => {
                       // 下载进度回调
                       console.info('Progress:', info.title, Math.floor(info.progress) + "%");
-                      this.downloadTasks = this.downloadManager!.getAllTaskInfo()
+                      let index = this.downloadTasks.findIndex(t => t.id === info.id)
+                      if (index >= 0) {
+                        let task = this.downloadTasks[index];
+                        task.progress = info.progress;
+                      }
                     },
                     (info) => {
                       // 状态变化回调
                       console.info('Status changed:', info.title, info.status);
-                      this.downloadTasks = this.downloadManager!.getAllTaskInfo()
+                      if (info.status === DownloadStatus.Removed) {
+                        this.downloadTasks = this.downloadManager!.getAllTaskInfo()
+                      } else {
+                        let index = this.downloadTasks.findIndex(t => t.id === info.id)
+                        if (index >= 0) {
+                          let task = this.downloadTasks[index];
+                          task.status = info.status;
+                        }
+                      }
                     }
                   );
                 }

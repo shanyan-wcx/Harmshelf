@@ -12,16 +12,17 @@ export enum DownloadStatus {
   Removed = 'Removed',
 }
 
-export interface DownloadTaskInfo {
-  mediaType: string;
-  folder: string;
-  id: string;
-  title: string;
-  url: string;
-  filePath: string;
-  status: DownloadStatus;
-  progress: number;
-  background?: boolean;
+@ObservedV2
+export class DownloadTaskInfo {
+  @Trace mediaType: string = '';
+  @Trace folder: string = '';
+  @Trace id: string = '';
+  @Trace title: string = '';
+  @Trace url: string = '';
+  @Trace filePath: string = '';
+  @Trace status: DownloadStatus = DownloadStatus.Idle;
+  @Trace progress: number = 0;
+  @Trace background: boolean = false;
 }
 
 type ProgressCallback = (info: DownloadTaskInfo) => void;
