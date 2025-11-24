@@ -1998,16 +1998,16 @@ export default struct reportBuilder {
       Column() {
         Text("举报内容")
           .width('100%')
-          .height(60)
           .textAlign(TextAlign.Center)
           .fontSize(20)
           .fontWeight(FontWeight.Bold)
+          .margin({ top: 16, bottom: 15 })
 
         Row() {
           Text("举报原因")
             .fontSize(18)
           TextInput({
-            placeholder: '请输入举报原因（如违规内容）',
+            placeholder: '请填写举报原因',
             text: $$this.reason
           })
             .width("100%")
