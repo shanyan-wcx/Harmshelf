@@ -105,6 +105,7 @@ export struct DownloadTask {
               label: "clean",
               action: async () => {
                 await this.downloadManager!.clearAll()
+                this.downloadTasks = []
                 this.getUIContext().getPromptAction().showToast({
                   message: '清除全部下载任务！',
                   duration: 500

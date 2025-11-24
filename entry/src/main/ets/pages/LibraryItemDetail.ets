@@ -939,11 +939,11 @@ export struct LibraryItemDetail {
                             (info) => {
                               // 状态变化回调
                               console.info('Status changed:', info.title, info.status);
-                              if (info.status === DownloadStatus.Removed) {
-                                this.downloadTasks = this.downloadManager!.getAllTaskInfo()
-                              } else {
-                                let index = this.downloadTasks.findIndex(t => t.id === info.id)
-                                if (index >= 0) {
+                              let index = this.downloadTasks.findIndex(t => t.id === info.id)
+                              if (index >= 0) {
+                                if (info.status === DownloadStatus.Removed) {
+                                  this.downloadTasks.splice(index, 1);
+                                } else {
                                   let task = this.downloadTasks[index];
                                   task.status = info.status;
                                 }
