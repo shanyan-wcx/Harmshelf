@@ -11,13 +11,32 @@ import { LocalMedia } from "../pages/Local";
 import { Log } from "../pages/Log";
 import { Setting } from "../pages/Setting";
 import { Stats } from "../pages/Stat";
-import { addToPlaylist,
+import {
+  addToPlaylist,
   createPlaylist,
   getItem,
-  getPlayItem, getPlaylists, getUser, removeFromPlaylist, updateProgress } from "./Api";
-import { Author, Series, LibraryItem, Library, Book, Progress, Episode, Filter1, UpdateProgress, PlayItem, Collection, Playlist,
+  getPlayItem,
+  getPlaylists,
+  getUser,
+  removeFromPlaylist,
+  updateProgress
+} from "./Api";
+import {
+  Author,
+  Series,
+  LibraryItem,
+  Library,
+  Book,
+  Progress,
+  Episode,
+  Filter1,
+  UpdateProgress,
+  PlayItem,
+  Collection,
+  Playlist,
   PlaylistItem,
-  User} from "./Interface"
+  User
+} from "./Interface"
 import { media } from "@kit.MediaKit";
 import { DownloadStatus, DownloadTaskInfo, DownloadManager } from "./Class";
 import { fileUri, fileIo as fs } from "@kit.CoreFileKit";
@@ -50,6 +69,7 @@ export struct MyNavigation {
   @Consumer() downloadTasks: DownloadTaskInfo[] = []
   @Consumer() downloadCount: number = 0
   @Local isDownloadEmpty: boolean = true
+
   @Monitor('downloadCount')
   async updateMenus(monitor: IMonitor) {
     if (this.downloadCount === 0) {
@@ -93,7 +113,9 @@ export struct MyNavigation {
           .fontColor([this.isConnect ? Color.Green : Color.Orange])
       }
       .clip(true)
-      .width(!this.isDownloadEmpty ? (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 225 : this.sideBarContentWidth - 149) : (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 177 : this.sideBarContentWidth - 101))
+      .width(!this.isDownloadEmpty ?
+        (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 225 : this.sideBarContentWidth - 149) :
+        (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 177 : this.sideBarContentWidth - 101))
       .padding({ left: 16, right: 16 })
     }
     .width('100%')
@@ -124,7 +146,7 @@ export struct MyNavigation {
     .backgroundColor($r('sys.color.background_secondary'))
     .mode(NavigationMode.Stack)
     .titleBar({
-      avoidLayoutSafeArea:true,
+      avoidLayoutSafeArea: true,
       enableComponentSafeArea: false,
       padding: {
         end: deviceTypeInfo === '2in1' ? LengthMetrics.vp(168) : LengthMetrics.vp(16)
@@ -140,15 +162,15 @@ export struct MyNavigation {
         menu: {
           value: this.sidebarType === SideBarContainerType.Embed ?
             (this.isDownloadEmpty ?
-            [{
-              content: {
-                icon: $r('sys.symbol.magnifyingglass'),
-                label: 'search',
-                action: () => {
-                  this.pageInfos.pushPathByName('search', null)
+              [{
+                content: {
+                  icon: $r('sys.symbol.magnifyingglass'),
+                  label: 'search',
+                  action: () => {
+                    this.pageInfos.pushPathByName('search', null)
+                  }
                 }
-              }
-            }] :
+              }] :
               [{
                 content: {
                   icon: $r('sys.symbol.download'),
@@ -156,6 +178,9 @@ export struct MyNavigation {
                   action: () => {
                     this.pageInfos.pushPathByName('downloadTask', null)
                   }
+                },
+                badge: {
+                  count: this.downloadCount
                 }
               }, {
                 content: {
@@ -184,30 +209,33 @@ export struct MyNavigation {
                 }
               }] :
               [{
-              content: {
-                icon: $r('sys.symbol.download'),
-                label: 'download',
-                action: () => {
-                  this.pageInfos.pushPathByName('downloadTask', null)
+                content: {
+                  icon: $r('sys.symbol.download'),
+                  label: 'download',
+                  action: () => {
+                    this.pageInfos.pushPathByName('downloadTask', null)
+                  }
+                },
+                badge: {
+                  count: this.downloadCount
                 }
-              }
-            }, {
-              content: {
-                icon: $r('sys.symbol.magnifyingglass'),
-                label: 'search',
-                action: () => {
-                  this.pageInfos.pushPathByName('search', null)
+              }, {
+                content: {
+                  icon: $r('sys.symbol.magnifyingglass'),
+                  label: 'search',
+                  action: () => {
+                    this.pageInfos.pushPathByName('search', null)
+                  }
                 }
-              }
-            }, {
-              content: {
-                icon: $r('sys.symbol.open_sidebar'),
-                label: 'sidebar',
-                action: () => {
-                  this.isShowSidebar = !this.isShowSidebar
+              }, {
+                content: {
+                  icon: $r('sys.symbol.open_sidebar'),
+                  label: 'sidebar',
+                  action: () => {
+                    this.isShowSidebar = !this.isShowSidebar
+                  }
                 }
-              }
-            }])
+              }])
         }
       }
     })
@@ -250,7 +278,8 @@ export struct LibraryItemComponent {
           if (this.library?.mediaType === 'book') {
             Progress({ value: (this.progress?.progress ?? 0) * 100, total: 100, type: ProgressType.Linear })
               .width('100%')
-              .color(this.progress?.progress === 1 || this.progress?.isFinished ? $r('sys.color.ohos_id_color_palette4') :
+              .color(this.progress?.progress === 1 || this.progress?.isFinished ?
+                $r('sys.color.ohos_id_color_palette4') :
                 $r('sys.color.multi_color_11'))
               .backgroundColor(Color.Transparent)
               .style({
@@ -335,7 +364,8 @@ export struct LibraryItemComponent1 {
           if (this.library?.mediaType === 'book') {
             Progress({ value: (this.progress?.progress ?? 0) * 100, total: 100, type: ProgressType.Linear })
               .width('100%')
-              .color(this.progress?.progress === 1 || this.progress?.isFinished ? $r('sys.color.ohos_id_color_palette4') :
+              .color(this.progress?.progress === 1 || this.progress?.isFinished ?
+                $r('sys.color.ohos_id_color_palette4') :
                 $r('sys.color.multi_color_11'))
               .backgroundColor(Color.Transparent)
               .style({
@@ -635,7 +665,8 @@ export struct PlaylistItemComponent {
             ForEach([0, 1], (row: number) => {
               Row() {
                 ForEach([0, 1], (col: number) => {
-                  Image(this.baseUrl + `/api/items/${this.displayImages[row * 2 + col].libraryItemId}/cover?token=${this.apiToken}`)
+                  Image(this.baseUrl +
+                    `/api/items/${this.displayImages[row * 2 + col].libraryItemId}/cover?token=${this.apiToken}`)
                     .alt($rawfile('nocover.jpg'))
                     .objectFit(ImageFit.Cover)
                     .width('50%')
@@ -842,7 +873,12 @@ export struct RecentEpisodeComponent {
 
           Text("剧集")
             .fontSize(12)
-            .padding({ left: 5, right: 5, top: 3, bottom: 2 })
+            .padding({
+              left: 5,
+              right: 5,
+              top: 3,
+              bottom: 2
+            })
             .borderRadius(5)
             .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
             .position({
@@ -867,7 +903,7 @@ export struct RecentEpisodeComponent {
       })
 
       Column() {
-        Text(this.item.recentEpisode?.title??"-")
+        Text(this.item.recentEpisode?.title ?? "-")
           .fontSize(18)
           .fontWeight(FontWeight.Medium)
           .margin({ top: 5 })
@@ -922,6 +958,7 @@ export struct EpisodeComponent {
   @Local showCreatePlaylist: boolean = false
   @Local tmpPlaylistName: string = ""
   @Local tmpPlaylistDescription: string = ""
+
   @Monitor('syncTime')
   async refreshProgress(monitor: IMonitor) {
     this.itemProgress = undefined
@@ -1273,7 +1310,8 @@ export struct EpisodeComponent {
         })
 
         Button({ type: ButtonType.Normal }) {
-          SymbolGlyph(this.itemProgress?.isFinished ? $r('sys.symbol.checkmark_square_fill') : $r('sys.symbol.checkmark_square'))
+          SymbolGlyph(this.itemProgress?.isFinished ? $r('sys.symbol.checkmark_square_fill') :
+            $r('sys.symbol.checkmark_square'))
             .fontSize(20)
             .fontColor([$r('sys.color.font')])
         }
@@ -1292,7 +1330,7 @@ export struct EpisodeComponent {
             }
             let status = await updateProgress(tmpProgress, this.item.libraryItemId!, this.item.id)
             if (status) {
-              this.progress = (await getUser())?.mediaProgress??this.progress
+              this.progress = (await getUser())?.mediaProgress ?? this.progress
               this.itemProgress = this.progress.find(p => p.episodeId === this.item.id)
             }
           } else {
@@ -1304,7 +1342,7 @@ export struct EpisodeComponent {
             }
             let status = await updateProgress(tmpProgress, this.item.libraryItemId!, this.item.id)
             if (status) {
-              this.progress = (await getUser())?.mediaProgress??this.progress
+              this.progress = (await getUser())?.mediaProgress ?? this.progress
               this.itemProgress = this.progress.find(p => p.episodeId === this.item.id)
             }
           }
@@ -1472,6 +1510,7 @@ export struct EpisodeComponent1 {
   @Local showCreatePlaylist: boolean = false
   @Local tmpPlaylistName: string = ""
   @Local tmpPlaylistDescription: string = ""
+
   @Monitor('syncTime')
   async refreshProgress(monitor: IMonitor) {
     this.itemProgress = undefined
@@ -1498,7 +1537,6 @@ export struct EpisodeComponent1 {
     let minutes = date.getMinutes().toString().padStart(2, '0')
     return `${year}/${month}/${day} ${hours}:${minutes}`
   }
-
 
   @Builder
   playlistsBuilder() {
@@ -1789,7 +1827,8 @@ export struct EpisodeComponent1 {
         })
 
         Button({ type: ButtonType.Normal }) {
-          SymbolGlyph(this.itemProgress?.isFinished ? $r('sys.symbol.checkmark_square_fill') : $r('sys.symbol.checkmark_square'))
+          SymbolGlyph(this.itemProgress?.isFinished ? $r('sys.symbol.checkmark_square_fill') :
+            $r('sys.symbol.checkmark_square'))
             .fontSize(20)
             .fontColor([$r('sys.color.font')])
         }
@@ -1808,7 +1847,7 @@ export struct EpisodeComponent1 {
             }
             let status = await updateProgress(tmpProgress, this.item.libraryItemId!, this.item.id)
             if (status) {
-              this.progress = (await getUser())?.mediaProgress??this.progress
+              this.progress = (await getUser())?.mediaProgress ?? this.progress
               this.itemProgress = this.progress.find(p => p.episodeId === this.item.id)
             }
           } else {
@@ -1820,7 +1859,7 @@ export struct EpisodeComponent1 {
             }
             let status = await updateProgress(tmpProgress, this.item.libraryItemId!, this.item.id)
             if (status) {
-              this.progress = (await getUser())?.mediaProgress??this.progress
+              this.progress = (await getUser())?.mediaProgress ?? this.progress
               this.itemProgress = this.progress.find(p => p.episodeId === this.item.id)
             }
           }
