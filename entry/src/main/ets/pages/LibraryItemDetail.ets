@@ -1437,6 +1437,17 @@ export struct LibraryItemDetail {
                   .onClick(() => {
                     this.showChapters = !this.showChapters
                   })
+                  .bindSheet(this.showConfirm, this.confirmBuilder(), {
+                    height: SheetSize.FIT_CONTENT,
+                    preferType: SheetType.CENTER,
+                    title: {
+                      title: "确认播放"
+                    },
+                    showClose: false,
+                    onDisappear: () => {
+                      this.showConfirm = false
+                    }
+                  })
 
                   List() {
                     ListItem() {
@@ -1506,17 +1517,6 @@ export struct LibraryItemDetail {
                   })
                   .visibility(this.showChapters ? Visibility.Visible : Visibility.None)
                   .height(this.contentHeight - 158)
-                  .bindSheet(this.showConfirm, this.confirmBuilder(), {
-                    height: SheetSize.FIT_CONTENT,
-                    preferType: SheetType.CENTER,
-                    title: {
-                      title: "确认播放"
-                    },
-                    showClose: false,
-                    onDisappear: () => {
-                      this.showConfirm = false
-                    }
-                  })
 
                   Button({ type: ButtonType.Normal }) {
                     Row() {
