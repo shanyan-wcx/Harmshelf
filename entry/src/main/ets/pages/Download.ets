@@ -1,6 +1,6 @@
 import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit';
 import { LengthMetrics } from '@kit.ArkUI';
-import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Download';
+import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
 
 @Builder
 export function downloadTaskBuilder(name: string, param: Object) {
@@ -16,10 +16,11 @@ export struct DownloadTask {
   @Consumer() sideBarContentWidth: number = 0
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() isStartPlaying: boolean = false
-  @Consumer() downloadTasks: DownloadTaskInfo[] = [];
-  @Monitor('downloadTasks')
+  @Consumer() downloadTasks: DownloadTaskInfo[] = []
+  @Consumer() downloadCount: number = 0
+  @Monitor('downloadCount')
   async goBackPage(monitor: IMonitor) {
-    if (this.downloadTasks.length === 0) {
+    if (this.downloadCount === 0) {
       this.pageInfos.pop()
     }
   }
@@ -117,7 +118,8 @@ export struct DownloadTask {
               label: "clean",
               action: async () => {
                 await this.downloadManager!.clearAll()
-                this.downloadTasks = []
+                this.downloadTasks.splice(0, this.downloadTasks.length)
+                this.downloadCount = this.downloadTasks.length
                 this.getUIContext().getPromptAction().showToast({
                   message: '清除全部下载任务！',
                   duration: 500

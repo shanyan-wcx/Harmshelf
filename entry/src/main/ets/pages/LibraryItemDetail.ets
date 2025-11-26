@@ -32,7 +32,7 @@ import {
   updateProgress } from "../utils/Api";
 import reportBuilder, { EpisodeComponent1 } from "../utils/Component";
 import { media } from "@kit.MediaKit";
-import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Download';
+import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { OtherSetting } from "./Index";
 
@@ -71,7 +71,8 @@ export struct LibraryItemDetail {
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Consumer() user: User | undefined = undefined
   @Consumer() downloadUri: string = ""
-  @Consumer() downloadTasks: DownloadTaskInfo[] = [];
+  @Consumer() downloadTasks: DownloadTaskInfo[] = []
+  @Consumer() downloadCount: number = 0
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.libraryItemId === this.libraryItem!.id)
   @Local maxIntroLine: number = 5
   @Local showMoreIntro: boolean = false
@@ -920,6 +921,7 @@ export struct LibraryItemDetail {
                           task.url = this.baseUrl + track.contentUrl + "?token=" + this.apiToken
                           task.filePath = dir + "/" + track.metadata.filename
                           this.downloadTasks.push(task)
+                          this.downloadCount = this.downloadTasks.length
                           this.downloadManager!.add(
                             this.libraryItem!.mediaType,
                             this.libraryItem!.media.metadata.title,
@@ -943,6 +945,7 @@ export struct LibraryItemDetail {
                               if (index >= 0) {
                                 if (info.status === DownloadStatus.Removed) {
                                   this.downloadTasks.splice(index, 1);
+                                  this.downloadCount = this.downloadTasks.length
                                 } else {
                                   let task = this.downloadTasks[index];
                                   task.status = info.status;

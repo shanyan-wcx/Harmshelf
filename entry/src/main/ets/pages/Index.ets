@@ -29,7 +29,7 @@ import { CountdownTimer } from '../utils/Class';
 import { getUser, syncSession } from '../utils/Api';
 import { bundleManager } from '@kit.AbilityKit';
 import { fileIo as fs, fileUri, picker } from '@kit.CoreFileKit';
-import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Download';
+import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -150,7 +150,8 @@ struct Index {
   @Provider() syncTime: number = 0
   @Provider() logs: string[] = []
   @Provider() downloadUri: string = ""
-  @Provider() downloadTasks: DownloadTaskInfo[] = [];
+  @Provider() downloadTasks: DownloadTaskInfo[] = []
+  @Provider() downloadCount: number = 0
   @Local uiContext: UIContext | undefined = undefined
   @Local mainWindow: window.Window | undefined = undefined
   @Local elapsedTime: number = 0

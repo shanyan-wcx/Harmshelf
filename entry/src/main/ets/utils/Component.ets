@@ -19,7 +19,7 @@ import { Author, Series, LibraryItem, Library, Book, Progress, Episode, Filter1,
   PlaylistItem,
   User} from "./Interface"
 import { media } from "@kit.MediaKit";
-import { DownloadStatus, DownloadTaskInfo, DownloadManager } from "./Download";
+import { DownloadStatus, DownloadTaskInfo, DownloadManager } from "./Class";
 import { fileUri, fileIo as fs } from "@kit.CoreFileKit";
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
@@ -47,7 +47,17 @@ export struct MyNavigation {
   @Consumer() sideBarContentWidth: number = 0
   @Consumer() libraries: Library[] = []
   @Consumer() library: Library | undefined = undefined
-  @Consumer() downloadTasks: DownloadTaskInfo[] = [];
+  @Consumer() downloadTasks: DownloadTaskInfo[] = []
+  @Consumer() downloadCount: number = 0
+  @Local isDownloadEmpty: boolean = true
+  @Monitor('downloadCount')
+  async updateMenus(monitor: IMonitor) {
+    if (this.downloadCount === 0) {
+      this.isDownloadEmpty = true
+    } else {
+      this.isDownloadEmpty = false
+    }
+  }
 
   aboutToAppear() {
     this.firstAppear = true
@@ -83,7 +93,7 @@ export struct MyNavigation {
           .fontColor([this.isConnect ? Color.Green : Color.Orange])
       }
       .clip(true)
-      .width(this.downloadTasks.length > 0 ? (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 225 : this.sideBarContentWidth - 149) : (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 177 : this.sideBarContentWidth - 101))
+      .width(this.isDownloadEmpty ? (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 225 : this.sideBarContentWidth - 149) : (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 177 : this.sideBarContentWidth - 101))
       .padding({ left: 16, right: 16 })
     }
     .width('100%')
@@ -129,7 +139,7 @@ export struct MyNavigation {
         stackBuilder: (): void => this.titleBarBuilder(),
         menu: {
           value: this.sidebarType === SideBarContainerType.Embed ?
-            (this.downloadTasks.length === 0 ?
+            (this.isDownloadEmpty ?
             [{
               content: {
                 icon: $r('sys.symbol.magnifyingglass'),
@@ -146,9 +156,6 @@ export struct MyNavigation {
                   action: () => {
                     this.pageInfos.pushPathByName('downloadTask', null)
                   }
-                },
-                badge: {
-                  count: this.downloadTasks.length
                 }
               }, {
                 content: {
@@ -158,7 +165,7 @@ export struct MyNavigation {
                     this.pageInfos.pushPathByName('search', null)
                   }
                 }
-              }]) : (this.downloadTasks.length === 0 ?
+              }]) : (this.isDownloadEmpty ?
               [{
                 content: {
                   icon: $r('sys.symbol.magnifyingglass'),
@@ -183,9 +190,6 @@ export struct MyNavigation {
                 action: () => {
                   this.pageInfos.pushPathByName('downloadTask', null)
                 }
-              },
-              badge: {
-                count: this.downloadTasks.length
               }
             }, {
               content: {
@@ -908,7 +912,8 @@ export struct EpisodeComponent {
   @Consumer() isIndex: boolean = true
   @Consumer() user: User | undefined = undefined
   @Consumer() downloadUri: string = ""
-  @Consumer() downloadTasks: DownloadTaskInfo[] = [];
+  @Consumer() downloadTasks: DownloadTaskInfo[] = []
+  @Consumer() downloadCount: number = 0
   @Local podcast: LibraryItem | undefined = undefined
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.episodeId === this.item.id)
   @Local showPlayLoading: boolean = false
@@ -1372,6 +1377,7 @@ export struct EpisodeComponent {
             task.url = this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken
             task.filePath = dir + "/" + this.item!.audioFile!.metadata.filename
             this.downloadTasks.push(task)
+            this.downloadCount = this.downloadTasks.length
             this.downloadManager!.add(
               this.library!.mediaType,
               this.podcast!.media.metadata.title,
@@ -1395,6 +1401,7 @@ export struct EpisodeComponent {
                 if (index >= 0) {
                   if (info.status === DownloadStatus.Removed) {
                     this.downloadTasks.splice(index, 1);
+                    this.downloadCount = this.downloadTasks.length
                   } else {
                     let task = this.downloadTasks[index];
                     task.status = info.status;
@@ -1455,7 +1462,8 @@ export struct EpisodeComponent1 {
   @Consumer() isIndex: boolean = true
   @Consumer() user: User | undefined = undefined
   @Consumer() downloadUri: string = ""
-  @Consumer() downloadTasks: DownloadTaskInfo[] = [];
+  @Consumer() downloadTasks: DownloadTaskInfo[] = []
+  @Consumer() downloadCount: number = 0
   @Local podcast: LibraryItem | undefined = undefined
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.episodeId === this.item.id)
   @Local showPlayLoading: boolean = false
@@ -1885,6 +1893,7 @@ export struct EpisodeComponent1 {
             task.url = this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken
             task.filePath = dir + "/" + this.item!.audioFile!.metadata.filename
             this.downloadTasks.push(task)
+            this.downloadCount = this.downloadTasks.length
             this.downloadManager!.add(
               this.library!.mediaType,
               this.podcast!.media.metadata.title,
@@ -1908,6 +1917,7 @@ export struct EpisodeComponent1 {
                 if (index >= 0) {
                   if (info.status === DownloadStatus.Removed) {
                     this.downloadTasks.splice(index, 1);
+                    this.downloadCount = this.downloadTasks.length
                   } else {
                     let task = this.downloadTasks[index];
                     task.status = info.status;

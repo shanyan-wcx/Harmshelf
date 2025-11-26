@@ -18,7 +18,7 @@ import { common, ConfigurationConstant, Want } from '@kit.AbilityKit'
 import { env } from '../utils/Class'
 import { media } from '@kit.MediaKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
-import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Download';
+import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
 import reportBuilder from '../utils/Component'
 import { OtherSetting } from './Index'
 
@@ -52,7 +52,8 @@ export struct EpisodeDetail {
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Consumer() user: User | undefined = undefined
   @Consumer() downloadUri: string = ""
-  @Consumer() downloadTasks: DownloadTaskInfo[] = [];
+  @Consumer() downloadTasks: DownloadTaskInfo[] = []
+  @Consumer() downloadCount: number = 0
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.episodeId === this.episode!.id)
   @Local podcast: LibraryItem | undefined = undefined
   @Local showLoadingProgress: boolean = false
@@ -586,6 +587,7 @@ export struct EpisodeDetail {
                   task.url = this.baseUrl + this.episode!.audioTrack?.contentUrl + "?token=" + this.apiToken
                   task.filePath = dir + "/" + this.episode!.audioFile!.metadata.filename
                   this.downloadTasks.push(task)
+                  this.downloadCount = this.downloadTasks.length
                   this.downloadManager!.add(
                     this.library!.mediaType,
                     this.podcast!.media.metadata.title,
@@ -609,6 +611,7 @@ export struct EpisodeDetail {
                       if (index >= 0) {
                         if (info.status === DownloadStatus.Removed) {
                           this.downloadTasks.splice(index, 1);
+                          this.downloadCount = this.downloadTasks.length
                         } else {
                           let task = this.downloadTasks[index];
                           task.status = info.status;
