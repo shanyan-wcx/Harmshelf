@@ -85,7 +85,7 @@ export struct DownloadTask {
           strokeWidth: 1,
           startMargin: 20,
           endMargin: 20,
-          color: $r('sys.color.comp_divider')
+          color: $r('app.color.divider')
         })
       }
       .width('100%')

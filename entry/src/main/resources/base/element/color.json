@@ -11,6 +11,10 @@
     {
       "name": "sliderBlock",
       "value": "#3A3A3B"
+    },
+    {
+      "name": "divider",
+      "value": "#33182431"
     }
   ]
 }

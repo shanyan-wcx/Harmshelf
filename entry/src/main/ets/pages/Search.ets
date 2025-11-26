@@ -102,6 +102,7 @@ export struct SearchMedia {
                     .alignItems(HorizontalAlign.Start)
                   }
                   .width('100%')
+                  .padding({ left: 20, right: 20 })
                   .margin({ top: index === 0 ? 66 + this.statusBarHeight : 10, bottom: index === this.searchResult!.book!.length - 1 ? (this.isStartPlaying ? 99 : 20) : 10 })
                   .onClick(() => {
                     this.libraryItem = libraryItemSearchResult.libraryItem
@@ -141,6 +142,7 @@ export struct SearchMedia {
                     .alignItems(HorizontalAlign.Start)
                   }
                   .width('100%')
+                  .padding({ left: 20, right: 20 })
                   .margin({ top: index === 0 ? 66 + this.statusBarHeight : 10, bottom: index === this.searchResult!.podcast!.length - 1 ? (this.isStartPlaying ? 99 : 20) : 10 })
                   .onClick(() => {
                     this.libraryItem = libraryItemSearchResult.libraryItem
@@ -153,15 +155,12 @@ export struct SearchMedia {
         }
         .width('100%')
         .height('100%')
-        .padding({
-          left: 20,
-          right: 20
-        })
         .divider({
           strokeWidth: 1,
-          color: $r('sys.color.comp_divider')
+          color: $r('app.color.divider'),
+          startMargin: 20,
+          endMargin: 20
         })
-        .lanes(this.displayWidth >= 1400 ? 3 : (this.displayWidth >= 1000 ? 2 : 1))
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .scrollBar(BarState.Off)
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
