@@ -93,7 +93,7 @@ export struct MyNavigation {
           .fontColor([this.isConnect ? Color.Green : Color.Orange])
       }
       .clip(true)
-      .width(this.isDownloadEmpty ? (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 225 : this.sideBarContentWidth - 149) : (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 177 : this.sideBarContentWidth - 101))
+      .width(!this.isDownloadEmpty ? (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 225 : this.sideBarContentWidth - 149) : (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 177 : this.sideBarContentWidth - 101))
       .padding({ left: 16, right: 16 })
     }
     .width('100%')
