@@ -73,29 +73,6 @@ export struct SearchMedia {
         List({ scroller: this.searchScroller }) {
           if (this.library?.mediaType === 'book') {
             if (this.searchResult && this.searchResult.book!.length > 0) {
-              ListItem() {
-                Column() {
-                  Text("图书")
-                    .fontSize(18)
-                    .fontWeight(FontWeight.Medium)
-                }
-                .margin({ top: 66 + this.statusBarHeight })
-              }
-
-              if (this.displayWidth >= 1000) {
-                ListItem() {
-                  Column()
-                    .margin({ top: 66 + this.statusBarHeight })
-                }
-              }
-
-              if (this.displayWidth >= 1400) {
-                ListItem() {
-                  Column()
-                    .margin({ top: 66 + this.statusBarHeight })
-                }
-              }
-
               ForEach(this.searchResult.book, (libraryItemSearchResult: LibraryItemSearchResult, index) => {
                 ListItem() {
                   Row() {
@@ -103,7 +80,7 @@ export struct SearchMedia {
                       `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
                       .alt($rawfile('nocover.jpg'))
                       .objectFit(ImageFit.Cover)
-                      .width(60)
+                      .width(64)
                       .aspectRatio(1)
                       .borderRadius(8)
                       .margin({ right: 10 })
@@ -111,21 +88,21 @@ export struct SearchMedia {
 
                     Column() {
                       Text(libraryItemSearchResult.libraryItem.media.metadata.title)
-                        .fontSize(17)
+                        .fontSize(19)
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
                         .margin({ bottom: 5 })
 
-                      Text("by " + (libraryItemSearchResult.libraryItem.media.metadata.authorName ?? "-"))
-                        .fontSize(15)
+                      Text((libraryItemSearchResult.libraryItem.media.metadata.authorName ?? "-"))
+                        .fontSize(16)
+                        .fontColor($r('sys.color.font_secondary'))
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
                     }
                     .alignItems(HorizontalAlign.Start)
                   }
                   .width('100%')
-                  .height(70)
-                  .margin({ bottom: index === this.searchResult!.book!.length - 1 ? (this.isStartPlaying ? 99 : 20) : 0 })
+                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 10, bottom: index === this.searchResult!.book!.length - 1 ? (this.isStartPlaying ? 99 : 20) : 10 })
                   .onClick(() => {
                     this.libraryItem = libraryItemSearchResult.libraryItem
                     this.pageInfos.pushPathByName('libraryItemDetail', null)
@@ -135,29 +112,6 @@ export struct SearchMedia {
             }
           } else if (this.library?.mediaType === 'podcast') {
             if (this.searchResult && this.searchResult.podcast!.length > 0) {
-              ListItem() {
-                Column() {
-                  Text("播客")
-                    .fontSize(18)
-                    .fontWeight(FontWeight.Medium)
-                }
-                .margin({ top: 66 + this.statusBarHeight })
-              }
-
-              if (this.displayWidth >= 1000) {
-                ListItem() {
-                  Column()
-                    .margin({ top: 66 + this.statusBarHeight })
-                }
-              }
-
-              if (this.displayWidth >= 1400) {
-                ListItem() {
-                  Column()
-                    .margin({ top: 66 + this.statusBarHeight })
-                }
-              }
-
               ForEach(this.searchResult.podcast, (libraryItemSearchResult: LibraryItemSearchResult, index) => {
                 ListItem() {
                   Row() {
@@ -165,7 +119,7 @@ export struct SearchMedia {
                       `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
                       .alt($rawfile('nocover.jpg'))
                       .objectFit(ImageFit.Cover)
-                      .width(60)
+                      .width(64)
                       .aspectRatio(1)
                       .borderRadius(8)
                       .margin({ right: 10 })
@@ -173,21 +127,21 @@ export struct SearchMedia {
 
                     Column() {
                       Text(libraryItemSearchResult.libraryItem.media.metadata.title)
-                        .fontSize(17)
+                        .fontSize(19)
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
                         .margin({ bottom: 5 })
 
-                      Text("by " + (libraryItemSearchResult.libraryItem.media.metadata.author ?? "-"))
-                        .fontSize(15)
+                      Text((libraryItemSearchResult.libraryItem.media.metadata.author ?? "-"))
+                        .fontSize(16)
+                        .fontColor($r('sys.color.font_secondary'))
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
                     }
                     .alignItems(HorizontalAlign.Start)
                   }
                   .width('100%')
-                  .height(70)
-                  .margin({ bottom: index === this.searchResult!.podcast!.length - 1 ? (this.isStartPlaying ? 99 : 20) : 0 })
+                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 10, bottom: index === this.searchResult!.podcast!.length - 1 ? (this.isStartPlaying ? 99 : 20) : 10 })
                   .onClick(() => {
                     this.libraryItem = libraryItemSearchResult.libraryItem
                     this.pageInfos.pushPathByName('libraryItemDetail', null)
@@ -202,6 +156,10 @@ export struct SearchMedia {
         .padding({
           left: 20,
           right: 20
+        })
+        .divider({
+          strokeWidth: 1,
+          color: $r('sys.color.comp_divider')
         })
         .lanes(this.displayWidth >= 1400 ? 3 : (this.displayWidth >= 1000 ? 2 : 1))
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
@@ -246,7 +204,8 @@ export struct SearchMedia {
       },
       style: {
         scrollEffectOpts: {
-          enableScrollEffect: true
+          enableScrollEffect: true,
+          blurEffectiveStartOffset: LengthMetrics.vp(10)
         }
       },
       content: {
