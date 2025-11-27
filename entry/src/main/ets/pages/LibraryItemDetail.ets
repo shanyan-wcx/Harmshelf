@@ -419,7 +419,7 @@ export struct LibraryItemDetail {
   @Builder
   confirmDownloadBuilder() {
     Column() {
-      Text("确认下载《" + this.libraryItem?.media.metadata.title + "》？")
+      Text("确认下载" + this.libraryItem?.media.metadata.title + "？")
         .fontSize(19)
         .margin({ bottom: 20 })
 
