@@ -927,6 +927,7 @@ export struct RecentEpisodeComponent {
 @ComponentV2
 export struct EpisodeComponent {
   @Require @Param item: Episode
+  @Consumer() displayWidth: number = 0
   @Consumer() downloadManager: DownloadManager | undefined = undefined
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() episode: Episode | undefined = undefined
@@ -958,6 +959,7 @@ export struct EpisodeComponent {
   @Local showPlaylists: boolean = false
   @Local showProgress: boolean = false
   @Local showCreatePlaylist: boolean = false
+  @Local showConfirmDownload: boolean = false
   @Local tmpPlaylistName: string = ""
   @Local tmpPlaylistDescription: string = ""
 
@@ -986,6 +988,107 @@ export struct EpisodeComponent {
     let hours = date.getHours().toString().padStart(2, '0')
     let minutes = date.getMinutes().toString().padStart(2, '0')
     return `${year}/${month}/${day} ${hours}:${minutes}`
+  }
+
+  @Builder
+  confirmDownloadBuilder() {
+    Column() {
+      Text("确认下载" + this.item.title + "？")
+        .fontSize(19)
+        .margin({ bottom: 20 })
+
+      if (this.displayWidth >= 600) {
+        Blank()
+          .height(160)
+      }
+
+      Row({ space: 20 }) {
+        Button({ type: ButtonType.Normal }) {
+          Text("取消")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(() => {
+          this.showConfirmDownload = false
+        })
+
+        Button({ type: ButtonType.Normal }) {
+          Text("确认")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(async () => {
+          this.getUIContext().getPromptAction().showToast({
+            message: '开始下载！',
+            duration: 500
+          });
+          this.showConfirmDownload = false
+          this.podcast = await getItem(this.item!.libraryItemId!)
+          if (this.podcast) {
+            this.item!.audioTrack = this.podcast!.media.episodes!.find(e => e.id === this.item!.id)?.audioTrack
+          } else {
+            this.getUIContext().getPromptAction().showToast({
+              message: '下载失败，请检查网络！',
+              duration: 500
+            });
+            return
+          }
+          const downloadPath = new fileUri.FileUri(this.downloadUri).path
+          const dir = downloadPath + "/播客/" + this.podcast!.media.metadata.title
+          const existsDir = fs.accessSync(dir)
+          if (!existsDir) {
+            fs.mkdirSync(dir);
+          }
+          const task = new DownloadTaskInfo()
+          task.mediaType = this.library!.mediaType
+          task.folder = this.podcast!.media.metadata.title
+          task.id = this.item!.id!
+          task.title = this.item!.audioFile!.metadata.filename
+          task.url = this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken
+          task.filePath = dir + "/" + this.item!.audioFile!.metadata.filename
+          this.downloadTasks.push(task)
+          this.downloadCount = this.downloadTasks.length
+          this.downloadManager!.add(
+            this.library!.mediaType,
+            this.podcast!.media.metadata.title,
+            this.item!.id!,
+            this.item!.audioFile!.metadata.filename,
+            this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken,
+            dir + "/" + this.item!.audioFile!.metadata.filename,
+            (info) => {
+              // 下载进度回调
+              console.info('Progress:', info.title, Math.floor(info.progress) + "%");
+              let index = this.downloadTasks.findIndex(t => t.id === info.id)
+              if (index >= 0) {
+                this.downloadTasks[index].progress = info.progress;
+              }
+            },
+            (info) => {
+              // 状态变化回调
+              console.info('Status changed:', info.title, info.status);
+              let index = this.downloadTasks.findIndex(t => t.id === info.id)
+              if (index >= 0) {
+                if (info.status === DownloadStatus.Removed) {
+                  this.downloadTasks.splice(index, 1);
+                  this.downloadCount = this.downloadTasks.length
+                } else {
+                  this.downloadTasks[index].status = info.status
+                }
+              }
+            }
+          );
+        })
+      }
+    }
+    .padding({ left: 20, right: 20, bottom: 25 })
   }
 
   @Builder
@@ -1397,60 +1500,18 @@ export struct EpisodeComponent {
               duration: 500
             });
           } else {
-            this.podcast = await getItem(this.item!.libraryItemId!)
-            if (this.podcast) {
-              this.item!.audioTrack = this.podcast!.media.episodes!.find(e => e.id === this.item!.id)?.audioTrack
-            }
-            this.getUIContext().getPromptAction().showToast({
-              message: '开始下载！',
-              duration: 500
-            });
-            const downloadPath = new fileUri.FileUri(this.downloadUri).path
-            const dir = downloadPath + "/播客/" + this.podcast!.media.metadata.title
-            const existsDir = fs.accessSync(dir)
-            if (!existsDir) {
-              fs.mkdirSync(dir);
-            }
-            const task = new DownloadTaskInfo()
-            task.mediaType = this.library!.mediaType
-            task.folder = this.podcast!.media.metadata.title
-            task.id = this.item!.id!
-            task.title = this.item!.audioFile!.metadata.filename
-            task.url = this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken
-            task.filePath = dir + "/" + this.item!.audioFile!.metadata.filename
-            this.downloadTasks.push(task)
-            this.downloadCount = this.downloadTasks.length
-            this.downloadManager!.add(
-              this.library!.mediaType,
-              this.podcast!.media.metadata.title,
-              this.item!.id!,
-              this.item!.audioFile!.metadata.filename,
-              this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken,
-              dir + "/" + this.item!.audioFile!.metadata.filename,
-              (info) => {
-                // 下载进度回调
-                console.info('Progress:', info.title, Math.floor(info.progress) + "%");
-                let index = this.downloadTasks.findIndex(t => t.id === info.id)
-                if (index >= 0) {
-                  let task = this.downloadTasks[index];
-                  task.progress = info.progress;
-                }
-              },
-              (info) => {
-                // 状态变化回调
-                console.info('Status changed:', info.title, info.status);
-                let index = this.downloadTasks.findIndex(t => t.id === info.id)
-                if (index >= 0) {
-                  if (info.status === DownloadStatus.Removed) {
-                    this.downloadTasks.splice(index, 1);
-                    this.downloadCount = this.downloadTasks.length
-                  } else {
-                    let task = this.downloadTasks[index];
-                    task.status = info.status;
-                  }
-                }
-              }
-            );
+            this.showConfirmDownload = true
+          }
+        })
+        .bindSheet(this.showConfirmDownload, this.confirmDownloadBuilder(), {
+          height: SheetSize.FIT_CONTENT,
+          preferType: SheetType.CENTER,
+          title: {
+            title: "确认下载"
+          },
+          showClose: false,
+          onDisappear: () => {
+            this.showConfirmDownload = false
           }
         })
       }
@@ -1484,6 +1545,7 @@ export struct EpisodeComponent {
 @ComponentV2
 export struct EpisodeComponent1 {
   @Require @Param item: Episode
+  @Consumer() displayWidth: number = 0
   @Consumer() downloadManager: DownloadManager | undefined = undefined
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() episode: Episode | undefined = undefined
@@ -1514,6 +1576,7 @@ export struct EpisodeComponent1 {
   @Local showPlaylists: boolean = false
   @Local showProgress: boolean = false
   @Local showCreatePlaylist: boolean = false
+  @Local showConfirmDownload: boolean = false
   @Local tmpPlaylistName: string = ""
   @Local tmpPlaylistDescription: string = ""
 
@@ -1542,6 +1605,107 @@ export struct EpisodeComponent1 {
     let hours = date.getHours().toString().padStart(2, '0')
     let minutes = date.getMinutes().toString().padStart(2, '0')
     return `${year}/${month}/${day} ${hours}:${minutes}`
+  }
+
+  @Builder
+  confirmDownloadBuilder() {
+    Column() {
+      Text("确认下载" + this.item.title + "？")
+        .fontSize(19)
+        .margin({ bottom: 20 })
+
+      if (this.displayWidth >= 600) {
+        Blank()
+          .height(160)
+      }
+
+      Row({ space: 20 }) {
+        Button({ type: ButtonType.Normal }) {
+          Text("取消")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(() => {
+          this.showConfirmDownload = false
+        })
+
+        Button({ type: ButtonType.Normal }) {
+          Text("确认")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(async () => {
+          this.getUIContext().getPromptAction().showToast({
+            message: '开始下载！',
+            duration: 500
+          });
+          this.showConfirmDownload = false
+          this.podcast = await getItem(this.item!.libraryItemId!)
+          if (this.podcast) {
+            this.item!.audioTrack = this.podcast!.media.episodes!.find(e => e.id === this.item!.id)?.audioTrack
+          } else {
+            this.getUIContext().getPromptAction().showToast({
+              message: '下载失败，请检查网络！',
+              duration: 500
+            });
+            return
+          }
+          const downloadPath = new fileUri.FileUri(this.downloadUri).path
+          const dir = downloadPath + "/播客/" + this.podcast!.media.metadata.title
+          const existsDir = fs.accessSync(dir)
+          if (!existsDir) {
+            fs.mkdirSync(dir);
+          }
+          const task = new DownloadTaskInfo()
+          task.mediaType = this.library!.mediaType
+          task.folder = this.podcast!.media.metadata.title
+          task.id = this.item!.id!
+          task.title = this.item!.audioFile!.metadata.filename
+          task.url = this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken
+          task.filePath = dir + "/" + this.item!.audioFile!.metadata.filename
+          this.downloadTasks.push(task)
+          this.downloadCount = this.downloadTasks.length
+          this.downloadManager!.add(
+            this.library!.mediaType,
+            this.podcast!.media.metadata.title,
+            this.item!.id!,
+            this.item!.audioFile!.metadata.filename,
+            this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken,
+            dir + "/" + this.item!.audioFile!.metadata.filename,
+            (info) => {
+              // 下载进度回调
+              console.info('Progress:', info.title, Math.floor(info.progress) + "%");
+              let index = this.downloadTasks.findIndex(t => t.id === info.id)
+              if (index >= 0) {
+                this.downloadTasks[index].progress = info.progress;
+              }
+            },
+            (info) => {
+              // 状态变化回调
+              console.info('Status changed:', info.title, info.status);
+              let index = this.downloadTasks.findIndex(t => t.id === info.id)
+              if (index >= 0) {
+                if (info.status === DownloadStatus.Removed) {
+                  this.downloadTasks.splice(index, 1);
+                  this.downloadCount = this.downloadTasks.length
+                } else {
+                  this.downloadTasks[index].status = info.status;
+                }
+              }
+            }
+          );
+        })
+      }
+    }
+    .padding({ left: 20, right: 20, bottom: 25 })
   }
 
   @Builder
@@ -1918,60 +2082,18 @@ export struct EpisodeComponent1 {
               duration: 500
             });
           } else {
-            this.podcast = await getItem(this.item!.libraryItemId!)
-            if (this.podcast) {
-              this.item!.audioTrack = this.podcast!.media.episodes!.find(e => e.id === this.item!.id)?.audioTrack
-            }
-            this.getUIContext().getPromptAction().showToast({
-              message: '开始下载！',
-              duration: 500
-            });
-            const downloadPath = new fileUri.FileUri(this.downloadUri).path
-            const dir = downloadPath + "/播客/" + this.podcast!.media.metadata.title
-            const existsDir = fs.accessSync(dir)
-            if (!existsDir) {
-              fs.mkdirSync(dir);
-            }
-            const task = new DownloadTaskInfo()
-            task.mediaType = this.library!.mediaType
-            task.folder = this.podcast!.media.metadata.title
-            task.id = this.item!.id!
-            task.title = this.item!.audioFile!.metadata.filename
-            task.url = this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken
-            task.filePath = dir + "/" + this.item!.audioFile!.metadata.filename
-            this.downloadTasks.push(task)
-            this.downloadCount = this.downloadTasks.length
-            this.downloadManager!.add(
-              this.library!.mediaType,
-              this.podcast!.media.metadata.title,
-              this.item!.id!,
-              this.item!.audioFile!.metadata.filename,
-              this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken,
-              dir + "/" + this.item!.audioFile!.metadata.filename,
-              (info) => {
-                // 下载进度回调
-                console.info('Progress:', info.title, Math.floor(info.progress) + "%");
-                let index = this.downloadTasks.findIndex(t => t.id === info.id)
-                if (index >= 0) {
-                  let task = this.downloadTasks[index];
-                  task.progress = info.progress;
-                }
-              },
-              (info) => {
-                // 状态变化回调
-                console.info('Status changed:', info.title, info.status);
-                let index = this.downloadTasks.findIndex(t => t.id === info.id)
-                if (index >= 0) {
-                  if (info.status === DownloadStatus.Removed) {
-                    this.downloadTasks.splice(index, 1);
-                    this.downloadCount = this.downloadTasks.length
-                  } else {
-                    let task = this.downloadTasks[index];
-                    task.status = info.status;
-                  }
-                }
-              }
-            );
+            this.showConfirmDownload = true
+          }
+        })
+        .bindSheet(this.showConfirmDownload, this.confirmDownloadBuilder(), {
+          height: SheetSize.FIT_CONTENT,
+          preferType: SheetType.CENTER,
+          title: {
+            title: "确认下载"
+          },
+          showClose: false,
+          onDisappear: () => {
+            this.showConfirmDownload = false
           }
         })
       }

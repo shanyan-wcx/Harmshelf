@@ -89,6 +89,7 @@ export struct LibraryItemDetail {
   @Local moreMenus: MenuElement[] = []
   @Local showPlayLoading: boolean = false
   @Local showConfirm: boolean = false
+  @Local showConfirmDownload: boolean = false
   @Local showPlaylists: boolean = false
   @Local showProgress: boolean = false
   @Local showCreatePlaylist: boolean = false
@@ -409,6 +410,99 @@ export struct LibraryItemDetail {
             console.log("起始位置为", this.playStartTime)
           }
           this.showConfirm = false
+        })
+      }
+    }
+    .padding({ left: 20, right: 20, bottom: 25 })
+  }
+
+  @Builder
+  confirmDownloadBuilder() {
+    Column() {
+      Text("确认下载《" + this.libraryItem?.media.metadata.title + "》？")
+        .fontSize(19)
+        .margin({ bottom: 20 })
+
+      if (this.displayWidth >= 600) {
+        Blank()
+          .height(160)
+      }
+
+      Row({ space: 20 }) {
+        Button({ type: ButtonType.Normal }) {
+          Text("取消")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(() => {
+          this.showConfirmDownload = false
+        })
+
+        Button({ type: ButtonType.Normal }) {
+          Text("确认")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(async () => {
+          this.showConfirmDownload = false
+          this.getUIContext().getPromptAction().showToast({
+            message: '开始下载！',
+            duration: 500
+          });
+          const downloadPath = new fileUri.FileUri(this.downloadUri).path
+          const dir = downloadPath + "/有声书/" + this.libraryItem?.media.metadata.title
+          const existsDir = fs.accessSync(dir)
+          if (!existsDir) {
+            fs.mkdirSync(dir);
+          }
+          this.libraryItem?.media.tracks?.forEach(async (track: Track, index) => {
+            const task = new DownloadTaskInfo()
+            task.mediaType = this.libraryItem!.mediaType
+            task.folder = this.libraryItem!.media.metadata.title
+            task.id = this.libraryItem!.id + "_" + track.index
+            task.title = track.metadata.filename
+            task.url = this.baseUrl + track.contentUrl + "?token=" + this.apiToken
+            task.filePath = dir + "/" + track.metadata.filename
+            this.downloadTasks.push(task)
+            this.downloadCount = this.downloadTasks.length
+            this.downloadManager!.add(
+              this.libraryItem!.mediaType,
+              this.libraryItem!.media.metadata.title,
+              this.libraryItem!.id + "_" + track.index,
+              track.metadata.filename,
+              this.baseUrl + track.contentUrl + "?token=" + this.apiToken,
+              dir + "/" + track.metadata.filename,
+              (info) => {
+                // 下载进度回调
+                console.info('Progress:', info.title, Math.floor(info.progress) + "%");
+                let index = this.downloadTasks.findIndex(t => t.id === info.id)
+                if (index >= 0) {
+                  this.downloadTasks[index].progress = info.progress;
+                }
+              },
+              (info) => {
+                // 状态变化回调
+                console.info('Status changed:', info.title, info.status);
+                let index = this.downloadTasks.findIndex(t => t.id === info.id)
+                if (index >= 0) {
+                  if (info.status === DownloadStatus.Removed) {
+                    this.downloadTasks.splice(index, 1);
+                    this.downloadCount = this.downloadTasks.length
+                  } else {
+                    this.downloadTasks[index].status = info.status;
+                  }
+                }
+              }
+            );
+          })
         })
       }
     }
@@ -906,58 +1000,18 @@ export struct LibraryItemDetail {
                           duration: 500
                         });
                       } else {
-                        this.getUIContext().getPromptAction().showToast({
-                          message: '开始下载！',
-                          duration: 500
-                        });
-                        const downloadPath = new fileUri.FileUri(this.downloadUri).path
-                        const dir = downloadPath + "/有声书/" + this.libraryItem?.media.metadata.title
-                        const existsDir = fs.accessSync(dir)
-                        if (!existsDir) {
-                          fs.mkdirSync(dir);
-                        }
-                        this.libraryItem?.media.tracks?.forEach(async (track: Track, index) => {
-                          const task = new DownloadTaskInfo()
-                          task.mediaType = this.libraryItem!.mediaType
-                          task.folder = this.libraryItem!.media.metadata.title
-                          task.id = this.libraryItem!.id + "_" + track.index
-                          task.title = track.metadata.filename
-                          task.url = this.baseUrl + track.contentUrl + "?token=" + this.apiToken
-                          task.filePath = dir + "/" + track.metadata.filename
-                          this.downloadTasks.push(task)
-                          this.downloadCount = this.downloadTasks.length
-                          this.downloadManager!.add(
-                            this.libraryItem!.mediaType,
-                            this.libraryItem!.media.metadata.title,
-                            this.libraryItem!.id + "_" + track.index,
-                            track.metadata.filename,
-                            this.baseUrl + track.contentUrl + "?token=" + this.apiToken,
-                            dir + "/" + track.metadata.filename,
-                            (info) => {
-                              // 下载进度回调
-                              console.info('Progress:', info.title, Math.floor(info.progress) + "%");
-                              let index = this.downloadTasks.findIndex(t => t.id === info.id)
-                              if (index >= 0) {
-                                let task = this.downloadTasks[index];
-                                task.progress = info.progress;
-                              }
-                            },
-                            (info) => {
-                              // 状态变化回调
-                              console.info('Status changed:', info.title, info.status);
-                              let index = this.downloadTasks.findIndex(t => t.id === info.id)
-                              if (index >= 0) {
-                                if (info.status === DownloadStatus.Removed) {
-                                  this.downloadTasks.splice(index, 1);
-                                  this.downloadCount = this.downloadTasks.length
-                                } else {
-                                  let task = this.downloadTasks[index];
-                                  task.status = info.status;
-                                }
-                              }
-                            }
-                          );
-                        })
+                        this.showConfirmDownload = true
+                      }
+                    })
+                    .bindSheet(this.showConfirmDownload, this.confirmDownloadBuilder(), {
+                      height: SheetSize.FIT_CONTENT,
+                      preferType: SheetType.CENTER,
+                      title: {
+                        title: "确认下载"
+                      },
+                      showClose: false,
+                      onDisappear: () => {
+                        this.showConfirmDownload = false
                       }
                     })
                   }
