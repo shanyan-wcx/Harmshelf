@@ -2,8 +2,8 @@
   "app": {
     "bundleName": "com.shanyan.harmshelf",
     "vendor": "example",
-    "versionCode": 2000104,
-    "versionName": "2.1.4",
+    "versionCode": 2000200,
+    "versionName": "2.2.0",
     "icon": "$media:layered_image",
     "label": "$string:app_name"
   }
