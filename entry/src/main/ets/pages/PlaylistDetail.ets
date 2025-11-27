@@ -38,6 +38,8 @@ export struct PlaylistDetail {
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Consumer() baseUrl: string = ""
   @Consumer() apiToken: string = ""
+  @Consumer() toCloseSession: PlayItem | undefined = undefined
+  @Consumer() toCloseIndex: number = 0
   @Local showLoadingProgress: boolean = false
   @Local showPlayLoading: boolean = false
   @Local topHeight: Length = 0
@@ -362,6 +364,8 @@ export struct PlaylistDetail {
                 .borderRadius(8)
                 .onClick(async () => {
                   this.showPlayLoading = true
+                  this.toCloseIndex = this.playingIndex
+                  this.toCloseSession = this.playingItem
                   let id: string | undefined = undefined
                   let id1: string | undefined = undefined
                   if (this.library?.mediaType === 'book') {
@@ -473,6 +477,8 @@ export struct PlaylistDetail {
                         .width(40)
                         .backgroundColor($r('sys.color.comp_background_tertiary'))
                         .onClick(async () => {
+                          this.toCloseIndex = this.playingIndex
+                          this.toCloseSession = this.playingItem
                           if (this.library?.mediaType === 'book') {
                             this.playingItem = await getPlayItem(item.libraryItemId)
                             if (this.playingItem) {

@@ -73,6 +73,8 @@ export struct LibraryItemDetail {
   @Consumer() downloadUri: string = ""
   @Consumer() downloadTasks: DownloadTaskInfo[] = []
   @Consumer() downloadCount: number = 0
+  @Consumer() toCloseSession: PlayItem | undefined = undefined
+  @Consumer() toCloseIndex: number = 0
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.libraryItemId === this.libraryItem!.id)
   @Local maxIntroLine: number = 5
   @Local showMoreIntro: boolean = false
@@ -856,6 +858,8 @@ export struct LibraryItemDetail {
                   .borderRadius(8)
                   .onClick(async () => {
                     this.showPlayLoading = true
+                    this.toCloseIndex = this.playingIndex
+                    this.toCloseSession = this.playingItem
                     if (this.library?.mediaType === 'book') {
                       this.playingItem = await getPlayItem(this.libraryItem!.id)
                       if (this.playingItem) {

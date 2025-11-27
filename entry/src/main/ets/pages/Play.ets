@@ -1132,7 +1132,7 @@ export struct Play {
   primaryButtonBuilder() {
     Button({ type: ButtonType.Circle }) {
       Stack() {
-        Image(this.baseUrl + `/api/items/${this.playingItem!.libraryItemId}/cover?token=${this.apiToken}`)
+        Image(this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`)
           .alt($rawfile('nocover.jpg'))
           .objectFit(ImageFit.Cover)
           .width(65)

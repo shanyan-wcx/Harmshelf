@@ -950,6 +950,8 @@ export struct EpisodeComponent {
   @Consumer() downloadUri: string = ""
   @Consumer() downloadTasks: DownloadTaskInfo[] = []
   @Consumer() downloadCount: number = 0
+  @Consumer() toCloseSession: PlayItem | undefined = undefined
+  @Consumer() toCloseIndex: number = 0
   @Local podcast: LibraryItem | undefined = undefined
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.episodeId === this.item.id)
   @Local showPlayLoading: boolean = false
@@ -1293,6 +1295,8 @@ export struct EpisodeComponent {
         .borderRadius(8)
         .onClick(async () => {
           this.showPlayLoading = true
+          this.toCloseIndex = this.playingIndex
+          this.toCloseSession = this.playingItem
           this.playingItem = await getPlayItem(this.item.libraryItemId!, this.item.id)
           if (this.playingItem) {
             await this.avPlayer!.reset();
@@ -1502,6 +1506,8 @@ export struct EpisodeComponent1 {
   @Consumer() downloadUri: string = ""
   @Consumer() downloadTasks: DownloadTaskInfo[] = []
   @Consumer() downloadCount: number = 0
+  @Consumer() toCloseSession: PlayItem | undefined = undefined
+  @Consumer() toCloseIndex: number = 0
   @Local podcast: LibraryItem | undefined = undefined
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.episodeId === this.item.id)
   @Local showPlayLoading: boolean = false
@@ -1810,6 +1816,8 @@ export struct EpisodeComponent1 {
         .borderRadius(8)
         .onClick(async () => {
           this.showPlayLoading = true
+          this.toCloseIndex = this.playingIndex
+          this.toCloseSession = this.playingItem
           this.playingItem = await getPlayItem(this.item.libraryItemId!, this.item.id)
           if (this.playingItem) {
             await this.avPlayer!.reset();

@@ -781,7 +781,7 @@ export async function syncSession(sessionId: string, updateSession: UpdateSessio
   }
 }
 
-export async function closeSession(sessionId: string, updateSession: UpdateSession) {
+export async function closeSession(sessionId: string, updateSession: UpdateSession): Promise<boolean> {
   const api: Axios = createApi()
   try {
     const response: AxiosResponse =
@@ -791,12 +791,14 @@ export async function closeSession(sessionId: string, updateSession: UpdateSessi
         connectTimeout: 5000
       })
     console.log("关闭会话成功", response.data);
+    return true
   } catch (error) {
     console.error(JSON.stringify(error));
     promptAction.showToast({
       message: '关闭会话失败，请检查网络！',
       duration: 500
     });
+    return false
   }
 }
 

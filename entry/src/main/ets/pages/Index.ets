@@ -26,10 +26,10 @@ import { media } from '@kit.MediaKit';
 import { backgroundTaskManager } from '@kit.BackgroundTasksKit';
 import { audio } from '@kit.AudioKit';
 import { CountdownTimer } from '../utils/Class';
-import { getUser, syncSession } from '../utils/Api';
+import { closeSession, getUser, syncSession } from '../utils/Api';
 import { bundleManager } from '@kit.AbilityKit';
 import { fileIo as fs, fileUri, picker } from '@kit.CoreFileKit';
-import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
+import { DownloadManager, DownloadTaskInfo } from '../utils/Class';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -152,10 +152,20 @@ struct Index {
   @Provider() downloadUri: string = ""
   @Provider() downloadTasks: DownloadTaskInfo[] = []
   @Provider() downloadCount: number = 0
+  @Provider() toCloseSession: PlayItem | undefined = undefined
+  @Provider() toCloseIndex: number = 0
   @Local uiContext: UIContext | undefined = undefined
   @Local mainWindow: window.Window | undefined = undefined
   @Local elapsedTime: number = 0
   @Local isSyncing: boolean = false
+  @Monitor('toCloseSession')
+  async closeEndSession(monitor: IMonitor) {
+    if (this.toCloseSession) {
+      this.syncProgress(this.toCloseSession, this.toCloseIndex)
+      this.toCloseSession = undefined
+      this.toCloseIndex = 0
+    }
+  }
   pages?: HdsSideMenuMainItem[] = [
     new HdsSideMenuMainItem({
       symbol: new SymbolGlyphModifier($r('sys.symbol.house')),
@@ -238,33 +248,60 @@ struct Index {
     }, step);
   }
 
-  async syncProgress() {
+  async syncProgress(closeItem?: PlayItem, closeIndex?: number) {
     if (!this.isSyncing) {
       this.isSyncing = true
       let bundleFlags = bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT;
       let bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleFlags)
-      let updateSession: UpdateSession = {
-        deviceInfo: {
-          id: deviceInfo.displayVersion,
-          userId: this.playingItem!.userId,
-          deviceName: deviceInfo.marketName,
-          clientName: "Harmshelf",
-          clientVersion: bundleInfo.versionName
-        },
-        mediaPlayer: "avPlayer",
-        currentTime: this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playedTime,
-        timeListened: new Date().getTime() / 1000 - this.syncTime
-      }
-      for (let element of this.progress) {
-        if (this.playingItem!.mediaType === 'book' ? element.libraryItemId === this.playingItem!.libraryItemId : element.episodeId === this.playingItem!.episodeId) {
-          element.duration = this.playingItem!.duration
-          element.currentTime = this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playedTime
-          element.progress = element.currentTime / (Math.trunc(element.duration * 1000) / 1000)
-          element.isFinished = element.progress >= 1 ? true : false
-          break
+      let updateSession: UpdateSession | undefined = undefined
+      let status = false
+      if (closeItem) {
+        updateSession = {
+          deviceInfo: {
+            id: deviceInfo.displayVersion,
+            userId: this.user!.id,
+            deviceName: deviceInfo.marketName,
+            clientName: "Harmshelf",
+            clientVersion: bundleInfo.versionName
+          },
+          mediaPlayer: "avPlayer",
+          currentTime: closeItem.audioTracks[closeIndex!].startOffset + this.playedTime,
+          timeListened: new Date().getTime() / 1000 - this.syncTime
         }
+        for (let element of this.progress) {
+          if (closeItem.mediaType === 'book' ? element.libraryItemId === closeItem.libraryItemId : element.episodeId === closeItem.episodeId) {
+            element.duration = closeItem.duration
+            element.currentTime = closeItem.audioTracks[closeIndex!].startOffset + this.playedTime
+            element.progress = element.currentTime / (Math.trunc(element.duration * 1000) / 1000)
+            element.isFinished = element.progress >= 1 ? true : false
+            break
+          }
+        }
+        status = await closeSession(closeItem!.id, updateSession)
+      } else {
+        updateSession = {
+          deviceInfo: {
+            id: deviceInfo.displayVersion,
+            userId: this.user!.id,
+            deviceName: deviceInfo.marketName,
+            clientName: "Harmshelf",
+            clientVersion: bundleInfo.versionName
+          },
+          mediaPlayer: "avPlayer",
+          currentTime: this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playedTime,
+          timeListened: new Date().getTime() / 1000 - this.syncTime
+        }
+        for (let element of this.progress) {
+          if (this.playingItem!.mediaType === 'book' ? element.libraryItemId === this.playingItem!.libraryItemId : element.episodeId === this.playingItem!.episodeId) {
+            element.duration = this.playingItem!.duration
+            element.currentTime = this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playedTime
+            element.progress = element.currentTime / (Math.trunc(element.duration * 1000) / 1000)
+            element.isFinished = element.progress >= 1 ? true : false
+            break
+          }
+        }
+        status = await syncSession(this.playingItem!.id, updateSession)
       }
-      let status = await syncSession(this.playingItem!.id, updateSession)
       if (status) {
         this.isConnect = true
         console.log("会话当前时间", updateSession.currentTime)
@@ -543,7 +580,8 @@ struct Index {
           break;
         case 'stopped':
           console.info('播放器停止。');
-          this.syncProgress()
+          this.toCloseIndex = this.playingIndex
+          this.toCloseSession = this.playingItem
           this.showPlay = false
           await this.session!.destroy()
           this.session = undefined
@@ -552,6 +590,8 @@ struct Index {
           this.playedPercent = 0
           this.sleepTime = 0
           this.sleepController?.clear()
+          this.playingItem = undefined
+          this.playingIndex = 0
           setTimeout(() => {
             this.isStartPlaying = false
             this.isPlaying = false
@@ -697,6 +737,9 @@ struct Index {
   }
 
   aboutToDisappear() {
+    if (this.playingItem) {
+      this.syncProgress(this.playingItem, this.playingIndex)
+    }
     this.avPlayer?.release()
   }
 

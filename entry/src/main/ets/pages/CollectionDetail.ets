@@ -39,6 +39,8 @@ export struct CollectionDetail {
   @Consumer() apiToken: string = ""
   @Consumer() library: Library | undefined = undefined
   @Consumer() user: User | undefined = undefined
+  @Consumer() toCloseSession: PlayItem | undefined = undefined
+  @Consumer() toCloseIndex: number = 0
   @Local showLoadingProgress: boolean = false
   @Local showPlayLoading: boolean = false
   @Local topHeight: Length = 0
@@ -362,6 +364,8 @@ export struct CollectionDetail {
                 .borderRadius(8)
                 .onClick(async () => {
                   this.showPlayLoading = true
+                  this.toCloseIndex = this.playingIndex
+                  this.toCloseSession = this.playingItem
                   let id: string | undefined = undefined
                   for (let book of this.collection1!.books!) {
                     let isFinished = this.progress.find(p => p.libraryItemId === book.id)?.isFinished ?? false
@@ -436,6 +440,8 @@ export struct CollectionDetail {
                         .width(40)
                         .backgroundColor($r('sys.color.comp_background_tertiary'))
                         .onClick(async () => {
+                          this.toCloseIndex = this.playingIndex
+                          this.toCloseSession = this.playingItem
                           this.playingItem = await getPlayItem(book.id)
                           if (this.playingItem) {
                             await this.avPlayer!.reset();

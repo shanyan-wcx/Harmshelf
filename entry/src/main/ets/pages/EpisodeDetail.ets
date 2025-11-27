@@ -54,6 +54,8 @@ export struct EpisodeDetail {
   @Consumer() downloadUri: string = ""
   @Consumer() downloadTasks: DownloadTaskInfo[] = []
   @Consumer() downloadCount: number = 0
+  @Consumer() toCloseSession: PlayItem | undefined = undefined
+  @Consumer() toCloseIndex: number = 0
   @Local itemProgress: Progress | undefined = this.progress.find(p => p.episodeId === this.episode!.id)
   @Local podcast: LibraryItem | undefined = undefined
   @Local showLoadingProgress: boolean = false
@@ -534,6 +536,8 @@ export struct EpisodeDetail {
               .borderRadius(8)
               .onClick(async () => {
                 this.showPlayLoading = true
+                this.toCloseIndex = this.playingIndex
+                this.toCloseSession = this.playingItem
                 this.playingItem = await getPlayItem(this.episode!.libraryItemId!, this.episode!.id!)
                 if (this.playingItem) {
                   await this.avPlayer!.reset();
