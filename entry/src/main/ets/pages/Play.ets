@@ -671,14 +671,14 @@ export struct Play {
             Button({ type: ButtonType.Normal }) {
               Row() {
                 Text(chapter.title)
-                  .fontSize(18)
+                  .fontSize(17)
                   .width('100%')
                   .layoutWeight(1)
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                 Text(this.formatSeconds(chapter.start))
-                  .fontSize(18)
+                  .fontSize(17)
                   .fontColor($r('sys.color.font_secondary'))
                   .margin({ left: 10 })
               }
