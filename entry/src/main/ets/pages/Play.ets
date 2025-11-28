@@ -671,14 +671,14 @@ export struct Play {
             Button({ type: ButtonType.Normal }) {
               Row() {
                 Text(chapter.title)
-                  .fontSize(17)
+                  .fontSize(16)
                   .width('100%')
                   .layoutWeight(1)
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                 Text(this.formatSeconds(chapter.start))
-                  .fontSize(17)
+                  .fontSize(16)
                   .fontColor($r('sys.color.font_secondary'))
                   .margin({ left: 10 })
               }
@@ -784,7 +784,7 @@ export struct Play {
                   .objectFit(ImageFit.Cover)
                   .width(deviceTypeInfo === '2in1' ?
                     (((this.displayWidth / 2) - 60) > (this.displayHeight / 2) ? this.displayHeight / 2 : '100%') :
-                    '100%')
+                    ((this.displayWidth > (this.displayHeight * 3 / 5)) ? this.displayHeight / 3 : '100%'))
                   .aspectRatio(1)
                   .borderRadius(10)
                   .draggable(false)
