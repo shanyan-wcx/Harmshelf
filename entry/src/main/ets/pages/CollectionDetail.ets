@@ -102,13 +102,8 @@ export struct CollectionDetail {
   }
 
   private getPosition(collection: Collection, index: number): number {
-    const gap =
-      (this.sideBarContentWidth - 40 >= 500 ? 500 : this.sideBarContentWidth - 40) / (collection.books!.length - 1) / 2;
-    if (collection.books!.length == 1) {
-      return (this.sideBarContentWidth - 40 >= 500 ? 500 : this.sideBarContentWidth - 40) / 2
-    } else {
-      return (collection.books!.length - 1 - index) * gap
-    }
+    const gap = (this.sideBarContentWidth - 40 >= 500 ? 500 : this.sideBarContentWidth - 40) / (collection.books!.length - 1) / 2;
+    return (collection.books!.length - 1 - index) * gap
   }
 
   @Builder
