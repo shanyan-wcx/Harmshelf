@@ -555,6 +555,10 @@ export struct LibraryItemDetail {
         .scrollBar(BarState.Off)
         .borderRadius(8)
         .clip(true)
+        .divider({
+          strokeWidth: 1,
+          color: $r('app.color.divider')
+        })
         .visibility(!this.showProgress ? Visibility.Visible : Visibility.None)
 
         Column() {
@@ -748,6 +752,10 @@ export struct LibraryItemDetail {
         .scrollBar(BarState.Off)
         .borderRadius(8)
         .clip(true)
+        .divider({
+          strokeWidth: 1,
+          color: $r('app.color.divider')
+        })
         .visibility(!this.showProgress ? Visibility.Visible : Visibility.None)
 
         Column() {
