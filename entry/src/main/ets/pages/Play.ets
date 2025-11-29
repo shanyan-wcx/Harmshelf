@@ -779,7 +779,7 @@ export struct Play {
 
             Column() {
               if (this.displayHeight >= 700) {
-                Image(this.baseUrl + `/api/items/${this.playingItem!.libraryItemId}/cover?token=${this.apiToken}`)
+                Image(this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`)
                   .alt($rawfile('nocover.jpg'))
                   .objectFit(ImageFit.Cover)
                   .width(deviceTypeInfo === '2in1' ?
@@ -804,7 +804,7 @@ export struct Play {
 
                 Text(this.playingItem?.mediaType === 'book' ?
                   this.playingItem?.mediaMetadata.authors?.map(item => item.name).join(", ") :
-                  this.playingItem!.displayAuthor)
+                  this.playingItem?.displayAuthor)
                   .width('100%')
                   .fontSize(18)
                   .fontWeight(FontWeight.Medium)
@@ -821,11 +821,11 @@ export struct Play {
               Column() {
                 Column() {
                   Row() {
-                    Text(this.formatSeconds(this.playedPercent * this.playingItem!.audioTracks[this.playingIndex].duration / 100))
+                    Text(this.formatSeconds(this.playedPercent * (this.playingItem?.audioTracks[this.playingIndex].duration??0) / 100))
                       .fontSize(16)
                       .fontWeight(FontWeight.Medium)
 
-                    Text(this.formatSeconds(this.playingItem!.audioTracks[this.playingIndex].duration))
+                    Text(this.formatSeconds(this.playingItem?.audioTracks[this.playingIndex].duration??0))
                       .fontSize(16)
                       .fontWeight(FontWeight.Medium)
                   }
@@ -948,7 +948,7 @@ export struct Play {
                   .height(40)
                   .width(40)
                   .backgroundColor(Color.Transparent)
-                  .enabled(this.playingIndex < this.playingItem!.audioTracks.length - 1 ? true : false)
+                  .enabled(this.playingIndex < (this.playingItem?.audioTracks.length??0) - 1 ? true : false)
                   .onClick(async () => {
                     await this.avPlayer!.reset();
                     this.playingIndex++
@@ -1118,7 +1118,7 @@ export struct Play {
     }
     .width('100%')
     .height('100%')
-    .backgroundImage(this.baseUrl + `/api/items/${this.playingItem!.libraryItemId}/cover?token=${this.apiToken}`)
+    .backgroundImage(this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`)
     .backgroundImageSize(ImageSize.FILL)
     .backgroundBlurStyle(BlurStyle.BACKGROUND_ULTRA_THICK)
     .backgroundBrightness({
