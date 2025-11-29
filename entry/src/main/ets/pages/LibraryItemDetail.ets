@@ -1522,11 +1522,11 @@ export struct LibraryItemDetail {
                     ListItem() {
                       Row() {
                         Text("标题")
-                          .fontSize(16)
+                          .fontSize(15)
                           .fontWeight(FontWeight.Medium)
 
                         Text("开始")
-                          .fontSize(16)
+                          .fontSize(15)
                           .fontWeight(FontWeight.Medium)
                           .margin({ left: 20 })
                       }
@@ -1544,15 +1544,13 @@ export struct LibraryItemDetail {
                       ListItem() {
                         Row() {
                           Text(chapter.title)
-                            .fontSize(16)
+                            .fontSize(15)
                             .fontWeight(FontWeight.Medium)
                             .width('100%')
                             .layoutWeight(1)
-                            .maxLines(1)
-                            .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                           Text(this.formatSeconds(chapter.start))
-                            .fontSize(16)
+                            .fontSize(15)
                             .fontWeight(FontWeight.Medium)
                             .margin({ left: 20 })
                             .decoration({
@@ -1567,10 +1565,11 @@ export struct LibraryItemDetail {
                             })
                         }
                         .width('100%')
-                        .height(36)
                         .padding({
                           left: 20,
-                          right: 20
+                          right: 20,
+                          top: 9.5,
+                          bottom: 9.5
                         })
                         .justifyContent(FlexAlign.SpaceBetween)
                         .backgroundColor(index % 2 === 0 ? Color.Transparent : $r('sys.color.comp_background_tertiary'))
@@ -1613,11 +1612,11 @@ export struct LibraryItemDetail {
                     ListItem() {
                       Row() {
                         Text("文件名")
-                          .fontSize(16)
+                          .fontSize(15)
                           .fontWeight(FontWeight.Medium)
 
-                        Text("持续时间")
-                          .fontSize(16)
+                        Text("时长")
+                          .fontSize(15)
                           .fontWeight(FontWeight.Medium)
                           .margin({ left: 20 })
                       }
@@ -1635,23 +1634,22 @@ export struct LibraryItemDetail {
                       ListItem() {
                         Row() {
                           Text(audioFile.metadata.filename)
-                            .fontSize(16)
+                            .fontSize(15)
                             .fontWeight(FontWeight.Medium)
                             .width('100%')
                             .layoutWeight(1)
-                            .maxLines(1)
-                            .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                           Text(this.formatSeconds(audioFile.duration))
-                            .fontSize(16)
+                            .fontSize(15)
                             .fontWeight(FontWeight.Medium)
                             .margin({ left: 20 })
                         }
                         .width('100%')
-                        .height(36)
                         .padding({
                           left: 20,
-                          right: 20
+                          right: 20,
+                          top: 9.5,
+                          bottom: 9.5
                         })
                         .justifyContent(FlexAlign.SpaceBetween)
                         .backgroundColor(index % 2 === 0 ? Color.Transparent : $r('sys.color.comp_background_tertiary'))
