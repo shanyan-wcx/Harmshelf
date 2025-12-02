@@ -110,6 +110,7 @@ export struct Play {
           this.avPlayer!.pause()
         }
         this.sleepTime = 0
+        this.sleepController?.clear()
       }, (remain) => {
         if (this.sleepTime !== 0) {
           this.sleepTime = remain
@@ -540,7 +541,6 @@ export struct Play {
         .backgroundColor(Color.Transparent)
         .onClick(() => {
           this.sleepTime = 5 * 60
-          this.sleepController
           this.setSleepTime()
           this.showSleep = false
         })
