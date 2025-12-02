@@ -412,7 +412,7 @@ export struct EpisodeDetail {
         .onClick(async () => {
           if (this.showProgress) {
             this.getUIContext().getPromptAction().showToast({
-              message: '正在加载播放列表',
+              message: '正在加载播放列表！',
               duration: 500
             });
           } else {
