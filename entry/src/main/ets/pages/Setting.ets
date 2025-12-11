@@ -306,8 +306,8 @@ export struct Setting {
               .width(60)
               .fontSize(20)
             Select([{ value: this.urlHead[0] }, { value: this.urlHead[1] }])
-              .value(this.urlHead[0])
-              .selected(0)
+              .value(this.tmpBaseurl.includes("https://") ? this.urlHead[1] : this.urlHead[0])
+              .selected(this.tmpBaseurl.includes("https://") ? 1 : 0)
               .zIndex(999)
               .backgroundColor($r('app.color.textInput'))
               .onSelect((index) => {
@@ -725,6 +725,7 @@ export struct Setting {
               .onClick(() => {
                 this.editServerIndex = index
                 this.tmpServername = this.serverSetting?.loginInfos[this.editServerIndex].name??""
+                this.tmpBaseurl = this.serverSetting?.loginInfos[this.editServerIndex].server??""
                 this.tmpUrl = this.serverSetting?.loginInfos[this.editServerIndex].server.replace(/^https?:\/\//, "")??""
                 this.tmpUsername = this.serverSetting?.loginInfos[this.editServerIndex].username??""
                 this.tmpPassword = this.serverSetting?.loginInfos[this.editServerIndex].password??""
@@ -755,6 +756,7 @@ export struct Setting {
             onDisappear: () => {
               this.showAddServer = false
               this.tmpServername = ""
+              this.tmpBaseurl = ""
               this.tmpUrl = ""
               this.tmpUsername = ""
               this.tmpPassword = ""
@@ -783,6 +785,7 @@ export struct Setting {
             this.showEditServer = false
             this.editServerIndex = -1
             this.tmpServername = ""
+            this.tmpBaseurl = ""
             this.tmpUrl = ""
             this.tmpUsername = ""
             this.tmpPassword = ""
