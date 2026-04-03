@@ -19,7 +19,7 @@ import { env } from '../utils/Class'
 import { media } from '@kit.MediaKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
-import reportBuilder from '../utils/Component'
+import { reportBuilder } from '../utils/Component'
 import { OtherSetting } from './Index'
 
 @Builder

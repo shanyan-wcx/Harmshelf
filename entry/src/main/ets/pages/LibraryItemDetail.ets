@@ -30,7 +30,7 @@ import {
   removeFromCollection,
   removeFromPlaylist,
   updateProgress } from "../utils/Api";
-import reportBuilder, { EpisodeComponent1 } from "../utils/Component";
+import { reportBuilder, EpisodeComponent1 } from "../utils/Component";
 import { media } from "@kit.MediaKit";
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
@@ -93,6 +93,7 @@ export struct LibraryItemDetail {
   @Local showPlaylists: boolean = false
   @Local showProgress: boolean = false
   @Local showCreatePlaylist: boolean = false
+  @Local showSkipStartEnd: boolean = false
   @Local tmpPlaylistName: string = ""
   @Local tmpPlaylistDescription: string = ""
   @Local tmpPlayingItem: PlayItem | undefined = undefined
@@ -236,6 +237,13 @@ export struct LibraryItemDetail {
         }
       })
     }
+    this.moreMenus.push({
+      symbolIcon: new SymbolGlyphModifier($r('sys.symbol.skip_silence')),
+      value: "跳过开头结尾",
+      action: async () => {
+        this.showSkipStartEnd = true
+      }
+    })
     if (!this.otherSetting?.hideReport) {
       this.moreMenus.push({
         symbolIcon: new SymbolGlyphModifier($r('sys.symbol.exclamationmark_triangle')),
@@ -897,6 +905,13 @@ export struct LibraryItemDetail {
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
+  }
+
+  @Builder
+  skipStartEndBuilder() {
+    Column() {
+
+    }
   }
 
   build() {
@@ -1860,6 +1875,17 @@ export struct LibraryItemDetail {
             }
           }
           .width('100%')
+          .bindSheet(this.showSkipStartEnd, this.skipStartEndBuilder(), {
+            height: SheetSize.FIT_CONTENT,
+            preferType: SheetType.CENTER,
+            title: {
+              title: "跳过开头结尾"
+            },
+            showClose: false,
+            onDisappear: () => {
+              this.showSkipStartEnd = false
+            }
+          })
         }
         .width('100%')
         .height('100%')

@@ -2172,7 +2172,7 @@ export struct pageUpDown {
 }
 
 @CustomDialog
-export default struct reportBuilder {
+export struct reportBuilder {
   @State reason: string = ''
   @State description: string = ''
   @State showProgress: boolean = false
