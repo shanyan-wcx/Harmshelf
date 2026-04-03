@@ -36,6 +36,7 @@ export struct Play {
   @Consumer() sliderMoving: boolean = false
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Consumer() sleepController: CountdownTimer | undefined = undefined
+  @Consumer() speed: media.PlaybackSpeed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
   @Local rotateAngle: number = 0
   @Local sliderValue: number = 0
   @Local lockPlayer: boolean = false
@@ -44,7 +45,6 @@ export struct Play {
   @Local showSpeed: boolean = false
   @Local showSleep: boolean = false
   @Local showChapter: boolean = false
-  @Local speed: media.PlaybackSpeed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
   @Local speedIcon: Resource = $r('sys.symbol.speed_100percent')
   @Local tmpBookmarkTitle: string = ""
   @Local tmpBookmarkTime: number = 0
@@ -52,6 +52,46 @@ export struct Play {
   @Local editBookmarkIndex: number = 0
   @Local maxIntroLine: number = 5
   @Local showMoreIntro: boolean = false
+  @Monitor('playingItem')
+  async setSpeed(monitor: IMonitor) {
+    if (this.playSetting?.rememberSpeed === true) {
+      this.speed = this.playSetting.globalSpeed
+    } else {
+      this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
+    }
+  }
+  @Monitor('speed')
+  async speedMonitoring(monitor: IMonitor) {
+    this.changeSpeedIcon()
+  }
+
+  changeSpeedIcon() {
+    switch(this.speed) {
+      case media.PlaybackSpeed.SPEED_FORWARD_0_50_X:
+        this.speedIcon = $r('sys.symbol.speed_50percent')
+        break;
+      case media.PlaybackSpeed.SPEED_FORWARD_0_75_X:
+        this.speedIcon = $r('sys.symbol.speed_75percent')
+        break;
+      case media.PlaybackSpeed.SPEED_FORWARD_1_00_X:
+        this.speedIcon = $r('sys.symbol.speed_100percent')
+        break;
+      case media.PlaybackSpeed.SPEED_FORWARD_1_25_X:
+        this.speedIcon = $r('sys.symbol.speed_125percent')
+        break;
+      case media.PlaybackSpeed.SPEED_FORWARD_1_50_X:
+        this.speedIcon = $r('sys.symbol.speed_150percent')
+        break;
+      case media.PlaybackSpeed.SPEED_FORWARD_1_75_X:
+        this.speedIcon = $r('sys.symbol.speed_175percent')
+        break;
+      case media.PlaybackSpeed.SPEED_FORWARD_2_00_X:
+        this.speedIcon = $r('sys.symbol.speed_200percent')
+        break;
+      default :
+        break;
+    }
+  }
 
   formatTime(timestamp: number): string {
     const date = new Date(timestamp)
@@ -427,7 +467,6 @@ export struct Play {
         .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_50_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_50_X
-          this.speedIcon = $r('sys.symbol.speed_50percent')
           this.avPlayer!.setSpeed(this.speed)
           this.showSpeed = false
         })
@@ -442,7 +481,6 @@ export struct Play {
         .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_75_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_75_X
-          this.speedIcon = $r('sys.symbol.speed_75percent')
           this.avPlayer!.setSpeed(this.speed)
           this.showSpeed = false
         })
@@ -457,7 +495,6 @@ export struct Play {
         .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_00_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
-          this.speedIcon = $r('sys.symbol.speed_100percent')
           this.avPlayer!.setSpeed(this.speed)
           this.showSpeed = false
         })
@@ -472,7 +509,6 @@ export struct Play {
         .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_25_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_25_X
-          this.speedIcon = $r('sys.symbol.speed_125percent')
           this.avPlayer!.setSpeed(this.speed)
           this.showSpeed = false
         })
@@ -487,7 +523,6 @@ export struct Play {
         .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_50_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_50_X
-          this.speedIcon = $r('sys.symbol.speed_150percent')
           this.avPlayer!.setSpeed(this.speed)
           this.showSpeed = false
         })
@@ -502,7 +537,6 @@ export struct Play {
         .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_75_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_75_X
-          this.speedIcon = $r('sys.symbol.speed_175percent')
           this.avPlayer!.setSpeed(this.speed)
           this.showSpeed = false
         })
@@ -517,7 +551,6 @@ export struct Play {
         .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_2_00_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_2_00_X
-          this.speedIcon = $r('sys.symbol.speed_200percent')
           this.avPlayer!.setSpeed(this.speed)
           this.showSpeed = false
         })
@@ -1178,6 +1211,7 @@ export struct Play {
     })
     .onClick(() => {
       this.showPlay = true
+      this.changeSpeedIcon()
     })
   }
 

@@ -7,6 +7,7 @@ import { Library, LoginInfo, PlayItem, User } from "../utils/Interface";
 import { avSession } from "@kit.AVSessionKit";
 import { BusinessError } from '@kit.BasicServicesKit';
 import { bundleManager } from '@kit.AbilityKit';
+import { media } from "@kit.MediaKit";
 
 let bundleFlags = bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT;
 let bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleFlags)
@@ -40,6 +41,7 @@ export struct Setting {
   @Consumer() playingTitle: string = "-"
   @Consumer() playingIndex: number = 0
   @Consumer() session: avSession.AVSession | undefined = undefined
+  @Consumer() speed: media.PlaybackSpeed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
   @Local showProgress:boolean = false
   @Local showAddServer: boolean = false
   @Local showEditServer: boolean = false
@@ -871,6 +873,29 @@ export struct Setting {
           }
           .width('100%')
           .justifyContent(FlexAlign.SpaceBetween)
+
+          Row() {
+            Text("全局记忆倍速")
+              .fontSize(20)
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+            Toggle({ type: ToggleType.Switch, isOn: this.playSetting?.rememberSpeed })
+              .selectedColor($r('sys.color.comp_emphasize_secondary'))
+              .onClick(() => {
+                if (this.playSetting) {
+                  this.playSetting.rememberSpeed = !this.playSetting.rememberSpeed
+                  if (this.playSetting.rememberSpeed === true && this.isStartPlaying) {
+                    this.playSetting.globalSpeed = this.speed
+                  } else {
+                    this.playSetting.globalSpeed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
+                  }
+                }
+              })
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.SpaceBetween)
+          .margin({ top: 5 })
 
           Row() {
             Text("快进快退时间")

@@ -60,6 +60,8 @@ export class ColorMode {
 @ObservedV2
 export class PlaySetting {
   @Trace fadeInOut: boolean = false
+  @Trace rememberSpeed: boolean = false
+  @Trace globalSpeed: media.PlaybackSpeed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
   @Trace skipIntervals: number = 10
 }
 
@@ -110,6 +112,7 @@ struct Index {
   @Provider() searchResult: SearchResult | undefined = undefined
   @Provider() showLoadingProgress: boolean = false
   @Provider() firstAppear: boolean = false
+  @Provider() speed: media.PlaybackSpeed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
   @Provider() serverName: string =
     this.serverSetting && this.serverSetting?.loginInfos.length > 0 && this.serverIndex?.serverIndex !== -1 ?
       this.serverSetting?.loginInfos[this.serverIndex?.serverIndex!].name : ""
@@ -486,6 +489,9 @@ struct Index {
           console.info("设置速度 未知");
           break;
       }
+      if (this.playSetting?.rememberSpeed === true) {
+        this.playSetting.globalSpeed = data
+      }
     })
     avPlayer.on('volumeChange', (vol: number) => {
       console.info('设置播放音量' + vol)
@@ -536,6 +542,7 @@ struct Index {
             this.avPlayer!.seek(this.playStartTime * 1000)
             this.playStartTime = 0
           }
+          this.avPlayer!.setSpeed(this.speed)
           if (this.isPlaying === true) {
             if (this.playSetting?.fadeInOut) {
               this.fadeIn()
@@ -712,6 +719,7 @@ struct Index {
     this.registerInterception()
     this.avPlayer = await media.createAVPlayer();
     this.setAVPlayerCallback(this.avPlayer!);
+    this.speed = this.playSetting?.globalSpeed??media.PlaybackSpeed.SPEED_FORWARD_1_00_X
     this.downloadManager = new DownloadManager(this.context!);
     try {
       const documentViewPicker = new picker.DocumentViewPicker(this.context!);
