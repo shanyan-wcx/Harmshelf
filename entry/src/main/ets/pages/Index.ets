@@ -25,7 +25,6 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { media } from '@kit.MediaKit';
 import { backgroundTaskManager } from '@kit.BackgroundTasksKit';
 import { audio } from '@kit.AudioKit';
-import { CountdownTimer } from '../utils/Class';
 import { closeSession, getUser, syncSession } from '../utils/Api';
 import { bundleManager } from '@kit.AbilityKit';
 import { fileIo as fs, fileUri, picker } from '@kit.CoreFileKit';
@@ -149,7 +148,6 @@ struct Index {
   @Provider() session: avSession.AVSession | undefined = undefined
   @Provider() sleepTime: number = 0
   @Provider() sliderMoving: boolean = false
-  @Provider() sleepController: CountdownTimer | undefined = undefined
   @Provider() syncTime: number = 0
   @Provider() logs: string[] = []
   @Provider() downloadUri: string = ""
@@ -444,6 +442,16 @@ struct Index {
     avPlayer.on('timeUpdate', async (time: number) => {
       this.elapsedTime += 100
       this.playedTime = time / 1000
+      if (this.sleepTime !== 0 && (this.sleepTime + 0.2/*延时，防止跟播放完成时的判断冲突*/) <= (this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset)) {
+        setTimeout(() => {
+          if (this.playSetting?.fadeInOut) {
+            this.fadeOut()
+          } else {
+            this.avPlayer!.pause()
+          }
+          this.sleepTime = 0
+        }, 200/*延时*/);
+      }
       if (this.sliderMoving === false) {
         this.playedPercent = this.playedTime / this.playingItem!.audioTracks[this.playingIndex].duration * 100
       }
@@ -564,25 +572,28 @@ struct Index {
           this.isPlaying = true
           await this.setPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PLAY)
           this.startContinuousTask()
-          this.sleepController?.start()
           break;
         case 'paused':
           console.info('播放器暂停。');
           this.isPlaying = false
           await this.setPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PAUSE)
           this.stopContinuousTask()
-          this.sleepController?.pause()
           break;
         case 'completed':
           console.info('播放完毕。');
           this.syncProgress()
-          if (this.playingIndex < this.playingItem!.audioTracks.length - 1) {
-            await this.avPlayer!.reset()
-            this.playingIndex++
-            this.playingTitle = this.playingItem!.chapters[this.playingIndex].title
-            this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
-          } else {
+          if (this.sleepTime !== 0 && Number(this.sleepTime.toFixed(3)) <= Number((this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset).toFixed(3))) {
             this.isPlaying = false
+            this.sleepTime = 0
+          } else {
+            if (this.playingIndex < this.playingItem!.audioTracks.length - 1) {
+              await this.avPlayer!.reset()
+              this.playingIndex++
+              this.playingTitle = this.playingItem!.chapters[this.playingIndex].title
+              this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+            } else {
+              this.isPlaying = false
+            }
           }
           break;
         case 'stopped':
@@ -596,7 +607,6 @@ struct Index {
           this.playedTime = 0
           this.playedPercent = 0
           this.sleepTime = 0
-          this.sleepController?.clear()
           this.playingItem = undefined
           this.playingIndex = 0
           setTimeout(() => {
