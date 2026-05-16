@@ -849,7 +849,7 @@ export struct Play {
                     .geometryTransition("cover")
                     .margin({ bottom: 40 })
                 } else if (this.localPlayItem?.coverPath) {
-                  Image(this.localPlayItem.coverPath)
+                  Image(fileUri.getUriFromPath(this.localPlayItem.coverPath))
                     .alt($rawfile('nocover.jpg'))
                     .objectFit(ImageFit.Cover)
                     .width(deviceTypeInfo === '2in1' ?

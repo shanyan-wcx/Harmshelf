@@ -70,6 +70,11 @@ export class OtherSetting {
   @Trace hideReport: boolean = false
 }
 
+@ObservedV2
+export class DownloadSetting {
+  @Trace skipExistingFiles: boolean = false
+}
+
 @Entry
 @ComponentV2
 struct Index {
@@ -78,6 +83,7 @@ struct Index {
   @Provider() colorMode: ColorMode | undefined = PersistenceV2.connect(ColorMode, () => new ColorMode());
   @Provider() playSetting: PlaySetting | undefined = PersistenceV2.connect(PlaySetting, () => new PlaySetting());
   @Provider() otherSetting: OtherSetting | undefined = PersistenceV2.connect(OtherSetting, () => new OtherSetting());
+  @Provider() downloadSetting: DownloadSetting | undefined = PersistenceV2.connect(DownloadSetting, () => new DownloadSetting());
   @Provider() displayWidth: number = 0
   @Provider() displayHeight: number = 0
   @Provider() selectThemeIndex: number = 0

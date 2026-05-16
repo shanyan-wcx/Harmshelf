@@ -34,7 +34,7 @@ import { reportBuilder, EpisodeComponent1 } from "../utils/Component";
 import { media } from "@kit.MediaKit";
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
-import { OtherSetting } from "./Index";
+import { DownloadSetting, OtherSetting } from "./Index";
 
 @Builder
 export function libraryItemDetailBuilder(name: string, param: Object) {
@@ -45,6 +45,7 @@ export function libraryItemDetailBuilder(name: string, param: Object) {
 export struct LibraryItemDetail {
   private libraryDetailScroller: Scroller = new Scroller();
   @Consumer() otherSetting: OtherSetting | undefined = PersistenceV2.connect(OtherSetting, () => new OtherSetting());
+  @Consumer() downloadSetting: DownloadSetting | undefined = PersistenceV2.connect(DownloadSetting, () => new DownloadSetting());
   @Consumer() downloadManager: DownloadManager | undefined = undefined
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() displayWidth: number = 0
@@ -472,45 +473,52 @@ export struct LibraryItemDetail {
             fs.mkdirSync(dir);
           }
           this.libraryItem?.media.tracks?.forEach(async (track: Track, index) => {
-            const task = new DownloadTaskInfo()
-            task.mediaType = this.libraryItem!.mediaType
-            task.folder = this.libraryItem!.media.metadata.title
-            task.id = this.libraryItem!.id + "_" + track.index
-            task.title = track.metadata.filename
-            task.url = this.baseUrl + track.contentUrl + "?token=" + this.apiToken
-            task.filePath = dir + "/" + track.metadata.filename
-            this.downloadTasks.push(task)
-            this.downloadCount = this.downloadTasks.length
-            this.downloadManager!.add(
-              this.libraryItem!.mediaType,
-              this.libraryItem!.media.metadata.title,
-              this.libraryItem!.id + "_" + track.index,
-              track.metadata.filename,
-              this.baseUrl + track.contentUrl + "?token=" + this.apiToken,
-              dir + "/" + track.metadata.filename,
-              (info) => {
-                // 下载进度回调
-                console.info('Progress:', info.title, Math.floor(info.progress) + "%");
-                let index = this.downloadTasks.findIndex(t => t.id === info.id)
-                if (index >= 0) {
-                  this.downloadTasks[index].progress = info.progress;
-                }
-              },
-              (info) => {
-                // 状态变化回调
-                console.info('Status changed:', info.title, info.status);
-                let index = this.downloadTasks.findIndex(t => t.id === info.id)
-                if (index >= 0) {
-                  if (info.status === DownloadStatus.Removed) {
-                    this.downloadTasks.splice(index, 1);
-                    this.downloadCount = this.downloadTasks.length
-                  } else {
-                    this.downloadTasks[index].status = info.status;
+            const filePath = dir + "/" + track.metadata.filename
+            if (this.downloadSetting?.skipExistingFiles && fs.accessSync(filePath)) {
+              console.info('文件已存在，跳过:', filePath)
+            } else {
+              const task = new DownloadTaskInfo()
+              task.mediaType = this.libraryItem!.mediaType
+              task.folder = this.libraryItem!.media.metadata.title
+              task.id = this.libraryItem!.id + "_" + track.index
+              task.title = track.metadata.filename
+              task.url = this.baseUrl + track.contentUrl + "?token=" + this.apiToken
+              task.filePath = filePath
+              this.downloadTasks.push(task)
+              this.downloadCount = this.downloadTasks.length
+              this.downloadManager!.add(
+                this.libraryItem!.mediaType,
+                this.libraryItem!.media.metadata.title,
+                this.libraryItem!.id + "_" + track.index,
+                track.metadata.filename,
+                this.baseUrl + track.contentUrl + "?token=" + this.apiToken,
+                filePath,
+                (info) => {
+                  // 下载进度回调
+                  console.info('Progress:', info.title, Math.floor(info.progress) + "%");
+                  let index = this.downloadTasks.findIndex(t => t.id === info.id)
+                  if (index >= 0) {
+                    this.downloadTasks[index].progress = info.progress;
+                  }
+                },
+                (info) => {
+                  // 状态变化回调
+                  console.info('Status changed:', info.title, info.status);
+                  let index = this.downloadTasks.findIndex(t => t.id === info.id)
+                  if (index >= 0) {
+                    if (info.status === DownloadStatus.Removed) {
+                      this.downloadTasks.splice(index, 1);
+                      this.downloadCount = this.downloadTasks.length
+                    } else {
+                      this.downloadTasks[index].status = info.status;
+                    }
                   }
                 }
-              }
-            );
+              )
+            };
           })
+          const coverUrl = this.baseUrl + `/api/items/${this.libraryItem!.id}/cover?token=${this.apiToken}`
+          this.downloadManager!.downloadCover(coverUrl, dir + "/cover.jpg")
         })
       }
     }

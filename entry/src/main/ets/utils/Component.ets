@@ -39,6 +39,7 @@ import {
 } from "./Interface"
 import { media } from "@kit.MediaKit";
 import { DownloadStatus, DownloadTaskInfo, DownloadManager } from "./Class";
+import { DownloadSetting } from "../pages/Index";
 import { fileUri, fileIo as fs } from "@kit.CoreFileKit";
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
@@ -951,6 +952,7 @@ export struct EpisodeComponent {
   @Consumer() downloadUri: string = ""
   @Consumer() downloadTasks: DownloadTaskInfo[] = []
   @Consumer() downloadCount: number = 0
+  @Consumer() downloadSetting: DownloadSetting | undefined = undefined
   @Consumer() toCloseSession: PlayItem | undefined = undefined
   @Consumer() toCloseIndex: number = 0
   @Local podcast: LibraryItem | undefined = undefined
@@ -1047,44 +1049,51 @@ export struct EpisodeComponent {
           if (!existsDir) {
             fs.mkdirSync(dir);
           }
-          const task = new DownloadTaskInfo()
-          task.mediaType = this.library!.mediaType
-          task.folder = this.podcast!.media.metadata.title
-          task.id = this.item!.id!
-          task.title = this.item!.audioFile!.metadata.filename
-          task.url = this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken
-          task.filePath = dir + "/" + this.item!.audioFile!.metadata.filename
-          this.downloadTasks.push(task)
-          this.downloadCount = this.downloadTasks.length
-          this.downloadManager!.add(
-            this.library!.mediaType,
-            this.podcast!.media.metadata.title,
-            this.item!.id!,
-            this.item!.audioFile!.metadata.filename,
-            this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken,
-            dir + "/" + this.item!.audioFile!.metadata.filename,
-            (info) => {
-              // 下载进度回调
-              console.info('Progress:', info.title, Math.floor(info.progress) + "%");
-              let index = this.downloadTasks.findIndex(t => t.id === info.id)
-              if (index >= 0) {
-                this.downloadTasks[index].progress = info.progress;
-              }
-            },
-            (info) => {
-              // 状态变化回调
-              console.info('Status changed:', info.title, info.status);
-              let index = this.downloadTasks.findIndex(t => t.id === info.id)
-              if (index >= 0) {
-                if (info.status === DownloadStatus.Removed) {
-                  this.downloadTasks.splice(index, 1);
-                  this.downloadCount = this.downloadTasks.length
-                } else {
-                  this.downloadTasks[index].status = info.status
+          const filePath = dir + "/" + this.item!.audioFile!.metadata.filename
+          if (this.downloadSetting?.skipExistingFiles && fs.accessSync(filePath)) {
+            console.info('文件已存在，跳过:', filePath)
+          } else {
+            const task = new DownloadTaskInfo()
+            task.mediaType = this.library!.mediaType
+            task.folder = this.podcast!.media.metadata.title
+            task.id = this.item!.id!
+            task.title = this.item!.audioFile!.metadata.filename
+            task.url = this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken
+            task.filePath = filePath
+            this.downloadTasks.push(task)
+            this.downloadCount = this.downloadTasks.length
+            this.downloadManager!.add(
+              this.library!.mediaType,
+              this.podcast!.media.metadata.title,
+              this.item!.id!,
+              this.item!.audioFile!.metadata.filename,
+              this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken,
+              filePath,
+              (info) => {
+                // 下载进度回调
+                console.info('Progress:', info.title, Math.floor(info.progress) + "%");
+                let index = this.downloadTasks.findIndex(t => t.id === info.id)
+                if (index >= 0) {
+                  this.downloadTasks[index].progress = info.progress;
+                }
+              },
+              (info) => {
+                // 状态变化回调
+                console.info('Status changed:', info.title, info.status);
+                let index = this.downloadTasks.findIndex(t => t.id === info.id)
+                if (index >= 0) {
+                  if (info.status === DownloadStatus.Removed) {
+                    this.downloadTasks.splice(index, 1);
+                    this.downloadCount = this.downloadTasks.length
+                  } else {
+                    this.downloadTasks[index].status = info.status;
+                  }
                 }
               }
-            }
-          );
+            )
+          }
+          const coverUrl = this.baseUrl + `/api/items/${this.item.libraryItemId}/cover?token=${this.apiToken}`
+          this.downloadManager!.downloadCover(coverUrl, dir + "/cover.jpg")
         })
       }
     }
@@ -1572,6 +1581,7 @@ export struct EpisodeComponent1 {
   @Consumer() downloadUri: string = ""
   @Consumer() downloadTasks: DownloadTaskInfo[] = []
   @Consumer() downloadCount: number = 0
+  @Consumer() downloadSetting: DownloadSetting | undefined = undefined
   @Consumer() toCloseSession: PlayItem | undefined = undefined
   @Consumer() toCloseIndex: number = 0
   @Local podcast: LibraryItem | undefined = undefined
@@ -1668,44 +1678,51 @@ export struct EpisodeComponent1 {
           if (!existsDir) {
             fs.mkdirSync(dir);
           }
-          const task = new DownloadTaskInfo()
-          task.mediaType = this.library!.mediaType
-          task.folder = this.podcast!.media.metadata.title
-          task.id = this.item!.id!
-          task.title = this.item!.audioFile!.metadata.filename
-          task.url = this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken
-          task.filePath = dir + "/" + this.item!.audioFile!.metadata.filename
-          this.downloadTasks.push(task)
-          this.downloadCount = this.downloadTasks.length
-          this.downloadManager!.add(
-            this.library!.mediaType,
-            this.podcast!.media.metadata.title,
-            this.item!.id!,
-            this.item!.audioFile!.metadata.filename,
-            this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken,
-            dir + "/" + this.item!.audioFile!.metadata.filename,
-            (info) => {
-              // 下载进度回调
-              console.info('Progress:', info.title, Math.floor(info.progress) + "%");
-              let index = this.downloadTasks.findIndex(t => t.id === info.id)
-              if (index >= 0) {
-                this.downloadTasks[index].progress = info.progress;
-              }
-            },
-            (info) => {
-              // 状态变化回调
-              console.info('Status changed:', info.title, info.status);
-              let index = this.downloadTasks.findIndex(t => t.id === info.id)
-              if (index >= 0) {
-                if (info.status === DownloadStatus.Removed) {
-                  this.downloadTasks.splice(index, 1);
-                  this.downloadCount = this.downloadTasks.length
-                } else {
-                  this.downloadTasks[index].status = info.status;
+          const filePath = dir + "/" + this.item!.audioFile!.metadata.filename
+          if (this.downloadSetting?.skipExistingFiles && fs.accessSync(filePath)) {
+            console.info('文件已存在，跳过:', filePath)
+          } else {
+            const task = new DownloadTaskInfo()
+            task.mediaType = this.library!.mediaType
+            task.folder = this.podcast!.media.metadata.title
+            task.id = this.item!.id!
+            task.title = this.item!.audioFile!.metadata.filename
+            task.url = this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken
+            task.filePath = filePath
+            this.downloadTasks.push(task)
+            this.downloadCount = this.downloadTasks.length
+            this.downloadManager!.add(
+              this.library!.mediaType,
+              this.podcast!.media.metadata.title,
+              this.item!.id!,
+              this.item!.audioFile!.metadata.filename,
+              this.baseUrl + this.item!.audioTrack?.contentUrl + "?token=" + this.apiToken,
+              filePath,
+              (info) => {
+                // 下载进度回调
+                console.info('Progress:', info.title, Math.floor(info.progress) + "%");
+                let index = this.downloadTasks.findIndex(t => t.id === info.id)
+                if (index >= 0) {
+                  this.downloadTasks[index].progress = info.progress;
+                }
+              },
+              (info) => {
+                // 状态变化回调
+                console.info('Status changed:', info.title, info.status);
+                let index = this.downloadTasks.findIndex(t => t.id === info.id)
+                if (index >= 0) {
+                  if (info.status === DownloadStatus.Removed) {
+                    this.downloadTasks.splice(index, 1);
+                    this.downloadCount = this.downloadTasks.length
+                  } else {
+                    this.downloadTasks[index].status = info.status;
+                  }
                 }
               }
-            }
-          );
+            )
+          }
+          const coverUrl = this.baseUrl + `/api/items/${this.item.libraryItemId}/cover?token=${this.apiToken}`
+          this.downloadManager!.downloadCover(coverUrl, dir + "/cover.jpg")
         })
       }
     }

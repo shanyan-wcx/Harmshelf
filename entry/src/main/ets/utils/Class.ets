@@ -249,4 +249,25 @@ export class DownloadManager {
   getAllTaskInfo(): DownloadTaskInfo[] {
     return Array.from(this.tasks.values(), t => t.info);
   }
+
+  // 下载封面（不加入下载队列追踪）
+  async downloadCover(url: string, filePath: string): Promise<void> {
+    try {
+      const file = fs.openSync(filePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE);
+      fs.closeSync(file.fd);
+      let config: request.agent.Config = {
+        action: request.agent.Action.DOWNLOAD,
+        url: url,
+        saveas: fileUri.getUriFromPath(filePath),
+        gauge: false,
+        overwrite: true,
+        network: request.agent.Network.ANY,
+        mode: request.agent.Mode.FOREGROUND,
+      };
+      const task = await request.agent.create(this.context, config);
+      task.start();
+    } catch (err) {
+      console.error(`封面下载失败: ${err}`);
+    }
+  }
 }
