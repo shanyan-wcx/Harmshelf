@@ -1,8 +1,9 @@
 import { HdsActionBar, ActionBarButton, HdsListItem } from '@kit.UIDesignKit'
-import { Bookmark, Chapter, PlayItem, User } from '../utils/Interface'
+import { Bookmark, Chapter, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
 import { CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier } from '@kit.ArkUI'
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import { env } from '../utils/Class';
+import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { deviceInfo } from "@kit.BasicServicesKit";
 import { createBookmark, deleteBookmark, getBookmarks } from '../utils/Api';
 import { PlaySetting } from './Index';
@@ -21,6 +22,8 @@ export struct Play {
   @Consumer() isStartPlaying: boolean = false
   @Consumer() showPlay: boolean = false
   @Consumer() playingItem: PlayItem | undefined = undefined
+  @Consumer() localPlayItem: LocalPlayItem | undefined = undefined
+  @Consumer() isLocalPlaying: boolean = false
   @Consumer() baseUrl: string = ""
   @Consumer() apiToken: string = ""
   @Consumer() playingTitle: string = "-"
@@ -32,6 +35,7 @@ export struct Play {
   @Consumer() playStartTime: number = 0
   @Consumer() playedTime: number = 0
   @Consumer() playedPercent: number = 0
+  @Consumer() currentTrackDuration: number = 0
   @Consumer() sleepTime: number = 0
   @Consumer() sliderMoving: boolean = false
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
@@ -138,6 +142,13 @@ export struct Play {
     }
     formattedTime += `${minutes} min`;
     return formattedTime;
+  }
+
+  getCurrentDuration(): number {
+    if (this.isLocalPlaying) {
+      return this.currentTrackDuration
+    }
+    return this.playingItem?.audioTracks[this.playingIndex]?.duration ?? 0
   }
 
   fadeIn() {
@@ -666,46 +677,88 @@ export struct Play {
   @Builder
   chapterBuilder() {
     Column() {
-      List({ scroller: this.chapterScroller }) {
-        ForEach(this.playingItem!.chapters, (chapter: Chapter, index) => {
-          ListItem() {
-            Button({ type: ButtonType.Normal }) {
-              Row() {
-                Text(chapter.title)
-                  .fontSize(16)
-                  .width('100%')
-                  .layoutWeight(1)
-                  .maxLines(1)
-                  .textOverflow({ overflow: TextOverflow.Ellipsis })
-
-                Text(this.formatSeconds(chapter.start))
-                  .fontSize(16)
-                  .fontColor($r('sys.color.font_secondary'))
-                  .margin({ left: 10 })
+      if (this.isLocalPlaying) {
+        List({ scroller: this.chapterScroller }) {
+          ForEach(this.localPlayItem!.tracks, (track: LocalTrack, index: number) => {
+            ListItem() {
+              Button({ type: ButtonType.Normal }) {
+                Row() {
+                  Text(track.title)
+                    .fontSize(16)
+                    .width('100%')
+                    .layoutWeight(1)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                }
               }
+              .width('100%')
+              .height(50)
+              .borderRadius(8)
+              .padding({ left: 15, right: 15 })
+              .backgroundColor(this.playingIndex === index ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
+              .onClick(async () => {
+                this.showChapter = false
+                await this.avPlayer!.reset();
+                this.playingIndex = index
+                this.playingTitle = track.title
+                try {
+                  const file = fs.openSync(track.filePath, fs.OpenMode.READ_ONLY)
+                  this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+                } catch (_) {
+                  this.getUIContext().getPromptAction().showToast({ message: '播放失败，格式不支持或文件不存在！', duration: 500 })
+                }
+              })
             }
-            .width('100%')
-            .height(50)
-            .borderRadius(8)
-            .padding({ left: 15, right: 15 })
-            .backgroundColor(this.playingIndex === index ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
-            .onClick(async () => {
-              this.showChapter = false
-              await this.avPlayer!.reset();
-              this.isPlaying = true
-              this.playingIndex = index
-              this.playingTitle = chapter.title
-              this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
-            })
-          }
-        })
+          })
+        }
+        .width('100%')
+        .height('100%')
+        .padding({ left: 20, right: 20, bottom: 25 })
+        .scrollBar(BarState.Off)
+        .borderRadius(8)
+        .clip(true)
+      } else {
+        List({ scroller: this.chapterScroller }) {
+          ForEach(this.playingItem!.chapters, (chapter: Chapter, index) => {
+            ListItem() {
+              Button({ type: ButtonType.Normal }) {
+                Row() {
+                  Text(chapter.title)
+                    .fontSize(16)
+                    .width('100%')
+                    .layoutWeight(1)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+                  Text(this.formatSeconds(chapter.start))
+                    .fontSize(16)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .margin({ left: 10 })
+                }
+              }
+              .width('100%')
+              .height(50)
+              .borderRadius(8)
+              .padding({ left: 15, right: 15 })
+              .backgroundColor(this.playingIndex === index ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
+              .onClick(async () => {
+                this.showChapter = false
+                await this.avPlayer!.reset();
+                this.isPlaying = true
+                this.playingIndex = index
+                this.playingTitle = chapter.title
+                this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+              })
+            }
+          })
+        }
+        .width('100%')
+        .height('100%')
+        .padding({ left: 20, right: 20, bottom: 25 })
+        .scrollBar(BarState.Off)
+        .borderRadius(8)
+        .clip(true)
       }
-      .width('100%')
-      .height('100%')
-      .padding({ left: 20, right: 20, bottom: 25 })
-      .scrollBar(BarState.Off)
-      .borderRadius(8)
-      .clip(true)
     }
   }
 
@@ -741,7 +794,7 @@ export struct Play {
               })
 
               Row() {
-                Text("睡眠定时 " + ((this.sleepTime !== 0 && this.playingItem!.audioTracks !== undefined) ? this.formatSleepTime(this.sleepTime - this.playedTime - this.playingItem!.audioTracks[this.playingIndex].startOffset) : 0))
+                Text("睡眠定时 " + ((this.sleepTime !== 0 && !this.isLocalPlaying && this.playingItem!.audioTracks !== undefined) ? this.formatSleepTime(this.sleepTime - this.playedTime - this.playingItem!.audioTracks[this.playingIndex].startOffset) : 0))
                   .fontSize(18)
               }
               .height(40)
@@ -770,6 +823,9 @@ export struct Play {
                 value: "关闭播放器",
                 action: () => {
                   this.avPlayer!.stop()
+                  this.showPlay = false
+                  this.isStartPlaying = false
+                  this.isPlaying = false
                 }
               }])
             }
@@ -780,17 +836,42 @@ export struct Play {
 
             Column() {
               if (this.displayHeight >= 700) {
-                Image(this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`)
-                  .alt($rawfile('nocover.jpg'))
-                  .objectFit(ImageFit.Cover)
-                  .width(deviceTypeInfo === '2in1' ?
-                    (((this.displayWidth / 2) - 60) > (this.displayHeight / 2) ? this.displayHeight / 2 : '100%') :
-                    ((this.displayWidth > (this.displayHeight * 3 / 5)) ? this.displayHeight / 3 : '100%'))
-                  .aspectRatio(1)
-                  .borderRadius(10)
-                  .draggable(false)
-                  .geometryTransition("cover")
-                  .margin({ bottom: 40 })
+                if (!this.isLocalPlaying) {
+                  Image(this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`)
+                    .alt($rawfile('nocover.jpg'))
+                    .objectFit(ImageFit.Cover)
+                    .width(deviceTypeInfo === '2in1' ?
+                      (((this.displayWidth / 2) - 60) > (this.displayHeight / 2) ? this.displayHeight / 2 : '100%') :
+                      ((this.displayWidth > (this.displayHeight * 3 / 5)) ? this.displayHeight / 3 : '100%'))
+                    .aspectRatio(1)
+                    .borderRadius(10)
+                    .draggable(false)
+                    .geometryTransition("cover")
+                    .margin({ bottom: 40 })
+                } else if (this.localPlayItem?.coverPath) {
+                  Image(this.localPlayItem.coverPath)
+                    .alt($rawfile('nocover.jpg'))
+                    .objectFit(ImageFit.Cover)
+                    .width(deviceTypeInfo === '2in1' ?
+                      (((this.displayWidth / 2) - 60) > (this.displayHeight / 2) ? this.displayHeight / 2 : '100%') :
+                      ((this.displayWidth > (this.displayHeight * 3 / 5)) ? this.displayHeight / 3 : '100%'))
+                    .aspectRatio(1)
+                    .borderRadius(10)
+                    .draggable(false)
+                    .geometryTransition("cover")
+                    .margin({ bottom: 40 })
+                } else {
+                  Image($rawfile('nocover.jpg'))
+                    .objectFit(ImageFit.Cover)
+                    .width(deviceTypeInfo === '2in1' ?
+                      (((this.displayWidth / 2) - 60) > (this.displayHeight / 2) ? this.displayHeight / 2 : '100%') :
+                      ((this.displayWidth > (this.displayHeight * 3 / 5)) ? this.displayHeight / 3 : '100%'))
+                    .aspectRatio(1)
+                    .borderRadius(10)
+                    .draggable(false)
+                    .geometryTransition("cover")
+                    .margin({ bottom: 40 })
+                }
               }
 
               Column() {
@@ -803,9 +884,10 @@ export struct Play {
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                Text(this.playingItem?.mediaType === 'book' ?
+                Text(this.isLocalPlaying ? "本地文件" :
+                  (this.playingItem?.mediaType === 'book' ?
                   this.playingItem?.mediaMetadata.authors?.map(item => item.name).join(", ") :
-                  this.playingItem?.displayAuthor)
+                  this.playingItem?.displayAuthor))
                   .width('100%')
                   .fontSize(18)
                   .fontWeight(FontWeight.Medium)
@@ -822,11 +904,11 @@ export struct Play {
               Column() {
                 Column() {
                   Row() {
-                    Text(this.formatSeconds(this.playedPercent * (this.playingItem?.audioTracks[this.playingIndex].duration??0) / 100))
+                    Text(this.formatSeconds(this.playedPercent * this.getCurrentDuration() / 100))
                       .fontSize(16)
                       .fontWeight(FontWeight.Medium)
 
-                    Text(this.formatSeconds(this.playingItem?.audioTracks[this.playingIndex].duration??0))
+                    Text(this.formatSeconds(this.getCurrentDuration()))
                       .fontSize(16)
                       .fontWeight(FontWeight.Medium)
                   }
@@ -858,11 +940,12 @@ export struct Play {
                         this.sliderMoving = true
                       }
                       if (mode === SliderChangeMode.End && this.sliderMoving === true) {
-                        let seekTime = value * this.playingItem!.audioTracks[this.playingIndex].duration * 10
+                        let dur = this.getCurrentDuration()
+                        let seekTime = value * dur * 10
                         if (seekTime < 0) {
                           seekTime = 0
-                        } else if (seekTime > this.playingItem!.audioTracks[this.playingIndex].duration * 1000) {
-                          seekTime = this.playingItem!.audioTracks[this.playingIndex].duration * 1000
+                        } else if (seekTime > dur * 1000) {
+                          seekTime = dur * 1000
                         }
                         this.avPlayer!.seek(seekTime)
                         this.sliderMoving = false
@@ -885,8 +968,18 @@ export struct Play {
                   .onClick(async () => {
                     await this.avPlayer!.reset();
                     this.playingIndex--
-                    this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
-                    this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+                    if (this.isLocalPlaying) {
+                      this.playingTitle = this.localPlayItem!.tracks[this.playingIndex].title
+                      try {
+                        let file = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
+                        this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+                      } catch (_) {
+                        this.getUIContext().getPromptAction().showToast({ message: '播放失败，格式不支持或文件不存在！', duration: 500 })
+                      }
+                    } else {
+                      this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
+                      this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+                    }
                   })
                   .visibility(this.lockPlayer ? Visibility.Hidden : Visibility.Visible)
 
@@ -937,7 +1030,8 @@ export struct Play {
                   .width(50)
                   .backgroundColor(Color.Transparent)
                   .onClick(() => {
-                    this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < this.playingItem!.audioTracks[this.playingIndex].duration ? (this.playedTime + this.playSetting!.skipIntervals) * 1000 : this.playingItem!.audioTracks[this.playingIndex].duration * 1000)
+                    let dur = this.getCurrentDuration()
+                    this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < dur ? (this.playedTime + this.playSetting!.skipIntervals) * 1000 : dur * 1000)
                   })
                   .visibility(this.lockPlayer ? Visibility.Hidden : Visibility.Visible)
 
@@ -949,12 +1043,22 @@ export struct Play {
                   .height(40)
                   .width(40)
                   .backgroundColor(Color.Transparent)
-                  .enabled(this.playingIndex < (this.playingItem?.audioTracks.length??0) - 1 ? true : false)
+                  .enabled(this.playingIndex < (this.isLocalPlaying ? (this.localPlayItem?.tracks.length ?? 0) : (this.playingItem?.audioTracks.length ?? 0)) - 1 ? true : false)
                   .onClick(async () => {
                     await this.avPlayer!.reset();
                     this.playingIndex++
-                    this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
-                    this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+                    if (this.isLocalPlaying) {
+                      this.playingTitle = this.localPlayItem!.tracks[this.playingIndex].title
+                      try {
+                        let file = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
+                        this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+                      } catch (_) {
+                        this.getUIContext().getPromptAction().showToast({ message: '播放失败，格式不支持或文件不存在！', duration: 500 })
+                      }
+                    } else {
+                      this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
+                      this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+                    }
                   })
                   .visibility(this.lockPlayer ? Visibility.Hidden : Visibility.Visible)
                 }
@@ -971,7 +1075,7 @@ export struct Play {
                   .height(45)
                   .width(45)
                   .backgroundColor(Color.Transparent)
-                  .enabled(this.playingItem?.mediaType === 'book' ? true : false)
+                  .enabled(!this.isLocalPlaying && this.playingItem?.mediaType === 'book' ? true : false)
                   .onClick(() => {
                     this.tmpBookmarkTitle = ""
                     this.showBookmark = !this.showBookmark;
@@ -1048,7 +1152,7 @@ export struct Play {
                   .height(45)
                   .width(45)
                   .backgroundColor(Color.Transparent)
-                  .enabled(this.playingItem?.mediaType === 'book' ? true : false)
+                  .enabled(!this.isLocalPlaying ? this.playingItem?.mediaType === 'book' : (this.localPlayItem?.tracks.length ?? 0) > 1)
                   .onClick(() => {
                     this.showChapter = !this.showChapter;
                   })
@@ -1056,7 +1160,7 @@ export struct Play {
                     height: SheetSize.MEDIUM,
                     preferType: SheetType.CENTER,
                     title: {
-                      title: "章节 " + this.playingItem?.chapters.length
+                      title: this.isLocalPlaying ? ("章节 " + this.localPlayItem!.tracks.length) : ("章节 " + this.playingItem?.chapters.length)
                     },
                     showClose: false,
                     onWillAppear: () => {
@@ -1119,7 +1223,9 @@ export struct Play {
     }
     .width('100%')
     .height('100%')
-    .backgroundImage(this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`)
+    .backgroundImage(this.isLocalPlaying ?
+      (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
+      (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
     .backgroundImageSize(ImageSize.FILL)
     .backgroundBlurStyle(BlurStyle.BACKGROUND_ULTRA_THICK)
     .backgroundBrightness({
@@ -1133,7 +1239,9 @@ export struct Play {
   primaryButtonBuilder() {
     Button({ type: ButtonType.Circle }) {
       Stack() {
-        Image(this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`)
+        Image(this.isLocalPlaying ?
+          (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
+          (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
           .alt($rawfile('nocover.jpg'))
           .objectFit(ImageFit.Cover)
           .width(65)
@@ -1196,6 +1304,9 @@ export struct Play {
           baseIcon: $r('sys.symbol.stop_circle'),
           onClick: () => {
             this.avPlayer!.stop()
+            this.showPlay = false
+            this.isStartPlaying = false
+            this.isPlaying = false
           }
         })],
         endButtons: [new ActionBarButton({
@@ -1214,14 +1325,14 @@ export struct Play {
                 this.avPlayer!.play()
               }
             }
+            this.isPlaying = !this.isPlaying
           }
         }), new ActionBarButton({
           baseIcon: this.goforwardIcon,
           onClick: () => {
-            this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals <
-            this.playingItem!.audioTracks[this.playingIndex].duration ?
-              (this.playedTime + this.playSetting!.skipIntervals) * 1000 :
-              this.playingItem!.audioTracks[this.playingIndex].duration * 1000)
+            let dur = this.getCurrentDuration()
+            this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < dur ?
+              (this.playedTime + this.playSetting!.skipIntervals) * 1000 : dur * 1000)
           }
         })],
         primaryButtonBuilder: (): void => this.primaryButtonBuilder(),

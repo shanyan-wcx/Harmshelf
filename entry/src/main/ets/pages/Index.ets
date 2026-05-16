@@ -7,6 +7,7 @@ import {
   Episode,
   Library,
   LibraryItem,
+  LocalPlayItem,
   PlayItem,
   SearchResult,
   Series,
@@ -132,6 +133,8 @@ struct Index {
   @Provider() isPlaying: boolean = false
   @Provider() showPlay: boolean = false
   @Provider() playingItem: PlayItem | undefined = undefined
+  @Provider() localPlayItem: LocalPlayItem | undefined = undefined
+  @Provider() isLocalPlaying: boolean = false
   @Provider() playingTitle: string = "-"
   @Provider() playingIndex: number = 0
   @Provider() showAddServer: boolean = false
@@ -144,6 +147,7 @@ struct Index {
   @Provider() playStartTime: number = 0
   @Provider() playedTime: number = 0
   @Provider() playedPercent: number = 0
+  @Provider() currentTrackDuration: number = 0
   @Provider() avPlayer: media.AVPlayer | undefined = undefined
   @Provider() session: avSession.AVSession | undefined = undefined
   @Provider() sleepTime: number = 0
@@ -167,6 +171,48 @@ struct Index {
       this.toCloseIndex = 0
     }
   }
+
+  @Monitor('playingItem')
+  onPlayingItemChange(monitor: IMonitor) {
+    if (this.playingItem !== undefined) {
+      this.isLocalPlaying = false
+      this.localPlayItem = undefined
+      this.currentTrackDuration = 0
+    }
+  }
+
+  async findCoverInFolder(folderPath: string): Promise<string | undefined> {
+    const candidates = ['cover.jpg', 'cover.jpeg', 'cover.png', 'cover.webp', 'folder.jpg']
+    try {
+      const entries = await fs.listFile(folderPath)
+      for (let c of candidates) {
+        if (entries.includes(c)) {
+          return `${folderPath}/${c}`
+        }
+      }
+    } catch (_) {}
+    return undefined
+  }
+
+  async playLocal(localItem: LocalPlayItem, index: number) {
+    if (this.avPlayer === undefined) return
+    await this.avPlayer.reset()
+    if (!localItem.coverPath) {
+      localItem.coverPath = await this.findCoverInFolder(localItem.folderPath)
+    }
+    this.isLocalPlaying = true
+    this.localPlayItem = localItem
+    this.playingItem = undefined
+    this.playingIndex = index
+    this.playingTitle = localItem.tracks[index].title
+    this.playStartTime = 0
+    this.isPlaying = true
+    this.isStartPlaying = true
+    this.showPlay = true
+    const file = fs.openSync(localItem.tracks[index].filePath, fs.OpenMode.READ_ONLY)
+    this.avPlayer.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+  }
+
   pages?: HdsSideMenuMainItem[] = [
     new HdsSideMenuMainItem({
       symbol: new SymbolGlyphModifier($r('sys.symbol.house')),
@@ -356,9 +402,11 @@ struct Index {
     let metadata: avSession.AVMetadata = {
       assetId: this.playingIndex.toString(),
       title: this.playingTitle,
-      subtitle: this.playingItem!.displayAuthor,
-      duration: this.playingItem!.audioTracks[this.playingIndex].duration * 1000,
-      mediaImage: this.baseUrl + `/api/items/${this.playingItem!.libraryItemId}/cover?token=${this.apiToken}`,
+      subtitle: this.isLocalPlaying ? "本地文件" : this.playingItem!.displayAuthor,
+      duration: this.isLocalPlaying
+        ? this.localPlayItem!.tracks[this.playingIndex].duration * 1000
+        : this.playingItem!.audioTracks[this.playingIndex].duration * 1000,
+      mediaImage: this.isLocalPlaying ? "" : (this.baseUrl + `/api/items/${this.playingItem!.libraryItemId}/cover?token=${this.apiToken}`),
       skipIntervals: this.playSetting!.skipIntervals
     };
     this.session!.setAVMetadata(metadata).then(() => {
@@ -411,24 +459,50 @@ struct Index {
       this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ? (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
     })
     this.session!.on('fastForward', () => {
-      this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < this.playingItem!.audioTracks[this.playingIndex].duration ? (this.playedTime + this.playSetting!.skipIntervals) * 1000 : this.playingItem!.audioTracks[this.playingIndex].duration * 1000)
+      let dur = this.isLocalPlaying
+        ? this.localPlayItem!.tracks[this.playingIndex].duration
+        : this.playingItem!.audioTracks[this.playingIndex].duration
+      this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < dur ? (this.playedTime + this.playSetting!.skipIntervals) * 1000 : dur * 1000)
     })
-    if (this.playingIndex > 0) {
+    if (this.isLocalPlaying || this.playingIndex > 0) {
       this.session!.on('playPrevious', async () => {
         await this.avPlayer!.reset();
         this.playingIndex--
-        this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
-        this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+        this.playingTitle = this.isLocalPlaying
+          ? this.localPlayItem!.tracks[this.playingIndex].title
+          : (this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle)
+        if (this.isLocalPlaying) {
+          try {
+            const prevFile = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
+            this.avPlayer!.fdSrc = { fd: prevFile.fd, offset: 0, length: -1 }
+          } catch (_) {
+            this.uiContext?.getPromptAction().showToast({ message: '播放失败，格式不支持或文件不存在！', duration: 500 })
+          }
+        } else {
+          this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+        }
       });
     } else {
       this.session!.off('playPrevious')
     }
-    if (this.playingIndex < this.playingItem!.audioTracks.length - 1) {
+    let trackCount = this.isLocalPlaying ? this.localPlayItem!.tracks.length : this.playingItem!.audioTracks.length
+    if (this.playingIndex < trackCount - 1) {
       this.session!.on('playNext', async () => {
         await this.avPlayer!.reset();
         this.playingIndex++
-        this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
-        this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+        this.playingTitle = this.isLocalPlaying
+          ? this.localPlayItem!.tracks[this.playingIndex].title
+          : (this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle)
+        if (this.isLocalPlaying) {
+          try {
+            const nextFile = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
+            this.avPlayer!.fdSrc = { fd: nextFile.fd, offset: 0, length: -1 }
+          } catch (_) {
+            this.uiContext?.getPromptAction().showToast({ message: '播放失败，格式不支持或文件不存在！', duration: 500 })
+          }
+        } else {
+          this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+        }
       });
     } else {
       this.session!.off('playNext');
@@ -442,7 +516,7 @@ struct Index {
     avPlayer.on('timeUpdate', async (time: number) => {
       this.elapsedTime += 100
       this.playedTime = time / 1000
-      if (this.sleepTime !== 0 && (this.sleepTime + 0.2/*延时，防止跟播放完成时的判断冲突*/) <= (this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset)) {
+      if (this.isLocalPlaying === false && this.sleepTime !== 0 && (this.sleepTime + 0.2) <= (this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset)) {
         setTimeout(() => {
           if (this.playSetting?.fadeInOut) {
             this.fadeOut()
@@ -450,12 +524,13 @@ struct Index {
             this.avPlayer!.pause()
           }
           this.sleepTime = 0
-        }, 200/*延时*/);
+        }, 200);
       }
       if (this.sliderMoving === false) {
-        this.playedPercent = this.playedTime / this.playingItem!.audioTracks[this.playingIndex].duration * 100
+        let dur = this.isLocalPlaying ? this.currentTrackDuration : this.playingItem!.audioTracks[this.playingIndex].duration
+        this.playedPercent = dur > 0 ? this.playedTime / dur * 100 : 0
       }
-      if (this.elapsedTime >= 10000) {
+      if (!this.isLocalPlaying && this.elapsedTime >= 10000) {
         this.syncProgress()
       }
     })
@@ -468,7 +543,9 @@ struct Index {
         await this.setPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PAUSE)
       }
       this.sliderMoving = false
-      this.syncProgress()
+      if (!this.isLocalPlaying) {
+        this.syncProgress()
+      }
     })
     avPlayer.on('speedDone', (data: number) => {
       switch(data) {
@@ -503,6 +580,9 @@ struct Index {
     })
     avPlayer.on('volumeChange', (vol: number) => {
       console.info('设置播放音量' + vol)
+    })
+    avPlayer.on('durationUpdate', (duration: number) => {
+      this.currentTrackDuration = duration / 1000
     })
     avPlayer.on('error', async (err: BusinessError) => {
       await avPlayer.reset();
@@ -581,8 +661,26 @@ struct Index {
           break;
         case 'completed':
           console.info('播放完毕。');
-          this.syncProgress()
-          if (this.sleepTime !== 0 && Number(this.sleepTime.toFixed(3)) <= Number((this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset).toFixed(3))) {
+          if (!this.isLocalPlaying) {
+            this.syncProgress()
+          }
+          if (this.isLocalPlaying) {
+            if (this.playingIndex < this.localPlayItem!.tracks.length - 1) {
+              const newIndex = this.playingIndex + 1
+              try {
+                const nextFile = fs.openSync(this.localPlayItem!.tracks[newIndex].filePath, fs.OpenMode.READ_ONLY)
+                await this.avPlayer!.reset()
+                this.playingIndex = newIndex
+                this.playingTitle = this.localPlayItem!.tracks[newIndex].title
+                this.avPlayer!.fdSrc = { fd: nextFile.fd, offset: 0, length: -1 }
+              } catch (_) {
+                this.isPlaying = false
+                this.uiContext?.getPromptAction().showToast({ message: '播放失败，格式不支持或文件不存在！', duration: 500 })
+              }
+            } else {
+              this.isPlaying = false
+            }
+          } else if (this.sleepTime !== 0 && Number(this.sleepTime.toFixed(3)) <= Number((this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset).toFixed(3))) {
             this.isPlaying = false
             this.sleepTime = 0
           } else {
@@ -599,7 +697,9 @@ struct Index {
         case 'stopped':
           console.info('播放器停止。');
           this.toCloseIndex = this.playingIndex
-          this.toCloseSession = this.playingItem
+          if (!this.isLocalPlaying) {
+            this.toCloseSession = this.playingItem
+          }
           this.showPlay = false
           await this.session!.destroy()
           this.session = undefined
@@ -608,6 +708,8 @@ struct Index {
           this.playedPercent = 0
           this.sleepTime = 0
           this.playingItem = undefined
+          this.localPlayItem = undefined
+          this.isLocalPlaying = false
           this.playingIndex = 0
           setTimeout(() => {
             this.isStartPlaying = false
@@ -755,7 +857,7 @@ struct Index {
   }
 
   aboutToDisappear() {
-    if (this.playingItem) {
+    if (!this.isLocalPlaying && this.playingItem) {
       this.syncProgress(this.playingItem, this.playingIndex)
     }
     this.avPlayer?.release()

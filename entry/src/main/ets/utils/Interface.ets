@@ -489,6 +489,21 @@ export interface AudioTrack {
   metadata: AudioMetadata;
 }
 
+export interface LocalTrack {
+  index: number;
+  title: string;
+  filePath: string;
+  duration: number;
+}
+
+export interface LocalPlayItem {
+  id: string;
+  folderPath: string;
+  displayTitle: string;
+  coverPath?: string;
+  tracks: LocalTrack[];
+}
+
 export interface PlaylistItem {
   libraryItemId: string;
   episodeId: string | null;

@@ -3,7 +3,7 @@ import { env } from '../utils/Class';
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import { PersistenceV2 } from '@kit.ArkUI';
 import { ColorMode } from "../pages/Index";
-import { PlayItem } from '../utils/Interface';
+import { LocalPlayItem, LocalTrack, PlayItem } from '../utils/Interface';
 import { media } from '@kit.MediaKit';
 
 @ComponentV2
@@ -12,11 +12,14 @@ export struct LocalMedia {
   @Consumer() colorMode: ColorMode | undefined = PersistenceV2.connect(ColorMode, () => new ColorMode());
   @Consumer() isStartPlaying: boolean = false
   @Consumer() isPlaying: boolean = false
+  @Consumer() showPlay: boolean = false
   @Consumer() playingItem: PlayItem | undefined = undefined
   @Consumer() playingTitle: string = "-"
   @Consumer() playingIndex: number = 0
   @Consumer() playStartTime: number = 0
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
+  @Consumer() localPlayItem: LocalPlayItem | undefined = undefined
+  @Consumer() isLocalPlaying: boolean = false
   @Consumer() downloadUri: string = ""
   @Local folderList: string[] = []
   @Local subFolderList: string[] = []
@@ -47,6 +50,139 @@ export struct LocalMedia {
         this.folderList.push(name);
       }
     }
+  }
+
+  getCurrentAudioFolderPath(): string {
+    return `${this.downloadPath}/${this.folderList[this.folderIdx]}/${this.subFolderList[this.subFolderIdx]}`
+  }
+
+  async findCoverInFolder(folderPath: string): Promise<string | undefined> {
+    const candidates = ['cover.jpg', 'cover.jpeg', 'cover.png', 'cover.webp', 'folder.jpg']
+    try {
+      const entries = await fs.listFile(folderPath)
+      for (let c of candidates) {
+        if (entries.includes(c)) {
+          return `${folderPath}/${c}`
+        }
+      }
+    } catch (_) {}
+    return undefined
+  }
+
+  async startLocalPlayback(clickIndex: number) {
+    const folderPath = this.getCurrentAudioFolderPath()
+    let tracks: LocalTrack[] = []
+    for (let i = 0; i < this.audioFolderList.length; i++) {
+      const name = this.audioFolderList[i]
+      tracks.push({
+        index: i,
+        title: name,
+        filePath: `${folderPath}/${name}`,
+        duration: 0,
+      })
+    }
+    let coverPath = await this.findCoverInFolder(folderPath)
+    let localItem: LocalPlayItem = {
+      id: folderPath,
+      folderPath: folderPath,
+      displayTitle: this.subFolderList[this.subFolderIdx],
+      coverPath: coverPath,
+      tracks: tracks,
+    }
+    this.localPlayItem = localItem
+    this.isLocalPlaying = true
+    this.playingItem = undefined
+    this.playingIndex = clickIndex
+    this.playingTitle = tracks[clickIndex].title
+    this.playStartTime = 0
+    this.isPlaying = true
+    this.isStartPlaying = true
+    this.showPlay = true
+    await this.avPlayer!.reset()
+    const file = fs.openSync(tracks[clickIndex].filePath, fs.OpenMode.READ_ONLY)
+    this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+  }
+
+  async deleteLocalFile(fileName: string) {
+    const fullPath = `${this.getCurrentAudioFolderPath()}/${fileName}`
+    try {
+      await fs.unlink(fullPath)
+      let idx = this.audioFolderList.indexOf(fileName)
+      if (idx >= 0) {
+        this.audioFolderList.splice(idx, 1)
+      }
+      this.getUIContext().getPromptAction().showToast({
+        message: '已删除',
+        duration: 500
+      })
+    } catch (err) {
+      console.error('删除失败', err)
+      this.getUIContext().getPromptAction().showToast({
+        message: '删除失败',
+        duration: 500
+      })
+    }
+  }
+
+  async deleteSubFolder(folderName: string) {
+    const folderPath = `${this.downloadPath}/${this.folderList[this.folderIdx]}/${folderName}`
+    try {
+      const entries = await fs.listFile(folderPath)
+      for (let name of entries) {
+        const fullPath = `${folderPath}/${name}`
+        const stat = await fs.stat(fullPath)
+        if (stat.isFile()) {
+          await fs.unlink(fullPath)
+        }
+      }
+      await fs.rmdir(folderPath)
+      let idx = this.subFolderList.indexOf(folderName)
+      if (idx >= 0) {
+        this.subFolderList.splice(idx, 1)
+      }
+      this.getUIContext().getPromptAction().showToast({
+        message: '已删除',
+        duration: 500
+      })
+    } catch (err) {
+      console.error('删除失败', err)
+      this.getUIContext().getPromptAction().showToast({
+        message: '删除失败',
+        duration: 500
+      })
+    }
+  }
+
+  @Builder
+  deleteSubFolderButton(folderName: string) {
+    Button({ type: ButtonType.Circle }) {
+      SymbolGlyph($r('sys.symbol.trash_fill'))
+        .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+        .fontColor([$r('sys.color.white')])
+    }
+    .width(40)
+    .height(40)
+    .margin({ left: 10, right: 10 })
+    .backgroundColor($r('sys.color.warning'))
+    .onClick(() => {
+      this.deleteSubFolder(folderName)
+    })
+  }
+
+  @Builder
+  deleteButton(fileName: string) {
+    Button({ type: ButtonType.Circle }) {
+      SymbolGlyph($r('sys.symbol.trash_fill'))
+        .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+        .fontColor([$r('sys.color.white')])
+    }
+    .width(40)
+    .height(40)
+    .margin({ left: 10, right: 10 })
+    .backgroundColor($r('sys.color.warning'))
+    .onClick(() => {
+      this.deleteLocalFile(fileName)
+    })
   }
 
   build() {
@@ -132,42 +268,54 @@ export struct LocalMedia {
               })
 
               if (this.subFolderList.length > 0) {
-                ForEach(this.subFolderList.sort((a, b) => a.localeCompare(b)), (folder: string, index) => {
-                  Button({ type: ButtonType.Normal }) {
-                    Row() {
-                      Text(folder)
-                        .fontSize(18)
-                        .fontWeight(FontWeight.Medium)
-                        .maxLines(1)
-                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                List({ space: 6 }) {
+                  ForEach(this.subFolderList.sort((a, b) => a.localeCompare(b)), (folder: string, index) => {
+                    ListItem() {
+                      Row() {
+                        Text(folder)
+                          .fontSize(18)
+                          .fontWeight(FontWeight.Medium)
+                          .maxLines(1)
+                          .textOverflow({ overflow: TextOverflow.Ellipsis })
+                          .layoutWeight(1)
 
-                      SymbolGlyph($r('sys.symbol.chevron_right'))
-                        .fontSize(18)
-                        .fontColor([$r('sys.color.font_secondary')])
+                        SymbolGlyph($r('sys.symbol.chevron_right'))
+                          .fontSize(18)
+                          .fontColor([$r('sys.color.font_secondary')])
+                      }
+                      .width('100%')
+                      .height(50)
+                      .padding({ left: 20, right: 20 })
                     }
                     .width('100%')
-                    .justifyContent(FlexAlign.SpaceBetween)
-                  }
-                  .width('100%')
-                  .height(50)
-                  .borderRadius(8)
-                  .margin({ bottom: index !== this.subFolderList.length - 1 ? 10 : 0 })
-                  .padding({ left: 20, right: 20 })
-                  .backgroundColor($r('sys.color.comp_background_tertiary'))
-                  .onClick(async () => {
-                    this.audioFolderList = []
-                    const entries = await fs.listFile(this.downloadPath + "/" + this.folderList[this.folderIdx] + "/" + folder);
-                    for (let name of entries) {
-                      const fullPath = `${this.downloadPath}/${this.folderList[this.folderIdx]}/${folder}/${name}`;
-                      const stat = await fs.stat(fullPath);
-                      if (stat.isFile() && this.isAudioFile(name)) {
-                        this.audioFolderList.push(name);
+                    .height(50)
+                    .borderRadius(8)
+                    .backgroundColor($r('sys.color.comp_background_tertiary'))
+                    .swipeAction({
+                      end: {
+                        builder: () => {
+                          this.deleteSubFolderButton(folder)
+                        }
                       }
-                    }
-                    this.subFolderIdx = index
-                    this.folderDeep = 2
+                    })
+                    .onClick(async () => {
+                      this.audioFolderList = []
+                      const entries = await fs.listFile(this.downloadPath + "/" + this.folderList[this.folderIdx] + "/" + folder);
+                      for (let name of entries) {
+                        const fullPath = `${this.downloadPath}/${this.folderList[this.folderIdx]}/${folder}/${name}`;
+                        const stat = await fs.stat(fullPath);
+                        if (stat.isFile() && this.isAudioFile(name)) {
+                          this.audioFolderList.push(name);
+                        }
+                      }
+                      this.subFolderIdx = index
+                      this.folderDeep = 2
+                    })
                   })
-                })
+                }
+                .width('100%')
+                .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
+                .scrollBar(BarState.Off)
               } else {
                 Row() {
                   Text("没有项目")
@@ -205,28 +353,41 @@ export struct LocalMedia {
               })
 
               if (this.audioFolderList.length > 0) {
-                ForEach(this.audioFolderList.sort((a, b) => a.localeCompare(b)), (file: string, index) => {
-                  Button({ type: ButtonType.Normal }) {
-                    Row() {
-                      Text(file)
-                        .fontSize(18)
-                        .fontWeight(FontWeight.Medium)
-                        .maxLines(1)
-                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                List({ space: 6 }) {
+                  ForEach(this.audioFolderList.sort((a, b) => a.localeCompare(b)), (file: string, index) => {
+                    ListItem() {
+                      Row() {
+                        Text(file)
+                          .fontSize(18)
+                          .fontWeight(FontWeight.Medium)
+                          .maxLines(1)
+                          .textOverflow({ overflow: TextOverflow.Ellipsis })
+                          .layoutWeight(1)
+                      }
+                      .width('100%')
+                      .height(50)
+                      .padding({ left: 20, right: 20 })
                     }
                     .width('100%')
-                    .justifyContent(FlexAlign.SpaceBetween)
-                  }
-                  .width('100%')
-                  .height(50)
-                  .borderRadius(8)
-                  .margin({ bottom: index !== this.audioFolderList.length - 1 ? 10 : 0 })
-                  .padding({ left: 20, right: 20 })
-                  .backgroundColor($r('sys.color.comp_background_tertiary'))
-                  .onClick(async () => {
-
+                    .height(50)
+                    .borderRadius(8)
+                    .backgroundColor($r('sys.color.comp_background_tertiary'))
+                    .swipeAction({
+                      end: {
+                        builder: () => {
+                          this.deleteButton(file)
+                        }
+                      }
+                    })
+                    .onClick(() => {
+                      this.startLocalPlayback(index)
+                    })
                   })
-                })
+                }
+                .width('100%')
+                .height('100%')
+                .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
+                .scrollBar(BarState.Off)
               } else {
                 Row() {
                   Text("没有文件")
