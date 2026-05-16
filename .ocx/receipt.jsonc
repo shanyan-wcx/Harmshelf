@@ -1,0 +1,82 @@
+{
+  "version": 1,
+  "root": "C:\\Users\\21633\\Desktop\\Harmshelf",
+  "installed": {
+    "https://registry.kdco.dev::kdco/kdco-primitives@sha256:b108360e94fdc5e70eabd338460361fef61c6bb1f2301461027e395402885ba4": {
+      "registryUrl": "https://registry.kdco.dev",
+      "registryName": "kdco",
+      "name": "kdco-primitives",
+      "revision": "sha256:b108360e94fdc5e70eabd338460361fef61c6bb1f2301461027e395402885ba4",
+      "hash": "b108360e94fdc5e70eabd338460361fef61c6bb1f2301461027e395402885ba4",
+      "files": [
+        {
+          "path": ".opencode/plugins/kdco-primitives/get-project-id.ts",
+          "hash": "2bdcb8e839171e8a9ddff36f7b9c28c90fae972cb395cec38f8d3e85cfd66ad9"
+        },
+        {
+          "path": ".opencode/plugins/kdco-primitives/with-timeout.ts",
+          "hash": "3c582e3e89f5d0de8230122ef0fea2066b3ebff3d77579515cef251628439527"
+        },
+        {
+          "path": ".opencode/plugins/kdco-primitives/log-warn.ts",
+          "hash": "7ed7eb195fd4d67cbee8057ae35593b92693e1e5e84012fcf5402a14df071311"
+        },
+        {
+          "path": ".opencode/plugins/kdco-primitives/types.ts",
+          "hash": "4471c8d97b16e06906f3446e89e01c4a436130a42e5fa6c31f107e63f3b42666"
+        },
+        {
+          "path": ".opencode/plugins/kdco-primitives/mutex.ts",
+          "hash": "4caacfd38bb4b971c356ed9dbfb4dcc10634a83a39c51e724852325d84be941e"
+        },
+        {
+          "path": ".opencode/plugins/kdco-primitives/shell.ts",
+          "hash": "9941f4f642c10f04795304a7657111b2cd10ec066b08f0e0866ae87de5160669"
+        },
+        {
+          "path": ".opencode/plugins/kdco-primitives/temp.ts",
+          "hash": "b66983f2a747d87fb84dcdaa3ed88e5da2e8e46c8151e98f74e76755148f7e08"
+        },
+        {
+          "path": ".opencode/plugins/kdco-primitives/cmux.ts",
+          "hash": "58d066e118a3ca75b1541d65b586ed3b846b42860ac08cfe302232a6a5ceac7b"
+        },
+        {
+          "path": ".opencode/plugins/kdco-primitives/terminal-detect.ts",
+          "hash": "523435085e8fc31883a6a702e70fd9ba82c5d799026d0f04be890c84dbab6b41"
+        },
+        {
+          "path": ".opencode/plugins/kdco-primitives/index.ts",
+          "hash": "2c7a1609f214b7e1bd427ef5d14f615dbfee7b021962b7b28f4cc7c83c701578"
+        }
+      ],
+      "installedAt": "2026-05-15T14:42:18.769Z"
+    },
+    "https://registry.kdco.dev::kdco/worktree@sha256:d8f420767d3cd8033e0e93c51a33951a060e379e8ce8a7642a83a3d8fe56ffe6": {
+      "registryUrl": "https://registry.kdco.dev",
+      "registryName": "kdco",
+      "name": "worktree",
+      "revision": "sha256:d8f420767d3cd8033e0e93c51a33951a060e379e8ce8a7642a83a3d8fe56ffe6",
+      "hash": "d8f420767d3cd8033e0e93c51a33951a060e379e8ce8a7642a83a3d8fe56ffe6",
+      "files": [
+        {
+          "path": ".opencode/plugins/worktree.ts",
+          "hash": "77a26cdf0a8e645006cfe601a91bf3e8a4b54c07689c34ac275f772f24bcf18e"
+        },
+        {
+          "path": ".opencode/plugins/worktree/state.ts",
+          "hash": "4bcf9b53a8389938f59ae43e15387e9f90ca970c2ccfb4d7fd78513aebcd2eb7"
+        },
+        {
+          "path": ".opencode/plugins/worktree/terminal.ts",
+          "hash": "627a2e070393026365f6e6bccdaa47dafe63d273056e446f004b9c36a5c36587"
+        },
+        {
+          "path": ".opencode/plugins/worktree/launch-context.ts",
+          "hash": "48c7151fd7ea0bd141e40c7a0e8a685d804bd8ab8aaba1dfed00ec2ebae13b48"
+        }
+      ],
+      "installedAt": "2026-05-15T14:42:18.790Z"
+    }
+  }
+}
