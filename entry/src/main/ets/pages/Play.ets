@@ -1,4 +1,4 @@
-import { HdsActionBar, ActionBarButton, HdsListItem } from '@kit.UIDesignKit'
+import { BlurStrategy, HdsActionBar, ActionBarButton, HdsListItem } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
 import { CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier } from '@kit.ArkUI'
 import { ConfigurationConstant } from '@kit.AbilityKit';
@@ -1338,7 +1338,8 @@ export struct Play {
         })],
         primaryButtonBuilder: (): void => this.primaryButtonBuilder(),
         primaryButtonBuilderWidth: LengthMetrics.vp(70),
-        isExpand: true
+        isExpand: true,
+        blurStrategy: BlurStrategy.ENABLE
       })
         .height(0)
         .hitTestBehavior(HitTestMode.BLOCK_HIERARCHY)
