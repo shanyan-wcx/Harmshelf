@@ -417,7 +417,7 @@ struct Index {
       this.session!.on('playPrevious', async () => {
         await this.avPlayer!.reset();
         this.playingIndex--
-        this.playingTitle = this.playingItem!.chapters[this.playingIndex].title
+        this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
         this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
       });
     } else {
@@ -427,7 +427,7 @@ struct Index {
       this.session!.on('playNext', async () => {
         await this.avPlayer!.reset();
         this.playingIndex++
-        this.playingTitle = this.playingItem!.chapters[this.playingIndex].title
+        this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
         this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
       });
     } else {
@@ -589,7 +589,7 @@ struct Index {
             if (this.playingIndex < this.playingItem!.audioTracks.length - 1) {
               await this.avPlayer!.reset()
               this.playingIndex++
-              this.playingTitle = this.playingItem!.chapters[this.playingIndex].title
+              this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
               this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
             } else {
               this.isPlaying = false

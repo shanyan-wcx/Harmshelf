@@ -179,14 +179,14 @@ export struct Play {
 
   async getPlayContent(playItem: PlayItem, time: number) {
     let index: number = 0
-    for (let track of playItem.audioTracks) {
-      if (track.startOffset > time) {
-        index = track.index - 2
+    for (let i = 0; i < playItem.audioTracks.length; i++) {
+      if (playItem.audioTracks[i].startOffset > time) {
+        index = i > 0 ? i - 1 : 0
         break
       }
     }
     this.playingIndex = index
-    this.playingTitle = this.playingItem!.chapters[this.playingIndex].title
+    this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
     this.playStartTime = time - playItem.audioTracks[index].startOffset
     this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
     console.log("共", playItem.audioTracks.length, "条音轨")
@@ -885,7 +885,7 @@ export struct Play {
                   .onClick(async () => {
                     await this.avPlayer!.reset();
                     this.playingIndex--
-                    this.playingTitle = this.playingItem!.chapters[this.playingIndex].title
+                    this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
                     this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
                   })
                   .visibility(this.lockPlayer ? Visibility.Hidden : Visibility.Visible)
@@ -953,7 +953,7 @@ export struct Play {
                   .onClick(async () => {
                     await this.avPlayer!.reset();
                     this.playingIndex++
-                    this.playingTitle = this.playingItem!.chapters[this.playingIndex].title
+                    this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
                     this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
                   })
                   .visibility(this.lockPlayer ? Visibility.Hidden : Visibility.Visible)

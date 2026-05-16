@@ -49,14 +49,14 @@ export struct PlaylistDetail {
 
   async getPlayContent(playItem: PlayItem) {
     let index: number = 0
-    for (let track of playItem.audioTracks) {
-      if (track.startOffset > playItem.currentTime) {
-        index = track.index - 2
+    for (let i = 0; i < playItem.audioTracks.length; i++) {
+      if (playItem.audioTracks[i].startOffset > playItem.currentTime) {
+        index = i > 0 ? i - 1 : 0
         break
       }
     }
     this.playingIndex = index
-    this.playingTitle = this.playingItem!.chapters[this.playingIndex].title
+    this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
     this.playStartTime = playItem.currentTime - playItem.audioTracks[index].startOffset
     this.avPlayer!.url =
       this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
