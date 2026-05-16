@@ -187,233 +187,230 @@ export struct LocalMedia {
 
   build() {
     Stack() {
-      Scroll(this.LocalMediaScroller) {
+      Column() {
         Column() {
-          Column() {
-            Text("本地媒体")
-              .fontSize(18)
-              .fontWeight(FontWeight.Bold)
-              .margin({ top: 15, bottom: 15 })
+          Text("本地媒体")
+            .fontSize(18)
+            .fontWeight(FontWeight.Bold)
+            .margin({ top: 15, bottom: 15 })
 
-            if (this.folderDeep === 0) {
-              ForEach(this.folderList, (folder: string, index) => {
-                Button({ type: ButtonType.Normal }) {
-                  Row() {
-                    Text(folder)
-                      .fontSize(18)
-                      .fontWeight(FontWeight.Medium)
-                      .maxLines(1)
-                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+          if (this.folderDeep === 0) {
+            ForEach(this.folderList, (folder: string, index) => {
+              Button({ type: ButtonType.Normal }) {
+                Row() {
+                  Text(folder)
+                    .fontSize(18)
+                    .fontWeight(FontWeight.Medium)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                    SymbolGlyph($r('sys.symbol.chevron_right'))
-                      .fontSize(18)
-                      .fontColor([$r('sys.color.font_secondary')])
+                  SymbolGlyph($r('sys.symbol.chevron_right'))
+                    .fontSize(18)
+                    .fontColor([$r('sys.color.font_secondary')])
+                }
+                .width('100%')
+                .justifyContent(FlexAlign.SpaceBetween)
+              }
+              .width('100%')
+              .height(50)
+              .borderRadius(8)
+              .margin({ bottom: index !== this.folderList.length - 1 ? 10 : 0 })
+              .padding({ left: 20, right: 20 })
+              .backgroundColor($r('sys.color.comp_background_tertiary'))
+              .onClick(async () => {
+                this.subFolderList = []
+                const entries = await fs.listFile(this.downloadPath + "/" + folder);
+                for (let name of entries) {
+                  const fullPath = `${this.downloadPath}/${folder}/${name}`;
+                  const stat = await fs.stat(fullPath);
+                  if (stat.isDirectory()) {
+                    this.subFolderList.push(name);
+                  }
+                }
+                if (folder === "有声书") {
+                  this.mediaType = "book"
+                } else if (folder === "播客") {
+                  this.mediaType = "podcast"
+                }
+                this.folderIdx = index
+                this.folderDeep = 1
+                this.metadata = undefined
+                if (fs.accessSync(this.downloadPath + "/" + folder + "/metadata.json")) {
+                  this.metadata = await fs.readText(this.downloadPath + "/" + folder + "/metadata.json")
+                }
+              })
+            })
+          } else if (this.folderDeep === 1) {
+            Button({ type: ButtonType.Normal }) {
+              Row() {
+                Text("返回上一级")
+                  .fontSize(18)
+                  .fontWeight(FontWeight.Medium)
+                  .maxLines(1)
+                  .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+                SymbolGlyph($r('sys.symbol.chevron_right'))
+                  .fontSize(18)
+                  .fontColor([$r('sys.color.font_secondary')])
+              }
+              .width('100%')
+              .justifyContent(FlexAlign.SpaceBetween)
+            }
+            .width('100%')
+            .height(50)
+            .borderRadius(8)
+            .margin({ bottom: 10 })
+            .padding({ left: 20, right: 20 })
+            .backgroundColor($r('sys.color.comp_background_tertiary'))
+            .onClick(async () => {
+              this.folderDeep = 0
+            })
+
+            if (this.subFolderList.length > 0) {
+              List({ space: 6 }) {
+                ForEach(this.subFolderList.sort((a, b) => a.localeCompare(b)), (folder: string, index) => {
+                  ListItem() {
+                    Row() {
+                      Text(folder)
+                        .fontSize(18)
+                        .fontWeight(FontWeight.Medium)
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        .layoutWeight(1)
+
+                      SymbolGlyph($r('sys.symbol.chevron_right'))
+                        .fontSize(18)
+                        .fontColor([$r('sys.color.font_secondary')])
+                    }
+                    .width('100%')
+                    .height(50)
+                    .padding({ left: 20, right: 20 })
                   }
                   .width('100%')
-                  .justifyContent(FlexAlign.SpaceBetween)
-                }
-                .width('100%')
-                .height(50)
-                .borderRadius(8)
-                .margin({ bottom: index !== this.folderList.length - 1 ? 10 : 0 })
-                .padding({ left: 20, right: 20 })
-                .backgroundColor($r('sys.color.comp_background_tertiary'))
-                .onClick(async () => {
-                  this.subFolderList = []
-                  const entries = await fs.listFile(this.downloadPath + "/" + folder);
-                  for (let name of entries) {
-                    const fullPath = `${this.downloadPath}/${folder}/${name}`;
-                    const stat = await fs.stat(fullPath);
-                    if (stat.isDirectory()) {
-                      this.subFolderList.push(name);
+                  .height(50)
+                  .borderRadius(8)
+                  .backgroundColor($r('sys.color.comp_background_tertiary'))
+                  .swipeAction({
+                    end: {
+                      builder: () => {
+                        this.deleteSubFolderButton(folder)
+                      }
                     }
-                  }
-                  if (folder === "有声书") {
-                    this.mediaType = "book"
-                  } else if (folder === "播客") {
-                    this.mediaType = "podcast"
-                  }
-                  this.folderIdx = index
-                  this.folderDeep = 1
-                  this.metadata = undefined
-                  if (fs.accessSync(this.downloadPath + "/" + folder + "/metadata.json")) {
-                    this.metadata = await fs.readText(this.downloadPath + "/" + folder + "/metadata.json")
-                  }
+                  })
+                  .onClick(async () => {
+                    this.audioFolderList = []
+                    const entries = await fs.listFile(this.downloadPath + "/" + this.folderList[this.folderIdx] + "/" + folder);
+                    for (let name of entries) {
+                      const fullPath = `${this.downloadPath}/${this.folderList[this.folderIdx]}/${folder}/${name}`;
+                      const stat = await fs.stat(fullPath);
+                      if (stat.isFile() && this.isAudioFile(name)) {
+                        this.audioFolderList.push(name);
+                      }
+                    }
+                    this.subFolderIdx = index
+                    this.folderDeep = 2
+                  })
                 })
-              })
-            } else if (this.folderDeep === 1) {
-              Button({ type: ButtonType.Normal }) {
-                Row() {
-                  Text("返回上一级")
-                    .fontSize(18)
-                    .fontWeight(FontWeight.Medium)
-                    .maxLines(1)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
-
-                  SymbolGlyph($r('sys.symbol.chevron_right'))
-                    .fontSize(18)
-                    .fontColor([$r('sys.color.font_secondary')])
-                }
-                .width('100%')
-                .justifyContent(FlexAlign.SpaceBetween)
               }
               .width('100%')
-              .height(50)
-              .borderRadius(8)
-              .margin({ bottom: 10 })
-              .padding({ left: 20, right: 20 })
-              .backgroundColor($r('sys.color.comp_background_tertiary'))
-              .onClick(async () => {
-                this.folderDeep = 0
-              })
-
-              if (this.subFolderList.length > 0) {
-                List({ space: 6 }) {
-                  ForEach(this.subFolderList.sort((a, b) => a.localeCompare(b)), (folder: string, index) => {
-                    ListItem() {
-                      Row() {
-                        Text(folder)
-                          .fontSize(18)
-                          .fontWeight(FontWeight.Medium)
-                          .maxLines(1)
-                          .textOverflow({ overflow: TextOverflow.Ellipsis })
-                          .layoutWeight(1)
-
-                        SymbolGlyph($r('sys.symbol.chevron_right'))
-                          .fontSize(18)
-                          .fontColor([$r('sys.color.font_secondary')])
-                      }
-                      .width('100%')
-                      .height(50)
-                      .padding({ left: 20, right: 20 })
-                    }
-                    .width('100%')
-                    .height(50)
-                    .borderRadius(8)
-                    .backgroundColor($r('sys.color.comp_background_tertiary'))
-                    .swipeAction({
-                      end: {
-                        builder: () => {
-                          this.deleteSubFolderButton(folder)
-                        }
-                      }
-                    })
-                    .onClick(async () => {
-                      this.audioFolderList = []
-                      const entries = await fs.listFile(this.downloadPath + "/" + this.folderList[this.folderIdx] + "/" + folder);
-                      for (let name of entries) {
-                        const fullPath = `${this.downloadPath}/${this.folderList[this.folderIdx]}/${folder}/${name}`;
-                        const stat = await fs.stat(fullPath);
-                        if (stat.isFile() && this.isAudioFile(name)) {
-                          this.audioFolderList.push(name);
-                        }
-                      }
-                      this.subFolderIdx = index
-                      this.folderDeep = 2
-                    })
-                  })
-                }
-                .width('100%')
-                .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
-                .scrollBar(BarState.Off)
-              } else {
-                Row() {
-                  Text("没有项目")
-                    .fontSize(18)
-                    .fontWeight(FontWeight.Medium)
-                }
-                .height(50)
-                .borderRadius(8)
-                .padding({ left: 20, right: 20 })
-              }
+              .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
+              .scrollBar(BarState.Off)
             } else {
-              Button({ type: ButtonType.Normal }) {
-                Row() {
-                  Text("返回上一级")
-                    .fontSize(18)
-                    .fontWeight(FontWeight.Medium)
-                    .maxLines(1)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
-
-                  SymbolGlyph($r('sys.symbol.chevron_right'))
-                    .fontSize(18)
-                    .fontColor([$r('sys.color.font_secondary')])
-                }
-                .width('100%')
-                .justifyContent(FlexAlign.SpaceBetween)
+              Row() {
+                Text("没有项目")
+                  .fontSize(18)
+                  .fontWeight(FontWeight.Medium)
               }
-              .width('100%')
               .height(50)
               .borderRadius(8)
-              .margin({ bottom: 10 })
               .padding({ left: 20, right: 20 })
-              .backgroundColor($r('sys.color.comp_background_tertiary'))
-              .onClick(async () => {
-                this.folderDeep = 1
-              })
+            }
+          } else {
+            Button({ type: ButtonType.Normal }) {
+              Row() {
+                Text("返回上一级")
+                  .fontSize(18)
+                  .fontWeight(FontWeight.Medium)
+                  .maxLines(1)
+                  .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-              if (this.audioFolderList.length > 0) {
-                List({ space: 6 }) {
-                  ForEach(this.audioFolderList.sort((a, b) => a.localeCompare(b)), (file: string, index) => {
-                    ListItem() {
-                      Row() {
-                        Text(file)
-                          .fontSize(18)
-                          .fontWeight(FontWeight.Medium)
-                          .maxLines(1)
-                          .textOverflow({ overflow: TextOverflow.Ellipsis })
-                          .layoutWeight(1)
-                      }
-                      .width('100%')
-                      .height(50)
-                      .padding({ left: 20, right: 20 })
+                SymbolGlyph($r('sys.symbol.chevron_right'))
+                  .fontSize(18)
+                  .fontColor([$r('sys.color.font_secondary')])
+              }
+              .width('100%')
+              .justifyContent(FlexAlign.SpaceBetween)
+            }
+            .width('100%')
+            .height(50)
+            .borderRadius(8)
+            .margin({ bottom: 10 })
+            .padding({ left: 20, right: 20 })
+            .backgroundColor($r('sys.color.comp_background_tertiary'))
+            .onClick(async () => {
+              this.folderDeep = 1
+            })
+
+            if (this.audioFolderList.length > 0) {
+              List({ space: 6 }) {
+                ForEach(this.audioFolderList.sort((a, b) => a.localeCompare(b)), (file: string, index) => {
+                  ListItem() {
+                    Row() {
+                      Text(file)
+                        .fontSize(18)
+                        .fontWeight(FontWeight.Medium)
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        .layoutWeight(1)
                     }
                     .width('100%')
                     .height(50)
-                    .borderRadius(8)
-                    .backgroundColor($r('sys.color.comp_background_tertiary'))
-                    .swipeAction({
-                      end: {
-                        builder: () => {
-                          this.deleteButton(file)
-                        }
+                    .padding({ left: 20, right: 20 })
+                  }
+                  .width('100%')
+                  .height(50)
+                  .borderRadius(8)
+                  .backgroundColor($r('sys.color.comp_background_tertiary'))
+                  .swipeAction({
+                    end: {
+                      builder: () => {
+                        this.deleteButton(file)
                       }
-                    })
-                    .onClick(() => {
-                      this.startLocalPlayback(index)
-                    })
+                    }
                   })
-                }
-                .width('100%')
-                .height('100%')
-                .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
-                .scrollBar(BarState.Off)
-              } else {
-                Row() {
-                  Text("没有文件")
-                    .fontSize(18)
-                    .fontWeight(FontWeight.Medium)
-                }
-                .height(50)
-                .borderRadius(8)
-                .padding({ left: 20, right: 20 })
+                  .onClick(() => {
+                    this.startLocalPlayback(index)
+                  })
+                })
               }
+              .width('100%')
+              .layoutWeight(1)
+              .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
+              .scrollBar(BarState.Off)
+            } else {
+              Row() {
+                Text("没有文件")
+                  .fontSize(18)
+                  .fontWeight(FontWeight.Medium)
+              }
+              .height(50)
+              .borderRadius(8)
+              .padding({ left: 20, right: 20 })
             }
           }
-          .width('100%')
-          .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
-            env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
-            this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
-            $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
-          .borderRadius(8)
-          .padding({ left: 20, right: 20, bottom: 20 })
         }
+        .width('100%')
+        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
+          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
+          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
+          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
+        .borderRadius(8)
+        .padding({ left: 20, right: 20, bottom: 20 })
+        .clip(true)
       }
       .width('100%')
       .height('100%')
-      .padding({ left: 20, right: 20, top: 69, bottom: this.isStartPlaying ? 109 : 25 })
-      .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
-      .scrollBar(BarState.Off)
+      .padding({ left: 20, right: 20, top: 69, bottom: this.isStartPlaying ? 104 : 25 })
       .align(Alignment.Top)
     }
     .width('100%')
