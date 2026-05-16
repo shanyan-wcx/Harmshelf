@@ -2,7 +2,7 @@ import { HdsActionBar, ActionBarButton, HdsListItem } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, PlayItem, User } from '../utils/Interface'
 import { CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier } from '@kit.ArkUI'
 import { ConfigurationConstant } from '@kit.AbilityKit';
-import { CountdownTimer, env } from '../utils/Class';
+import { env } from '../utils/Class';
 import { deviceInfo } from "@kit.BasicServicesKit";
 import { createBookmark, deleteBookmark, getBookmarks } from '../utils/Api';
 import { PlaySetting } from './Index';
@@ -35,7 +35,6 @@ export struct Play {
   @Consumer() sleepTime: number = 0
   @Consumer() sliderMoving: boolean = false
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
-  @Consumer() sleepController: CountdownTimer | undefined = undefined
   @Consumer() speed: media.PlaybackSpeed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
   @Local rotateAngle: number = 0
   @Local sliderValue: number = 0
@@ -54,6 +53,7 @@ export struct Play {
   @Local showMoreIntro: boolean = false
   @Monitor('playingItem')
   async setSpeed(monitor: IMonitor) {
+    this.sleepTime = 0
     if (this.playSetting?.rememberSpeed === true) {
       this.speed = this.playSetting.globalSpeed
     } else {
@@ -118,7 +118,6 @@ export struct Play {
 
   formatSleepTime(seconds: number): string {
     if (seconds <= 0) {
-      this.sleepTime = 0
       return "0 sec"
     }
     if (seconds >= 60) {
@@ -139,28 +138,6 @@ export struct Play {
     }
     formattedTime += `${minutes} min`;
     return formattedTime;
-  }
-
-  setSleepTime() {
-    if (!this.sleepController) {
-      this.sleepController = new CountdownTimer(this.sleepTime, () => {
-        if (this.playSetting?.fadeInOut) {
-          this.fadeOut()
-        } else {
-          this.avPlayer!.pause()
-        }
-        this.sleepTime = 0
-        this.sleepController?.clear()
-      }, (remain) => {
-        if (this.sleepTime !== 0) {
-          this.sleepTime = remain
-        }
-      })
-      this.sleepController.start()
-    } else {
-      this.sleepController.reset(this.sleepTime)
-      this.sleepController.start()
-    }
   }
 
   fadeIn() {
@@ -573,8 +550,7 @@ export struct Play {
         .borderRadius(8)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
-          this.sleepTime = 5 * 60
-          this.setSleepTime()
+          this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 5 * 60
           this.showSleep = false
         })
 
@@ -587,8 +563,7 @@ export struct Play {
         .borderRadius(8)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
-          this.sleepTime = 10 * 60
-          this.setSleepTime()
+          this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 10 * 60
           this.showSleep = false
         })
 
@@ -601,8 +576,7 @@ export struct Play {
         .borderRadius(8)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
-          this.sleepTime = 15 * 60
-          this.setSleepTime()
+          this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 15 * 60
           this.showSleep = false
         })
 
@@ -615,8 +589,7 @@ export struct Play {
         .borderRadius(8)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
-          this.sleepTime = 30 * 60
-          this.setSleepTime()
+          this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 30 * 60
           this.showSleep = false
         })
 
@@ -629,8 +602,7 @@ export struct Play {
         .borderRadius(8)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
-          this.sleepTime = 45 * 60
-          this.setSleepTime()
+          this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 45 * 60
           this.showSleep = false
         })
 
@@ -643,8 +615,7 @@ export struct Play {
         .borderRadius(8)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
-          this.sleepTime = 60 * 60
-          this.setSleepTime()
+          this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 60 * 60
           this.showSleep = false
         })
 
@@ -657,8 +628,7 @@ export struct Play {
         .borderRadius(8)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
-          this.sleepTime = 90 * 60
-          this.setSleepTime()
+          this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 90 * 60
           this.showSleep = false
         })
 
@@ -671,8 +641,7 @@ export struct Play {
         .borderRadius(8)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
-          this.sleepTime = this.playingItem!.audioTracks[this.playingIndex].duration - this.playedTime
-          this.setSleepTime()
+          this.sleepTime = this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playingItem!.audioTracks[this.playingIndex].duration
           this.showSleep = false
         })
 
@@ -686,7 +655,6 @@ export struct Play {
         .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .onClick(() => {
           this.sleepTime = 0
-          this.sleepController?.clear()
           this.showSleep = false
         })
       }
@@ -773,7 +741,7 @@ export struct Play {
               })
 
               Row() {
-                Text("睡眠定时 " + this.formatSleepTime(this.sleepTime))
+                Text("睡眠定时 " + ((this.sleepTime !== 0 && this.playingItem!.audioTracks !== undefined) ? this.formatSleepTime(this.sleepTime - this.playedTime - this.playingItem!.audioTracks[this.playingIndex].startOffset) : 0))
                   .fontSize(18)
               }
               .height(40)
