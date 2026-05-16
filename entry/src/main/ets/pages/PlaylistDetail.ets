@@ -7,6 +7,7 @@ import { ColorMode } from "../pages/Index";
 import { deletePlaylist, getPlayItem, getPlaylists, removeFromPlaylist, updatePlaylist } from '../utils/Api';
 import { media } from '@kit.MediaKit';
 import { deviceInfo } from '@kit.BasicServicesKit';
+import { Logger } from '../utils/Logger';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -60,9 +61,9 @@ export struct PlaylistDetail {
     this.playStartTime = playItem.currentTime - playItem.audioTracks[index].startOffset
     this.avPlayer!.url =
       this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
-    console.log("共", playItem.audioTracks.length, "条音轨")
-    console.log("播放序号为", this.playingIndex)
-    console.log("起始位置为", this.playStartTime)
+    Logger.info(`共playItem.audioTracks.length条音轨`)
+    Logger.info(`播放序号为this.playingIndex`)
+    Logger.info(`起始位置为this.playStartTime`)
   }
 
   get totalDuration(): string {
@@ -409,9 +410,9 @@ export struct PlaylistDetail {
                           this.playingItem!.currentTime - this.playingItem!.audioTracks[0].startOffset
                         this.avPlayer!.url =
                           this.baseUrl + this.playingItem!.audioTracks[0].contentUrl + "?token=" + this.apiToken
-                        console.log("共", this.playingItem!.audioTracks.length, "条音轨")
-                        console.log("播放序号为", this.playingIndex)
-                        console.log("起始位置为", this.playStartTime)
+                        Logger.info(`共this.playingItem!.audioTracks.length条音轨`)
+                        Logger.info(`播放序号为this.playingIndex`)
+                        Logger.info(`起始位置为this.playStartTime`)
                       }
                     }
                   }
@@ -499,9 +500,9 @@ export struct PlaylistDetail {
                                 this.playingItem!.currentTime - this.playingItem!.audioTracks[0].startOffset
                               this.avPlayer!.url =
                                 this.baseUrl + this.playingItem!.audioTracks[0].contentUrl + "?token=" + this.apiToken
-                              console.log("共", this.playingItem!.audioTracks.length, "条音轨")
-                              console.log("播放序号为", this.playingIndex)
-                              console.log("起始位置为", this.playStartTime)
+                              Logger.info(`共this.playingItem!.audioTracks.length条音轨`)
+                              Logger.info(`播放序号为this.playingIndex`)
+                              Logger.info(`起始位置为this.playStartTime`)
                             }
                           }
                         })

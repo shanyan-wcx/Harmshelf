@@ -32,6 +32,7 @@ import {
   SearchPodcast
 } from './Interface'
 import { JSON, util } from '@kit.ArkTS';
+import { Logger } from './Logger';
 
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 
@@ -60,7 +61,7 @@ export async function healthCheck() {
     })
     return true
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return false
   }
 }
@@ -80,10 +81,10 @@ export async function getLogin(loginInfo: LoginInfo): Promise<string[] | null> {
     })
     authToken = response.data.user.token
     userId = response.data.user.id
-    console.log("Token", authToken);
+    Logger.info("登录成功！");
     return [authToken, userId]
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return null
   }
 }
@@ -97,10 +98,10 @@ export async function getLogout() {
     baseUrl = ""
     authToken = ""
     userId = ""
-    console.log("退出登录！")
+    Logger.info("退出登录！")
     return true
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return false
   }
 }
@@ -116,7 +117,7 @@ export async function getUser(): Promise<User | undefined> {
       })
     return response.data
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取用户失败，请检查网络！',
       duration: 500
@@ -136,7 +137,7 @@ export async function getHome(libraryId: string): Promise<HomeSection[]> {
       })
     return response.data
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取首页失败，请检查网络！',
       duration: 500
@@ -147,7 +148,6 @@ export async function getHome(libraryId: string): Promise<HomeSection[]> {
 
 export async function getLibraries(): Promise<Library[]> {
   let libraries: Library[] = []
-  let libraryNames: string[] = []
   const api: Axios = createApi()
   try {
     const response: AxiosResponse = await api.get<string, AxiosResponse<string>, null>('/api/libraries', {
@@ -155,16 +155,13 @@ export async function getLibraries(): Promise<Library[]> {
       readTimeout: 30000,
       connectTimeout: 30000
     })
-    console.log("获取媒体库成功！")
+    Logger.info("获取媒体库成功！")
 
     libraries = response.data.libraries
-    libraries.forEach(element => {
-      libraryNames.push(element.name)
-    });
-    console.log("媒体库：", libraryNames)
+    Logger.info(`媒体库：${libraries.length}个`)
   } catch (error) {
-    console.log("获取媒体库失败！")
-    console.error(JSON.stringify(error));
+    Logger.info("获取媒体库失败！")
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取媒体库失败，请检查网络！',
       duration: 500
@@ -176,7 +173,6 @@ export async function getLibraries(): Promise<Library[]> {
 export async function getLibraryItems(libraryId: string): Promise<LibraryItem[]> {
   const api: Axios = createApi()
   let libraryItems: LibraryItem[] = []
-  let itemTitles: string[] = []
   try {
     const response: AxiosResponse =
       await api.get<string, AxiosResponse<string>, null>(`/api/libraries/${libraryId}/items`, {
@@ -186,13 +182,10 @@ export async function getLibraryItems(libraryId: string): Promise<LibraryItem[]>
         connectTimeout: 30000
       })
     libraryItems = response.data.results
-    libraryItems.forEach((element: LibraryItem) => {
-      itemTitles.push(element.media.metadata.title)
-    });
-    console.log("项目：", itemTitles.toString());
+    Logger.info(`项目：${libraryItems.length}个`);
     return libraryItems
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取媒体库内容失败，请检查网络！',
       duration: 500
@@ -204,7 +197,6 @@ export async function getLibraryItems(libraryId: string): Promise<LibraryItem[]>
 export async function getLibraryItemsInProgress(libraryId: string): Promise<LibraryItem[]> {
   const api: Axios = createApi()
   let libraryItems: LibraryItem[] = []
-  let itemTitles: string[] = []
   try {
     const response: AxiosResponse =
       await api.get<string, AxiosResponse<string>, null>(`/api/libraries/${libraryId}/items?filter=progress.aW4tcHJvZ3Jlc3M%3D`,
@@ -215,13 +207,10 @@ export async function getLibraryItemsInProgress(libraryId: string): Promise<Libr
           connectTimeout: 30000
         })
     libraryItems = response.data.results
-    libraryItems.forEach((element: LibraryItem) => {
-      itemTitles.push(element.media.metadata.title)
-    });
-    console.log("进行中项目：", itemTitles.toString());
+    Logger.info(`进行中项目：${libraryItems.length}个`);
     return libraryItems
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取进行中项目失败，请检查网络！',
       duration: 500
@@ -233,7 +222,6 @@ export async function getLibraryItemsInProgress(libraryId: string): Promise<Libr
 export async function getLibraryItemsFinished(libraryId: string): Promise<LibraryItem[]> {
   const api: Axios = createApi()
   let libraryItems: LibraryItem[] = []
-  let itemTitles: string[] = []
   try {
     const response: AxiosResponse =
       await api.get<string, AxiosResponse<string>, null>(`/api/libraries/${libraryId}/items?filter=progress.ZmluaXNoZWQ%3D`,
@@ -244,13 +232,10 @@ export async function getLibraryItemsFinished(libraryId: string): Promise<Librar
           connectTimeout: 30000
         })
     libraryItems = response.data.results
-    libraryItems.forEach((element: LibraryItem) => {
-      itemTitles.push(element.media.metadata.title)
-    });
-    console.log("已完成项目：", itemTitles.toString());
+    Logger.info(`已完成项目：${libraryItems.length}个`);
     return libraryItems
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取已完成项目失败，请检查网络！',
       duration: 500
@@ -270,7 +255,7 @@ export async function getItem(itemId: string): Promise<LibraryItem | undefined> 
       })
     return response.data
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取项目失败，请检查网络！',
       duration: 500
@@ -290,7 +275,7 @@ export async function getEpisode(itemId: string, EpisodeId: string): Promise<Epi
       })
     return response.data
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取项目失败，请检查网络！',
       duration: 500
@@ -310,7 +295,7 @@ export async function searchLibrary(libraryId: string, query: string): Promise<S
       })
     return response.data
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '搜索失败，请检查网络！',
       duration: 500
@@ -332,7 +317,7 @@ export async function getCover(itemId: string) {
         })
     return response.data
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取封面失败，请检查网络！',
       duration: 500
@@ -348,7 +333,7 @@ export async function getProgress(itemId: string, episodeId?: string): Promise<P
       await api.get<string, AxiosResponse<string>, null>(`/api/me/progress/${itemId}` + (episodeId ? `/${episodeId}` : ""), {
         timeout: 30000
       })
-    console.log("手动获取项目进度：" + JSON.stringify(response))
+    Logger.info("手动获取项目进度：" + JSON.stringify(response))
     progress = response.data
     return progress
   } catch (error) {
@@ -379,10 +364,10 @@ export async function getPlayItem(itemId: string, episodeId?: string): Promise<P
         connectTimeout: 30000
       })
     playItem = response.data
-    console.log("获取到播放项目", playItem?.libraryItemId)
-    console.log("当前位置", playItem?.currentTime)
+    Logger.info(`获取到播放项目${playItem?.libraryItemId}`)
+    Logger.info(`当前位置${playItem?.currentTime}`)
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取播放项目失败，请检查网络！',
       duration: 500
@@ -408,10 +393,10 @@ export async function updateProgress(progress: UpdateProgress, itemId: string, e
   };
   try {
     const response: rcp.Response = await session.fetch(req)
-    console.log("上传进度", response);
+    Logger.info(`上传进度${response}`);
     return true
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return false
   }
 }
@@ -426,9 +411,10 @@ export async function getAuthors(libraryId: string): Promise<Author[]> {
       connectTimeout: 30000
     })
     authors = response.data.authors
+    Logger.info(`作者：${authors.length}个`);
     return authors
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取作者失败，请检查网络！',
       duration: 500
@@ -440,7 +426,6 @@ export async function getAuthors(libraryId: string): Promise<Author[]> {
 export async function getSeries(libraryId: string): Promise<Series[]> {
   const api: Axios = createApi()
   let series: Series[] = []
-  let itemTitles: string[] = []
   try {
     const response: AxiosResponse = await api.get<string, AxiosResponse<string>, null>(`/api/libraries/${libraryId}/series?limit=99999999999`, {
       timeout: 30000,
@@ -448,13 +433,10 @@ export async function getSeries(libraryId: string): Promise<Series[]> {
       connectTimeout: 30000
     })
     series = response.data.results
-    series.forEach((element: Series) => {
-      itemTitles.push(element.name)
-    });
-    console.log("系列：", itemTitles.toString());
+    Logger.info(`系列：${series.length}个`);
     return series
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取系列失败，请检查网络！',
       duration: 500
@@ -466,7 +448,6 @@ export async function getSeries(libraryId: string): Promise<Series[]> {
 export async function getCollections(libraryId: string): Promise<Collection[]> {
   const api: Axios = createApi()
   let collections: Collection[] = []
-  let itemTitles: string[] = []
   try {
     const response: AxiosResponse = await api.get<string, AxiosResponse<string>, null>(`/api/libraries/${libraryId}/collections`, {
       timeout: 90000,
@@ -474,13 +455,10 @@ export async function getCollections(libraryId: string): Promise<Collection[]> {
       connectTimeout: 90000
     })
     collections = response.data.results
-    collections.forEach((element: Collection) => {
-      itemTitles.push(element.name)
-    });
-    console.log("收藏：", itemTitles.toString());
+    Logger.info(`收藏：${collections.length}个`);
     return collections
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取收藏失败，请检查网络！',
       duration: 500
@@ -501,14 +479,14 @@ export async function addToCollection(collectionId: string, bookId: string): Pro
       connectTimeout: 30000
     })
     collection = response.data
-    console.log("添加成功");
+    Logger.info("添加成功");
     promptAction.showToast({
       message: '添加成功！',
       duration: 500
     });
     return collection
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '添加失败，请检查网络！',
       duration: 500
@@ -526,14 +504,14 @@ export async function removeFromCollection(collectionId: string, bookId: string)
         readTimeout: 30000,
         connectTimeout: 30000
       })
-    console.log("移除成功");
+    Logger.info("移除成功");
     promptAction.showToast({
       message: '移除成功！',
       duration: 500
     });
     return response.data
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '移除失败，请检查网络！',
       duration: 500
@@ -552,10 +530,10 @@ export async function createCollection(collection: Collection1): Promise<Collect
       connectTimeout: 30000
     })
     collection1 = response.data
-    console.log("创建成功");
+    Logger.info("创建成功");
     return collection1
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return undefined
   }
 }
@@ -587,11 +565,11 @@ export async function updateCollection(collectionId: string, name: string, descr
       const bodyString = decoder.decodeWithStream(uint8Array);
       const parsed = JSON.parse(bodyString) as Collection;
       collection = parsed;
-      console.log("更新成功");
+      Logger.info("更新成功");
     }
     return collection
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return undefined
   }
 }
@@ -605,10 +583,10 @@ export async function deleteCollection(collectionId: string): Promise<boolean> {
         readTimeout: 30000,
         connectTimeout: 30000
       })
-    console.log("删除成功");
+    Logger.info("删除成功");
     return true
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return false
   }
 }
@@ -616,7 +594,6 @@ export async function deleteCollection(collectionId: string): Promise<boolean> {
 export async function getPlaylists(libraryId: string): Promise<Playlist[]> {
   const api: Axios = createApi()
   let playlists: Playlist[] = []
-  let itemTitles: string[] = []
   try {
     const response: AxiosResponse = await api.get<string, AxiosResponse<string>, null>(`/api/libraries/${libraryId}/playlists`, {
       timeout: 30000,
@@ -624,13 +601,10 @@ export async function getPlaylists(libraryId: string): Promise<Playlist[]> {
       connectTimeout: 30000
     })
     playlists = response.data.results
-    playlists.forEach((element: Playlist) => {
-      itemTitles.push(element.name)
-    });
-    console.log("播放列表：", itemTitles.toString());
+    Logger.info(`播放列表：${playlists.length}个`);
     return playlists
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取收藏失败，请检查网络！',
       duration: 500
@@ -652,14 +626,14 @@ export async function addToPlaylist(playlistId: string, libraryItemId: string, e
       connectTimeout: 30000
     })
     playlist = response.data
-    console.log("添加成功");
+    Logger.info("添加成功");
     promptAction.showToast({
       message: '添加成功！',
       duration: 500
     });
     return playlist
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '添加失败，请检查网络！',
       duration: 500
@@ -677,14 +651,14 @@ export async function removeFromPlaylist(playlistId: string, libraryItemId: stri
         readTimeout: 30000,
         connectTimeout: 30000
       })
-    console.log("移除成功");
+    Logger.info("移除成功");
     promptAction.showToast({
       message: '移除成功！',
       duration: 500
     });
     return response.data
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '移除失败，请检查网络！',
       duration: 500
@@ -703,10 +677,10 @@ export async function createPlaylist(playlist: Playlist): Promise<Playlist | und
       connectTimeout: 30000
     })
     playlist1 = response.data
-    console.log("创建成功");
+    Logger.info("创建成功");
     return playlist1
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return undefined
   }
 }
@@ -738,11 +712,11 @@ export async function updatePlaylist(playlistId: string, name: string, descripti
       const bodyString = decoder.decodeWithStream(uint8Array);
       const parsed = JSON.parse(bodyString) as Playlist;
       playlist = parsed;
-      console.log("更新成功");
+      Logger.info("更新成功");
     }
     return playlist
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return undefined
   }
 }
@@ -756,10 +730,10 @@ export async function deletePlaylist(playlistId: string): Promise<boolean> {
         readTimeout: 30000,
         connectTimeout: 30000
       })
-    console.log("删除成功");
+    Logger.info("删除成功");
     return true
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return false
   }
 }
@@ -773,10 +747,10 @@ export async function syncSession(sessionId: string, updateSession: UpdateSessio
         readTimeout: 5000,
         connectTimeout: 5000
       })
-    console.log("同步会话", response.data);
+    Logger.info("同步会话" + response.data);
     return true
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return false
   }
 }
@@ -790,10 +764,10 @@ export async function closeSession(sessionId: string, updateSession: UpdateSessi
         readTimeout: 5000,
         connectTimeout: 5000
       })
-    console.log("关闭会话成功", response.data);
+    Logger.info("关闭会话成功" + response.data);
     return true
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '关闭会话失败，请检查网络！',
       duration: 500
@@ -813,10 +787,10 @@ export async function getStats(): Promise<ListeningStats | undefined> {
         connectTimeout: 30000
       })
     listeningStats = response.data
-    console.log("获取统计数据成功");
+    Logger.info("获取统计数据成功");
     return listeningStats
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取统计数据失败，请检查网络！',
       duration: 500
@@ -838,7 +812,7 @@ export async function getBookmarks(userId: string): Promise<Bookmark[]> {
     bookmarks = response.data.bookmarks
     return bookmarks
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取书签失败，请检查网络！',
       duration: 500
@@ -856,10 +830,10 @@ export async function createBookmark(itemId: string, bookmark: Bookmark): Promis
         readTimeout: 30000,
         connectTimeout: 30000
       })
-    console.log("创建书签成功", JSON.stringify(response.data));
+    Logger.info("创建书签成功" + JSON.stringify(response.data));
     return true
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return false
   }
 }
@@ -873,10 +847,10 @@ export async function deleteBookmark(itemId: string, time: number): Promise<bool
         readTimeout: 30000,
         connectTimeout: 30000
       })
-    console.log("删除书签成功", JSON.stringify(response.data));
+    Logger.info("删除书签成功" + JSON.stringify(response.data));
     return true
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return false
   }
 }
@@ -890,10 +864,10 @@ export async function searchPodcasts(term: string) {
         readTimeout: 30000,
         connectTimeout: 30000
       })
-    console.log("搜索播客成功，共" + response.data.length + "个结果");
+    Logger.info("搜索播客成功，共" + response.data.length + "个结果");
     return response.data
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '搜索播客失败，请检查网络！',
       duration: 500
@@ -916,7 +890,7 @@ export async function getFeed(feed: string): Promise<Podcast | undefined> {
       })
     return response.data.podcast
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return undefined
   }
 }
@@ -955,7 +929,7 @@ export async function addPodcast(libraryId: string, folderId: string, path:strin
       })
     return response.data
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return undefined
   }
 }
@@ -971,7 +945,7 @@ export async function getRecentEpisodes(libraryId: string, page: number) {
       })
     return response.data.episodes
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     promptAction.showToast({
       message: '获取最新剧集失败，请检查网络！',
       duration: 500
@@ -991,7 +965,7 @@ export async function downloadEpisodes(podcastId: string, episodes: Episode[]): 
       })
     return true
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return false
   }
 }
@@ -1005,10 +979,10 @@ export async function deleteFromServer(podcastId: string, episodeId: string): Pr
         readTimeout: 30000,
         connectTimeout: 30000
       })
-    console.log("删除剧集成功");
+    Logger.info("删除剧集成功");
     return true
   } catch (error) {
-    console.error(JSON.stringify(error));
+    Logger.error(JSON.stringify(error));
     return false
   }
 }

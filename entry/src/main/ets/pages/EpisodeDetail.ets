@@ -21,6 +21,7 @@ import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
 import { reportBuilder } from '../utils/Component'
 import { DownloadSetting, OtherSetting } from './Index'
+import { Logger } from '../utils/Logger'
 
 @Builder
 export function episodeDetailBuilder(name: string, param: Object) {
@@ -292,7 +293,7 @@ export struct EpisodeDetail {
           }
           const filePath = dir + "/" + this.episode!.audioFile!.metadata.filename
           if (this.downloadSetting?.skipExistingFiles && fs.accessSync(filePath)) {
-            console.info('文件已存在，跳过:', filePath)
+            Logger.info(`文件已存在，跳过: ${filePath}`)
           } else {
             const task = new DownloadTaskInfo()
             task.mediaType = this.library!.mediaType
@@ -312,7 +313,7 @@ export struct EpisodeDetail {
               filePath,
               (info) => {
                 // 下载进度回调
-                console.info('Progress:', info.title, Math.floor(info.progress) + "%");
+                Logger.info(`Progress: ${info.title} ${Math.floor(info.progress)}%`);
                 let index = this.downloadTasks.findIndex(t => t.id === info.id)
                 if (index >= 0) {
                   this.downloadTasks[index].progress = info.progress;
@@ -320,7 +321,7 @@ export struct EpisodeDetail {
               },
               (info) => {
                 // 状态变化回调
-                console.info('Status changed:', info.title, info.status);
+                Logger.info(`Status changed: ${info.title} ${info.status}`);
                 let index = this.downloadTasks.findIndex(t => t.id === info.id)
                 if (index >= 0) {
                   if (info.status === DownloadStatus.Removed) {
@@ -651,9 +652,9 @@ export struct EpisodeDetail {
                   this.playingTitle = this.playingItem!.displayTitle.trim()
                   this.playStartTime = this.playingItem!.currentTime - this.playingItem!.audioTracks[0].startOffset
                   this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[0].contentUrl + "?token=" + this.apiToken
-                  console.log("共", this.playingItem!.audioTracks.length, "条音轨")
-                  console.log("播放序号为", this.playingIndex)
-                  console.log("起始位置为", this.playStartTime)
+                  Logger.info(`共this.playingItem!.audioTracks.length条音轨`)
+                  Logger.info(`播放序号为this.playingIndex`)
+                  Logger.info(`起始位置为this.playStartTime`)
                 }
                 this.showPlayLoading = false
               })

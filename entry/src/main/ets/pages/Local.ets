@@ -5,6 +5,7 @@ import { PersistenceV2 } from '@kit.ArkUI';
 import { ColorMode } from "../pages/Index";
 import { LocalPlayItem, LocalTrack, PlayItem } from '../utils/Interface';
 import { media } from '@kit.MediaKit';
+import { Logger } from '../utils/Logger';
 
 @ComponentV2
 export struct LocalMedia {
@@ -116,7 +117,7 @@ export struct LocalMedia {
         duration: 500
       })
     } catch (err) {
-      console.error('删除失败', err)
+      Logger.error(`删除失败${err}`)
       this.getUIContext().getPromptAction().showToast({
         message: '删除失败',
         duration: 500
@@ -145,7 +146,7 @@ export struct LocalMedia {
         duration: 500
       })
     } catch (err) {
-      console.error('删除失败', err)
+      Logger.error(`删除失败${err}`)
       this.getUIContext().getPromptAction().showToast({
         message: '删除失败',
         duration: 500

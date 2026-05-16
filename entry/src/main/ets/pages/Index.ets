@@ -30,6 +30,7 @@ import { closeSession, getUser, syncSession } from '../utils/Api';
 import { bundleManager } from '@kit.AbilityKit';
 import { fileIo as fs, fileUri, picker } from '@kit.CoreFileKit';
 import { DownloadManager, DownloadTaskInfo } from '../utils/Class';
+import { LogEntry, Logger } from '../utils/Logger';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -159,7 +160,7 @@ struct Index {
   @Provider() sleepTime: number = 0
   @Provider() sliderMoving: boolean = false
   @Provider() syncTime: number = 0
-  @Provider() logs: string[] = []
+  @Provider() logs: LogEntry[] = []
   @Provider() downloadUri: string = ""
   @Provider() downloadTasks: DownloadTaskInfo[] = []
   @Provider() downloadCount: number = 0
@@ -357,8 +358,8 @@ struct Index {
       }
       if (status) {
         this.isConnect = true
-        console.log("会话当前时间", updateSession.currentTime)
-        console.log("会话汇报间隔", updateSession.timeListened)
+        Logger.info(`会话当前时间${updateSession.currentTime}`)
+        Logger.info(`会话汇报间隔${updateSession.timeListened}`)
         this.syncTime = new Date().getTime() / 1000
         this.user = await getUser()
         this.progress = this.user?.mediaProgress??[]
@@ -389,18 +390,18 @@ struct Index {
     wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj: WantAgent) => {
       backgroundTaskManager.startBackgroundRunning(this.context,
         backgroundTaskManager.BackgroundMode.AUDIO_PLAYBACK, wantAgentObj).then(() => {
-        console.info(`启动长时任务。`);
+        Logger.info(`启动长时任务。`);
       }).catch((err: BusinessError) => {
-        console.error(`启动长时任务出错，代码 ${err.code}，错误信息 ${err.message}`);
+        Logger.error(`启动长时任务出错，代码 ${err.code}，错误信息 ${err.message}`);
       });
     });
   }
 
   async stopContinuousTask() {
     backgroundTaskManager.stopBackgroundRunning(this.context).then(() => {
-      console.info(`停止长时任务。`);
+      Logger.info(`停止长时任务。`);
     }).catch((err: BusinessError) => {
-      console.error(`停止长时任务出错，代码 ${err.code}，错误信息 ${err.message}`);
+      Logger.error(`停止长时任务出错，代码 ${err.code}，错误信息 ${err.message}`);
     });
   }
 
@@ -416,9 +417,9 @@ struct Index {
       skipIntervals: this.playSetting!.skipIntervals
     };
     this.session!.setAVMetadata(metadata).then(() => {
-      console.info(`SetAVMetadata successfully`);
+      Logger.info(`SetAVMetadata successfully`);
     }).catch((err: BusinessError) => {
-      console.error(`Failed to set AVMetadata. Code: ${err.code}, message: ${err.message}`);
+      Logger.error(`Failed to set AVMetadata. Code: ${err.code}, message: ${err.message}`);
     });
   }
 
@@ -432,9 +433,9 @@ struct Index {
     };
     this.session!.setAVPlaybackState(playbackState, (err) => {
       if (err) {
-        console.error(`设置Session状态失败，Code: ${err.code}, message: ${err.message}`);
+        Logger.error(`设置Session状态失败，Code: ${err.code}, message: ${err.message}`);
       } else {
-        console.info("设置Session状态", state);
+        Logger.info(`设置Session状态${state}`);
       }
     });
   }
@@ -541,7 +542,7 @@ struct Index {
       }
     })
     avPlayer.on('seekDone', async (seekDoneTime: number) => {
-      console.info(`播放器跳转成功，当前时间为 ${seekDoneTime}`);
+      Logger.info(`播放器跳转成功，当前时间为 ${seekDoneTime}`);
       this.playedTime = seekDoneTime / 1000
       if (this.isPlaying === true) {
         await this.setPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PLAY)
@@ -556,28 +557,28 @@ struct Index {
     avPlayer.on('speedDone', (data: number) => {
       switch(data) {
         case media.PlaybackSpeed.SPEED_FORWARD_0_50_X:
-          console.info("设置速度 " + 0.5);
+          Logger.info("设置速度 " + 0.5);
           break;
         case media.PlaybackSpeed.SPEED_FORWARD_0_75_X:
-          console.info("设置速度 " + 0.75);
+          Logger.info("设置速度 " + 0.75);
           break;
         case media.PlaybackSpeed.SPEED_FORWARD_1_00_X:
-          console.info("设置速度 " + 1);
+          Logger.info("设置速度 " + 1);
           break;
         case media.PlaybackSpeed.SPEED_FORWARD_1_25_X:
-          console.info("设置速度 " + 1.25);
+          Logger.info("设置速度 " + 1.25);
           break;
         case media.PlaybackSpeed.SPEED_FORWARD_1_50_X:
-          console.info("设置速度 " + 1.5);
+          Logger.info("设置速度 " + 1.5);
           break;
         case media.PlaybackSpeed.SPEED_FORWARD_1_75_X:
-          console.info("设置速度 " + 1.75);
+          Logger.info("设置速度 " + 1.75);
           break;
         case media.PlaybackSpeed.SPEED_FORWARD_2_00_X:
-          console.info("设置速度 " + 2);
+          Logger.info("设置速度 " + 2);
           break;
         default :
-          console.info("设置速度 未知");
+          Logger.info("设置速度 未知");
           break;
       }
       if (this.playSetting?.rememberSpeed === true) {
@@ -585,14 +586,14 @@ struct Index {
       }
     })
     avPlayer.on('volumeChange', (vol: number) => {
-      console.info('设置播放音量' + vol)
+      Logger.info('设置播放音量' + vol)
     })
     avPlayer.on('durationUpdate', (duration: number) => {
       this.currentTrackDuration = duration / 1000
     })
     avPlayer.on('error', async (err: BusinessError) => {
       await avPlayer.reset();
-      console.error(`播放器出现错误，code is ${err.code}, message is ${err.message}`);
+      Logger.error(`播放器出现错误，code is ${err.code}, message is ${err.message}`);
       if (err.code === 5400106 || err.code === 5400103 || err.code === 5411007) {
         this.uiContext!.getPromptAction().showToast({
           message: '播放失败，格式不支持或文件不存在！',
@@ -613,16 +614,16 @@ struct Index {
     avPlayer.on('stateChange', async (state: string, reason: media.StateChangeReason) => {
       switch (state) {
         case 'idle':
-          console.info('播放器重置。');
+          Logger.info('播放器重置。');
           this.stopContinuousTask()
           this.playedTime = 0
           break;
         case 'initialized':
-          console.info('播放器初始化。');
+          Logger.info('播放器初始化。');
           avPlayer.prepare();
           break;
         case 'prepared':
-          console.info('播放器就绪。');
+          Logger.info('播放器就绪。');
           this.playedTime = 0
           if (this.session === undefined) {
             this.session = await avSession.createAVSession(this.context!, 'AUDIO_PLAY', 'video');
@@ -654,19 +655,19 @@ struct Index {
           this.syncTime = new Date().getTime() / 1000
           break;
         case 'playing':
-          console.info('播放器开始播放。');
+          Logger.info('播放器开始播放。');
           this.isPlaying = true
           await this.setPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PLAY)
           this.startContinuousTask()
           break;
         case 'paused':
-          console.info('播放器暂停。');
+          Logger.info('播放器暂停。');
           this.isPlaying = false
           await this.setPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PAUSE)
           this.stopContinuousTask()
           break;
         case 'completed':
-          console.info('播放完毕。');
+          Logger.info('播放完毕。');
           if (!this.isLocalPlaying) {
             this.syncProgress()
           }
@@ -701,7 +702,7 @@ struct Index {
           }
           break;
         case 'stopped':
-          console.info('播放器停止。');
+          Logger.info('播放器停止。');
           this.toCloseIndex = this.playingIndex
           if (!this.isLocalPlaying) {
             this.toCloseSession = this.playingItem
@@ -723,10 +724,10 @@ struct Index {
           }, 100)
           break;
         case 'released':
-          console.info('播放器释放。');
+          Logger.info('播放器释放。');
           break;
         default:
-          console.info('播放器状态未知。');
+          Logger.info('播放器状态未知。');
           break;
       }
     })
@@ -767,12 +768,15 @@ struct Index {
   }
 
   async aboutToAppear() {
+    Logger.setCallback((entries) => {
+      this.logs = entries
+    })
     this.firstAppear = true
     app.setImageCacheCount(512);
     app.setImageRawDataCacheSize(100 * 1024 * 1024);
     this.uiContext = this.getUIContext();
     if (!this.uiContext) {
-      console.warn("no uiContext");
+      Logger.warn("no uiContext");
       return;
     }
     this.context = this.uiContext.getHostContext() as common.UIAbilityContext;
@@ -845,7 +849,7 @@ struct Index {
       documentSaveOptions.pickerMode = picker.DocumentPickerMode.DOWNLOAD;
       documentViewPicker.save(documentSaveOptions).then(async (documentSaveResult: Array<string>) => {
         this.downloadUri = documentSaveResult[0];
-        console.info('documentViewPicker.save succeed and uri is:' + this.downloadUri);
+        Logger.debug('documentViewPicker.save succeed and uri is:' + this.downloadUri);
         const downloadPath = new fileUri.FileUri(this.downloadUri).path
         if (!fs.accessSync(downloadPath + "/有声书")) {
           fs.mkdirSync(downloadPath + "/有声书")
@@ -854,10 +858,10 @@ struct Index {
           fs.mkdirSync(downloadPath + "/播客")
         }
       }).catch((err: BusinessError) => {
-        console.error(`Invoke documentViewPicker.save failed, code is ${err.code}, message is ${err.message}`);
+        Logger.error(`Invoke documentViewPicker.save failed, code is ${err.code}, message is ${err.message}`);
       })
     } catch (err) {
-      console.error(`Failed to create a documentSaveOptions, err: ${err}`);
+      Logger.error(`Failed to create a documentSaveOptions, err: ${err}`);
       return;
     }
   }

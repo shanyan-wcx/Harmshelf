@@ -8,6 +8,7 @@ import { deviceInfo } from "@kit.BasicServicesKit";
 import { createBookmark, deleteBookmark, getBookmarks } from '../utils/Api';
 import { PlaySetting } from './Index';
 import { media } from '@kit.MediaKit';
+import { Logger } from '../utils/Logger';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -200,9 +201,9 @@ export struct Play {
     this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
     this.playStartTime = time - playItem.audioTracks[index].startOffset
     this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
-    console.log("共", playItem.audioTracks.length, "条音轨")
-    console.log("播放序号为", this.playingIndex)
-    console.log("起始位置为", this.playStartTime)
+    Logger.info(`共playItem.audioTracks.length条音轨`)
+    Logger.info(`播放序号为this.playingIndex`)
+    Logger.info(`起始位置为this.playStartTime`)
   }
 
   @Builder

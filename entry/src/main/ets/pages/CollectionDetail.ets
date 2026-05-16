@@ -7,6 +7,7 @@ import { ColorMode } from "../pages/Index";
 import { deleteCollection, getCollections, getPlayItem, removeFromCollection, updateCollection } from '../utils/Api';
 import { media } from '@kit.MediaKit';
 import { deviceInfo } from '@kit.BasicServicesKit';
+import { Logger } from '../utils/Logger';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -61,9 +62,9 @@ export struct CollectionDetail {
     this.playStartTime = playItem.currentTime - playItem.audioTracks[index].startOffset
     this.avPlayer!.url =
       this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
-    console.log("共", playItem.audioTracks.length, "条音轨")
-    console.log("播放序号为", this.playingIndex)
-    console.log("起始位置为", this.playStartTime)
+    Logger.info(`共playItem.audioTracks.length条音轨`)
+    Logger.info(`播放序号为this.playingIndex`)
+    Logger.info(`起始位置为this.playStartTime`)
   }
 
   get totalDuration(): string {

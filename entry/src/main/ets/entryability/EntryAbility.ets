@@ -1,16 +1,14 @@
 import { AbilityConstant, appRecovery, Configuration, ConfigurationConstant, errorManager, UIAbility, Want } from '@kit.AbilityKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { env } from '../utils/Class';
+import { Logger } from '../utils/Logger';
 import app, { AppResponse } from '@system.app';
 import { BusinessError } from '@kit.BasicServicesKit';
 
-const DOMAIN = 0x0000;
-
 let callback: errorManager.ErrorObserver = {
   onUnhandledException(errMsg) {
-    console.log(errMsg);
+    Logger.error(errMsg);
     appRecovery.saveAppState();
     appRecovery.restartApp();
   }
@@ -18,7 +16,7 @@ let callback: errorManager.ErrorObserver = {
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
+    Logger.debug('Ability onCreate');
     env.colorMode = this.context.config.colorMode;
     app.setImageFileCacheSize(256 * 1024 * 1024);
     appRecovery.enableAppRecovery(appRecovery.RestartFlag.ALWAYS_RESTART,
@@ -27,12 +25,12 @@ export default class EntryAbility extends UIAbility {
   }
 
   onDestroy(): void {
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onDestroy');
+    Logger.debug('Ability onDestroy');
   }
 
   onWindowStageCreate(windowStage: window.WindowStage): void {
     // Main window is created, set main page for this ability
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
+    Logger.debug('Ability onWindowStageCreate');
 
     errorManager.on('error', callback);
 
@@ -40,10 +38,10 @@ export default class EntryAbility extends UIAbility {
 
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
-        hilog.error(DOMAIN, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err));
+        Logger.error('Failed to load the content. Cause: ' + JSON.stringify(err));
         return;
       }
-      hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
+      Logger.debug('Succeeded in loading the content.');
 
       windowStage.getMainWindow().then((data: window.Window) => {
         data.setWindowLayoutFullScreen(true)
@@ -65,12 +63,12 @@ export default class EntryAbility extends UIAbility {
         let orientation = window.Orientation.AUTO_ROTATION_UNSPECIFIED;
         try {
           data.setPreferredOrientation(orientation).then(() => {
-            console.info('Succeeded in setting the window orientation.');
+            Logger.debug('Succeeded in setting the window orientation.');
           }).catch((err: BusinessError) => {
-            console.error(`Failed to set the window orientation. Cause code: ${err.code}, message: ${err.message}`);
+            Logger.error(`Failed to set the window orientation. Cause code: ${err.code}, message: ${err.message}`);
           });
         } catch (exception) {
-          console.error(`Failed to set window orientation. Cause code: ${exception.code}, message: ${exception.message}`);
+          Logger.error(`Failed to set window orientation. Cause code: ${exception.code}, message: ${exception.message}`);
         }
       })
     });
@@ -78,17 +76,17 @@ export default class EntryAbility extends UIAbility {
 
   onWindowStageDestroy(): void {
     // Main window is destroyed, release UI related resources
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onWindowStageDestroy');
+    Logger.debug('Ability onWindowStageDestroy');
   }
 
   onForeground(): void {
     // Ability has brought to foreground
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onForeground');
+    Logger.debug('Ability onForeground');
   }
 
   onBackground(): void {
     // Ability has back to background
-    hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onBackground');
+    Logger.debug('Ability onBackground');
   }
 
   async onConfigurationUpdate(newConfig: Configuration) {

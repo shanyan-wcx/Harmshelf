@@ -35,6 +35,7 @@ import { media } from "@kit.MediaKit";
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { DownloadSetting, OtherSetting } from "./Index";
+import { Logger } from '../utils/Logger';
 
 @Builder
 export function libraryItemDetailBuilder(name: string, param: Object) {
@@ -172,9 +173,9 @@ export struct LibraryItemDetail {
     this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
     this.playStartTime = playItem.currentTime - playItem.audioTracks[index].startOffset
     this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
-    console.log("共", playItem.audioTracks.length, "条音轨")
-    console.log("播放序号为", this.playingIndex)
-    console.log("起始位置为", this.playStartTime)
+    Logger.info(`共playItem.audioTracks.length条音轨`)
+    Logger.info(`播放序号为this.playingIndex`)
+    Logger.info(`起始位置为this.playStartTime`)
   }
 
   updateMoreMenus() {
@@ -216,7 +217,7 @@ export struct LibraryItemDetail {
               this.progress = (await getUser())?.mediaProgress??this.progress
               this.itemProgress = this.progress.find(p => p.libraryItemId === this.libraryItem!.id)
             }
-            console.log(JSON.stringify(this.itemProgress))
+            Logger.info(JSON.stringify(this.itemProgress))
             this.updateMoreMenus()
           }
         })
@@ -414,9 +415,9 @@ export struct LibraryItemDetail {
             this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
             this.playStartTime = 0
             this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
-            console.log("共", this.playingItem!.audioTracks.length, "条音轨")
-            console.log("播放序号为", this.playingIndex)
-            console.log("起始位置为", this.playStartTime)
+            Logger.info(`共this.playingItem!.audioTracks.length条音轨`)
+            Logger.info(`播放序号为this.playingIndex`)
+            Logger.info(`起始位置为this.playStartTime`)
           }
           this.showConfirm = false
         })
@@ -475,7 +476,7 @@ export struct LibraryItemDetail {
           this.libraryItem?.media.tracks?.forEach(async (track: Track, index) => {
             const filePath = dir + "/" + track.metadata.filename
             if (this.downloadSetting?.skipExistingFiles && fs.accessSync(filePath)) {
-              console.info('文件已存在，跳过:', filePath)
+              Logger.info(`文件已存在，跳过: ${filePath}`)
             } else {
               const task = new DownloadTaskInfo()
               task.mediaType = this.libraryItem!.mediaType
@@ -495,7 +496,7 @@ export struct LibraryItemDetail {
                 filePath,
                 (info) => {
                   // 下载进度回调
-                  console.info('Progress:', info.title, Math.floor(info.progress) + "%");
+                  Logger.info(`Progress: ${info.title} ${Math.floor(info.progress)}%`);
                   let index = this.downloadTasks.findIndex(t => t.id === info.id)
                   if (index >= 0) {
                     this.downloadTasks[index].progress = info.progress;
@@ -503,7 +504,7 @@ export struct LibraryItemDetail {
                 },
                 (info) => {
                   // 状态变化回调
-                  console.info('Status changed:', info.title, info.status);
+                  Logger.info(`Status changed: ${info.title} ${info.status}`);
                   let index = this.downloadTasks.findIndex(t => t.id === info.id)
                   if (index >= 0) {
                     if (info.status === DownloadStatus.Removed) {
@@ -1003,9 +1004,9 @@ export struct LibraryItemDetail {
                         this.playingTitle = this.playingItem!.displayTitle.trim()
                         this.playStartTime = this.playingItem!.currentTime - this.playingItem!.audioTracks[0].startOffset
                         this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[0].contentUrl + "?token=" + this.apiToken
-                        console.log("共", this.playingItem!.audioTracks.length, "条音轨")
-                        console.log("播放序号为", this.playingIndex)
-                        console.log("起始位置为", this.playStartTime)
+                        Logger.info(`共this.playingItem!.audioTracks.length条音轨`)
+                        Logger.info(`播放序号为this.playingIndex`)
+                        Logger.info(`起始位置为this.playStartTime`)
                       }
                     }
                     this.showPlayLoading = false

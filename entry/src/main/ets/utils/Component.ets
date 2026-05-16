@@ -41,6 +41,7 @@ import { media } from "@kit.MediaKit";
 import { DownloadStatus, DownloadTaskInfo, DownloadManager } from "./Class";
 import { DownloadSetting } from "../pages/Index";
 import { fileUri, fileIo as fs } from "@kit.CoreFileKit";
+import { Logger } from './Logger';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -1051,7 +1052,7 @@ export struct EpisodeComponent {
           }
           const filePath = dir + "/" + this.item!.audioFile!.metadata.filename
           if (this.downloadSetting?.skipExistingFiles && fs.accessSync(filePath)) {
-            console.info('文件已存在，跳过:', filePath)
+            Logger.info(`文件已存在，跳过: ${filePath}`)
           } else {
             const task = new DownloadTaskInfo()
             task.mediaType = this.library!.mediaType
@@ -1071,7 +1072,7 @@ export struct EpisodeComponent {
               filePath,
               (info) => {
                 // 下载进度回调
-                console.info('Progress:', info.title, Math.floor(info.progress) + "%");
+                Logger.info(`Progress: ${info.title} ${Math.floor(info.progress)}%`);
                 let index = this.downloadTasks.findIndex(t => t.id === info.id)
                 if (index >= 0) {
                   this.downloadTasks[index].progress = info.progress;
@@ -1079,7 +1080,7 @@ export struct EpisodeComponent {
               },
               (info) => {
                 // 状态变化回调
-                console.info('Status changed:', info.title, info.status);
+                Logger.info(`Status changed: ${info.title} ${info.status}`);
                 let index = this.downloadTasks.findIndex(t => t.id === info.id)
                 if (index >= 0) {
                   if (info.status === DownloadStatus.Removed) {
@@ -1422,9 +1423,9 @@ export struct EpisodeComponent {
             this.playingTitle = this.playingItem!.displayTitle.trim()
             this.playStartTime = this.playingItem!.currentTime - this.playingItem!.audioTracks[0].startOffset
             this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[0].contentUrl + "?token=" + this.apiToken
-            console.log("共", this.playingItem!.audioTracks.length, "条音轨")
-            console.log("播放序号为", this.playingIndex)
-            console.log("起始位置为", this.playStartTime)
+            Logger.info(`共this.playingItem!.audioTracks.length条音轨`)
+            Logger.info(`播放序号为this.playingIndex`)
+            Logger.info(`起始位置为this.playStartTime`)
           }
           this.showPlayLoading = false
         })
@@ -1680,7 +1681,7 @@ export struct EpisodeComponent1 {
           }
           const filePath = dir + "/" + this.item!.audioFile!.metadata.filename
           if (this.downloadSetting?.skipExistingFiles && fs.accessSync(filePath)) {
-            console.info('文件已存在，跳过:', filePath)
+            Logger.info(`文件已存在，跳过: ${filePath}`)
           } else {
             const task = new DownloadTaskInfo()
             task.mediaType = this.library!.mediaType
@@ -1700,7 +1701,7 @@ export struct EpisodeComponent1 {
               filePath,
               (info) => {
                 // 下载进度回调
-                console.info('Progress:', info.title, Math.floor(info.progress) + "%");
+                Logger.info(`Progress: ${info.title} ${Math.floor(info.progress)}%`);
                 let index = this.downloadTasks.findIndex(t => t.id === info.id)
                 if (index >= 0) {
                   this.downloadTasks[index].progress = info.progress;
@@ -1708,7 +1709,7 @@ export struct EpisodeComponent1 {
               },
               (info) => {
                 // 状态变化回调
-                console.info('Status changed:', info.title, info.status);
+                Logger.info(`Status changed: ${info.title} ${info.status}`);
                 let index = this.downloadTasks.findIndex(t => t.id === info.id)
                 if (index >= 0) {
                   if (info.status === DownloadStatus.Removed) {
@@ -2016,9 +2017,9 @@ export struct EpisodeComponent1 {
             this.playingTitle = this.playingItem!.displayTitle.trim()
             this.playStartTime = this.playingItem!.currentTime - this.playingItem!.audioTracks[0].startOffset
             this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[0].contentUrl + "?token=" + this.apiToken
-            console.log("共", this.playingItem!.audioTracks.length, "条音轨")
-            console.log("播放序号为", this.playingIndex)
-            console.log("起始位置为", this.playStartTime)
+            Logger.info(`共this.playingItem!.audioTracks.length条音轨`)
+            Logger.info(`播放序号为this.playingIndex`)
+            Logger.info(`起始位置为this.playStartTime`)
           }
           this.showPlayLoading = false
         })

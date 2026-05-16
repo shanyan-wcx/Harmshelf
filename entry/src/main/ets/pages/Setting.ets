@@ -8,6 +8,7 @@ import { avSession } from "@kit.AVSessionKit";
 import { BusinessError } from '@kit.BasicServicesKit';
 import { bundleManager } from '@kit.AbilityKit';
 import { media } from "@kit.MediaKit";
+import { Logger } from '../utils/Logger';
 
 let bundleFlags = bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT;
 let bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleFlags)
@@ -73,9 +74,9 @@ export struct Setting {
       skipIntervals: this.playSetting!.skipIntervals
     };
     this.session!.setAVMetadata(metadata).then(() => {
-      console.info(`SetAVMetadata successfully`);
+      Logger.info(`SetAVMetadata successfully`);
     }).catch((err: BusinessError) => {
-      console.error(`Failed to set AVMetadata. Code: ${err.code}, message: ${err.message}`);
+      Logger.error(`Failed to set AVMetadata. Code: ${err.code}, message: ${err.message}`);
     });
   }
 

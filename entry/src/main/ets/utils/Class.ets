@@ -3,6 +3,7 @@ import request from '@ohos.request';
 import common from '@ohos.app.ability.common';
 import { BusinessError } from '@ohos.base';
 import { fileUri, fileIo as fs } from '@kit.CoreFileKit';
+import { Logger } from './Logger';
 
 export class Env {
   language: string | undefined;
@@ -67,7 +68,7 @@ export class DownloadManager {
     onStatusChange?: StatusCallback
   ): void {
     if (this.tasks.has(id)) {
-      console.log(`任务 ${id} 已存在`);
+      Logger.info(`任务 ${id} 已存在`);
       return;
     }
     const info: DownloadTaskInfo = {
@@ -135,7 +136,7 @@ export class DownloadManager {
       const downloadTask = await request.agent.create(this.context!, config)
       downloadTask.start((err: BusinessError) => {
         if (err) {
-          console.error(`Failed to start the download task, Code: ${err.code}  message: ${err.message}`);
+          Logger.error(`Failed to start the download task, Code: ${err.code}  message: ${err.message}`);
           return;
         }
       });
@@ -218,7 +219,7 @@ export class DownloadManager {
   remove(id: string): void {
     const task = this.tasks.get(id);
     if (!task) {
-      console.log(`不存在任务 ${id}`);
+      Logger.info(`不存在任务 ${id}`);
       return;
     }
     if (task.downloadTask) {
@@ -267,7 +268,7 @@ export class DownloadManager {
       const task = await request.agent.create(this.context, config);
       task.start();
     } catch (err) {
-      console.error(`封面下载失败: ${err}`);
+      Logger.error(`封面下载失败: ${err}`);
     }
   }
 }
