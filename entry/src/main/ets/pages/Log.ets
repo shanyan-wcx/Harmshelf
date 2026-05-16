@@ -15,6 +15,8 @@ export struct Log {
   @Consumer() logs: LogEntry[] = []
   @Consumer() context: common.UIAbilityContext | undefined = undefined
   @Local selectedFilter: number = 1
+  @Local showLoadingProgress: boolean = false
+  @Local displayLogs: LogEntry[] = []
 
   private filterOptions: SelectOption[] = [
     { value: 'DEBUG' },
@@ -45,10 +47,26 @@ export struct Log {
   }
 
   @Monitor('logs')
-  scrollLogs() {
+  onLogsChange() {
+    if (this.showLoadingProgress) {
+      return
+    }
+    this.displayLogs = this.filteredLogs
     setTimeout(() => {
       this.logScroller.scrollEdge(Edge.Bottom)
     }, 25)
+  }
+
+  refreshDisplay() {
+    this.showLoadingProgress = true
+    this.displayLogs = []
+    setTimeout(() => {
+      this.displayLogs = this.filteredLogs
+      this.showLoadingProgress = false
+      setTimeout(() => {
+        this.logScroller.scrollEdge(Edge.Bottom)
+      }, 75)
+    }, 50)
   }
 
   copyAllLogs() {
@@ -106,9 +124,19 @@ export struct Log {
 
   build() {
     Stack() {
-      if (this.filteredLogs.length > 0) {
+      if (this.showLoadingProgress) {
+        Column() {
+          LoadingProgress()
+            .width(56)
+            .height(56)
+            .color($r('sys.color.loading_progress_focused_color'))
+        }
+        .height('100%')
+        .width('100%')
+        .justifyContent(FlexAlign.Center)
+      } else if (this.displayLogs.length > 0) {
         List({ scroller: this.logScroller }) {
-          ForEach(this.filteredLogs, (log: LogEntry, index: number) => {
+          ForEach(this.displayLogs, (log: LogEntry, index: number) => {
           ListItem() {
             Row() {
               Text(log.timestamp)
@@ -131,7 +159,7 @@ export struct Log {
           }
           .width('100%')
           .padding({ left: 20, right: 20, top: 4, bottom: 4 })
-          .margin({ top: index === 0 ? 56 : 0, bottom: index === this.filteredLogs.length - 1 ? (this.isStartPlaying ? 150 : 71) : 0 })
+          .margin({ top: index === 0 ? 56 : 0, bottom: index === this.displayLogs.length - 1 ? (this.isStartPlaying ? 150 : 71) : 0 })
           })
         }
         .width('100%')
@@ -140,7 +168,7 @@ export struct Log {
         .edgeEffect(EdgeEffect.None)
       }
 
-      if (this.filteredLogs.length === 0) {
+      if (!this.showLoadingProgress && this.displayLogs.length === 0) {
         Text('没有日志')
           .fontSize(32)
           .fontColor($r('sys.color.font'))
@@ -153,9 +181,7 @@ export struct Log {
           .value(this.filterOptions[this.selectedFilter].value)
           .onSelect((index: number) => {
             this.selectedFilter = index
-            setTimeout(() => {
-              this.logScroller.scrollEdge(Edge.Bottom)
-            }, 25)
+            this.refreshDisplay()
           })
           .width(120)
           .margin({ left: 20 })
@@ -201,7 +227,7 @@ export struct Log {
     .width('100%')
     .height('100%')
     .onAppear(() => {
-      this.logScroller.scrollEdge(Edge.Bottom)
+      this.refreshDisplay()
     })
   }
 }
