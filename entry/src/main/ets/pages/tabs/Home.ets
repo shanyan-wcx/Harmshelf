@@ -308,7 +308,7 @@ export struct SubHome {
                 })
               }
               .width('100%')
-              .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
+              .height(this.displayWidth >= 1400 ? 172 : (this.displayWidth >= 1200 ? 158 : 144))
               .listDirection(Axis.Horizontal)
               .scrollBar(BarState.Off)
             }
@@ -339,11 +339,5 @@ export struct SubHome {
     .width('100%')
     .height('100%')
     .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
-
-    // .onClick(() => {
-    //   this.homeData.forEach((data, index) => {
-    //     console.log(data.id)
-    //   })
-    // })
   }
 }
