@@ -74,6 +74,15 @@ export struct Play {
   async speedMonitoring(monitor: IMonitor) {
     this.changeSpeedIcon()
   }
+  @Monitor('gobackwardIcon')
+  async changeIcon(monitor: IMonitor) {
+    this.goBackwardButton.baseIcon = this.gobackwardIcon
+    this.goForwardButton.baseIcon = this.goforwardIcon
+  }
+  @Monitor('isPlaying')
+  async changeIcon2(monitor: IMonitor) {
+    this.playPauseButton.baseIcon = this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill');
+  }
 
   changeSpeedIcon() {
     switch(this.speed) {
@@ -209,6 +218,23 @@ export struct Play {
     Logger.info(`共playItem.audioTracks.length条音轨`)
     Logger.info(`播放序号为this.playingIndex`)
     Logger.info(`起始位置为this.playStartTime`)
+  }
+
+  startRotate() {
+    if (this.rotateTimer !== -1) {
+      return
+    }
+    this.rotateTimer = setInterval(() => {
+      this.rotateAngle += 0.1
+    }, 10)
+  }
+
+  stopRotate() {
+    if (this.rotateTimer === -1) {
+      return
+    }
+    clearInterval(this.rotateTimer)
+    this.rotateTimer = -1
   }
 
   @Builder
@@ -1269,7 +1295,7 @@ export struct Play {
           .height(71)
           .style({
             strokeWidth: 3,
-            enableSmoothEffect: false
+            enableSmoothEffect: true
           })
       }
       .width(70)
@@ -1294,60 +1320,56 @@ export struct Play {
     })
   }
 
-  startRotate() {
-    if (this.rotateTimer !== -1) {
-      return
+  goBackwardButton: ActionBarButton = new ActionBarButton({
+    baseIcon: this.gobackwardIcon,
+    onClick: () => {
+      this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ? (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
     }
-    this.rotateTimer = setInterval(() => {
-      this.rotateAngle += 0.1
-    }, 10)
-  }
+  })
 
-  stopRotate() {
-    if (this.rotateTimer === -1) {
-      return
+  stopButton: ActionBarButton = new ActionBarButton({
+    baseIcon: $r('sys.symbol.stop_circle'),
+    onClick: () => {
+      this.avPlayer!.stop()
+      this.showPlay = false
+      this.isStartPlaying = false
+      this.isPlaying = false
     }
-    clearInterval(this.rotateTimer)
-    this.rotateTimer = -1
-  }
+  })
+
+  playPauseButton: ActionBarButton = new ActionBarButton({
+    baseIcon: this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'),
+    onClick: () => {
+      if (this.isPlaying) {
+        if (this.playSetting?.fadeInOut) {
+          this.fadeOut()
+        } else {
+          this.avPlayer!.pause()
+        }
+      } else {
+        if (this.playSetting?.fadeInOut) {
+          this.fadeIn()
+        } else {
+          this.avPlayer!.play()
+        }
+      }
+      this.isPlaying = !this.isPlaying
+    }
+  })
+
+  goForwardButton: ActionBarButton = new ActionBarButton({
+    baseIcon: this.goforwardIcon,
+    onClick: () => {
+      let dur = this.getCurrentDuration()
+      this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < dur ? (this.playedTime + this.playSetting!.skipIntervals) * 1000 : dur * 1000)
+    }
+  })
 
   build() {
     Column() {
-      if (this.isPlaying && this.playSetting?.skipIntervals === 10) {
-        HdsActionBar({
-          startButtons: [new ActionBarButton({
-            baseIcon: $r('sys.symbol.gobackward_10'),
-            onClick: () => {
-              this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ?
-                (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
-            }
-          }), new ActionBarButton({
-            baseIcon: $r('sys.symbol.stop_circle'),
-            onClick: () => {
-              this.avPlayer!.stop()
-              this.showPlay = false
-              this.isStartPlaying = false
-              this.isPlaying = false
-            }
-          })],
-          endButtons: [new ActionBarButton({
-            baseIcon: $r('sys.symbol.pause'),
-            onClick: () => {
-              if (this.playSetting?.fadeInOut) {
-                this.fadeOut()
-              } else {
-                this.avPlayer!.pause()
-              }
-              this.isPlaying = !this.isPlaying
-            }
-          }), new ActionBarButton({
-            baseIcon: $r('sys.symbol.goforward_10'),
-            onClick: () => {
-              let dur = this.getCurrentDuration()
-              this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < dur ?
-                (this.playedTime + this.playSetting!.skipIntervals) * 1000 : dur * 1000)
-            }
-          })],
+      HdsActionBar({
+        startButtons: [this.goBackwardButton, this.stopButton],
+          endButtons: [this.playPauseButton, this.goForwardButton],
           primaryButtonBuilder: (): void => this.primaryButtonBuilder(),
           primaryButtonBuilderWidth: LengthMetrics.vp(70),
           isExpand: true,
@@ -1356,222 +1378,6 @@ export struct Play {
           .height(0)
           .hitTestBehavior(HitTestMode.BLOCK_HIERARCHY)
           .margin({ bottom: 108 })
-      } else if (this.isPlaying && this.playSetting?.skipIntervals === 15) {
-        HdsActionBar({
-          startButtons: [new ActionBarButton({
-            baseIcon: $r('sys.symbol.gobackward_15'),
-            onClick: () => {
-              this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ?
-                (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
-            }
-          }), new ActionBarButton({
-            baseIcon: $r('sys.symbol.stop_circle'),
-            onClick: () => {
-              this.avPlayer!.stop()
-              this.showPlay = false
-              this.isStartPlaying = false
-              this.isPlaying = false
-            }
-          })],
-          endButtons: [new ActionBarButton({
-            baseIcon: $r('sys.symbol.pause'),
-            onClick: () => {
-              if (this.playSetting?.fadeInOut) {
-                this.fadeOut()
-              } else {
-                this.avPlayer!.pause()
-              }
-              this.isPlaying = !this.isPlaying
-            }
-          }), new ActionBarButton({
-            baseIcon: $r('sys.symbol.goforward_15'),
-            onClick: () => {
-              let dur = this.getCurrentDuration()
-              this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < dur ?
-                (this.playedTime + this.playSetting!.skipIntervals) * 1000 : dur * 1000)
-            }
-          })],
-          primaryButtonBuilder: (): void => this.primaryButtonBuilder(),
-          primaryButtonBuilderWidth: LengthMetrics.vp(70),
-          isExpand: true,
-          blurStrategy: BlurStrategy.ENABLE
-        })
-          .height(0)
-          .hitTestBehavior(HitTestMode.BLOCK_HIERARCHY)
-          .margin({ bottom: 108 })
-      } else if (this.isPlaying) {
-        HdsActionBar({
-          startButtons: [new ActionBarButton({
-            baseIcon: $r('sys.symbol.gobackward_30'),
-            onClick: () => {
-              this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ?
-                (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
-            }
-          }), new ActionBarButton({
-            baseIcon: $r('sys.symbol.stop_circle'),
-            onClick: () => {
-              this.avPlayer!.stop()
-              this.showPlay = false
-              this.isStartPlaying = false
-              this.isPlaying = false
-            }
-          })],
-          endButtons: [new ActionBarButton({
-            baseIcon: $r('sys.symbol.pause'),
-            onClick: () => {
-              if (this.playSetting?.fadeInOut) {
-                this.fadeOut()
-              } else {
-                this.avPlayer!.pause()
-              }
-              this.isPlaying = !this.isPlaying
-            }
-          }), new ActionBarButton({
-            baseIcon: $r('sys.symbol.goforward_30'),
-            onClick: () => {
-              let dur = this.getCurrentDuration()
-              this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < dur ?
-                (this.playedTime + this.playSetting!.skipIntervals) * 1000 : dur * 1000)
-            }
-          })],
-          primaryButtonBuilder: (): void => this.primaryButtonBuilder(),
-          primaryButtonBuilderWidth: LengthMetrics.vp(70),
-          isExpand: true,
-          blurStrategy: BlurStrategy.ENABLE
-        })
-          .height(0)
-          .hitTestBehavior(HitTestMode.BLOCK_HIERARCHY)
-          .margin({ bottom: 108 })
-      } else if (!this.isPlaying && this.playSetting?.skipIntervals === 10) {
-        HdsActionBar({
-          startButtons: [new ActionBarButton({
-            baseIcon: $r('sys.symbol.gobackward_10'),
-            onClick: () => {
-              this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ?
-                (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
-            }
-          }), new ActionBarButton({
-            baseIcon: $r('sys.symbol.stop_circle'),
-            onClick: () => {
-              this.avPlayer!.stop()
-              this.showPlay = false
-              this.isStartPlaying = false
-              this.isPlaying = false
-            }
-          })],
-          endButtons: [new ActionBarButton({
-            baseIcon: $r('sys.symbol.play_fill'),
-            onClick: () => {
-              if (this.playSetting?.fadeInOut) {
-                this.fadeIn()
-              } else {
-                this.avPlayer!.play()
-              }
-              this.isPlaying = !this.isPlaying
-            }
-          }), new ActionBarButton({
-            baseIcon: $r('sys.symbol.goforward_10'),
-            onClick: () => {
-              let dur = this.getCurrentDuration()
-              this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < dur ?
-                (this.playedTime + this.playSetting!.skipIntervals) * 1000 : dur * 1000)
-            }
-          })],
-          primaryButtonBuilder: (): void => this.primaryButtonBuilder(),
-          primaryButtonBuilderWidth: LengthMetrics.vp(70),
-          isExpand: true,
-          blurStrategy: BlurStrategy.ENABLE
-        })
-          .height(0)
-          .hitTestBehavior(HitTestMode.BLOCK_HIERARCHY)
-          .margin({ bottom: 108 })
-      } else if (!this.isPlaying && this.playSetting?.skipIntervals === 15) {
-        HdsActionBar({
-          startButtons: [new ActionBarButton({
-            baseIcon: $r('sys.symbol.gobackward_15'),
-            onClick: () => {
-              this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ?
-                (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
-            }
-          }), new ActionBarButton({
-            baseIcon: $r('sys.symbol.stop_circle'),
-            onClick: () => {
-              this.avPlayer!.stop()
-              this.showPlay = false
-              this.isStartPlaying = false
-              this.isPlaying = false
-            }
-          })],
-          endButtons: [new ActionBarButton({
-            baseIcon: $r('sys.symbol.play_fill'),
-            onClick: () => {
-              if (this.playSetting?.fadeInOut) {
-                this.fadeIn()
-              } else {
-                this.avPlayer!.play()
-              }
-              this.isPlaying = !this.isPlaying
-            }
-          }), new ActionBarButton({
-            baseIcon: $r('sys.symbol.goforward_15'),
-            onClick: () => {
-              let dur = this.getCurrentDuration()
-              this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < dur ?
-                (this.playedTime + this.playSetting!.skipIntervals) * 1000 : dur * 1000)
-            }
-          })],
-          primaryButtonBuilder: (): void => this.primaryButtonBuilder(),
-          primaryButtonBuilderWidth: LengthMetrics.vp(70),
-          isExpand: true,
-          blurStrategy: BlurStrategy.ENABLE
-        })
-          .height(0)
-          .hitTestBehavior(HitTestMode.BLOCK_HIERARCHY)
-          .margin({ bottom: 108 })
-      } else {
-        HdsActionBar({
-          startButtons: [new ActionBarButton({
-            baseIcon: $r('sys.symbol.gobackward_30'),
-            onClick: () => {
-              this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ?
-                (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
-            }
-          }), new ActionBarButton({
-            baseIcon: $r('sys.symbol.stop_circle'),
-            onClick: () => {
-              this.avPlayer!.stop()
-              this.showPlay = false
-              this.isStartPlaying = false
-              this.isPlaying = false
-            }
-          })],
-          endButtons: [new ActionBarButton({
-            baseIcon: $r('sys.symbol.play_fill'),
-            onClick: () => {
-              if (this.playSetting?.fadeInOut) {
-                this.fadeIn()
-              } else {
-                this.avPlayer!.play()
-              }
-              this.isPlaying = !this.isPlaying
-            }
-          }), new ActionBarButton({
-            baseIcon: $r('sys.symbol.goforward_30'),
-            onClick: () => {
-              let dur = this.getCurrentDuration()
-              this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < dur ?
-                (this.playedTime + this.playSetting!.skipIntervals) * 1000 : dur * 1000)
-            }
-          })],
-          primaryButtonBuilder: (): void => this.primaryButtonBuilder(),
-          primaryButtonBuilderWidth: LengthMetrics.vp(70),
-          isExpand: true,
-          blurStrategy: BlurStrategy.ENABLE
-        })
-          .height(0)
-          .hitTestBehavior(HitTestMode.BLOCK_HIERARCHY)
-          .margin({ bottom: 108 })
-      }
     }
     .width('100%')
     .height('100%')
