@@ -590,3 +590,8 @@ export interface NewPodcastMetadata {
   explicit: boolean
   language: string | null;
 }
+
+export interface SkipSettings {
+  skipStart: number;
+  skipEnd: number;
+}

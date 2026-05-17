@@ -17,7 +17,8 @@ import {
   Bookmark,
   UpdateSession,
   Playlist,
-  Collection
+  Collection,
+  SkipSettings
 } from '../utils/Interface';
 import { Play } from './Play';
 import { deviceInfo } from '@kit.BasicServicesKit';
@@ -76,6 +77,33 @@ export class DownloadSetting {
   @Trace skipExistingFiles: boolean = false
 }
 
+@ObservedV2
+export class ProjectSkipSettings {
+  @Trace settingsJson: string = '{}'
+
+  getSkipSettings(id: string): SkipSettings | undefined {
+    const data: Record<string, SkipSettings> = JSON.parse(this.settingsJson)
+    return data[id]
+  }
+
+  setSkipSettings(id: string, settings: SkipSettings): void {
+    const data: Record<string, SkipSettings> = JSON.parse(this.settingsJson)
+    data[id] = settings
+    this.settingsJson = JSON.stringify(data)
+  }
+
+  removeSkipSettings(id: string): void {
+    const data: Record<string, SkipSettings> = JSON.parse(this.settingsJson)
+    const newData: Record<string, SkipSettings> = {}
+    for (const key of Object.keys(data)) {
+      if (key !== id) {
+        newData[key] = data[key]
+      }
+    }
+    this.settingsJson = JSON.stringify(newData)
+  }
+}
+
 @Entry
 @ComponentV2
 struct Index {
@@ -85,6 +113,7 @@ struct Index {
   @Provider() playSetting: PlaySetting | undefined = PersistenceV2.connect(PlaySetting, () => new PlaySetting());
   @Provider() otherSetting: OtherSetting | undefined = PersistenceV2.connect(OtherSetting, () => new OtherSetting());
   @Provider() downloadSetting: DownloadSetting | undefined = PersistenceV2.connect(DownloadSetting, () => new DownloadSetting());
+  @Provider() projectSkipSettings: ProjectSkipSettings | undefined = PersistenceV2.connect(ProjectSkipSettings, () => new ProjectSkipSettings());
   @Provider() displayWidth: number = 0
   @Provider() displayHeight: number = 0
   @Provider() selectThemeIndex: number = 0
@@ -533,6 +562,28 @@ struct Index {
           this.sleepTime = 0
         }, 200);
       }
+      // 跳过结尾检测
+      if (!this.isLocalPlaying && this.playingItem) {
+        const skipSettings = this.projectSkipSettings?.getSkipSettings(this.playingItem.libraryItemId)
+        if (skipSettings && skipSettings.skipEnd > 0) {
+          const trackDuration = this.playingItem.audioTracks[this.playingIndex]?.duration ?? this.currentTrackDuration
+          if (trackDuration > skipSettings.skipEnd && this.playedTime >= trackDuration - skipSettings.skipEnd) {
+            // 到达跳过结尾位置，自动跳到下一首
+            if (this.playingIndex < this.playingItem.audioTracks.length - 1) {
+              Logger.info('跳过结尾：切换到下一首')
+              await this.avPlayer!.reset()
+              this.playingIndex++
+              this.playingTitle = this.playingItem.chapters?.[this.playingIndex]?.title ?? this.playingItem.displayTitle
+              this.avPlayer!.url = this.baseUrl + this.playingItem.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+              this.playStartTime = 0
+            } else {
+              Logger.info('跳过结尾：最后一首，暂停')
+              await this.avPlayer!.pause()
+              this.isPlaying = false
+            }
+          }
+        }
+      }
       if (this.sliderMoving === false) {
         let dur = this.isLocalPlaying ? this.currentTrackDuration : this.playingItem!.audioTracks[this.playingIndex].duration
         this.playedPercent = dur > 0 ? this.playedTime / dur * 100 : 0
@@ -633,10 +684,28 @@ struct Index {
           await this.session!.activate()
           await this.setSessionInfo()
           await this.setPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PREPARE)
-          if (this.playStartTime !== 0) {
-            this.avPlayer!.seek(this.playStartTime * 1000)
-            this.playStartTime = 0
+          // 应用跳过开头/结尾
+          let seekTarget = this.playStartTime
+          if (!this.isLocalPlaying && this.playingItem) {
+            const skipSettings = this.projectSkipSettings?.getSkipSettings(this.playingItem.libraryItemId)
+            if (skipSettings) {
+              // 使用 server 端已知的 track duration（比 currentTrackDuration 更可靠，后者在 prepared 时可能尚未更新）
+              const trackDuration = this.playingItem.audioTracks[this.playingIndex]?.duration ?? 0
+              // 跳过开头：只有从开头起播（playStartTime === 0）时才应用跳过
+              if (skipSettings.skipStart > 0 && trackDuration > skipSettings.skipStart) {
+                if (seekTarget === 0) {
+                  seekTarget = skipSettings.skipStart
+                  Logger.info('跳过开头：跳至' + skipSettings.skipStart + '秒')
+                }
+                // 如果 >0 且 < skipStart，说明用户在跳过范围内续播，忽略跳过
+              }
+              // 跳过结尾：由 timeUpdate 运行时检测，此处不做调整
+            }
           }
+          if (seekTarget !== 0) {
+            this.avPlayer!.seek(seekTarget * 1000)
+          }
+          this.playStartTime = 0
           this.avPlayer!.setSpeed(this.speed)
           if (this.isPlaying === true) {
             if (this.playSetting?.fadeInOut) {

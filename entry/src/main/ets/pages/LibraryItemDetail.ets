@@ -14,7 +14,8 @@ import {
   Collection,
   Collection1,
   User,
-  Track
+  Track,
+  SkipSettings
 } from "../utils/Interface";
 import { HdsNavDestination, HdsNavDestinationAttribute } from "@kit.UIDesignKit";
 import { LengthMetrics, PersistenceV2, SymbolGlyphModifier } from "@kit.ArkUI";
@@ -34,7 +35,7 @@ import { reportBuilder, EpisodeComponent1 } from "../utils/Component";
 import { media } from "@kit.MediaKit";
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
-import { DownloadSetting, OtherSetting } from "./Index";
+import { DownloadSetting, OtherSetting, ProjectSkipSettings } from "./Index";
 import { Logger } from '../utils/Logger';
 
 @Builder
@@ -47,6 +48,7 @@ export struct LibraryItemDetail {
   private libraryDetailScroller: Scroller = new Scroller();
   @Consumer() otherSetting: OtherSetting | undefined = PersistenceV2.connect(OtherSetting, () => new OtherSetting());
   @Consumer() downloadSetting: DownloadSetting | undefined = PersistenceV2.connect(DownloadSetting, () => new DownloadSetting());
+  @Consumer() projectSkipSettings: ProjectSkipSettings | undefined = PersistenceV2.connect(ProjectSkipSettings, () => new ProjectSkipSettings());
   @Consumer() downloadManager: DownloadManager | undefined = undefined
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() displayWidth: number = 0
@@ -96,6 +98,8 @@ export struct LibraryItemDetail {
   @Local showProgress: boolean = false
   @Local showCreatePlaylist: boolean = false
   @Local showSkipStartEnd: boolean = false
+  @Local tmpSkipStart: number = 0
+  @Local tmpSkipEnd: number = 0
   @Local tmpPlaylistName: string = ""
   @Local tmpPlaylistDescription: string = ""
   @Local tmpPlayingItem: PlayItem | undefined = undefined
@@ -266,6 +270,14 @@ export struct LibraryItemDetail {
     this.episodes = this.libraryItem?.media.episodes?.sort((a, b) => b.publishedAt! - a.publishedAt!)??[]
     if (this.displayWidth >= 1000) {
       this.showChapters = true
+    }
+    const saved = this.projectSkipSettings?.getSkipSettings(this.libraryItem!.id)
+    if (saved) {
+      this.tmpSkipStart = saved.skipStart
+      this.tmpSkipEnd = saved.skipEnd
+    } else {
+      this.tmpSkipStart = 0
+      this.tmpSkipEnd = 0
     }
     this.updateMoreMenus()
     this.showLoadingProgress = false
@@ -919,8 +931,114 @@ export struct LibraryItemDetail {
   @Builder
   skipStartEndBuilder() {
     Column() {
+      Text("开头")
+        .fontSize(18)
+        .fontWeight(FontWeight.Medium)
+        .width('100%')
+        .margin({ bottom: 10 })
+      Row() {
+        Text("0秒")
+          .fontSize(16)
+          .fontColor($r('sys.color.font_secondary'))
+        Text("120秒")
+          .fontSize(16)
+          .fontColor($r('sys.color.font_secondary'))
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.SpaceBetween)
+      .padding({ left: 5, right: 5 })
+      Slider({
+        value: this.tmpSkipStart,
+        min: 0,
+        max: 120,
+        step: 1,
+        style: SliderStyle.InSet
+      })
+        .width('100%')
+        .showTips(true, this.tmpSkipStart.toString())
+        .onChange((value: number) => {
+          this.tmpSkipStart = value
+        })
+        .margin({ bottom: 15 })
+        .blockColor($r('sys.color.white'))
+        .selectedColor($r('sys.color.comp_emphasize_secondary'))
 
+      Text("结尾")
+        .fontSize(18)
+        .fontWeight(FontWeight.Medium)
+        .width('100%')
+        .margin({ bottom: 10 })
+      Row() {
+        Text("0秒")
+          .fontSize(16)
+          .fontColor($r('sys.color.font_secondary'))
+        Text("120秒")
+          .fontSize(16)
+          .fontColor($r('sys.color.font_secondary'))
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.SpaceBetween)
+      .padding({ left: 5, right: 5 })
+      Slider({
+        value: this.tmpSkipEnd,
+        min: 0,
+        max: 120,
+        step: 1,
+        style: SliderStyle.InSet
+      })
+        .width('100%')
+        .showTips(true, this.tmpSkipEnd.toString())
+        .onChange((value: number) => {
+          this.tmpSkipEnd = value
+        })
+        .blockColor($r('sys.color.white'))
+        .selectedColor($r('sys.color.comp_emphasize_secondary'))
+
+      Row({ space: 20 }) {
+        Button({ type: ButtonType.Normal }) {
+          Text("清除")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(() => {
+          this.projectSkipSettings?.removeSkipSettings(this.libraryItem!.id)
+          this.tmpSkipStart = 0
+          this.tmpSkipEnd = 0
+          this.showSkipStartEnd = false
+          this.getUIContext().getPromptAction().showToast({
+            message: '已清除跳过设置',
+            duration: 500
+          });
+        })
+
+        Button({ type: ButtonType.Normal }) {
+          Text("设置")
+            .fontSize(18)
+        }
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .height(40)
+        .width('50%')
+        .layoutWeight(1)
+        .borderRadius(8)
+        .onClick(() => {
+          this.projectSkipSettings?.setSkipSettings(this.libraryItem!.id, {
+            skipStart: this.tmpSkipStart,
+            skipEnd: this.tmpSkipEnd
+          })
+          this.showSkipStartEnd = false
+          this.getUIContext().getPromptAction().showToast({
+            message: '跳过设置保存成功',
+            duration: 500
+          });
+        })
+      }
+      .margin({ top: 15 })
     }
+    .padding({ left: 20, right: 20, bottom: 25 })
   }
 
   build() {
@@ -1893,6 +2011,15 @@ export struct LibraryItemDetail {
             showClose: false,
             onDisappear: () => {
               this.showSkipStartEnd = false
+              // 未点"设置"时恢复为已保存的值
+              const saved = this.projectSkipSettings?.getSkipSettings(this.libraryItem!.id)
+              if (saved) {
+                this.tmpSkipStart = saved.skipStart
+                this.tmpSkipEnd = saved.skipEnd
+              } else {
+                this.tmpSkipStart = 0
+                this.tmpSkipEnd = 0
+              }
             }
           })
         }
