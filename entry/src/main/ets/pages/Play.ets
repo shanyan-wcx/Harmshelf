@@ -48,6 +48,7 @@ export struct Play {
   aboutToDisappear() {
     this.stopRotate()
   }
+  @Local shouldClosePlayer: boolean = false
   @Local lockPlayer: boolean = false
   @Local showProgress: boolean = false
   @Local showBookmark: boolean = false
@@ -855,9 +856,8 @@ export struct Play {
                 value: "关闭播放器",
                 action: () => {
                   this.avPlayer!.stop()
+                  this.shouldClosePlayer = true
                   this.showPlay = false
-                  this.isStartPlaying = false
-                  this.isPlaying = false
                 }
               }])
             }
@@ -1312,6 +1312,11 @@ export struct Play {
     .bindContentCover(this.showPlay, this.playBuilder(), {
       onDisappear: () => {
         this.showPlay = false
+        if (this.shouldClosePlayer) {
+          this.isStartPlaying = false
+          this.isPlaying = false
+          this.shouldClosePlayer = false
+        }
       }
     })
     .onClick(() => {
@@ -1331,9 +1336,13 @@ export struct Play {
     baseIcon: $r('sys.symbol.stop_circle'),
     onClick: () => {
       this.avPlayer!.stop()
-      this.showPlay = false
-      this.isStartPlaying = false
-      this.isPlaying = false
+      if (this.showPlay) {
+        this.shouldClosePlayer = true
+        this.showPlay = false
+      } else {
+        this.isStartPlaying = false
+        this.isPlaying = false
+      }
     }
   })
 
