@@ -10,3 +10,6 @@
 /.clang-tidy
 **/.test
 /.appanalyzer
+/.agents
+/.ocx
+./.opencode
