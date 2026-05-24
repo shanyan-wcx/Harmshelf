@@ -65,6 +65,7 @@ export class PlaySetting {
   @Trace rememberSpeed: boolean = false
   @Trace globalSpeed: media.PlaybackSpeed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
   @Trace skipIntervals: number = 10
+  @Trace shareAudio: boolean = false
 }
 
 @ObservedV2
@@ -202,6 +203,8 @@ struct Index {
   @Local playerState: string = 'idle'
   @Local consecutiveErrors: number = 0
   @Local continuousTaskRunning: boolean = false
+  @Local audioSessionManager: audio.AudioSessionManager | undefined = undefined
+  @Local audioSessionActivated: boolean = false
   @Monitor('toCloseSession')
   async closeEndSession(monitor: IMonitor) {
     if (this.toCloseSession) {
@@ -439,6 +442,34 @@ struct Index {
     }).catch((err: BusinessError) => {
       Logger.error(`停止长时任务出错，代码 ${err.code}，错误信息 ${err.message}`);
     });
+  }
+
+  async activateAudioSession() {
+    if (!this.playSetting?.shareAudio) return
+    if (!this.audioSessionManager) {
+      this.audioSessionManager = audio.getAudioManager().getSessionManager()
+    }
+    if (this.audioSessionActivated) return
+    try {
+      await this.audioSessionManager!.activateAudioSession({
+        concurrencyMode: audio.AudioConcurrencyMode.CONCURRENCY_MIX_WITH_OTHERS
+      })
+      this.audioSessionActivated = true
+      Logger.info('已激活混音模式，允许与其他应用同时播放。');
+    } catch (err) {
+      Logger.error('激活混音模式失败：' + JSON.stringify(err));
+    }
+  }
+
+  async deactivateAudioSession() {
+    if (!this.audioSessionManager || !this.audioSessionActivated) return
+    try {
+      await this.audioSessionManager!.deactivateAudioSession()
+      this.audioSessionActivated = false
+      Logger.info('已停用混音模式。');
+    } catch (err) {
+      Logger.error('停用混音模式失败：' + JSON.stringify(err));
+    }
   }
 
   async setSessionInfo() {
@@ -699,6 +730,9 @@ struct Index {
           Logger.info('播放器重置。');
           this.stopContinuousTask()
           this.playedTime = 0
+          if (this.audioSessionActivated) {
+            await this.deactivateAudioSession()
+          }
           break;
         case 'initialized':
           Logger.info('播放器初始化。');
@@ -765,12 +799,18 @@ struct Index {
           this.isPlaying = true
           await this.setPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PLAY)
           this.startContinuousTask()
+          if (this.playSetting?.shareAudio) {
+            await this.activateAudioSession()
+          }
           break;
         case 'paused':
           Logger.info('播放器暂停。');
           this.isPlaying = false
           await this.setPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PAUSE)
           this.stopContinuousTask()
+          if (this.audioSessionActivated) {
+            await this.deactivateAudioSession()
+          }
           break;
         case 'completed':
           Logger.info('播放完毕。');
@@ -810,6 +850,9 @@ struct Index {
         case 'stopped':
           Logger.info('播放器停止。');
           this.continuousTaskRunning = false
+          if (this.audioSessionActivated) {
+            await this.deactivateAudioSession()
+          }
           this.toCloseIndex = this.playingIndex
           if (!this.isLocalPlaying) {
             this.toCloseSession = this.playingItem
@@ -835,6 +878,9 @@ struct Index {
           break;
         case 'error':
           Logger.info('播放器进入错误状态。');
+          if (this.audioSessionActivated) {
+            await this.deactivateAudioSession()
+          }
           break;
         default:
           Logger.info('播放器状态未知。');

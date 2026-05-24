@@ -877,6 +877,24 @@ export struct Setting {
           .justifyContent(FlexAlign.SpaceBetween)
 
           Row() {
+            Text("与其他应用同时播放")
+              .fontSize(20)
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+            Toggle({ type: ToggleType.Switch, isOn: this.playSetting?.shareAudio })
+              .selectedColor($r('sys.color.comp_emphasize_secondary'))
+              .onClick(() => {
+                if (this.playSetting) {
+                  this.playSetting.shareAudio = !this.playSetting.shareAudio
+                }
+              })
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.SpaceBetween)
+          .margin({ top: 5 })
+
+          Row() {
             Text("全局记忆倍速")
               .fontSize(20)
               .maxLines(1)
