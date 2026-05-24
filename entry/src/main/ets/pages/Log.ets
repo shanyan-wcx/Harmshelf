@@ -159,7 +159,7 @@ export struct Log {
           }
           .width('100%')
           .padding({ left: 20, right: 20, top: 4, bottom: 4 })
-          .margin({ top: index === 0 ? 56 : 0, bottom: index === this.displayLogs.length - 1 ? (this.isStartPlaying ? 150 : 71) : 0 })
+          .margin({ top: index === 0 ? 56 : 0, bottom: index === this.displayLogs.length - 1 ? (this.isStartPlaying ? 150 : 79) : 0 })
           })
         }
         .width('100%')
@@ -220,7 +220,7 @@ export struct Log {
         .shadow({ radius: 12, color: $r('sys.color.font') })
         .margin({ right: 20 })
       }
-      .position({ bottom: this.isStartPlaying ? 99 : 20 })
+      .position({ bottom: this.isStartPlaying ? 99 : 28 })
       .width('100%')
       .alignItems(VerticalAlign.Center)
     }
