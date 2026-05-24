@@ -199,6 +199,9 @@ struct Index {
   @Local mainWindow: window.Window | undefined = undefined
   @Local elapsedTime: number = 0
   @Local isSyncing: boolean = false
+  @Local playerState: string = 'idle'
+  @Local consecutiveErrors: number = 0
+  @Local continuousTaskRunning: boolean = false
   @Monitor('toCloseSession')
   async closeEndSession(monitor: IMonitor) {
     if (this.toCloseSession) {
@@ -405,6 +408,7 @@ struct Index {
   }
 
   async startContinuousTask() {
+    if (this.continuousTaskRunning) return
     let wantAgentInfo: wantAgent.WantAgentInfo = {
       wants: [
         {
@@ -419,6 +423,7 @@ struct Index {
     wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj: WantAgent) => {
       backgroundTaskManager.startBackgroundRunning(this.context,
         backgroundTaskManager.BackgroundMode.AUDIO_PLAYBACK, wantAgentObj).then(() => {
+        this.continuousTaskRunning = true
         Logger.info(`启动长时任务。`);
       }).catch((err: BusinessError) => {
         Logger.error(`启动长时任务出错，代码 ${err.code}，错误信息 ${err.message}`);
@@ -427,7 +432,9 @@ struct Index {
   }
 
   async stopContinuousTask() {
+    if (!this.continuousTaskRunning) return
     backgroundTaskManager.stopBackgroundRunning(this.context).then(() => {
+      this.continuousTaskRunning = false
       Logger.info(`停止长时任务。`);
     }).catch((err: BusinessError) => {
       Logger.error(`停止长时任务出错，代码 ${err.code}，错误信息 ${err.message}`);
@@ -471,6 +478,8 @@ struct Index {
 
   async setSessionCallback() {
     this.session!.on('play', () => {
+      const playable = ['prepared', 'paused', 'completed']
+      if (!playable.includes(this.playerState)) return
       if (this.playSetting?.fadeInOut) {
         this.fadeIn()
       } else {
@@ -478,6 +487,7 @@ struct Index {
       }
     });
     this.session!.on('pause', () => {
+      if (this.playerState !== 'playing') return
       if (this.playSetting?.fadeInOut) {
         this.fadeOut()
       } else {
@@ -485,16 +495,24 @@ struct Index {
       }
     });
     this.session!.on('stop', async () => {
+      const stoppable = ['prepared', 'playing', 'paused', 'completed']
+      if (!stoppable.includes(this.playerState)) return
       this.avPlayer!.stop()
     });
     this.session!.on('seek', async (time: number) => {
+      const seekable = ['prepared', 'playing', 'paused', 'completed']
+      if (!seekable.includes(this.playerState)) return
       await this.setPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_BUFFERING)
       this.avPlayer!.seek(time)
     });
     this.session!.on('rewind', () => {
+      const seekable = ['prepared', 'playing', 'paused', 'completed']
+      if (!seekable.includes(this.playerState)) return
       this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ? (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
     })
     this.session!.on('fastForward', () => {
+      const seekable = ['prepared', 'playing', 'paused', 'completed']
+      if (!seekable.includes(this.playerState)) return
       let dur = this.isLocalPlaying
         ? this.localPlayItem!.tracks[this.playingIndex].duration
         : this.playingItem!.audioTracks[this.playingIndex].duration
@@ -643,8 +661,20 @@ struct Index {
       this.currentTrackDuration = duration / 1000
     })
     avPlayer.on('error', async (err: BusinessError) => {
-      await avPlayer.reset();
+      this.consecutiveErrors++
       Logger.error(`播放器出现错误，code is ${err.code}, message is ${err.message}`);
+      if (err.code === 5400102) {
+        return;
+      }
+      if (this.consecutiveErrors >= 2) {
+        this.stopContinuousTask()
+        this.uiContext!.getPromptAction().showToast({
+          message: '播放出错，请稍后重试！',
+          duration: 1500
+        });
+        return;
+      }
+      await avPlayer.reset();
       if (err.code === 5400106 || err.code === 5400103 || err.code === 5411007) {
         this.uiContext!.getPromptAction().showToast({
           message: '播放失败，格式不支持或文件不存在！',
@@ -663,6 +693,7 @@ struct Index {
       }
     })
     avPlayer.on('stateChange', async (state: string, reason: media.StateChangeReason) => {
+      this.playerState = state
       switch (state) {
         case 'idle':
           Logger.info('播放器重置。');
@@ -671,10 +702,16 @@ struct Index {
           break;
         case 'initialized':
           Logger.info('播放器初始化。');
-          avPlayer.prepare();
+          if (this.consecutiveErrors >= 2) {
+            Logger.info('连续错误过多，放弃自动恢复。');
+            this.stopContinuousTask()
+          } else {
+            avPlayer.prepare();
+          }
           break;
         case 'prepared':
           Logger.info('播放器就绪。');
+          this.consecutiveErrors = 0
           this.playedTime = 0
           if (this.session === undefined) {
             this.session = await avSession.createAVSession(this.context!, 'AUDIO_PLAY', 'video');
@@ -772,6 +809,7 @@ struct Index {
           break;
         case 'stopped':
           Logger.info('播放器停止。');
+          this.continuousTaskRunning = false
           this.toCloseIndex = this.playingIndex
           if (!this.isLocalPlaying) {
             this.toCloseSession = this.playingItem
@@ -794,6 +832,9 @@ struct Index {
           break;
         case 'released':
           Logger.info('播放器释放。');
+          break;
+        case 'error':
+          Logger.info('播放器进入错误状态。');
           break;
         default:
           Logger.info('播放器状态未知。');

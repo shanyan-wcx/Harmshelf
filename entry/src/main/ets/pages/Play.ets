@@ -979,7 +979,9 @@ export struct Play {
                         } else if (seekTime > dur * 1000) {
                           seekTime = dur * 1000
                         }
-                        this.avPlayer!.seek(seekTime)
+                        if (['prepared', 'playing', 'paused', 'completed'].includes(this.avPlayer!.state)) {
+                          this.avPlayer!.seek(seekTime)
+                        }
                         this.sliderMoving = false
                       }
                     })
@@ -1024,6 +1026,7 @@ export struct Play {
                   .width(50)
                   .backgroundColor(Color.Transparent)
                   .onClick(() => {
+                    if (!['prepared', 'playing', 'paused', 'completed'].includes(this.avPlayer!.state)) return
                     this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ? (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
                   })
                   .visibility(this.lockPlayer ? Visibility.Hidden : Visibility.Visible)
@@ -1038,13 +1041,14 @@ export struct Play {
                   .margin({ left: 6, right: 6 })
                   .backgroundColor($r('sys.color.comp_background_tertiary'))
                   .onClick(() => {
-                    if (this.isPlaying) {
+                    let state = this.avPlayer!.state
+                    if (state === 'playing') {
                       if (this.playSetting?.fadeInOut) {
                         this.fadeOut()
                       } else {
                         this.avPlayer!.pause()
                       }
-                    } else {
+                    } else if (state === 'paused' || state === 'completed') {
                       if (this.playSetting?.fadeInOut) {
                         this.fadeIn()
                       } else {
@@ -1062,6 +1066,7 @@ export struct Play {
                   .width(50)
                   .backgroundColor(Color.Transparent)
                   .onClick(() => {
+                    if (!['prepared', 'playing', 'paused', 'completed'].includes(this.avPlayer!.state)) return
                     let dur = this.getCurrentDuration()
                     this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < dur ? (this.playedTime + this.playSetting!.skipIntervals) * 1000 : dur * 1000)
                   })
@@ -1328,6 +1333,7 @@ export struct Play {
   goBackwardButton: ActionBarButton = new ActionBarButton({
     baseIcon: this.gobackwardIcon,
     onClick: () => {
+      if (!['prepared', 'playing', 'paused', 'completed'].includes(this.avPlayer!.state)) return
       this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ? (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
     }
   })
@@ -1349,26 +1355,27 @@ export struct Play {
   playPauseButton: ActionBarButton = new ActionBarButton({
     baseIcon: this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'),
     onClick: () => {
-      if (this.isPlaying) {
+      let state = this.avPlayer!.state
+      if (state === 'playing') {
         if (this.playSetting?.fadeInOut) {
           this.fadeOut()
         } else {
           this.avPlayer!.pause()
         }
-      } else {
+      } else if (state === 'paused' || state === 'completed') {
         if (this.playSetting?.fadeInOut) {
           this.fadeIn()
         } else {
           this.avPlayer!.play()
         }
       }
-      this.isPlaying = !this.isPlaying
     }
   })
 
   goForwardButton: ActionBarButton = new ActionBarButton({
     baseIcon: this.goforwardIcon,
     onClick: () => {
+      if (!['prepared', 'playing', 'paused', 'completed'].includes(this.avPlayer!.state)) return
       let dur = this.getCurrentDuration()
       this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < dur ? (this.playedTime + this.playSetting!.skipIntervals) * 1000 : dur * 1000)
     }
