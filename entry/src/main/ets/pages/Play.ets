@@ -44,9 +44,13 @@ export struct Play {
   @Local rotateAngle: number = 0
   @Local rotateTimer: number = -1
   @Local sliderValue: number = 0
+  @Local fadeInterval: number = -1
 
   aboutToDisappear() {
     this.stopRotate()
+    if (this.fadeInterval !== -1) {
+      clearInterval(this.fadeInterval)
+    }
   }
   @Local shouldClosePlayer: boolean = false
   @Local lockPlayer: boolean = false
@@ -169,6 +173,9 @@ export struct Play {
 
   fadeIn() {
     this.isPlaying = true
+    if (this.fadeInterval !== -1) {
+      clearInterval(this.fadeInterval)
+    }
     let duration = 1000
     let volume = 0;
     const step = 50; // 调整间隔时间，单位 ms
@@ -180,14 +187,19 @@ export struct Play {
       if (volume >= 1.0) {
         this.avPlayer!.setVolume(1.0);
         clearInterval(interval);
+        this.fadeInterval = -1
       } else {
         this.avPlayer!.setVolume(volume);
       }
     }, step);
+    this.fadeInterval = interval
   }
 
   fadeOut() {
     this.isPlaying = false
+    if (this.fadeInterval !== -1) {
+      clearInterval(this.fadeInterval)
+    }
     let duration = 1000
     let volume = 1.0; // 假设当前音量是最大值
     const step = 50; // 调整间隔时间，单位 ms
@@ -197,11 +209,13 @@ export struct Play {
       if (volume <= 0.0) {
         this.avPlayer!.setVolume(0.0);
         clearInterval(interval);
+        this.fadeInterval = -1
         this.avPlayer!.pause(); // 在音量完全降为 0 后暂停
       } else {
         this.avPlayer!.setVolume(volume);
       }
     }, step);
+    this.fadeInterval = interval
   }
 
   async getPlayContent(playItem: PlayItem, time: number) {
@@ -1041,18 +1055,21 @@ export struct Play {
                   .margin({ left: 6, right: 6 })
                   .backgroundColor($r('sys.color.comp_background_tertiary'))
                   .onClick(() => {
-                    let state = this.avPlayer!.state
-                    if (state === 'playing') {
-                      if (this.playSetting?.fadeInOut) {
-                        this.fadeOut()
-                      } else {
-                        this.avPlayer!.pause()
+                    if (this.isPlaying) {
+                      if (this.avPlayer!.state === 'playing') {
+                        if (this.playSetting?.fadeInOut) {
+                          this.fadeOut()
+                        } else {
+                          this.avPlayer!.pause()
+                        }
                       }
-                    } else if (state === 'paused' || state === 'completed') {
-                      if (this.playSetting?.fadeInOut) {
-                        this.fadeIn()
-                      } else {
-                        this.avPlayer!.play()
+                    } else {
+                      if (['paused', 'completed'].includes(this.avPlayer!.state)) {
+                        if (this.playSetting?.fadeInOut) {
+                          this.fadeIn()
+                        } else {
+                          this.avPlayer!.play()
+                        }
                       }
                     }
                   })
@@ -1355,18 +1372,21 @@ export struct Play {
   playPauseButton: ActionBarButton = new ActionBarButton({
     baseIcon: this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'),
     onClick: () => {
-      let state = this.avPlayer!.state
-      if (state === 'playing') {
-        if (this.playSetting?.fadeInOut) {
-          this.fadeOut()
-        } else {
-          this.avPlayer!.pause()
+      if (this.isPlaying) {
+        if (this.avPlayer!.state === 'playing') {
+          if (this.playSetting?.fadeInOut) {
+            this.fadeOut()
+          } else {
+            this.avPlayer!.pause()
+          }
         }
-      } else if (state === 'paused' || state === 'completed') {
-        if (this.playSetting?.fadeInOut) {
-          this.fadeIn()
-        } else {
-          this.avPlayer!.play()
+      } else {
+        if (['paused', 'completed'].includes(this.avPlayer!.state)) {
+          if (this.playSetting?.fadeInOut) {
+            this.fadeIn()
+          } else {
+            this.avPlayer!.play()
+          }
         }
       }
     }
