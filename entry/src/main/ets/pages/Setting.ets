@@ -601,6 +601,40 @@ export struct Setting {
       .width('100%')
       .margin({ top: 13, bottom: 5 })
       .justifyContent(FlexAlign.SpaceBetween)
+
+      Divider().margin({ top: 18, bottom: 12 })
+
+      Text("赞助支持")
+        .fontSize(20)
+        .fontWeight(FontWeight.Medium)
+
+      Text("如果喜欢 Harmshelf，欢迎赞助支持 🙏")
+        .fontSize(14)
+        .fontColor($r('sys.color.font_secondary'))
+        .margin({ top: 8 })
+
+      Row() {
+        Column() {
+          Image($rawfile('wx_qr.png'))
+            .width(120)
+            .height(120)
+          Text("微信")
+            .fontSize(14)
+            .margin({ top: 6 })
+        }
+
+        Column() {
+          Image($rawfile('alipay_qr.png'))
+            .width(120)
+            .height(120)
+          Text("支付宝")
+            .fontSize(14)
+            .margin({ top: 6 })
+        }
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.SpaceEvenly)
+      .margin({ top: 12 })
     }
     .width('100%')
     .padding({ left: 20, right: 20, bottom: 25 })

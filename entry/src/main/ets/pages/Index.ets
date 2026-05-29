@@ -202,6 +202,9 @@ struct Index {
   @Local isSyncing: boolean = false
   @Local playerState: string = 'idle'
   @Local consecutiveErrors: number = 0
+  @Local syncInterval: number = 10000
+  @Local errorRetryTimer: number = -1
+  @Local errorResetTimer: number = -1
   @Local continuousTaskRunning: boolean = false
   @Local audioSessionManager: audio.AudioSessionManager | undefined = undefined
   @Local audioSessionActivated: boolean = false
@@ -396,10 +399,12 @@ struct Index {
         Logger.info(`会话当前时间${updateSession.currentTime}`)
         Logger.info(`会话汇报间隔${updateSession.timeListened}`)
         this.syncTime = new Date().getTime() / 1000
+        this.syncInterval = 10000
         this.user = await getUser()
         this.progress = this.user?.mediaProgress??[]
       } else {
         this.isConnect = false
+        this.syncInterval = Math.min(this.syncInterval * 1.5, 60000)
         this.getUIContext().getPromptAction().showToast({
           message: '同步进度失败，请检查网络！',
           duration: 500
@@ -637,7 +642,7 @@ struct Index {
         let dur = this.isLocalPlaying ? this.currentTrackDuration : this.playingItem!.audioTracks[this.playingIndex].duration
         this.playedPercent = dur > 0 ? this.playedTime / dur * 100 : 0
       }
-      if (!this.isLocalPlaying && this.elapsedTime >= 10000) {
+      if (!this.isLocalPlaying && this.elapsedTime >= this.syncInterval) {
         this.syncProgress()
       }
     })
@@ -703,15 +708,37 @@ struct Index {
           message: '播放出错，请稍后重试！',
           duration: 1500
         });
+        if (this.errorResetTimer !== -1) {
+          clearTimeout(this.errorResetTimer)
+        }
+        this.errorResetTimer = setTimeout(() => {
+          this.consecutiveErrors = 0
+          this.errorResetTimer = -1
+        }, 30000)
         return;
       }
       await avPlayer.reset();
-      if (err.code === 5400106 || err.code === 5400103 || err.code === 5411007) {
+      const savedPosition = this.playedTime
+      if (this.isLocalPlaying) {
+        const file = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
+        avPlayer.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+      } else {
+        avPlayer.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+      }
+      this.playStartTime = savedPosition
+      if (this.errorRetryTimer !== -1) {
+        clearTimeout(this.errorRetryTimer)
+      }
+      this.errorRetryTimer = setTimeout(() => {
+        avPlayer.prepare()
+        this.errorRetryTimer = -1
+      }, 1500)
+      if (err.code === 5400106 || err.code === 5411007) {
         this.uiContext!.getPromptAction().showToast({
           message: '播放失败，格式不支持或文件不存在！',
           duration: 500
         });
-      } else if (err.code === 5400104 || err.code === 5411002 || err.code === 5411004) {
+      } else if (err.code === 5400104 || err.code === 5400103 || err.code === 5411002 || err.code === 5411004) {
         this.uiContext!.getPromptAction().showToast({
           message: '播放失败，请检查网络连接！',
           duration: 500
@@ -797,6 +824,7 @@ struct Index {
         case 'playing':
           Logger.info('播放器开始播放。');
           this.isPlaying = true
+          this.syncInterval = 10000
           await this.setPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PLAY)
           this.startContinuousTask()
           if (this.playSetting?.shareAudio) {
@@ -878,6 +906,7 @@ struct Index {
           break;
         case 'error':
           Logger.info('播放器进入错误状态。');
+          this.isPlaying = false
           if (this.audioSessionActivated) {
             await this.deactivateAudioSession()
           }
@@ -1025,6 +1054,14 @@ struct Index {
   aboutToDisappear() {
     if (!this.isLocalPlaying && this.playingItem) {
       this.syncProgress(this.playingItem, this.playingIndex)
+    }
+    if (this.errorRetryTimer !== -1) {
+      clearTimeout(this.errorRetryTimer)
+      this.errorRetryTimer = -1
+    }
+    if (this.errorResetTimer !== -1) {
+      clearTimeout(this.errorResetTimer)
+      this.errorResetTimer = -1
     }
     this.avPlayer?.release()
   }

@@ -1064,7 +1064,19 @@ export struct Play {
                         }
                       }
                     } else {
-                      if (['paused', 'completed'].includes(this.avPlayer!.state)) {
+                      if (this.avPlayer!.state === 'error') {
+                        this.isPlaying = true
+                        const savedPosition = this.playedTime
+                        this.avPlayer!.reset()
+                        this.playStartTime = savedPosition
+                        if (this.isLocalPlaying) {
+                          const file = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
+                          this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+                        } else {
+                          this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+                        }
+                        this.avPlayer!.prepare()
+                      } else if (['paused', 'completed'].includes(this.avPlayer!.state)) {
                         if (this.playSetting?.fadeInOut) {
                           this.fadeIn()
                         } else {
@@ -1381,7 +1393,19 @@ export struct Play {
           }
         }
       } else {
-        if (['paused', 'completed'].includes(this.avPlayer!.state)) {
+        if (this.avPlayer!.state === 'error') {
+          this.isPlaying = true
+          const savedPosition = this.playedTime
+          this.avPlayer!.reset()
+          this.playStartTime = savedPosition
+          if (this.isLocalPlaying) {
+            const file = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
+            this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+          } else {
+            this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+          }
+          this.avPlayer!.prepare()
+        } else if (['paused', 'completed'].includes(this.avPlayer!.state)) {
           if (this.playSetting?.fadeInOut) {
             this.fadeIn()
           } else {
