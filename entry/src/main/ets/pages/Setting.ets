@@ -634,7 +634,7 @@ export struct Setting {
       }
       .width('100%')
       .justifyContent(FlexAlign.SpaceEvenly)
-      .margin({ top: 12, bottom: 5 })
+      .margin({ top: 12 })
     }
     .width('100%')
     .padding({ left: 20, right: 20, bottom: 25 })
