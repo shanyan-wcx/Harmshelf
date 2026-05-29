@@ -1054,7 +1054,7 @@ export struct Play {
                   .width(78)
                   .margin({ left: 6, right: 6 })
                   .backgroundColor($r('sys.color.comp_background_tertiary'))
-                  .onClick(() => {
+                  .onClick(async () => {
                     if (this.isPlaying) {
                       if (this.avPlayer!.state === 'playing') {
                         if (this.playSetting?.fadeInOut) {
@@ -1067,7 +1067,7 @@ export struct Play {
                       if (this.avPlayer!.state === 'error') {
                         this.isPlaying = true
                         const savedPosition = this.playedTime
-                        this.avPlayer!.reset()
+                        await this.avPlayer!.reset()
                         this.playStartTime = savedPosition
                         if (this.isLocalPlaying) {
                           const file = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
@@ -1383,7 +1383,7 @@ export struct Play {
 
   playPauseButton: ActionBarButton = new ActionBarButton({
     baseIcon: this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'),
-    onClick: () => {
+    onClick: async () => {
       if (this.isPlaying) {
         if (this.avPlayer!.state === 'playing') {
           if (this.playSetting?.fadeInOut) {
@@ -1396,7 +1396,7 @@ export struct Play {
         if (this.avPlayer!.state === 'error') {
           this.isPlaying = true
           const savedPosition = this.playedTime
-          this.avPlayer!.reset()
+          await this.avPlayer!.reset()
           this.playStartTime = savedPosition
           if (this.isLocalPlaying) {
             const file = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)

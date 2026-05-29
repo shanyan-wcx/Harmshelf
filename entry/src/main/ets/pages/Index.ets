@@ -206,6 +206,9 @@ struct Index {
   @Local errorRetryTimer: number = -1
   @Local errorResetTimer: number = -1
   @Local continuousTaskRunning: boolean = false
+  @Local sleepTimerId: number = -1
+  @Local fadeInterval: number = -1
+  @Local stopTimeoutId: number = -1
   @Local audioSessionManager: audio.AudioSessionManager | undefined = undefined
   @Local audioSessionActivated: boolean = false
   @Monitor('toCloseSession')
@@ -305,10 +308,13 @@ struct Index {
 
   fadeIn() {
     this.isPlaying = true
+    if (this.fadeInterval !== -1) {
+      clearInterval(this.fadeInterval)
+    }
     let duration = 1000
     let volume = 0;
-    const step = 50; // 调整间隔时间，单位 ms
-    const increment = step / duration; // 每次增加的音量比例
+    const step = 50;
+    const increment = step / duration;
     this.avPlayer!.setVolume(volume);
     this.avPlayer!.play();
     const interval = setInterval(() => {
@@ -316,28 +322,35 @@ struct Index {
       if (volume >= 1.0) {
         this.avPlayer!.setVolume(1.0);
         clearInterval(interval);
+        this.fadeInterval = -1
       } else {
         this.avPlayer!.setVolume(volume);
       }
     }, step);
+    this.fadeInterval = interval
   }
 
   fadeOut() {
     this.isPlaying = false
+    if (this.fadeInterval !== -1) {
+      clearInterval(this.fadeInterval)
+    }
     let duration = 1000
-    let volume = 1.0; // 假设当前音量是最大值
-    const step = 50; // 调整间隔时间，单位 ms
-    const decrement = step / duration; // 每次减少的音量比例
+    let volume = 1.0;
+    const step = 50;
+    const decrement = step / duration;
     const interval = setInterval(() => {
       volume -= decrement;
       if (volume <= 0.0) {
         this.avPlayer!.setVolume(0.0);
         clearInterval(interval);
-        this.avPlayer!.pause(); // 在音量完全降为 0 后暂停
+        this.fadeInterval = -1
+        this.avPlayer!.pause();
       } else {
         this.avPlayer!.setVolume(volume);
       }
     }, step);
+    this.fadeInterval = interval
   }
 
   async syncProgress(closeItem?: PlayItem, closeIndex?: number) {
@@ -607,13 +620,17 @@ struct Index {
       this.elapsedTime += 100
       this.playedTime = time / 1000
       if (this.isLocalPlaying === false && this.sleepTime !== 0 && (this.sleepTime + 0.2) <= (this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset)) {
-        setTimeout(() => {
+        if (this.sleepTimerId !== -1) {
+          clearTimeout(this.sleepTimerId)
+        }
+        this.sleepTimerId = setTimeout(() => {
           if (this.playSetting?.fadeInOut) {
             this.fadeOut()
           } else {
             this.avPlayer!.pause()
           }
           this.sleepTime = 0
+          this.sleepTimerId = -1
         }, 200);
       }
       // 跳过结尾检测
@@ -717,20 +734,37 @@ struct Index {
         }, 30000)
         return;
       }
+      const wasPlaying = this.playerState === 'playing'
+      if (this.fadeInterval !== -1) {
+        clearInterval(this.fadeInterval)
+        this.fadeInterval = -1
+      }
       await avPlayer.reset();
       const savedPosition = this.playedTime
       if (this.isLocalPlaying) {
-        const file = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
-        avPlayer.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+        try {
+          const file = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
+          avPlayer.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+        } catch (_) {
+          this.uiContext?.getPromptAction().showToast({
+            message: '播放失败，本地文件不存在或格式不支持！',
+            duration: 500
+          })
+          this.isPlaying = false
+          return
+        }
       } else {
         avPlayer.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
       }
+      this.isPlaying = wasPlaying
       this.playStartTime = savedPosition
       if (this.errorRetryTimer !== -1) {
         clearTimeout(this.errorRetryTimer)
       }
       this.errorRetryTimer = setTimeout(() => {
-        avPlayer.prepare()
+        if (this.avPlayer?.state === 'initialized') {
+          avPlayer.prepare()
+        }
         this.errorRetryTimer = -1
       }, 1500)
       if (err.code === 5400106 || err.code === 5411007) {
@@ -763,12 +797,7 @@ struct Index {
           break;
         case 'initialized':
           Logger.info('播放器初始化。');
-          if (this.consecutiveErrors >= 2) {
-            Logger.info('连续错误过多，放弃自动恢复。');
-            this.stopContinuousTask()
-          } else {
-            avPlayer.prepare();
-          }
+          avPlayer.prepare();
           break;
         case 'prepared':
           Logger.info('播放器就绪。');
@@ -896,9 +925,10 @@ struct Index {
           this.localPlayItem = undefined
           this.isLocalPlaying = false
           this.playingIndex = 0
-          setTimeout(() => {
+          this.stopTimeoutId = setTimeout(() => {
             this.isStartPlaying = false
             this.isPlaying = false
+            this.stopTimeoutId = -1
           }, 100)
           break;
         case 'released':
@@ -1062,6 +1092,18 @@ struct Index {
     if (this.errorResetTimer !== -1) {
       clearTimeout(this.errorResetTimer)
       this.errorResetTimer = -1
+    }
+    if (this.sleepTimerId !== -1) {
+      clearTimeout(this.sleepTimerId)
+      this.sleepTimerId = -1
+    }
+    if (this.fadeInterval !== -1) {
+      clearInterval(this.fadeInterval)
+      this.fadeInterval = -1
+    }
+    if (this.stopTimeoutId !== -1) {
+      clearTimeout(this.stopTimeoutId)
+      this.stopTimeoutId = -1
     }
     this.avPlayer?.release()
   }
