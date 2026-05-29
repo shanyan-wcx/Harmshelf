@@ -190,7 +190,7 @@ export class DownloadManager {
   pause(id: string): void {
     const task = this.tasks.get(id);
     if (!task) return;
-    task.downloadTask?.pause();
+    try { task.downloadTask?.pause(); } catch (_) {}
   }
 
   // 恢复单个任务
@@ -205,7 +205,7 @@ export class DownloadManager {
   pauseAll(): void {
     for (const task of this.tasks.values()) {
       if (task.info.status === DownloadStatus.Downloading) {
-        task.downloadTask?.pause();
+        try { task.downloadTask?.pause(); } catch (_) {}
       }
     }
   }
@@ -223,7 +223,7 @@ export class DownloadManager {
       return;
     }
     if (task.downloadTask) {
-      request.agent.remove(task.downloadTask.tid);
+      try { request.agent.remove(task.downloadTask.tid); } catch (_) {}
     }
   }
 
@@ -233,7 +233,7 @@ export class DownloadManager {
     for (const id of ids) {
       const task = this.tasks.get(id);
       if (task?.downloadTask) {
-        request.agent.remove(task.downloadTask.tid);
+        try { request.agent.remove(task.downloadTask.tid); } catch (_) {}
       }
       this.activeDownloads.delete(id);
       this.tasks.delete(id);

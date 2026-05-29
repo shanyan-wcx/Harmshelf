@@ -43,14 +43,16 @@ export struct LocalMedia {
 
   async aboutToAppear() {
     this.downloadPath = new fileUri.FileUri(this.downloadUri).path
-    const entries = await fs.listFile(this.downloadPath);
-    for (let name of entries) {
-      const fullPath = `${this.downloadPath}/${name}`;
-      const stat = await fs.stat(fullPath);
-      if (stat.isDirectory()) {
-        this.folderList.push(name);
+    try {
+      const entries = await fs.listFile(this.downloadPath);
+      for (let name of entries) {
+        const fullPath = `${this.downloadPath}/${name}`;
+        const stat = await fs.stat(fullPath);
+        if (stat.isDirectory()) {
+          this.folderList.push(name);
+        }
       }
-    }
+    } catch (_) {}
   }
 
   getCurrentAudioFolderPath(): string {
@@ -99,9 +101,11 @@ export struct LocalMedia {
     this.isPlaying = true
     this.isStartPlaying = true
     this.showPlay = true
-    await this.avPlayer!.reset()
-    const file = fs.openSync(tracks[clickIndex].filePath, fs.OpenMode.READ_ONLY)
-    this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+    try {
+      await this.avPlayer!.reset()
+      const file = fs.openSync(tracks[clickIndex].filePath, fs.OpenMode.READ_ONLY)
+      this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+    } catch (_) {}
   }
 
   async deleteLocalFile(fileName: string) {
@@ -219,26 +223,28 @@ export struct LocalMedia {
               .padding({ left: 20, right: 20 })
               .backgroundColor($r('sys.color.comp_background_tertiary'))
               .onClick(async () => {
-                this.subFolderList = []
-                const entries = await fs.listFile(this.downloadPath + "/" + folder);
-                for (let name of entries) {
-                  const fullPath = `${this.downloadPath}/${folder}/${name}`;
-                  const stat = await fs.stat(fullPath);
-                  if (stat.isDirectory()) {
-                    this.subFolderList.push(name);
+                try {
+                  this.subFolderList = []
+                  const entries = await fs.listFile(this.downloadPath + "/" + folder);
+                  for (let name of entries) {
+                    const fullPath = `${this.downloadPath}/${folder}/${name}`;
+                    const stat = await fs.stat(fullPath);
+                    if (stat.isDirectory()) {
+                      this.subFolderList.push(name);
+                    }
                   }
-                }
-                if (folder === "有声书") {
-                  this.mediaType = "book"
-                } else if (folder === "播客") {
-                  this.mediaType = "podcast"
-                }
-                this.folderIdx = index
-                this.folderDeep = 1
-                this.metadata = undefined
-                if (fs.accessSync(this.downloadPath + "/" + folder + "/metadata.json")) {
-                  this.metadata = await fs.readText(this.downloadPath + "/" + folder + "/metadata.json")
-                }
+                  if (folder === "有声书") {
+                    this.mediaType = "book"
+                  } else if (folder === "播客") {
+                    this.mediaType = "podcast"
+                  }
+                  this.folderIdx = index
+                  this.folderDeep = 1
+                  this.metadata = undefined
+                  if (fs.accessSync(this.downloadPath + "/" + folder + "/metadata.json")) {
+                    this.metadata = await fs.readText(this.downloadPath + "/" + folder + "/metadata.json")
+                  }
+                } catch (_) {}
               })
             })
           } else if (this.folderDeep === 1) {
@@ -299,17 +305,19 @@ export struct LocalMedia {
                     }
                   })
                   .onClick(async () => {
-                    this.audioFolderList = []
-                    const entries = await fs.listFile(this.downloadPath + "/" + this.folderList[this.folderIdx] + "/" + folder);
-                    for (let name of entries) {
-                      const fullPath = `${this.downloadPath}/${this.folderList[this.folderIdx]}/${folder}/${name}`;
-                      const stat = await fs.stat(fullPath);
-                      if (stat.isFile() && this.isAudioFile(name)) {
-                        this.audioFolderList.push(name);
+                    try {
+                      this.audioFolderList = []
+                      const entries = await fs.listFile(this.downloadPath + "/" + this.folderList[this.folderIdx] + "/" + folder);
+                      for (let name of entries) {
+                        const fullPath = `${this.downloadPath}/${this.folderList[this.folderIdx]}/${folder}/${name}`;
+                        const stat = await fs.stat(fullPath);
+                        if (stat.isFile() && this.isAudioFile(name)) {
+                          this.audioFolderList.push(name);
+                        }
                       }
-                    }
-                    this.subFolderIdx = index
-                    this.folderDeep = 2
+                      this.subFolderIdx = index
+                      this.folderDeep = 2
+                    } catch (_) {}
                   })
                 })
               }

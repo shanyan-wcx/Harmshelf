@@ -1,5 +1,4 @@
 import { LogEntry, LogLevel, Logger } from '../utils/Logger';
-import { promptAction } from '@kit.ArkUI';
 import { pasteboard } from '@kit.BasicServicesKit';
 import { fileIo } from '@kit.CoreFileKit';
 import { fileUri } from '@kit.CoreFileKit';
@@ -75,8 +74,8 @@ export struct Log {
       return
     }
     const data = pasteboard.createData(pasteboard.MIMETYPE_TEXT_PLAIN, text)
-    pasteboard.getSystemPasteboard().setData(data)
-    promptAction.showToast({ message: '日志已复制', duration: 500 })
+    try { pasteboard.getSystemPasteboard().setData(data) } catch (_) {}
+    try { this.getUIContext().getPromptAction().showToast({ message: '日志已复制', duration: 500 }) } catch (_) {}
   }
 
   async shareLogs() {
@@ -89,7 +88,8 @@ export struct Log {
     const name = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}_${String(now.getHours()).padStart(2, '0')}_${String(now.getMinutes()).padStart(2, '0')}_${String(now.getSeconds()).padStart(2, '0')}.log`
     const filePath = `${dir}/${name}`
 
-    const files = fileIo.listFileSync(dir)
+    let files: string[] = []
+    try { files = fileIo.listFileSync(dir) } catch (_) {}
     for (const f of files) {
       if (f.endsWith('.log') && f !== name) {
         try {
@@ -99,9 +99,11 @@ export struct Log {
     }
 
     const content = this.filteredLogs.map((log: LogEntry) => `${log.timestamp} ${log.message}`).join('\n')
-    const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
-    fileIo.writeSync(file.fd, content)
-    fileIo.closeSync(file)
+    try {
+      const file = fileIo.openSync(filePath, fileIo.OpenMode.CREATE | fileIo.OpenMode.WRITE_ONLY)
+      fileIo.writeSync(file.fd, content)
+      fileIo.closeSync(file)
+    } catch (_) {}
 
     const uri = fileUri.getUriFromPath(filePath)
     let utdTypeId: string | undefined
@@ -116,10 +118,12 @@ export struct Log {
     }
     const shareData = new systemShare.SharedData({ utd: utdTypeId, uri: uri })
     const controller = new systemShare.ShareController(shareData)
-    controller.show(ctx, {
-      previewMode: systemShare.SharePreviewMode.DEFAULT,
-      selectionMode: systemShare.SelectionMode.SINGLE
-    })
+    try {
+      controller.show(ctx, {
+        previewMode: systemShare.SharePreviewMode.DEFAULT,
+        selectionMode: systemShare.SelectionMode.SINGLE
+      })
+    } catch (_) {}
   }
 
   build() {

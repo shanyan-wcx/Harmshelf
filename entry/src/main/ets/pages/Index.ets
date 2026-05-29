@@ -27,7 +27,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { media } from '@kit.MediaKit';
 import { backgroundTaskManager } from '@kit.BackgroundTasksKit';
 import { audio } from '@kit.AudioKit';
-import { closeSession, getUser, syncSession } from '../utils/Api';
+import { closeSession, getUser, initToastContext, syncSession } from '../utils/Api';
 import { bundleManager } from '@kit.AbilityKit';
 import { fileIo as fs, fileUri, picker } from '@kit.CoreFileKit';
 import { DownloadManager, DownloadTaskInfo } from '../utils/Class';
@@ -212,7 +212,7 @@ struct Index {
   @Local audioSessionManager: audio.AudioSessionManager | undefined = undefined
   @Local audioSessionActivated: boolean = false
   @Monitor('toCloseSession')
-  async closeEndSession(monitor: IMonitor) {
+  async closeEndSession(_: IMonitor) {
     if (this.toCloseSession) {
       this.syncProgress(this.toCloseSession, this.toCloseIndex)
       this.toCloseSession = undefined
@@ -221,7 +221,7 @@ struct Index {
   }
 
   @Monitor('playingItem')
-  onPlayingItemChange(monitor: IMonitor) {
+  onPlayingItemChange(_: IMonitor) {
     if (this.playingItem !== undefined) {
       this.isLocalPlaying = false
       this.localPlayItem = undefined
@@ -244,7 +244,7 @@ struct Index {
 
   async playLocal(localItem: LocalPlayItem, index: number) {
     if (this.avPlayer === undefined) return
-    await this.avPlayer.reset()
+    try { await this.avPlayer.reset() } catch (_) {}
     if (!localItem.coverPath) {
       localItem.coverPath = await this.findCoverInFolder(localItem.folderPath)
     }
@@ -257,8 +257,14 @@ struct Index {
     this.isPlaying = true
     this.isStartPlaying = true
     this.showPlay = true
-    const file = fs.openSync(localItem.tracks[index].filePath, fs.OpenMode.READ_ONLY)
-    this.avPlayer.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+    try {
+      const file = fs.openSync(localItem.tracks[index].filePath, fs.OpenMode.READ_ONLY)
+      try {
+        this.avPlayer.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+      } catch (_) {
+        fs.closeSync(file)
+      }
+    } catch (_) {}
   }
 
   pages?: HdsSideMenuMainItem[] = [
@@ -316,16 +322,18 @@ struct Index {
     const step = 50;
     const increment = step / duration;
     this.avPlayer!.setVolume(volume);
-    this.avPlayer!.play();
+    try { this.avPlayer!.play() } catch (_) {}
     const interval = setInterval(() => {
-      volume += increment;
-      if (volume >= 1.0) {
-        this.avPlayer!.setVolume(1.0);
-        clearInterval(interval);
-        this.fadeInterval = -1
-      } else {
-        this.avPlayer!.setVolume(volume);
-      }
+      try {
+        volume += increment;
+        if (volume >= 1.0) {
+          this.avPlayer!.setVolume(1.0);
+          clearInterval(interval);
+          this.fadeInterval = -1
+        } else {
+          this.avPlayer!.setVolume(volume);
+        }
+      } catch (_) {}
     }, step);
     this.fadeInterval = interval
   }
@@ -340,15 +348,17 @@ struct Index {
     const step = 50;
     const decrement = step / duration;
     const interval = setInterval(() => {
-      volume -= decrement;
-      if (volume <= 0.0) {
-        this.avPlayer!.setVolume(0.0);
-        clearInterval(interval);
-        this.fadeInterval = -1
-        this.avPlayer!.pause();
-      } else {
-        this.avPlayer!.setVolume(volume);
-      }
+      try {
+        volume -= decrement;
+        if (volume <= 0.0) {
+          this.avPlayer!.setVolume(0.0);
+          clearInterval(interval);
+          this.fadeInterval = -1
+          this.avPlayer!.pause();
+        } else {
+          this.avPlayer!.setVolume(volume);
+        }
+      } catch (_) {}
     }, step);
     this.fadeInterval = interval
   }
@@ -442,18 +452,24 @@ struct Index {
       wantAgentFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG]
     };
     wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj: WantAgent) => {
-      backgroundTaskManager.startBackgroundRunning(this.context,
-        backgroundTaskManager.BackgroundMode.AUDIO_PLAYBACK, wantAgentObj).then(() => {
-        this.continuousTaskRunning = true
-        Logger.info(`启动长时任务。`);
-      }).catch((err: BusinessError) => {
-        Logger.error(`启动长时任务出错，代码 ${err.code}，错误信息 ${err.message}`);
-      });
+      try {
+        if (!canIUse('SystemCapability.BackgroundTasksManager.ContinuousTask')) {
+          return
+        }
+        backgroundTaskManager.startBackgroundRunning(this.context,
+          backgroundTaskManager.BackgroundMode.AUDIO_PLAYBACK, wantAgentObj).then(() => {
+          this.continuousTaskRunning = true
+          Logger.info(`启动长时任务。`);
+        }).catch((err: BusinessError) => {
+          Logger.error(`启动长时任务出错，代码 ${err.code}，错误信息 ${err.message}`);
+        });
+      } catch (_) {}
     });
   }
 
   async stopContinuousTask() {
     if (!this.continuousTaskRunning) return
+    if (!canIUse('SystemCapability.BackgroundTasksManager.ContinuousTask')) return
     backgroundTaskManager.stopBackgroundRunning(this.context).then(() => {
       this.continuousTaskRunning = false
       Logger.info(`停止长时任务。`);
@@ -527,63 +543,77 @@ struct Index {
 
   async setSessionCallback() {
     this.session!.on('play', () => {
-      const playable = ['prepared', 'paused', 'completed']
-      if (!playable.includes(this.playerState)) return
-      if (this.playSetting?.fadeInOut) {
-        this.fadeIn()
-      } else {
-        this.avPlayer!.play()
-      }
+      try {
+        const playable = ['prepared', 'paused', 'completed']
+        if (!playable.includes(this.playerState)) return
+        if (this.playSetting?.fadeInOut) {
+          this.fadeIn()
+        } else {
+          this.avPlayer!.play()
+        }
+      } catch (_) {}
     });
     this.session!.on('pause', () => {
-      if (this.playerState !== 'playing') return
-      if (this.playSetting?.fadeInOut) {
-        this.fadeOut()
-      } else {
-        this.avPlayer!.pause()
-      }
+      try {
+        if (this.playerState !== 'playing') return
+        if (this.playSetting?.fadeInOut) {
+          this.fadeOut()
+        } else {
+          this.avPlayer!.pause()
+        }
+      } catch (_) {}
     });
     this.session!.on('stop', async () => {
-      const stoppable = ['prepared', 'playing', 'paused', 'completed']
-      if (!stoppable.includes(this.playerState)) return
-      this.avPlayer!.stop()
+      try {
+        const stoppable = ['prepared', 'playing', 'paused', 'completed']
+        if (!stoppable.includes(this.playerState)) return
+        this.avPlayer!.stop()
+      } catch (_) {}
     });
     this.session!.on('seek', async (time: number) => {
-      const seekable = ['prepared', 'playing', 'paused', 'completed']
-      if (!seekable.includes(this.playerState)) return
-      await this.setPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_BUFFERING)
-      this.avPlayer!.seek(time)
+      try {
+        const seekable = ['prepared', 'playing', 'paused', 'completed']
+        if (!seekable.includes(this.playerState)) return
+        await this.setPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_BUFFERING)
+        this.avPlayer!.seek(time)
+      } catch (_) {}
     });
     this.session!.on('rewind', () => {
-      const seekable = ['prepared', 'playing', 'paused', 'completed']
-      if (!seekable.includes(this.playerState)) return
-      this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ? (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
+      try {
+        const seekable = ['prepared', 'playing', 'paused', 'completed']
+        if (!seekable.includes(this.playerState)) return
+        this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ? (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
+      } catch (_) {}
     })
     this.session!.on('fastForward', () => {
-      const seekable = ['prepared', 'playing', 'paused', 'completed']
-      if (!seekable.includes(this.playerState)) return
-      let dur = this.isLocalPlaying
-        ? this.localPlayItem!.tracks[this.playingIndex].duration
-        : this.playingItem!.audioTracks[this.playingIndex].duration
-      this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < dur ? (this.playedTime + this.playSetting!.skipIntervals) * 1000 : dur * 1000)
+      try {
+        const seekable = ['prepared', 'playing', 'paused', 'completed']
+        if (!seekable.includes(this.playerState)) return
+        let dur = this.isLocalPlaying
+          ? this.localPlayItem!.tracks[this.playingIndex].duration
+          : this.playingItem!.audioTracks[this.playingIndex].duration
+        this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < dur ? (this.playedTime + this.playSetting!.skipIntervals) * 1000 : dur * 1000)
+      } catch (_) {}
     })
     if (this.isLocalPlaying || this.playingIndex > 0) {
       this.session!.on('playPrevious', async () => {
-        await this.avPlayer!.reset();
-        this.playingIndex--
-        this.playingTitle = this.isLocalPlaying
-          ? this.localPlayItem!.tracks[this.playingIndex].title
-          : (this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle)
-        if (this.isLocalPlaying) {
-          try {
-            const prevFile = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
-            this.avPlayer!.fdSrc = { fd: prevFile.fd, offset: 0, length: -1 }
-          } catch (_) {
-            this.uiContext?.getPromptAction().showToast({ message: '播放失败，格式不支持或文件不存在！', duration: 500 })
+        try {
+          await this.avPlayer!.reset();
+          this.playingIndex--
+          this.playingTitle = this.isLocalPlaying
+            ? this.localPlayItem!.tracks[this.playingIndex].title
+            : (this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle)
+          if (this.isLocalPlaying) {
+            try {
+              const prevFile = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
+              this.avPlayer!.fdSrc = { fd: prevFile.fd, offset: 0, length: -1 }
+            } catch (_) {
+              this.uiContext?.getPromptAction().showToast({ message: '播放失败，格式不支持或文件不存在！', duration: 500 })
+            }
+          } else {
+            this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
           }
-        } else {
-          this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
-        }
+        } catch (_) {}
       });
     } else {
       this.session!.off('playPrevious')
@@ -591,21 +621,23 @@ struct Index {
     let trackCount = this.isLocalPlaying ? this.localPlayItem!.tracks.length : this.playingItem!.audioTracks.length
     if (this.playingIndex < trackCount - 1) {
       this.session!.on('playNext', async () => {
-        await this.avPlayer!.reset();
-        this.playingIndex++
-        this.playingTitle = this.isLocalPlaying
-          ? this.localPlayItem!.tracks[this.playingIndex].title
-          : (this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle)
-        if (this.isLocalPlaying) {
-          try {
-            const nextFile = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
-            this.avPlayer!.fdSrc = { fd: nextFile.fd, offset: 0, length: -1 }
-          } catch (_) {
-            this.uiContext?.getPromptAction().showToast({ message: '播放失败，格式不支持或文件不存在！', duration: 500 })
+        try {
+          await this.avPlayer!.reset();
+          this.playingIndex++
+          this.playingTitle = this.isLocalPlaying
+            ? this.localPlayItem!.tracks[this.playingIndex].title
+            : (this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle)
+          if (this.isLocalPlaying) {
+            try {
+              const nextFile = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
+              this.avPlayer!.fdSrc = { fd: nextFile.fd, offset: 0, length: -1 }
+            } catch (_) {
+              this.uiContext?.getPromptAction().showToast({ message: '播放失败，格式不支持或文件不存在！', duration: 500 })
+            }
+          } else {
+            this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
           }
-        } else {
-          this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
-        }
+        } catch (_) {}
       });
     } else {
       this.session!.off('playNext');
@@ -791,6 +823,7 @@ struct Index {
           Logger.info('播放器重置。');
           this.stopContinuousTask()
           this.playedTime = 0
+          this.playedPercent = 0
           if (this.audioSessionActivated) {
             await this.deactivateAudioSession()
           }
@@ -840,12 +873,6 @@ struct Index {
             } else {
               this.avPlayer!.play()
             }
-          } else {
-            if (this.playSetting?.fadeInOut) {
-              this.fadeOut()
-            } else {
-              this.avPlayer!.pause()
-            }
           }
           this.elapsedTime = 10000
           this.syncTime = new Date().getTime() / 1000
@@ -878,10 +905,10 @@ struct Index {
             if (this.playingIndex < this.localPlayItem!.tracks.length - 1) {
               const newIndex = this.playingIndex + 1
               try {
-                const nextFile = fs.openSync(this.localPlayItem!.tracks[newIndex].filePath, fs.OpenMode.READ_ONLY)
                 await this.avPlayer!.reset()
                 this.playingIndex = newIndex
                 this.playingTitle = this.localPlayItem!.tracks[newIndex].title
+                const nextFile = fs.openSync(this.localPlayItem!.tracks[newIndex].filePath, fs.OpenMode.READ_ONLY)
                 this.avPlayer!.fdSrc = { fd: nextFile.fd, offset: 0, length: -1 }
               } catch (_) {
                 this.isPlaying = false
@@ -891,8 +918,16 @@ struct Index {
               this.isPlaying = false
             }
           } else if (this.sleepTime !== 0 && Number(this.sleepTime.toFixed(3)) <= Number((this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset).toFixed(3))) {
-            this.isPlaying = false
             this.sleepTime = 0
+            this.isPlaying = false
+            this.stopContinuousTask()
+            await this.setPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PAUSE)
+            if (this.playingIndex < this.playingItem!.audioTracks.length - 1) {
+              await this.avPlayer!.reset()
+              this.playingIndex++
+              this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
+              this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+            }
           } else {
             if (this.playingIndex < this.playingItem!.audioTracks.length - 1) {
               await this.avPlayer!.reset()
@@ -994,6 +1029,7 @@ struct Index {
       Logger.warn("no uiContext");
       return;
     }
+    initToastContext(this.uiContext)
     this.context = this.uiContext.getHostContext() as common.UIAbilityContext;
     this.context.getApplicationContext().setColorMode(this.colorMode?.colorMode)
     this.mainWindow = await window.getLastWindow(this.context)
@@ -1083,7 +1119,7 @@ struct Index {
 
   aboutToDisappear() {
     if (!this.isLocalPlaying && this.playingItem) {
-      this.syncProgress(this.playingItem, this.playingIndex)
+      try { this.syncProgress(this.playingItem, this.playingIndex) } catch (_) {}
     }
     if (this.errorRetryTimer !== -1) {
       clearTimeout(this.errorRetryTimer)
@@ -1127,9 +1163,11 @@ struct Index {
         items: this.pages,
         selectedIndex: this.pageIndex,
         $selectedIndex: (pageIndex: number) => {
-          this.pageIndex = pageIndex;
-          this.isShowSidebar = false
-          this.pageInfos.clear()
+          try {
+            this.pageIndex = pageIndex;
+            this.isShowSidebar = false
+            this.pageInfos.clear()
+          } catch (_) {}
         },
       })
     }

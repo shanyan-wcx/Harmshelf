@@ -32,9 +32,9 @@ export default class EntryAbility extends UIAbility {
     // Main window is created, set main page for this ability
     Logger.debug('Ability onWindowStageCreate');
 
-    errorManager.on('error', callback);
+    try { errorManager.on('error', callback); } catch (_) {}
 
-    windowStage.setWindowRectAutoSave(true, true);
+    try { windowStage.setWindowRectAutoSave(true, true); } catch (_) {}
 
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
@@ -91,15 +91,17 @@ export default class EntryAbility extends UIAbility {
 
   async onConfigurationUpdate(newConfig: Configuration) {
     env.colorMode = newConfig.colorMode;
-    let mainWindow = await window.getLastWindow(this.context)
-    if (env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK) {
-      mainWindow.setWindowSystemBarProperties({
-        statusBarContentColor: '#FFFFFF',
-      })
-    } else {
-      mainWindow.setWindowSystemBarProperties({
-        statusBarContentColor: '#000000',
-      })
-    }
+    try {
+      let mainWindow = await window.getLastWindow(this.context)
+      if (env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK) {
+        mainWindow.setWindowSystemBarProperties({
+          statusBarContentColor: '#FFFFFF',
+        })
+      } else {
+        mainWindow.setWindowSystemBarProperties({
+          statusBarContentColor: '#000000',
+        })
+      }
+    } catch (_) {}
   }
 }

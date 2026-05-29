@@ -67,7 +67,7 @@ export struct Play {
   @Local maxIntroLine: number = 5
   @Local showMoreIntro: boolean = false
   @Monitor('playingItem')
-  async setSpeed(monitor: IMonitor) {
+  async setSpeed(_: IMonitor) {
     this.sleepTime = 0
     if (this.playSetting?.rememberSpeed === true) {
       this.speed = this.playSetting.globalSpeed
@@ -76,16 +76,16 @@ export struct Play {
     }
   }
   @Monitor('speed')
-  async speedMonitoring(monitor: IMonitor) {
+  async speedMonitoring(_: IMonitor) {
     this.changeSpeedIcon()
   }
   @Monitor('gobackwardIcon')
-  async changeIcon(monitor: IMonitor) {
+  async changeIcon(_: IMonitor) {
     this.goBackwardButton.baseIcon = this.gobackwardIcon
     this.goForwardButton.baseIcon = this.goforwardIcon
   }
   @Monitor('isPlaying')
-  async changeIcon2(monitor: IMonitor) {
+  async changeIcon2(_: IMonitor) {
     this.playPauseButton.baseIcon = this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill');
   }
 
@@ -750,7 +750,11 @@ export struct Play {
                 this.playingTitle = track.title
                 try {
                   const file = fs.openSync(track.filePath, fs.OpenMode.READ_ONLY)
-                  this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+                  try {
+                    this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+                  } catch (_) {
+                    fs.closeSync(file)
+                  }
                 } catch (_) {
                   this.getUIContext().getPromptAction().showToast({ message: '播放失败，格式不支持或文件不存在！', duration: 500 })
                 }
@@ -1076,7 +1080,7 @@ export struct Play {
                           this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
                         }
                         this.avPlayer!.prepare()
-                      } else if (['paused', 'completed'].includes(this.avPlayer!.state)) {
+                      } else if (['prepared', 'paused', 'completed'].includes(this.avPlayer!.state)) {
                         if (this.playSetting?.fadeInOut) {
                           this.fadeIn()
                         } else {

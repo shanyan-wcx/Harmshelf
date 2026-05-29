@@ -1,5 +1,5 @@
 import axios, { Axios, AxiosResponse, FormData } from '@ohos/axios'
-import { promptAction } from '@kit.ArkUI';
+import { UIContext } from '@kit.ArkUI';
 import { bundleManager } from '@kit.AbilityKit';
 import { rcp } from '@kit.RemoteCommunicationKit';
 import { deviceInfo } from '@kit.BasicServicesKit';
@@ -37,6 +37,12 @@ import { Logger } from './Logger';
 axios.defaults.headers.post['Content-Type'] = 'application/json'
 
 let authToken: string = ""
+
+let toastUiContext: UIContext | undefined = undefined
+
+export function initToastContext(ctx: UIContext): void {
+  toastUiContext = ctx
+}
 let userId: string = ""
 let baseUrl = ""
 
@@ -118,10 +124,10 @@ export async function getUser(): Promise<User | undefined> {
     return response.data
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取用户失败，请检查网络！',
       duration: 500
-    });
+      })
     return undefined
   }
 }
@@ -138,10 +144,10 @@ export async function getHome(libraryId: string): Promise<HomeSection[]> {
     return response.data
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取首页失败，请检查网络！',
       duration: 500
-    });
+      })
     return []
   }
 }
@@ -162,10 +168,10 @@ export async function getLibraries(): Promise<Library[]> {
   } catch (error) {
     Logger.info("获取媒体库失败！")
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取媒体库失败，请检查网络！',
       duration: 500
-    });
+      })
   }
   return libraries
 }
@@ -186,10 +192,10 @@ export async function getLibraryItems(libraryId: string): Promise<LibraryItem[]>
     return libraryItems
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取媒体库内容失败，请检查网络！',
       duration: 500
-    });
+      })
     return []
   }
 }
@@ -211,10 +217,10 @@ export async function getLibraryItemsInProgress(libraryId: string): Promise<Libr
     return libraryItems
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取进行中项目失败，请检查网络！',
       duration: 500
-    });
+      })
     return []
   }
 }
@@ -236,10 +242,10 @@ export async function getLibraryItemsFinished(libraryId: string): Promise<Librar
     return libraryItems
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取已完成项目失败，请检查网络！',
       duration: 500
-    });
+      })
     return []
   }
 }
@@ -256,10 +262,10 @@ export async function getItem(itemId: string): Promise<LibraryItem | undefined> 
     return response.data
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取项目失败，请检查网络！',
       duration: 500
-    });
+      })
     return undefined
   }
 }
@@ -276,10 +282,10 @@ export async function getEpisode(itemId: string, EpisodeId: string): Promise<Epi
     return response.data
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取项目失败，请检查网络！',
       duration: 500
-    });
+      })
     return undefined
   }
 }
@@ -296,10 +302,10 @@ export async function searchLibrary(libraryId: string, query: string): Promise<S
     return response.data
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '搜索失败，请检查网络！',
       duration: 500
-    });
+      })
     return undefined
   }
 }
@@ -318,10 +324,10 @@ export async function getCover(itemId: string) {
     return response.data
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取封面失败，请检查网络！',
       duration: 500
-    });
+      })
   }
 }
 
@@ -368,10 +374,10 @@ export async function getPlayItem(itemId: string, episodeId?: string): Promise<P
     Logger.info(`当前位置${playItem?.currentTime}`)
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取播放项目失败，请检查网络！',
       duration: 500
-    });
+      })
   }
   return playItem
 }
@@ -415,10 +421,10 @@ export async function getAuthors(libraryId: string): Promise<Author[]> {
     return authors
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取作者失败，请检查网络！',
       duration: 500
-    });
+      })
     return []
   }
 }
@@ -437,10 +443,10 @@ export async function getSeries(libraryId: string): Promise<Series[]> {
     return series
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取系列失败，请检查网络！',
       duration: 500
-    });
+      })
     return []
   }
 }
@@ -459,10 +465,10 @@ export async function getCollections(libraryId: string): Promise<Collection[]> {
     return collections
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取收藏失败，请检查网络！',
       duration: 500
-    });
+      })
     return []
   }
 }
@@ -480,17 +486,17 @@ export async function addToCollection(collectionId: string, bookId: string): Pro
     })
     collection = response.data
     Logger.info("添加成功");
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '添加成功！',
       duration: 500
-    });
+      })
     return collection
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '添加失败，请检查网络！',
       duration: 500
-    });
+      })
     return undefined
   }
 }
@@ -505,17 +511,17 @@ export async function removeFromCollection(collectionId: string, bookId: string)
         connectTimeout: 30000
       })
     Logger.info("移除成功");
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '移除成功！',
       duration: 500
-    });
+      })
     return response.data
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '移除失败，请检查网络！',
       duration: 500
-    });
+      })
     return undefined
   }
 }
@@ -562,7 +568,7 @@ export async function updateCollection(collectionId: string, name: string, descr
     if (response.body) {
       const decoder = new util.TextDecoder();
       const uint8Array = new Uint8Array(response.body);
-      const bodyString = decoder.decodeWithStream(uint8Array);
+      const bodyString = decoder.decodeToString(uint8Array);
       const parsed = JSON.parse(bodyString) as Collection;
       collection = parsed;
       Logger.info("更新成功");
@@ -605,10 +611,10 @@ export async function getPlaylists(libraryId: string): Promise<Playlist[]> {
     return playlists
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取收藏失败，请检查网络！',
       duration: 500
-    });
+      })
     return []
   }
 }
@@ -627,17 +633,17 @@ export async function addToPlaylist(playlistId: string, libraryItemId: string, e
     })
     playlist = response.data
     Logger.info("添加成功");
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '添加成功！',
       duration: 500
-    });
+      })
     return playlist
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '添加失败，请检查网络！',
       duration: 500
-    });
+      })
     return undefined
   }
 }
@@ -652,17 +658,17 @@ export async function removeFromPlaylist(playlistId: string, libraryItemId: stri
         connectTimeout: 30000
       })
     Logger.info("移除成功");
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '移除成功！',
       duration: 500
-    });
+      })
     return response.data
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '移除失败，请检查网络！',
       duration: 500
-    });
+      })
     return undefined
   }
 }
@@ -709,7 +715,7 @@ export async function updatePlaylist(playlistId: string, name: string, descripti
     if (response.body) {
       const decoder = new util.TextDecoder();
       const uint8Array = new Uint8Array(response.body);
-      const bodyString = decoder.decodeWithStream(uint8Array);
+      const bodyString = decoder.decodeToString(uint8Array);
       const parsed = JSON.parse(bodyString) as Playlist;
       playlist = parsed;
       Logger.info("更新成功");
@@ -768,10 +774,10 @@ export async function closeSession(sessionId: string, updateSession: UpdateSessi
     return true
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '关闭会话失败，请检查网络！',
       duration: 500
-    });
+      })
     return false
   }
 }
@@ -791,10 +797,10 @@ export async function getStats(): Promise<ListeningStats | undefined> {
     return listeningStats
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取统计数据失败，请检查网络！',
       duration: 500
-    });
+      })
     return undefined
   }
 }
@@ -813,10 +819,10 @@ export async function getBookmarks(userId: string): Promise<Bookmark[]> {
     return bookmarks
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取书签失败，请检查网络！',
       duration: 500
-    });
+      })
     return []
   }
 }
@@ -868,10 +874,10 @@ export async function searchPodcasts(term: string) {
     return response.data
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '搜索播客失败，请检查网络！',
       duration: 500
-    });
+      })
     return []
   }
 }
@@ -946,10 +952,10 @@ export async function getRecentEpisodes(libraryId: string, page: number) {
     return response.data.episodes
   } catch (error) {
     Logger.error(JSON.stringify(error));
-    promptAction.showToast({
+    toastUiContext?.getPromptAction().showToast({
       message: '获取最新剧集失败，请检查网络！',
       duration: 500
-    });
+      })
     return []
   }
 }
