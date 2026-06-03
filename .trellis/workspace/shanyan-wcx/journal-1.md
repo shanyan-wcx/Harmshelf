@@ -77,3 +77,36 @@
 ### Next Steps
 
 - None - task complete
+
+
+## Session 3: Logger 逐条写入文件 + 修复后台播放被系统终止
+
+**Date**: 2026-06-03
+**Task**: Logger 逐条写入文件 + 修复后台播放被系统终止
+**Branch**: `main`
+
+### Summary
+
+Logger.ets: 新增文件日志逐条写入、多文件轮转。Index.ets: aboutToAppear/Disappear接入文件日志; startContinuousTask移除canIUse检查改用动态bundleName+完整错误日志; stopContinuousTask移除canIUse检查。EntryAbility.ets: 生命周期日志改为info级别。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `1a48ca8` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

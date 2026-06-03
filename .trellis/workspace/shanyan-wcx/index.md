@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 2
-- **Last Active**: 2026-05-29
+- **Total Sessions**: 3
+- **Last Active**: 2026-06-03
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~79 | Active |
+| `journal-1.md` | ~112 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 3 | 2026-06-03 | Logger 逐条写入文件 + 修复后台播放被系统终止 | `1a48ca8` | `main` |
 | 2 | 2026-05-29 | 修复播放器崩溃/卡死 + 增加同时播放 + 全面稳定性修复 | `82b8c48`, `f5df23a`, `9a523b8`, `2d90551`, `170051f` | `main` |
 | 1 | 2026-05-24 | 修复播放器崩溃/卡死 + 增加同时播放功能 + 修复按钮冻结 | `82b8c48`, `9a523b8`, `f5df23a` | `main` |
 <!-- @@@/auto:session-history -->
