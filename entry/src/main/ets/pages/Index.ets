@@ -443,7 +443,7 @@ struct Index {
     let wantAgentInfo: wantAgent.WantAgentInfo = {
       wants: [
         {
-          bundleName: "com.shanyan.harmshelf",
+          bundleName: this.context!.abilityInfo.bundleName,
           abilityName: "EntryAbility"
         }
       ],
@@ -452,24 +452,20 @@ struct Index {
       wantAgentFlags: [wantAgent.WantAgentFlags.UPDATE_PRESENT_FLAG]
     };
     wantAgent.getWantAgent(wantAgentInfo).then((wantAgentObj: WantAgent) => {
-      try {
-        if (!canIUse('SystemCapability.BackgroundTasksManager.ContinuousTask')) {
-          return
-        }
-        backgroundTaskManager.startBackgroundRunning(this.context,
-          backgroundTaskManager.BackgroundMode.AUDIO_PLAYBACK, wantAgentObj).then(() => {
-          this.continuousTaskRunning = true
-          Logger.info(`启动长时任务。`);
-        }).catch((err: BusinessError) => {
-          Logger.error(`启动长时任务出错，代码 ${err.code}，错误信息 ${err.message}`);
-        });
-      } catch (_) {}
+      backgroundTaskManager.startBackgroundRunning(this.context,
+        backgroundTaskManager.BackgroundMode.AUDIO_PLAYBACK, wantAgentObj).then(() => {
+        this.continuousTaskRunning = true
+        Logger.info(`启动长时任务。`);
+      }).catch((err: BusinessError) => {
+        Logger.error(`启动长时任务出错，代码 ${err.code}，错误信息 ${err.message}`);
+      });
+    }).catch((err: BusinessError) => {
+      Logger.error(`获取WantAgent失败，代码 ${err.code}，错误信息 ${err.message}`);
     });
   }
 
   async stopContinuousTask() {
     if (!this.continuousTaskRunning) return
-    if (!canIUse('SystemCapability.BackgroundTasksManager.ContinuousTask')) return
     backgroundTaskManager.stopBackgroundRunning(this.context).then(() => {
       this.continuousTaskRunning = false
       Logger.info(`停止长时任务。`);
@@ -1032,6 +1028,7 @@ struct Index {
     initToastContext(this.uiContext)
     this.context = this.uiContext.getHostContext() as common.UIAbilityContext;
     this.context.getApplicationContext().setColorMode(this.colorMode?.colorMode)
+    Logger.startFileLogging(this.context.filesDir + '/logs')
     this.mainWindow = await window.getLastWindow(this.context)
     this.mainWindow.on('windowEvent', (data) => {
       if (data === window.WindowEventType.WINDOW_ACTIVE) {
@@ -1141,6 +1138,7 @@ struct Index {
       clearTimeout(this.stopTimeoutId)
       this.stopTimeoutId = -1
     }
+    Logger.stopFileLogging()
     this.avPlayer?.release()
   }
 

@@ -80,13 +80,11 @@ export default class EntryAbility extends UIAbility {
   }
 
   onForeground(): void {
-    // Ability has brought to foreground
-    Logger.debug('Ability onForeground');
+    Logger.info('Ability onForeground');
   }
 
   onBackground(): void {
-    // Ability has back to background
-    Logger.debug('Ability onBackground');
+    Logger.info('Ability onBackground');
   }
 
   async onConfigurationUpdate(newConfig: Configuration) {
