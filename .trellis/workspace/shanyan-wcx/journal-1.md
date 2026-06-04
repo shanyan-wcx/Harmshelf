@@ -144,3 +144,38 @@ Index.ets: aboutToDisappear追加stopContinuousTask+session销毁; stopped状态
 ### Next Steps
 
 - None - task complete
+
+
+## Session 5: 下载选章功能+syncProgress try/catch+版本号更新
+
+**Date**: 2026-06-04
+**Task**: 下载选章功能+syncProgress try/catch+版本号更新
+**Branch**: `main`
+
+### Summary
+
+LibraryItemDetail.ets: 下载弹窗增加起始/结束章节输入框，校验规则，标签居中，短线条连接。Index.ets: syncProgress加try/catch/finally防止isSyncing卡死。版本号2.2.7→2.2.8。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `8fef5e1` | (see git log) |
+| `5c2e22d` | (see git log) |
+| `89751f5` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
