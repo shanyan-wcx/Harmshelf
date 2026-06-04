@@ -366,75 +366,80 @@ struct Index {
   async syncProgress(closeItem?: PlayItem, closeIndex?: number) {
     if (!this.isSyncing) {
       this.isSyncing = true
-      let bundleFlags = bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT;
-      let bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleFlags)
-      let updateSession: UpdateSession | undefined = undefined
-      let status = false
-      if (closeItem) {
-        updateSession = {
-          deviceInfo: {
-            id: deviceInfo.displayVersion,
-            userId: this.user!.id,
-            deviceName: deviceInfo.marketName,
-            clientName: "Harmshelf",
-            clientVersion: bundleInfo.versionName
-          },
-          mediaPlayer: "avPlayer",
-          currentTime: closeItem.audioTracks[closeIndex!].startOffset + this.playedTime,
-          timeListened: new Date().getTime() / 1000 - this.syncTime
-        }
-        for (let element of this.progress) {
-          if (closeItem.mediaType === 'book' ? element.libraryItemId === closeItem.libraryItemId : element.episodeId === closeItem.episodeId) {
-            element.duration = closeItem.duration
-            element.currentTime = closeItem.audioTracks[closeIndex!].startOffset + this.playedTime
-            element.progress = element.currentTime / (Math.trunc(element.duration * 1000) / 1000)
-            element.isFinished = element.progress >= 1 ? true : false
-            break
+      try {
+        let bundleFlags = bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT;
+        let bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleFlags)
+        let updateSession: UpdateSession | undefined = undefined
+        let status = false
+        if (closeItem) {
+          updateSession = {
+            deviceInfo: {
+              id: deviceInfo.displayVersion,
+              userId: this.user!.id,
+              deviceName: deviceInfo.marketName,
+              clientName: "Harmshelf",
+              clientVersion: bundleInfo.versionName
+            },
+            mediaPlayer: "avPlayer",
+            currentTime: closeItem.audioTracks[closeIndex!].startOffset + this.playedTime,
+            timeListened: new Date().getTime() / 1000 - this.syncTime
           }
-        }
-        status = await closeSession(closeItem!.id, updateSession)
-      } else {
-        updateSession = {
-          deviceInfo: {
-            id: deviceInfo.displayVersion,
-            userId: this.user!.id,
-            deviceName: deviceInfo.marketName,
-            clientName: "Harmshelf",
-            clientVersion: bundleInfo.versionName
-          },
-          mediaPlayer: "avPlayer",
-          currentTime: this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playedTime,
-          timeListened: new Date().getTime() / 1000 - this.syncTime
-        }
-        for (let element of this.progress) {
-          if (this.playingItem!.mediaType === 'book' ? element.libraryItemId === this.playingItem!.libraryItemId : element.episodeId === this.playingItem!.episodeId) {
-            element.duration = this.playingItem!.duration
-            element.currentTime = this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playedTime
-            element.progress = element.currentTime / (Math.trunc(element.duration * 1000) / 1000)
-            element.isFinished = element.progress >= 1 ? true : false
-            break
+          for (let element of this.progress) {
+            if (closeItem.mediaType === 'book' ? element.libraryItemId === closeItem.libraryItemId : element.episodeId === closeItem.episodeId) {
+              element.duration = closeItem.duration
+              element.currentTime = closeItem.audioTracks[closeIndex!].startOffset + this.playedTime
+              element.progress = element.currentTime / (Math.trunc(element.duration * 1000) / 1000)
+              element.isFinished = element.progress >= 1 ? true : false
+              break
+            }
           }
+          status = await closeSession(closeItem!.id, updateSession)
+        } else {
+          updateSession = {
+            deviceInfo: {
+              id: deviceInfo.displayVersion,
+              userId: this.user!.id,
+              deviceName: deviceInfo.marketName,
+              clientName: "Harmshelf",
+              clientVersion: bundleInfo.versionName
+            },
+            mediaPlayer: "avPlayer",
+            currentTime: this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playedTime,
+            timeListened: new Date().getTime() / 1000 - this.syncTime
+          }
+          for (let element of this.progress) {
+            if (this.playingItem!.mediaType === 'book' ? element.libraryItemId === this.playingItem!.libraryItemId : element.episodeId === this.playingItem!.episodeId) {
+              element.duration = this.playingItem!.duration
+              element.currentTime = this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playedTime
+              element.progress = element.currentTime / (Math.trunc(element.duration * 1000) / 1000)
+              element.isFinished = element.progress >= 1 ? true : false
+              break
+            }
+          }
+          status = await syncSession(this.playingItem!.id, updateSession)
         }
-        status = await syncSession(this.playingItem!.id, updateSession)
+        if (status) {
+          this.isConnect = true
+          Logger.info(`会话当前时间${updateSession.currentTime}`)
+          Logger.info(`会话汇报间隔${updateSession.timeListened}`)
+          this.syncTime = new Date().getTime() / 1000
+          this.syncInterval = 10000
+          this.user = await getUser()
+          this.progress = this.user?.mediaProgress??[]
+        } else {
+          this.isConnect = false
+          this.syncInterval = Math.min(this.syncInterval * 1.5, 60000)
+          this.getUIContext().getPromptAction().showToast({
+            message: '同步进度失败，请检查网络！',
+            duration: 500
+          });
+        }
+      } catch (_) {
+        Logger.error('同步进度出错')
+      } finally {
+        this.elapsedTime = 0
+        this.isSyncing = false
       }
-      if (status) {
-        this.isConnect = true
-        Logger.info(`会话当前时间${updateSession.currentTime}`)
-        Logger.info(`会话汇报间隔${updateSession.timeListened}`)
-        this.syncTime = new Date().getTime() / 1000
-        this.syncInterval = 10000
-        this.user = await getUser()
-        this.progress = this.user?.mediaProgress??[]
-      } else {
-        this.isConnect = false
-        this.syncInterval = Math.min(this.syncInterval * 1.5, 60000)
-        this.getUIContext().getPromptAction().showToast({
-          message: '同步进度失败，请检查网络！',
-          duration: 500
-        });
-      }
-      this.elapsedTime = 0
-      this.isSyncing = false
     }
   }
 
