@@ -110,3 +110,37 @@ Logger.ets: 新增文件日志逐条写入、多文件轮转。Index.ets: aboutT
 ### Next Steps
 
 - None - task complete
+
+
+## Session 4: 修复后台播放返回卡顿闪退
+
+**Date**: 2026-06-04
+**Task**: 修复后台播放返回卡顿闪退
+**Branch**: `main`
+
+### Summary
+
+Index.ets: aboutToDisappear追加stopContinuousTask+session销毁; stopped状态改用stopContinuousTask。EntryAbility.ets: 生命周期设置appInBackground。Play.ets: 消费isOnFocus，退后台stopRotate。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `214ef99` | (see git log) |
+| `214911b` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
