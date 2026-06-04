@@ -94,6 +94,15 @@ export struct LibraryItemDetail {
   @Local showPlayLoading: boolean = false
   @Local showConfirm: boolean = false
   @Local showConfirmDownload: boolean = false
+  @Local downloadStart: string = ''
+  @Local downloadEnd: string = ''
+  @Monitor('showConfirmDownload')
+  resetDownloadRange() {
+    if (this.showConfirmDownload) {
+      this.downloadStart = ''
+      this.downloadEnd = ''
+    }
+  }
   @Local showPlaylists: boolean = false
   @Local showProgress: boolean = false
   @Local showCreatePlaylist: boolean = false
@@ -443,12 +452,54 @@ export struct LibraryItemDetail {
     Column() {
       Text("确认下载" + this.libraryItem?.media.metadata.title + "？")
         .fontSize(19)
-        .margin({ bottom: 20 })
+        .margin({ bottom: 15 })
 
-      if (this.displayWidth >= 600) {
-        Blank()
-          .height(160)
+      Column({ space: 8 }) {
+        Row() {
+          Text("起始章节")
+            .fontSize(16)
+            .fontColor($r('sys.color.font_secondary'))
+            .textAlign(TextAlign.Center)
+            .layoutWeight(1)
+            .offset({ x: -15 })
+
+          Text("结束章节")
+            .fontSize(16)
+            .fontColor($r('sys.color.font_secondary'))
+            .textAlign(TextAlign.Center)
+            .layoutWeight(1)
+            .offset({ x: 15 })
+        }
+        .width('100%')
+
+        Row() {
+          TextInput({ text: this.downloadStart, placeholder: '1' })
+            .height(40)
+            .borderRadius(8)
+            .inputFilter('[0-9]', (err) => {})
+            .onChange((val) => { this.downloadStart = val })
+            .textAlign(TextAlign.Center)
+            .layoutWeight(1)
+
+          Divider()
+            .width(20)
+            .strokeWidth(2)
+            .color($r('sys.color.font_tertiary'))
+            .margin({ left: 20, right: 20 })
+            .lineCap(LineCapStyle.Square)
+
+          TextInput({ text: this.downloadEnd, placeholder: String(this.libraryItem?.media.tracks?.length ?? '') })
+            .height(40)
+            .borderRadius(8)
+            .inputFilter('[0-9]', (err) => {})
+            .onChange((val) => { this.downloadEnd = val })
+            .textAlign(TextAlign.Center)
+            .layoutWeight(1)
+        }
+        .width('100%')
       }
+      .width('100%')
+      .margin({ top: 0, bottom: 20 })
 
       Row({ space: 20 }) {
         Button({ type: ButtonType.Normal }) {
@@ -474,6 +525,21 @@ export struct LibraryItemDetail {
         .layoutWeight(1)
         .borderRadius(8)
         .onClick(async () => {
+          const maxTracks = this.libraryItem?.media.tracks?.length ?? 0
+          const start = this.downloadStart === '' ? 1 : Number(this.downloadStart)
+          const end = this.downloadEnd === '' ? maxTracks : Number(this.downloadEnd)
+          if (start <= 0) {
+            this.getUIContext().getPromptAction().showToast({ message: '起始章节必须大于0', duration: 1500 })
+            return
+          }
+          if (start >= end) {
+            this.getUIContext().getPromptAction().showToast({ message: '起始章节必须小于结束章节', duration: 1500 })
+            return
+          }
+          if (end > maxTracks) {
+            this.getUIContext().getPromptAction().showToast({ message: `结束章节不能超过最大章节数${maxTracks}`, duration: 1500 })
+            return
+          }
           this.showConfirmDownload = false
           this.getUIContext().getPromptAction().showToast({
             message: '开始下载！',
@@ -485,7 +551,10 @@ export struct LibraryItemDetail {
           if (!existsDir) {
             fs.mkdirSync(dir);
           }
-          this.libraryItem?.media.tracks?.forEach(async (track: Track, index) => {
+          const tracks = this.libraryItem?.media.tracks ?? []
+          for (let i = start - 1; i < end; i++) {
+            const track = tracks[i]
+            if (!track) continue
             const filePath = dir + "/" + track.metadata.filename
             if (this.downloadSetting?.skipExistingFiles && fs.accessSync(filePath)) {
               Logger.info(`文件已存在，跳过: ${filePath}`)
@@ -507,7 +576,6 @@ export struct LibraryItemDetail {
                 this.baseUrl + track.contentUrl + "?token=" + this.apiToken,
                 filePath,
                 (info) => {
-                  // 下载进度回调
                   Logger.info(`Progress: ${info.title} ${Math.floor(info.progress)}%`);
                   let index = this.downloadTasks.findIndex(t => t.id === info.id)
                   if (index >= 0) {
@@ -515,7 +583,6 @@ export struct LibraryItemDetail {
                   }
                 },
                 (info) => {
-                  // 状态变化回调
                   Logger.info(`Status changed: ${info.title} ${info.status}`);
                   let index = this.downloadTasks.findIndex(t => t.id === info.id)
                   if (index >= 0) {
@@ -528,8 +595,8 @@ export struct LibraryItemDetail {
                   }
                 }
               )
-            };
-          })
+            }
+          }
           const coverUrl = this.baseUrl + `/api/items/${this.libraryItem!.id}/cover?token=${this.apiToken}`
           this.downloadManager!.downloadCover(coverUrl, dir + "/cover.jpg")
         })
