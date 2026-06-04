@@ -45,6 +45,15 @@ export struct Play {
   @Local rotateTimer: number = -1
   @Local sliderValue: number = 0
   @Local fadeInterval: number = -1
+  @Consumer() isOnFocus: boolean = true
+  @Monitor('isOnFocus')
+  onFocusChange() {
+    if (!this.isOnFocus) {
+      this.stopRotate()
+    } else if (this.isPlaying) {
+      this.startRotate()
+    }
+  }
 
   aboutToDisappear() {
     this.stopRotate()
