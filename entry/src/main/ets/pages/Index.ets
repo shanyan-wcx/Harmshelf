@@ -937,7 +937,7 @@ struct Index {
           break;
         case 'stopped':
           Logger.info('播放器停止。');
-          this.continuousTaskRunning = false
+          await this.stopContinuousTask()
           if (this.audioSessionActivated) {
             await this.deactivateAudioSession()
           }
@@ -1138,6 +1138,9 @@ struct Index {
       clearTimeout(this.stopTimeoutId)
       this.stopTimeoutId = -1
     }
+    this.stopContinuousTask()
+    this.session?.destroy()
+    this.session = undefined
     Logger.stopFileLogging()
     this.avPlayer?.release()
   }

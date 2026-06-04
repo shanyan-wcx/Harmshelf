@@ -81,10 +81,12 @@ export default class EntryAbility extends UIAbility {
 
   onForeground(): void {
     Logger.info('Ability onForeground');
+    AppStorage.set<boolean>('appInBackground', false)
   }
 
   onBackground(): void {
     Logger.info('Ability onBackground');
+    AppStorage.set<boolean>('appInBackground', true)
   }
 
   async onConfigurationUpdate(newConfig: Configuration) {
