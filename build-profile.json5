@@ -14,25 +14,25 @@
           "certpath": "C:/Users/21633/Desktop/Harmshelf-Key/Harmshelf.cer"
         }
       }
-      //      {
-      //        "name": "default",
-      //        "type": "HarmonyOS",
-      //        "material": {
-      //          "certpath": "C:\\Users\\21633\\.ohos\\config\\default_Harmshelf_1RZGndlwcwS5k62TIr3NZeokN4sgOsls0fqfN6yx3dU=.cer",
-      //          "keyAlias": "debugKey",
-      //          "keyPassword": "0000001B1A8E89A90ABB3680790EE4972244B3806C1F22CB318AD637B0ABA8D3D4488B84A087EED091EBC2",
-      //          "profile": "C:\\Users\\21633\\.ohos\\config\\default_Harmshelf_1RZGndlwcwS5k62TIr3NZeokN4sgOsls0fqfN6yx3dU=.p7b",
-      //          "signAlg": "SHA256withECDSA",
-      //          "storeFile": "C:\\Users\\21633\\.ohos\\config\\default_Harmshelf_1RZGndlwcwS5k62TIr3NZeokN4sgOsls0fqfN6yx3dU=.p12",
-      //          "storePassword": "0000001BDCE6A2A517D0CCDADB0F8BBC15F9E8181202C6DD30041BFF377C3688399EB0E82B48AE15C87C72"
-      //        }
-      //      }
+//            {
+//              "name": "default",
+//              "type": "HarmonyOS",
+//              "material": {
+//                "certpath": "C:\\Users\\21633\\.ohos\\config\\default_Harmshelf_1RZGndlwcwS5k62TIr3NZeokN4sgOsls0fqfN6yx3dU=.cer",
+//                "keyAlias": "debugKey",
+//                "keyPassword": "0000001B1A8E89A90ABB3680790EE4972244B3806C1F22CB318AD637B0ABA8D3D4488B84A087EED091EBC2",
+//                "profile": "C:\\Users\\21633\\.ohos\\config\\default_Harmshelf_1RZGndlwcwS5k62TIr3NZeokN4sgOsls0fqfN6yx3dU=.p7b",
+//                "signAlg": "SHA256withECDSA",
+//                "storeFile": "C:\\Users\\21633\\.ohos\\config\\default_Harmshelf_1RZGndlwcwS5k62TIr3NZeokN4sgOsls0fqfN6yx3dU=.p12",
+//                "storePassword": "0000001BDCE6A2A517D0CCDADB0F8BBC15F9E8181202C6DD30041BFF377C3688399EB0E82B48AE15C87C72"
+//              }
+//            }
     ],
     "products": [
       {
         "name": "default",
         "signingConfig": "default",
-        "targetSdkVersion": "6.0.0(20)",
+        "targetSdkVersion": "6.1.0(23)",
         "compatibleSdkVersion": "6.0.0(20)",
         "runtimeOS": "HarmonyOS",
         "buildOption": {

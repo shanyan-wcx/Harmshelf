@@ -119,6 +119,9 @@ export struct MyNavigation {
         (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 225 : this.sideBarContentWidth - 149) :
         (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 177 : this.sideBarContentWidth - 101))
       .padding({ left: 16, right: 16 })
+      .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+      .borderRadius(8)
     }
     .width('100%')
     .justifyContent(FlexAlign.Start)
@@ -145,7 +148,8 @@ export struct MyNavigation {
     }
     .width(this.sidebarType === SideBarContainerType.Overlay ? '100%' : this.displayWidth - this.sideBarWidth)
     .height('100%')
-    .backgroundColor($r('sys.color.background_secondary'))
+    .backgroundColor(Color.Transparent)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
     .mode(NavigationMode.Stack)
     .titleBar({
       avoidLayoutSafeArea: true,
@@ -310,6 +314,8 @@ export struct LibraryItemComponent {
       .borderRadius(10)
       .clip(true)
       .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+      .shadow({ radius: 8, color: $r('sys.color.ohos_id_shadow_default_lg_dark') })
       .onClick(() => {
         this.libraryItem = this.item
         this.pageInfos.pushPathByName('libraryItemDetail', null)
@@ -396,6 +402,8 @@ export struct LibraryItemComponent1 {
       .borderRadius(10)
       .clip(true)
       .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+      .shadow({ radius: 8, color: $r('sys.color.ohos_id_shadow_default_lg_dark') })
       .onClick(() => {
         this.libraryItem = this.item
         this.pageInfos.pushPathByName('libraryItemDetail', null)
@@ -485,6 +493,7 @@ export struct SeriesItemComponent {
         .height('100%')
         .borderRadius(10)
         .backgroundColor($r('sys.color.comp_background_tertiary'))
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
         .clip(true)
       }
       .width('100%')
@@ -492,6 +501,8 @@ export struct SeriesItemComponent {
       .layoutWeight(1)
       .aspectRatio(2)
       .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+      .shadow({ radius: 8, color: $r('sys.color.ohos_id_shadow_default_lg_dark') })
       .onAreaChange((oldArea, newArea) => {
         this.imageWidth = newArea.width
       })
@@ -589,6 +600,7 @@ export struct CollectionItemComponent {
         .height('100%')
         .borderRadius(10)
         .backgroundColor($r('sys.color.comp_background_tertiary'))
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
         .clip(true)
       }
       .width('100%')
@@ -596,6 +608,8 @@ export struct CollectionItemComponent {
       .layoutWeight(1)
       .aspectRatio(2)
       .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+      .shadow({ radius: 8, color: $r('sys.color.ohos_id_shadow_default_lg_dark') })
       .onAreaChange((oldArea, newArea) => {
         this.imageWidth = newArea.width
       })
@@ -687,6 +701,8 @@ export struct PlaylistItemComponent {
       .layoutWeight(1)
       .aspectRatio(1)
       .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+      .shadow({ radius: 8, color: $r('sys.color.ohos_id_shadow_default_lg_dark') })
       .onClick(() => {
         this.playlist1 = this.playlist
         this.pageInfos.pushPathByName('playlistDetail', null)
@@ -740,6 +756,8 @@ export struct AuthorComponent {
       .layoutWeight(1)
       .aspectRatio(0.85)
       .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+      .shadow({ radius: 8, color: $r('sys.color.ohos_id_shadow_default_lg_dark') })
 
       Column() {
         Text(this.author.name)
@@ -798,6 +816,8 @@ export struct AuthorComponent1 {
       .layoutWeight(1)
       .aspectRatio(0.85)
       .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+      .shadow({ radius: 8, color: $r('sys.color.ohos_id_shadow_default_lg_dark') })
 
       Column() {
         Text(this.author.name)
@@ -899,6 +919,8 @@ export struct RecentEpisodeComponent {
       .borderRadius(10)
       .clip(true)
       .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+      .shadow({ radius: 8, color: $r('sys.color.ohos_id_shadow_default_lg_dark') })
       .onClick(() => {
         this.episode = this.item.recentEpisode
         this.pageInfos.pushPathByName('episodeDetail', null)
@@ -1099,6 +1121,9 @@ export struct EpisodeComponent {
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
+    .backgroundColor(Color.Transparent)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .borderRadius(8)
   }
 
   @Builder
@@ -1194,6 +1219,10 @@ export struct EpisodeComponent {
       .width('100%')
       .padding({ left: 20, right: 20 })
       .margin({ bottom: 25 })
+      .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+      .borderRadius(8)
+      .clip(true)
     }
   }
 
@@ -1296,19 +1325,28 @@ export struct EpisodeComponent {
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
+    .backgroundColor(Color.Transparent)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .borderRadius(8)
   }
 
   build() {
     Column() {
       Row() {
-        Image(this.baseUrl + `/api/items/${this.item.libraryItemId}/cover?token=${this.apiToken}`)
-          .alt($rawfile('nocover.jpg'))
-          .objectFit(ImageFit.Cover)
-          .height(45)
-          .aspectRatio(1)
-          .borderRadius(8)
-          .margin({ right: 10 })
-          .draggable(false)
+        Column() {
+          Image(this.baseUrl + `/api/items/${this.item.libraryItemId}/cover?token=${this.apiToken}`)
+            .alt($rawfile('nocover.jpg'))
+            .objectFit(ImageFit.Cover)
+            .height(45)
+            .aspectRatio(1)
+            .borderRadius(8)
+            .draggable(false)
+        }
+        .borderRadius(8)
+        .clip(true)
+        .backgroundColor(Color.Transparent)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+        .margin({ right: 10 })
 
         Column() {
           Text(this.item.podcast?.metadata.title ?? "-")
@@ -1728,6 +1766,9 @@ export struct EpisodeComponent1 {
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
+    .backgroundColor(Color.Transparent)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .borderRadius(8)
   }
 
   @Builder
@@ -1823,6 +1864,10 @@ export struct EpisodeComponent1 {
       .width('100%')
       .padding({ left: 20, right: 20 })
       .margin({ bottom: 25 })
+      .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+      .borderRadius(8)
+      .clip(true)
     }
   }
 
@@ -1925,6 +1970,9 @@ export struct EpisodeComponent1 {
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
+    .backgroundColor(Color.Transparent)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .borderRadius(8)
   }
 
   build() {
@@ -2162,7 +2210,9 @@ export struct pageUpDown {
           .fontSize($r('sys.float.ohos_id_text_size_headline9'))
           .fontColor([$r('sys.color.font')])
       }
-      .backgroundColor($r('sys.color.ohos_id_color_button_normal'))
+      .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+      .shadow({ radius: 6, color: $r('sys.color.font') })
       .height(25)
       .width(25)
       .borderRadius(5)
@@ -2177,7 +2227,9 @@ export struct pageUpDown {
           .fontColor([$r('sys.color.font')])
       }
       .margin({ left: 12 })
-      .backgroundColor($r('sys.color.ohos_id_color_button_normal'))
+      .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+      .shadow({ radius: 6, color: $r('sys.color.font') })
       .height(25)
       .width(25)
       .borderRadius(5)
@@ -2305,7 +2357,8 @@ export struct reportBuilder {
       }
       .width('100%')
       .height('100%')
-      .backgroundColor($r('sys.color.background_secondary'))
+      .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
       .padding({ left: 20, right: 20 })
 
       Column() {

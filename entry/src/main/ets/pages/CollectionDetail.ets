@@ -245,6 +245,9 @@ export struct CollectionDetail {
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
+    .backgroundColor(Color.Transparent)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .borderRadius(8)
   }
 
   build() {
@@ -296,6 +299,9 @@ export struct CollectionDetail {
               .borderRadius(10)
               .margin({ bottom: 5 })
               .clip(true)
+              .backgroundColor(Color.Transparent)
+              .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+              .shadow({ radius: 8, color: $r('sys.color.ohos_id_shadow_default_lg_dark') })
 
               if (this.collection1!.description && this.collection1!.description.length > 0) {
                 Text(this.collection1!.description)
@@ -575,7 +581,8 @@ export struct CollectionDetail {
       }
     })
     .hideBackButton(false)
-    .backgroundColor($r('sys.color.background_secondary'))
+    .backgroundColor(Color.Transparent)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
     .bindToScrollable([this.CollectionDetailScroller])
     .bindSheet(this.showEditCollection, this.editCollectionBuilder(), {
       height: SheetSize.FIT_CONTENT,

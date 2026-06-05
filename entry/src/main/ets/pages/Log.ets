@@ -199,14 +199,14 @@ export struct Log {
             .fontSize($r('sys.float.ohos_id_text_size_headline7'))
             .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
         }
-        .width(36)
-        .height(36)
+        .width(40)
+        .height(40)
         .onClick(() => {
           this.copyAllLogs()
         })
         .backgroundColor(Color.Transparent)
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-        .shadow({ radius: 12, color: $r('sys.color.font') })
+        .shadow({ radius: 16, color: $r('sys.color.font') })
         .margin({ right: 12 })
 
         Button({ type: ButtonType.Circle }) {
@@ -214,14 +214,14 @@ export struct Log {
             .fontSize($r('sys.float.ohos_id_text_size_headline7'))
             .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
         }
-        .width(36)
-        .height(36)
+        .width(40)
+        .height(40)
         .onClick(() => {
           this.shareLogs()
         })
         .backgroundColor(Color.Transparent)
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-        .shadow({ radius: 12, color: $r('sys.color.font') })
+        .shadow({ radius: 16, color: $r('sys.color.font') })
         .margin({ right: 20 })
       }
       .position({ bottom: this.isStartPlaying ? 99 : 28 })

@@ -330,6 +330,10 @@ export struct Play {
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
+    .backgroundColor(Color.Transparent)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .borderRadius(8)
+    .clip(true)
   }
 
   @Builder
@@ -434,16 +438,16 @@ export struct Play {
         .padding({ bottom: 80 })
         .justifyContent(FlexAlign.Center)
         .visibility(this.showProgress ? Visibility.Visible : Visibility.None)
-      }
-      .width('100%')
-      .height('100%')
-      .layoutWeight(1)
-      .hitTestBehavior(HitTestMode.None)
+    }
+    .width('100%')
+    .height('100%')
+    .layoutWeight(1)
+    .hitTestBehavior(HitTestMode.None)
 
-      Row() {
-        TextInput({
-          placeholder: this.formatTime(Date.now())
-        })
+    Row() {
+      TextInput({
+        placeholder: this.formatTime(Date.now())
+      })
           .width("100%")
           .height(45)
           .layoutWeight(1)
@@ -495,6 +499,12 @@ export struct Play {
       .margin({ left: 20, right: 20, bottom: 20 })
       .borderRadius(8)
     }
+    .width('100%')
+    .height('100%')
+    .backgroundColor(Color.Transparent)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .borderRadius(8)
+    .clip(true)
   }
 
   @Builder
@@ -600,6 +610,10 @@ export struct Play {
         })
       }
       .padding({ left: 20, right: 20, bottom: 25 })
+      .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+      .borderRadius(8)
+      .clip(true)
     }
     .scrollBar(BarState.Off)
   }
@@ -726,6 +740,10 @@ export struct Play {
         })
       }
       .padding({ left: 20, right: 20, bottom: 25 })
+      .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+      .borderRadius(8)
+      .clip(true)
     }
     .scrollBar(BarState.Off)
   }
@@ -820,6 +838,12 @@ export struct Play {
         .clip(true)
       }
     }
+    .width('100%')
+    .height('100%')
+    .backgroundColor(Color.Transparent)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .borderRadius(8)
+    .clip(true)
   }
 
   @Builder
@@ -841,36 +865,39 @@ export struct Play {
         GridCol({ span: 1 }) {
           Column() {
             Row() {
-              Button({ type: ButtonType.Circle }) {
-                SymbolGlyph($r('sys.symbol.chevron_down'))
-                  .fontSize(32)
-                  .fontColor([$r('sys.color.font_secondary')])
-              }
-              .height(40)
-              .width(40)
-              .backgroundColor(Color.Transparent)
-              .onClick(() => {
-                this.showPlay = false
-              })
+      Button({ type: ButtonType.Circle }) {
+        SymbolGlyph($r('sys.symbol.chevron_down'))
+          .fontSize(32)
+          .fontColor([$r('sys.color.font_secondary')])
+      }
+      .height(40)
+      .width(40)
+      .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+      .onClick(() => {
+        this.showPlay = false
+      })
 
-              Row() {
-                Text("睡眠定时 " + ((this.sleepTime !== 0 && !this.isLocalPlaying && this.playingItem!.audioTracks !== undefined) ? this.formatSleepTime(this.sleepTime - this.playedTime - this.playingItem!.audioTracks[this.playingIndex].startOffset) : 0))
-                  .fontSize(18)
-              }
-              .height(40)
-              .borderRadius(8)
-              .padding({ left: 15, right: 15 })
-              .backgroundColor($r('sys.color.comp_background_tertiary'))
-              .visibility(this.sleepTime !== 0 ? Visibility.Visible : Visibility.None)
+      Row() {
+        Text("睡眠定时 " + ((this.sleepTime !== 0 && !this.isLocalPlaying && this.playingItem!.audioTracks !== undefined) ? this.formatSleepTime(this.sleepTime - this.playedTime - this.playingItem!.audioTracks[this.playingIndex].startOffset) : 0))
+          .fontSize(18)
+      }
+      .height(40)
+      .borderRadius(8)
+      .padding({ left: 15, right: 15 })
+      .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+      .visibility(this.sleepTime !== 0 ? Visibility.Visible : Visibility.None)
 
-              Button({ type: ButtonType.Circle }) {
-                SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
-                  .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-                  .fontColor([$r('sys.color.font_secondary')])
-              }
-              .height(40)
-              .width(40)
-              .backgroundColor(Color.Transparent)
+      Button({ type: ButtonType.Circle }) {
+        SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
+          .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+          .fontColor([$r('sys.color.font_secondary')])
+      }
+      .height(40)
+      .width(40)
+      .backgroundColor(Color.Transparent)
+      .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
               .bindMenu([{
                 symbolIcon: new SymbolGlyphModifier(this.lockPlayer ? $r('sys.symbol.lock') :
                   $r('sys.symbol.lock_open')),
@@ -1066,7 +1093,8 @@ export struct Play {
                   .height(78)
                   .width(78)
                   .margin({ left: 6, right: 6 })
-                  .backgroundColor($r('sys.color.comp_background_tertiary'))
+                  .backgroundColor(Color.Transparent)
+                  .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .onClick(async () => {
                     if (this.isPlaying) {
                       if (this.avPlayer!.state === 'playing') {
@@ -1154,6 +1182,7 @@ export struct Play {
                   .height(45)
                   .width(45)
                   .backgroundColor(Color.Transparent)
+                  .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .enabled(!this.isLocalPlaying && this.playingItem?.mediaType === 'book' ? true : false)
                   .onClick(() => {
                     this.tmpBookmarkTitle = ""
@@ -1185,6 +1214,7 @@ export struct Play {
                   .height(45)
                   .width(45)
                   .backgroundColor(Color.Transparent)
+                  .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .onClick(() => {
                     this.showSpeed = !this.showSpeed;
                   })
@@ -1208,6 +1238,7 @@ export struct Play {
                   .height(45)
                   .width(45)
                   .backgroundColor(Color.Transparent)
+                  .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .onClick(() => {
                     this.showSleep = !this.showSleep;
                   })
@@ -1231,6 +1262,7 @@ export struct Play {
                   .height(45)
                   .width(45)
                   .backgroundColor(Color.Transparent)
+                  .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .enabled(!this.isLocalPlaying ? this.playingItem?.mediaType === 'book' : (this.localPlayItem?.tracks.length ?? 0) > 1)
                   .onClick(() => {
                     this.showChapter = !this.showChapter;
@@ -1351,9 +1383,9 @@ export struct Play {
     .width(70)
     .height(70)
     .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.Thin)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
     .shadow({
-      radius: 8,
+      radius: 12,
       color: $r('sys.color.font')
     })
     .bindContentCover(this.showPlay, this.playBuilder(), {

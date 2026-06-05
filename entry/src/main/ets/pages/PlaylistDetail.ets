@@ -259,6 +259,9 @@ export struct PlaylistDetail {
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
+    .backgroundColor(Color.Transparent)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .borderRadius(8)
   }
 
   build() {
@@ -301,6 +304,9 @@ export struct PlaylistDetail {
               .borderRadius(10)
               .margin({ bottom: 5 })
               .clip(true)
+              .backgroundColor(Color.Transparent)
+              .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+              .shadow({ radius: 8, color: $r('sys.color.ohos_id_shadow_default_lg_dark') })
 
               if (this.playlist1!.description && this.playlist1!.description.length > 0) {
                 Text(this.playlist1!.description)
@@ -635,7 +641,8 @@ export struct PlaylistDetail {
       }
     })
     .hideBackButton(false)
-    .backgroundColor($r('sys.color.background_secondary'))
+    .backgroundColor(Color.Transparent)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
     .bindToScrollable([this.PlaylistDetailScroller])
     .bindSheet(this.showEditPlaylist, this.editPlaylistBuilder(), {
       height: SheetSize.FIT_CONTENT,

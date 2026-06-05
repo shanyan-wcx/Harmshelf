@@ -71,13 +71,13 @@ export struct MediaLibrary {
         bottom: this.isStartPlaying ? 99 : 15
       })
       .animation({ duration: 510, curve: Curve.EaseInOut })
-      .width(36)
-      .height(36)
-      .borderRadius(6)
+      .width(40)
+      .height(40)
+      .borderRadius(12)
       .backgroundColor(Color.Transparent)
       .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
       .shadow({
-        radius: 12,
+        radius: 16,
         color: $r('sys.color.font'),
       })
       .onClick(async () => {

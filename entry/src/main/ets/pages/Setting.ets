@@ -252,6 +252,9 @@ export struct Setting {
           })
         }
         .padding({ left: 20, right: 20, bottom: 25 })
+        .backgroundColor(Color.Transparent)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+        .borderRadius(8)
       }
       .width('100%')
       .height('100%')
@@ -499,6 +502,9 @@ export struct Setting {
           }
         }
         .padding({ left: 20, right: 20, bottom: 25 })
+        .backgroundColor(Color.Transparent)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+        .borderRadius(8)
       }
       .width('100%')
       .height('100%')
@@ -618,6 +624,7 @@ export struct Setting {
           Image($rawfile('wx_qr.png'))
             .width(120)
             .height(120)
+            .borderRadius(8)
           Text("微信")
             .fontSize(14)
             .margin({ top: 6 })
@@ -627,6 +634,7 @@ export struct Setting {
           Image($rawfile('alipay_qr.png'))
             .width(120)
             .height(120)
+            .borderRadius(8)
           Text("支付宝")
             .fontSize(14)
             .margin({ top: 6 })
@@ -638,6 +646,9 @@ export struct Setting {
     }
     .width('100%')
     .padding({ left: 20, right: 20, bottom: 25 })
+    .backgroundColor(Color.Transparent)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .borderRadius(8)
   }
 
   aboutToAppear() {
@@ -805,10 +816,8 @@ export struct Setting {
           })
         }
         .width('100%')
-        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
-          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
-          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
-          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
+        .backgroundColor(Color.Transparent)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
         .borderRadius(8)
         .padding({ left: 20, right: 20, bottom: 20 })
         .margin({ top: 13 })
@@ -876,10 +885,8 @@ export struct Setting {
           .justifyContent(FlexAlign.SpaceBetween)
         }
         .width('100%')
-        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
-          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
-          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
-          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
+        .backgroundColor(Color.Transparent)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
         .borderRadius(8)
         .padding({ left: 20, right: 20, bottom: 20 })
         .margin({ top: 14 })
@@ -990,10 +997,8 @@ export struct Setting {
           .justifyContent(FlexAlign.SpaceBetween)
         }
         .width('100%')
-        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
-          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
-          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
-          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
+        .backgroundColor(Color.Transparent)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
         .borderRadius(8)
         .padding({ left: 20, right: 20, bottom: 10 })
         .margin({ top: 20 })
@@ -1025,10 +1030,8 @@ export struct Setting {
           .justifyContent(FlexAlign.SpaceBetween)
         }
         .width('100%')
-        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
-          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
-          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
-          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
+        .backgroundColor(Color.Transparent)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
         .borderRadius(8)
         .padding({ left: 20, right: 20, bottom: 15 })
         .margin({ top: 20 })
@@ -1060,10 +1063,8 @@ export struct Setting {
           .justifyContent(FlexAlign.SpaceBetween)
         }
         .width('100%')
-        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
-          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
-          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
-          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
+        .backgroundColor(Color.Transparent)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
         .borderRadius(8)
         .padding({ left: 20, right: 20, bottom: 15 })
         .margin({ top: 20 })
@@ -1085,10 +1086,8 @@ export struct Setting {
         }
         .width('100%')
         .height(60)
-        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
-          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
-          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
-          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
+        .backgroundColor(Color.Transparent)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
         .borderRadius(8)
         .margin({ left: 20, right: 20 ,top: 20 })
         .onClick(() => {
