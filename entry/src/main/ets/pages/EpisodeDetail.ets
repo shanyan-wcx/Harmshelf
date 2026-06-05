@@ -242,9 +242,6 @@ export struct EpisodeDetail {
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-    .borderRadius(8)
   }
 
   @Builder
@@ -343,9 +340,6 @@ export struct EpisodeDetail {
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-    .borderRadius(8)
   }
 
   @Builder
@@ -442,10 +436,6 @@ export struct EpisodeDetail {
       .padding({ left: 20, right: 20 })
       .margin({ bottom: 25 })
     }
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-    .borderRadius(8)
-    .clip(true)
   }
 
   @Builder
@@ -547,9 +537,6 @@ export struct EpisodeDetail {
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-    .borderRadius(8)
   }
 
   build() {
@@ -558,20 +545,14 @@ export struct EpisodeDetail {
         Scroll(this.episodeDetailScroller) {
           Column() {
             Row() {
-              Column() {
-                Image(this.baseUrl + `/api/items/${this.episode!.libraryItemId}/cover?token=${this.apiToken}`)
-                  .alt($rawfile('nocover.jpg'))
-                  .objectFit(ImageFit.Cover)
-                  .height(80)
-                  .aspectRatio(1)
-                  .borderRadius(8)
-                  .draggable(false)
-              }
-              .borderRadius(8)
-              .clip(true)
-              .backgroundColor(Color.Transparent)
-              .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-              .margin({ right: 10 })
+              Image(this.baseUrl + `/api/items/${this.episode!.libraryItemId}/cover?token=${this.apiToken}`)
+                .alt($rawfile('nocover.jpg'))
+                .objectFit(ImageFit.Cover)
+                .height(80)
+                .aspectRatio(1)
+                .borderRadius(8)
+                .margin({ right: 10 })
+                .draggable(false)
 
               Column() {
                 Text(this.podcast?.media.metadata.title ?? "-")
@@ -839,8 +820,7 @@ export struct EpisodeDetail {
       }
     })
     .hideBackButton(false)
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .backgroundColor($r('sys.color.background_secondary'))
     .bindToScrollable([this.episodeDetailScroller])
   }
 }

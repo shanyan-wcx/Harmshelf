@@ -71,13 +71,13 @@ export struct AllPlaylists {
         bottom: this.isStartPlaying ? 99 : 15
       })
       .animation({ duration: 510, curve: Curve.EaseInOut })
-      .width(40)
-      .height(40)
-      .borderRadius(12)
+      .width(36)
+      .height(36)
+      .borderRadius(6)
       .backgroundColor(Color.Transparent)
       .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
       .shadow({
-        radius: 16,
+        radius: 12,
         color: $r('sys.color.font'),
       })
       .onClick(async () => {

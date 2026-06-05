@@ -76,21 +76,15 @@ export struct SearchMedia {
               ForEach(this.searchResult.book, (libraryItemSearchResult: LibraryItemSearchResult, index) => {
                 ListItem() {
                   Row() {
-                    Column() {
-                      Image(this.baseUrl +
-                        `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
-                        .alt($rawfile('nocover.jpg'))
-                        .objectFit(ImageFit.Cover)
-                        .width(64)
-                        .aspectRatio(1)
-                        .borderRadius(8)
-                        .draggable(false)
-                    }
-                    .borderRadius(8)
-                    .clip(true)
-                    .backgroundColor(Color.Transparent)
-                    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-                    .margin({ right: 10 })
+                    Image(this.baseUrl +
+                      `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
+                      .alt($rawfile('nocover.jpg'))
+                      .objectFit(ImageFit.Cover)
+                      .width(64)
+                      .aspectRatio(1)
+                      .borderRadius(8)
+                      .margin({ right: 10 })
+                      .draggable(false)
 
                     Column() {
                       Text(libraryItemSearchResult.libraryItem.media.metadata.title)
@@ -122,21 +116,15 @@ export struct SearchMedia {
               ForEach(this.searchResult.podcast, (libraryItemSearchResult: LibraryItemSearchResult, index) => {
                 ListItem() {
                   Row() {
-                    Column() {
-                      Image(this.baseUrl +
-                        `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
-                        .alt($rawfile('nocover.jpg'))
-                        .objectFit(ImageFit.Cover)
-                        .width(64)
-                        .aspectRatio(1)
-                        .borderRadius(8)
-                        .draggable(false)
-                    }
-                    .borderRadius(8)
-                    .clip(true)
-                    .backgroundColor(Color.Transparent)
-                    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-                    .margin({ right: 10 })
+                    Image(this.baseUrl +
+                      `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
+                      .alt($rawfile('nocover.jpg'))
+                      .objectFit(ImageFit.Cover)
+                      .width(64)
+                      .aspectRatio(1)
+                      .borderRadius(8)
+                      .margin({ right: 10 })
+                      .draggable(false)
 
                     Column() {
                       Text(libraryItemSearchResult.libraryItem.media.metadata.title)
@@ -224,8 +212,7 @@ export struct SearchMedia {
       }
     })
     .hideBackButton(false)
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .backgroundColor($r('sys.color.background_secondary'))
     .bindToScrollable([this.searchScroller])
   }
 }

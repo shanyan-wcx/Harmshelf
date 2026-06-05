@@ -389,9 +389,6 @@ export struct LibraryItemDetail {
       })
     }
     .padding({ left: 20, right: 20, bottom: 25 })
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-    .borderRadius(8)
   }
 
   @Builder
@@ -448,9 +445,6 @@ export struct LibraryItemDetail {
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-    .borderRadius(8)
   }
 
   @Builder
@@ -609,9 +603,6 @@ export struct LibraryItemDetail {
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-    .borderRadius(8)
   }
 
   @Builder
@@ -708,10 +699,6 @@ export struct LibraryItemDetail {
       .padding({ left: 20, right: 20 })
       .margin({ bottom: 25 })
     }
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-    .borderRadius(8)
-    .clip(true)
   }
 
   @Builder
@@ -813,9 +800,6 @@ export struct LibraryItemDetail {
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-    .borderRadius(8)
   }
 
   @Builder
@@ -912,10 +896,6 @@ export struct LibraryItemDetail {
       .padding({ left: 20, right: 20 })
       .margin({ bottom: 25 })
     }
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-    .borderRadius(8)
-    .clip(true)
   }
 
   @Builder
@@ -1013,9 +993,6 @@ export struct LibraryItemDetail {
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-    .borderRadius(8)
   }
 
   @Builder
@@ -1129,9 +1106,6 @@ export struct LibraryItemDetail {
       .margin({ top: 15 })
     }
     .padding({ left: 20, right: 20, bottom: 25 })
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
-    .borderRadius(8)
   }
 
   build() {
@@ -2142,13 +2116,13 @@ export struct LibraryItemDetail {
             bottom: this.isStartPlaying ? 99 : 15
           })
           .animation({ duration: 510, curve: Curve.EaseInOut })
-          .width(40)
-          .height(40)
-          .borderRadius(12)
+          .width(36)
+          .height(36)
+          .borderRadius(6)
           .backgroundColor(Color.Transparent)
           .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
           .shadow({
-            radius: 16,
+            radius: 12,
             color: $r('sys.color.font'),
           })
           .onClick(async () => {
@@ -2195,8 +2169,7 @@ export struct LibraryItemDetail {
       }
     })
     .hideBackButton(false)
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .backgroundColor($r('sys.color.background_secondary'))
     .bindToScrollable([this.libraryDetailScroller])
   }
 }
