@@ -1,6 +1,6 @@
-import { BlurStrategy, HdsActionBar, ActionBarButton, HdsListItem } from '@kit.UIDesignKit'
+import { BlurStrategy, HdsActionBar, ActionBarButton, HdsListItem, ActionBarStyle } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
-import { CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier } from '@kit.ArkUI'
+import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier } from '@kit.ArkUI'
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import { env } from '../utils/Class';
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
@@ -1442,15 +1442,19 @@ export struct Play {
     Column() {
       HdsActionBar({
         startButtons: [this.goBackwardButton, this.stopButton],
-          endButtons: [this.playPauseButton, this.goForwardButton],
-          primaryButtonBuilder: (): void => this.primaryButtonBuilder(),
-          primaryButtonBuilderWidth: LengthMetrics.vp(70),
-          isExpand: true,
-          blurStrategy: BlurStrategy.ENABLE
+        endButtons: [this.playPauseButton, this.goForwardButton],
+        primaryButtonBuilder: (): void => this.primaryButtonBuilder(),
+        primaryButtonBuilderWidth: LengthMetrics.vp(70),
+        isExpand: true,
+        blurStrategy: BlurStrategy.ENABLE,
+        actionBarStyle: new ActionBarStyle({
+          backgroundColor: new ColorMetrics(),
+          backgroundBlurStyle: BlurStyle.COMPONENT_THIN
         })
-          .height(0)
-          .hitTestBehavior(HitTestMode.BLOCK_HIERARCHY)
-          .margin({ bottom: 108 })
+      })
+        .height(0)
+        .hitTestBehavior(HitTestMode.BLOCK_HIERARCHY)
+        .margin({ bottom: 108 })
     }
     .width('100%')
     .height('100%')
