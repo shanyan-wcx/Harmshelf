@@ -31,7 +31,7 @@ import {
   removeFromCollection,
   removeFromPlaylist,
   updateProgress } from "../utils/Api";
-import { reportBuilder, EpisodeComponent1 } from "../utils/Component";
+import { reportBuilder, EpisodeComponent1, GlassFloatingButton } from "../utils/Component";
 import { media } from "@kit.MediaKit";
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
@@ -2104,29 +2104,9 @@ export struct LibraryItemDetail {
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
 
         if (this.library?.mediaType === 'podcast') {
-          Button({ type: ButtonType.Normal }) {
-            SymbolGlyph($r('sys.symbol.arrow_up_to_line'))
-              .fontWeight(FontWeight.Normal)
-              .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-              .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
-              .hitTestBehavior(HitTestMode.None)
-          }
-          .position({
-            right: 15,
-            bottom: this.isStartPlaying ? 99 : 15
-          })
-          .animation({ duration: 510, curve: Curve.EaseInOut })
-          .width(36)
-          .height(36)
-          .borderRadius(6)
-          .backgroundColor(Color.Transparent)
-          .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-          .shadow({
-            radius: 12,
-            color: $r('sys.color.font'),
-          })
-          .onClick(async () => {
-            this.libraryDetailScroller.scrollEdge(Edge.Top, { velocity: 1000000 })
+          GlassFloatingButton({
+            scroller: this.libraryDetailScroller,
+            isStartPlaying: this.isStartPlaying
           })
           .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
         }

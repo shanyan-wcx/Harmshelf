@@ -2322,3 +2322,44 @@ export struct reportBuilder {
     .height('100%')
   }
 }
+
+@ComponentV2
+export struct GlassFloatingButton {
+  @Require @Param scroller: Scroller
+  @Param icon: Resource = $r('sys.symbol.arrow_up_to_line')
+  @Param isStartPlaying: boolean = false
+
+  build() {
+    Button({ type: ButtonType.Normal }) {
+      SymbolGlyph(this.icon)
+        .fontWeight(FontWeight.Normal)
+        .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+        .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+        .hitTestBehavior(HitTestMode.None)
+    }
+    .position({
+      right: 15,
+      bottom: this.isStartPlaying ? 99 : 15
+    })
+    .animation({ duration: 510, curve: Curve.EaseInOut })
+    .width(36)
+    .height(36)
+    .borderRadius(6)
+    .backgroundColor('rgba(255, 255, 255, 0.15)')
+    .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+    .shadow({
+      radius: 16,
+      offsetX: 0,
+      offsetY: 0,
+      color: 'rgba(0, 0, 0, 0.25)'
+    })
+    .border({
+      width: 0.5,
+      color: 'rgba(255, 255, 255, 0.2)',
+      radius: 6
+    })
+    .onClick(async () => {
+      this.scroller.scrollEdge(Edge.Top)
+    })
+  }
+}

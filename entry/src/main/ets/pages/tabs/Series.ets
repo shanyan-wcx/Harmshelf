@@ -1,4 +1,4 @@
-import { SeriesItemComponent } from "../../utils/Component";
+import { SeriesItemComponent, GlassFloatingButton } from "../../utils/Component";
 import { Series } from "../../utils/Interface"
 
 @ComponentV2
@@ -54,29 +54,9 @@ export struct AllSeries {
       .width('100%')
       .height('100%')
 
-      Button({ type: ButtonType.Normal }) {
-        SymbolGlyph($r('sys.symbol.arrow_up_to_line'))
-          .fontWeight(FontWeight.Normal)
-          .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-          .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
-          .hitTestBehavior(HitTestMode.None)
-      }
-      .position({
-        right: 15,
-        bottom: this.isStartPlaying ? 99 : 15
-      })
-      .animation({ duration: 510, curve: Curve.EaseInOut })
-      .width(36)
-      .height(36)
-      .borderRadius(6)
-      .backgroundColor(Color.Transparent)
-      .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-      .shadow({
-        radius: 12,
-        color: $r('sys.color.font'),
-      })
-      .onClick(async () => {
-        this.seriesScroller.scrollEdge(Edge.Top)
+      GlassFloatingButton({
+        scroller: this.seriesScroller,
+        isStartPlaying: this.isStartPlaying
       })
     }
     .width('100%')

@@ -1,4 +1,4 @@
-import { LibraryItemComponent1 } from "../utils/Component";
+import { LibraryItemComponent1, GlassFloatingButton } from "../utils/Component";
 import { Filter1, LibraryItem, Progress, Media, Series } from "../utils/Interface";
 import { LengthMetrics } from "@kit.ArkUI";
 import { HdsNavDestination, HdsNavDestinationAttribute } from "@kit.UIDesignKit";
@@ -153,29 +153,8 @@ export struct FilterItems {
         .height('100%')
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
 
-        Button({ type: ButtonType.Normal }) {
-          SymbolGlyph($r('sys.symbol.arrow_up_to_line'))
-            .fontWeight(FontWeight.Normal)
-            .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-            .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
-            .hitTestBehavior(HitTestMode.None)
-        }
-        .position({
-          right: 15,
-          bottom: 15
-        })
-        .animation({ duration: 510, curve: Curve.EaseInOut })
-        .width(36)
-        .height(36)
-        .borderRadius(6)
-        .backgroundColor(Color.Transparent)
-        .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-        .shadow({
-          radius: 12,
-          color: $r('sys.color.font'),
-        })
-        .onClick(async () => {
-          this.filterItemsScroller.scrollEdge(Edge.Top)
+        GlassFloatingButton({
+          scroller: this.filterItemsScroller
         })
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
 

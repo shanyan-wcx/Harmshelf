@@ -189,9 +189,19 @@ export struct Log {
           })
           .width(120)
           .margin({ left: 20 })
-          .shadow({ radius: 12, color: $r('sys.color.font') })
+          .backgroundColor('rgba(255, 255, 255, 0.15)')
           .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-          .backgroundColor(Color.Transparent)
+          .shadow({
+            radius: 16,
+            offsetX: 0,
+            offsetY: 0,
+            color: 'rgba(0, 0, 0, 0.25)'
+          })
+          .border({
+            width: 0.5,
+            color: 'rgba(255, 255, 255, 0.2)',
+            radius: 6
+          })
 
         Blank()
         Button({ type: ButtonType.Circle }) {
@@ -204,9 +214,19 @@ export struct Log {
         .onClick(() => {
           this.copyAllLogs()
         })
-        .backgroundColor(Color.Transparent)
+        .backgroundColor('rgba(255, 255, 255, 0.15)')
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-        .shadow({ radius: 12, color: $r('sys.color.font') })
+        .shadow({
+          radius: 16,
+          offsetX: 0,
+          offsetY: 0,
+          color: 'rgba(0, 0, 0, 0.25)'
+        })
+        .border({
+          width: 0.5,
+          color: 'rgba(255, 255, 255, 0.2)',
+          radius: 6
+        })
         .margin({ right: 12 })
 
         Button({ type: ButtonType.Circle }) {
@@ -219,9 +239,19 @@ export struct Log {
         .onClick(() => {
           this.shareLogs()
         })
-        .backgroundColor(Color.Transparent)
+        .backgroundColor('rgba(255, 255, 255, 0.15)')
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-        .shadow({ radius: 12, color: $r('sys.color.font') })
+        .shadow({
+          radius: 16,
+          offsetX: 0,
+          offsetY: 0,
+          color: 'rgba(0, 0, 0, 0.25)'
+        })
+        .border({
+          width: 0.5,
+          color: 'rgba(255, 255, 255, 0.2)',
+          radius: 6
+        })
         .margin({ right: 20 })
       }
       .position({ bottom: this.isStartPlaying ? 99 : 28 })

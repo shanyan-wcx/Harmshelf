@@ -1,4 +1,4 @@
-import { CollectionItemComponent } from "../../utils/Component";
+import { CollectionItemComponent, GlassFloatingButton } from "../../utils/Component";
 import { Collection } from "../../utils/Interface"
 
 @ComponentV2
@@ -52,29 +52,9 @@ export struct AllCollections {
       .height('100%')
 
 
-      Button({ type: ButtonType.Normal }) {
-        SymbolGlyph($r('sys.symbol.arrow_up_to_line'))
-          .fontWeight(FontWeight.Normal)
-          .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-          .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
-          .hitTestBehavior(HitTestMode.None)
-      }
-      .position({
-        right: 15,
-        bottom: this.isStartPlaying ? 99 : 15
-      })
-      .animation({ duration: 510, curve: Curve.EaseInOut })
-      .width(36)
-      .height(36)
-      .borderRadius(6)
-      .backgroundColor(Color.Transparent)
-      .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-      .shadow({
-        radius: 12,
-        color: $r('sys.color.font'),
-      })
-      .onClick(async () => {
-        this.collectionScroller.scrollEdge(Edge.Top)
+      GlassFloatingButton({
+        scroller: this.collectionScroller,
+        isStartPlaying: this.isStartPlaying
       })
     }
     .width('100%')
