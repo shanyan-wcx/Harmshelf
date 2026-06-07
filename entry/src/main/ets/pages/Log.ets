@@ -214,7 +214,7 @@ export struct Log {
         .onClick(() => {
           this.copyAllLogs()
         })
-        .backgroundColor('rgba(255, 255, 255, 0.2)')
+        .backgroundColor('rgba(255, 255, 255, 0.3)')
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
         .shadow({
           radius: 16,
@@ -238,7 +238,7 @@ export struct Log {
         .onClick(() => {
           this.shareLogs()
         })
-        .backgroundColor('rgba(255, 255, 255, 0.2)')
+        .backgroundColor('rgba(255, 255, 255, 0.3)')
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
         .shadow({
           radius: 16,
