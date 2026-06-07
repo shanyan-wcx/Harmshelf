@@ -1,4 +1,5 @@
 import { LogEntry, LogLevel, Logger } from '../utils/Logger';
+import { deviceInfo } from '@kit.BasicServicesKit';
 import { pasteboard } from '@kit.BasicServicesKit';
 import { fileIo } from '@kit.CoreFileKit';
 import { fileUri } from '@kit.CoreFileKit';
@@ -163,7 +164,7 @@ export struct Log {
           }
           .width('100%')
           .padding({ left: 20, right: 20, top: 4, bottom: 4 })
-          .margin({ top: index === 0 ? 56 : 0, bottom: index === this.displayLogs.length - 1 ? (this.isStartPlaying ? 150 : 79) : 0 })
+          .margin({ top: index === 0 ? 56 : 0, bottom: index === this.displayLogs.length - 1 ? (this.isStartPlaying ? 150 : (deviceInfo.deviceType === '2in1' ? 71 : 79)) : 0 })
           })
         }
         .width('100%')
@@ -253,7 +254,7 @@ export struct Log {
         })
         .margin({ right: 20 })
       }
-      .position({ bottom: this.isStartPlaying ? 99 : 28 })
+      .position({ bottom: this.isStartPlaying ? 99 : (deviceInfo.deviceType === '2in1' ? 20 : 28) })
       .width('100%')
       .alignItems(VerticalAlign.Center)
     }
