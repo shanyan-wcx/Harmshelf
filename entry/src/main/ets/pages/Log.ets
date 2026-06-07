@@ -224,8 +224,7 @@ export struct Log {
         })
         .border({
           width: 0.5,
-          color: 'rgba(255, 255, 255, 0.2)',
-          radius: 6
+          color: 'rgba(255, 255, 255, 0.2)'
         })
         .margin({ right: 12 })
 
@@ -249,8 +248,7 @@ export struct Log {
         })
         .border({
           width: 0.5,
-          color: 'rgba(255, 255, 255, 0.2)',
-          radius: 6
+          color: 'rgba(255, 255, 255, 0.2)'
         })
         .margin({ right: 20 })
       }
