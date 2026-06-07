@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 5
-- **Last Active**: 2026-06-04
+- **Total Sessions**: 6
+- **Last Active**: 2026-06-07
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~181 | Active |
+| `journal-1.md` | ~218 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 6 | 2026-06-07 | 回到顶部按钮和日志栏统一悬浮立体玻璃质感 | `618c614`, `7b5e77b`, `750170c`, `ef8bb0f`, `2232989` | `main` |
 | 5 | 2026-06-04 | 下载选章功能+syncProgress try/catch+版本号更新 | `8fef5e1`, `5c2e22d`, `89751f5` | `main` |
 | 4 | 2026-06-04 | 修复后台播放返回卡顿闪退 | `214ef99`, `214911b` | `main` |
 | 3 | 2026-06-03 | Logger 逐条写入文件 + 修复后台播放被系统终止 | `1a48ca8` | `main` |
