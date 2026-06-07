@@ -189,7 +189,7 @@ export struct Log {
           })
           .width(120)
           .margin({ left: 20 })
-          .backgroundColor('rgba(255, 255, 255, 0.15)')
+          .backgroundColor('rgba(255, 255, 255, 0.2)')
           .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
           .shadow({
             radius: 16,
@@ -199,8 +199,7 @@ export struct Log {
           })
           .border({
             width: 0.5,
-            color: 'rgba(255, 255, 255, 0.2)',
-            radius: 6
+            color: 'rgba(255, 255, 255, 0.2)'
           })
 
         Blank()
@@ -214,7 +213,7 @@ export struct Log {
         .onClick(() => {
           this.copyAllLogs()
         })
-        .backgroundColor('rgba(255, 255, 255, 0.15)')
+        .backgroundColor('rgba(255, 255, 255, 0.2)')
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
         .shadow({
           radius: 16,
@@ -239,7 +238,7 @@ export struct Log {
         .onClick(() => {
           this.shareLogs()
         })
-        .backgroundColor('rgba(255, 255, 255, 0.15)')
+        .backgroundColor('rgba(255, 255, 255, 0.2)')
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
         .shadow({
           radius: 16,

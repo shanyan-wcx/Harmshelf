@@ -2345,7 +2345,7 @@ export struct GlassFloatingButton {
     .width(36)
     .height(36)
     .borderRadius(6)
-    .backgroundColor('rgba(255, 255, 255, 0.15)')
+    .backgroundColor('rgba(255, 255, 255, 0.2)')
     .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
     .shadow({
       radius: 16,
