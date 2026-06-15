@@ -199,6 +199,8 @@ struct Index {
   @Local uiContext: UIContext | undefined = undefined
   @Local mainWindow: window.Window | undefined = undefined
   @Local elapsedTime: number = 0
+  @Local actualListenTime: number = 0
+  @Local lastPosition: number = -1
   @Local isSyncing: boolean = false
   @Local playerState: string = 'idle'
   @Local consecutiveErrors: number = 0
@@ -382,7 +384,7 @@ struct Index {
             },
             mediaPlayer: "avPlayer",
             currentTime: closeItem.audioTracks[closeIndex!].startOffset + this.playedTime,
-            timeListened: new Date().getTime() / 1000 - this.syncTime
+            timeListened: this.actualListenTime
           }
           for (let element of this.progress) {
             if (closeItem.mediaType === 'book' ? element.libraryItemId === closeItem.libraryItemId : element.episodeId === closeItem.episodeId) {
@@ -405,7 +407,7 @@ struct Index {
             },
             mediaPlayer: "avPlayer",
             currentTime: this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playedTime,
-            timeListened: new Date().getTime() / 1000 - this.syncTime
+            timeListened: this.actualListenTime
           }
           for (let element of this.progress) {
             if (this.playingItem!.mediaType === 'book' ? element.libraryItemId === this.playingItem!.libraryItemId : element.episodeId === this.playingItem!.episodeId) {
@@ -422,6 +424,7 @@ struct Index {
           this.isConnect = true
           Logger.info(`会话当前时间${updateSession.currentTime}`)
           Logger.info(`会话汇报间隔${updateSession.timeListened}`)
+          this.actualListenTime = 0
           this.syncTime = new Date().getTime() / 1000
           this.syncInterval = 10000
           this.user = await getUser()
@@ -650,6 +653,14 @@ struct Index {
 
   setAVPlayerCallback(avPlayer: media.AVPlayer) {
     avPlayer.on('timeUpdate', async (time: number) => {
+      let currentSec = time / 1000
+      if (this.isPlaying && this.lastPosition >= 0) {
+        let delta = currentSec - this.lastPosition
+        if (delta > 0) {
+          this.actualListenTime += delta
+        }
+      }
+      this.lastPosition = currentSec
       this.elapsedTime += 100
       this.playedTime = time / 1000
       if (this.isLocalPlaying === false && this.sleepTime !== 0 && (this.sleepTime + 0.2) <= (this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset)) {
@@ -699,6 +710,7 @@ struct Index {
     avPlayer.on('seekDone', async (seekDoneTime: number) => {
       Logger.info(`播放器跳转成功，当前时间为 ${seekDoneTime}`);
       this.playedTime = seekDoneTime / 1000
+      this.lastPosition = seekDoneTime / 1000
       if (this.isPlaying === true) {
         await this.setPlaybackState(avSession.PlaybackState.PLAYBACK_STATE_PLAY)
       } else {
@@ -867,6 +879,7 @@ struct Index {
             this.avPlayer!.seek(seekTarget * 1000)
           }
           this.playStartTime = 0
+          this.lastPosition = seekTarget
           this.avPlayer!.setSpeed(this.speed)
           if (this.isPlaying === true) {
             if (this.playSetting?.fadeInOut) {
