@@ -154,7 +154,8 @@ export struct FilterItems {
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
 
         GlassFloatingButton({
-          scroller: this.filterItemsScroller
+          scroller: this.filterItemsScroller,
+          isStartPlaying: this.isStartPlaying
         })
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
 
