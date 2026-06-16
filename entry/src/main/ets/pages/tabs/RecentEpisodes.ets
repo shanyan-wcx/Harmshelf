@@ -57,6 +57,10 @@ export struct RecentEpisodes {
         scroller: this.recentEpisodesScroller,
         isStartPlaying: this.isStartPlaying
       })
+      .position({
+        right: 15,
+        bottom: this.isStartPlaying ? 99 : 15
+      })
     }
     .width('100%')
     .height('100%')

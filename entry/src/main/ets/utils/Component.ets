@@ -2337,10 +2337,6 @@ export struct GlassFloatingButton {
         .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
         .hitTestBehavior(HitTestMode.None)
     }
-    .position({
-      right: 15,
-      bottom: this.isStartPlaying ? 99 : 15
-    })
     .animation({ duration: 510, curve: Curve.EaseInOut })
     .width(36)
     .height(36)
