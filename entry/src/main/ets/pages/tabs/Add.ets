@@ -293,6 +293,17 @@ export struct Add {
           rate: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.2 : 0.5,
           lightUpDegree: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.1 : 0.5
         })
+        .shadow({
+          radius: 16,
+          offsetX: 0,
+          offsetY: 0,
+          color: 'rgba(0, 0, 0, 0.25)'
+        })
+        .border({
+          width: 0.5,
+          color: 'rgba(255, 255, 255, 0.2)',
+          radius: 8
+        })
         .caretStyle({
           color: $r('sys.color.font')
         })
