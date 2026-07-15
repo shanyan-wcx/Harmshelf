@@ -528,7 +528,7 @@ struct Index {
     });
   }
 
-  async setPlaybackState(state: number) {
+  async setPlaybackState(state: number, syncOnly: boolean = false) {
     let playbackState: avSession.AVPlaybackState = {
       state: state,
       position: {
@@ -539,7 +539,7 @@ struct Index {
     this.session!.setAVPlaybackState(playbackState, (err) => {
       if (err) {
         Logger.error(`设置Session状态失败，Code: ${err.code}, message: ${err.message}`);
-      } else {
+      } else if (!syncOnly) {
         Logger.info(`设置Session状态${state}`);
       }
     });
@@ -706,6 +706,9 @@ struct Index {
       if (!this.isLocalPlaying && this.elapsedTime >= this.syncInterval) {
         this.syncProgress()
       }
+      this.setPlaybackState(this.isPlaying
+        ? avSession.PlaybackState.PLAYBACK_STATE_PLAY
+        : avSession.PlaybackState.PLAYBACK_STATE_PAUSE, true)
     })
     avPlayer.on('seekDone', async (seekDoneTime: number) => {
       Logger.info(`播放器跳转成功，当前时间为 ${seekDoneTime}`);
