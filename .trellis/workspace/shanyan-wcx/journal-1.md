@@ -249,3 +249,39 @@ LibraryItemDetail.ets: 下载弹窗增加起始/结束章节输入框，校验�
 ### Next Steps
 
 - None - task complete
+
+
+## Session 8: 修复按钮位置+搜索框玻璃质感
+
+**Date**: 2026-07-15
+**Task**: 修复按钮位置+搜索框玻璃质感
+**Branch**: `main`
+
+### Summary
+
+修复回到顶部按钮在HdsNavDestination页面位置异常(position移出组件还原为内联定位); 移除非tab页Stack的alignContent; 播客添加页搜索框添加玻璃质感边框和阴影; 更新版本号至2.3.0。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `8c96a21` | (see git log) |
+| `5d9d97f` | (see git log) |
+| `87e0557` | (see git log) |
+| `db936ac` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete

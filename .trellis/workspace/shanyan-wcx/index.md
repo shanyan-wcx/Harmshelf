@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 7
-- **Last Active**: 2026-06-15
+- **Total Sessions**: 8
+- **Last Active**: 2026-07-15
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~251 | Active |
+| `journal-1.md` | ~287 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 8 | 2026-07-15 | 修复按钮位置+搜索框玻璃质感 | `8c96a21`, `5d9d97f`, `87e0557`, `db936ac` | `main` |
 | 7 | 2026-06-15 | 修复收听时长异常的bug | `c000aac` | `main` |
 | 6 | 2026-06-07 | 回到顶部按钮和日志栏统一悬浮立体玻璃质感 | `618c614`, `7b5e77b`, `750170c`, `ef8bb0f`, `2232989` | `main` |
 | 5 | 2026-06-04 | 下载选章功能+syncProgress try/catch+版本号更新 | `8fef5e1`, `5c2e22d`, `89751f5` | `main` |
