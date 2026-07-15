@@ -285,3 +285,36 @@ LibraryItemDetail.ets: 下载弹窗增加起始/结束章节输入框，校验�
 ### Next Steps
 
 - None - task complete
+
+
+## Session 9: 修复AVSession进度条同步
+
+**Date**: 2026-07-15
+**Task**: 修复AVSession进度条同步
+**Branch**: `main`
+
+### Summary
+
+根因：setPlaybackState仅在状态切换时调用，系统长时间插值估算位置漂移(API23后更明显)。修复：timeUpdate中每10秒周期性刷新AVSession位置，保持与应用内进度一致。setPlaybackState新增syncOnly参数，周期性刷新时不输出日志。
+
+### Main Changes
+
+(Add details)
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `22e0210` | (see git log) |
+
+### Testing
+
+- [OK] (Add test results)
+
+### Status
+
+[OK] **Completed**
+
+### Next Steps
+
+- None - task complete
