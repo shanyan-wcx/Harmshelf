@@ -19,13 +19,16 @@ export struct RecentEpisodes {
           Text("最新剧集")
             .fontSize(20)
             .fontWeight(FontWeight.Medium)
-            .margin({ top: 20 })
+            .margin({ top: 16 })
 
-          ForEach(this.recentEpisodes, (episode: Episode, index) => {
-            EpisodeComponent({
-              item: episode
+          Column() {
+            ForEach(this.recentEpisodes, (episode: Episode, index) => {
+              EpisodeComponent({
+                item: episode
+              })
             })
-          })
+          }
+          .offset({ y: -5 })
 
           Column() {
             Text("没有剧集")
@@ -43,7 +46,7 @@ export struct RecentEpisodes {
       }
       .width('100%')
       .height('100%')
-      .padding({ top: this.statusBarHeight + 56 + 36, left: 20, right: 20, bottom: this.isStartPlaying ? 104 : 20 })
+      .padding({ top: this.statusBarHeight + 56 + 31, left: 20, right: 20, bottom: this.isStartPlaying ? 104 : 20 })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .onReachEnd(async () => {

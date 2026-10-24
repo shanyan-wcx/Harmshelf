@@ -165,7 +165,7 @@ export struct Home {
         maskHeight: 0,
         systemMaterial: new uiMaterial.ImmersiveMaterial({
           style: uiMaterial.ImmersiveStyle.ULTRA_THIN,
-          applyShadow: false,
+          applyShadow: true,
           interactive: true,
           lightEffect: { color: Color.White }
         })

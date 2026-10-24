@@ -141,7 +141,6 @@ export struct MyNavigation {
               this.needUpdate = !this.needUpdate
             }
           })
-          .borderRadius(8)
           .flexShrink(1)
 
         SymbolGlyph(this.isConnect ? $r('sys.symbol.checkmark_icloud_fill') : $r('sys.symbol.icloud_slash_fill'))
