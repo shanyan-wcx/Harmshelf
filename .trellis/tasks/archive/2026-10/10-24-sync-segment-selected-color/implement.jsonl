@@ -1,0 +1,5 @@
+{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend spec entry point for the ArkUI component change."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Shared topTabIndex and title-bar synchronization conventions to preserve."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "ArkTS SDK import and typed component configuration conventions."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Shared pre-modification and reuse checks."}
