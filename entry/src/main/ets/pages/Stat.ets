@@ -7,6 +7,7 @@ import { ConfigurationConstant } from "@kit.AbilityKit";
 @ComponentV2
 export struct Stats {
   @Consumer() statsScroller: Scroller = new Scroller();
+  @Consumer() statusBarHeight: number = 0
   @Consumer() displayWidth: number = 0
   @Consumer() showLoadingProgress: boolean = false
   @Consumer() library: Library | undefined = undefined
@@ -336,7 +337,7 @@ export struct Stats {
       }
       .width('100%')
       .height('100%')
-      .padding({ top: this.displayWidth >= 1000 ? 86 : 66, bottom: this.isStartPlaying ? 99 : 20 })
+      .padding({ top: this.statusBarHeight + (this.displayWidth >= 1000 ? 86 : 66), bottom: this.isStartPlaying ? 99 : 20 })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)

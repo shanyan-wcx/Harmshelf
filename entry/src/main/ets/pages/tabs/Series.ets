@@ -9,11 +9,22 @@ export struct AllSeries {
   @Consumer() series: Series[] = []
   @Consumer() series1: Series | undefined = undefined
   @Consumer() isStartPlaying: boolean = false
+  @Consumer() statusBarHeight: number = 0
 
   build() {
     Stack() {
       Column() {
         Grid(this.seriesScroller) {
+          GridItem() {
+            Row() {
+              Blank()
+                .width('100%')
+                .height(this.statusBarHeight + 56 + 36)
+            }
+          }
+          .columnStart(0)
+          .columnEnd(this.displayWidth >= 1200 ? 2 : (this.displayWidth >= 800 ? 1 : 0))
+
           ForEach(this.series, (series: Series, index) => {
             GridItem() {
               SeriesItemComponent({
@@ -32,9 +43,9 @@ export struct AllSeries {
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .padding({
           left: 20,
-          right: 20,
-          top: 56
+          right: 20
         })
+        .clip(false)
         .onReachEnd(async () => {
 
         })
@@ -53,6 +64,7 @@ export struct AllSeries {
       }
       .width('100%')
       .height('100%')
+      .clip(false)
 
       GlassFloatingButton({
         scroller: this.seriesScroller,
@@ -65,6 +77,7 @@ export struct AllSeries {
     }
     .width('100%')
     .height('100%')
+    .clip(false)
     .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
   }
 }

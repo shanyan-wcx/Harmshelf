@@ -8,11 +8,25 @@ export struct AllPlaylists {
   @Consumer() showLoadingProgress: boolean = false
   @Consumer() isStartPlaying: boolean = false
   @Consumer() playlists: Playlist[] = []
+  @Consumer() statusBarHeight: number = 0
 
   build() {
     Stack() {
       Column() {
         Grid(this.playlistScroller) {
+          GridItem() {
+            Row() {
+              Blank()
+                .width('100%')
+                .height(this.statusBarHeight + 56 + 36)
+            }
+          }
+          .columnStart(0)
+          .columnEnd(this.displayWidth >= 1400 ? 5 :
+            (this.displayWidth >= 1000 ? 4 :
+              (this.displayWidth >= 800 ? 3 :
+                (this.displayWidth >= 400 ? 2 : 1))))
+
           ForEach(this.playlists, (playlist: Playlist, index) => {
             GridItem() {
               PlaylistItemComponent({
@@ -34,9 +48,9 @@ export struct AllPlaylists {
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .padding({
           left: 20,
-          right: 20,
-          top: 56
+          right: 20
         })
+        .clip(false)
         .onReachEnd(async () => {
 
         })
@@ -57,6 +71,7 @@ export struct AllPlaylists {
       }
       .width('100%')
       .height('100%')
+      .clip(false)
 
 
       GlassFloatingButton({
@@ -70,6 +85,7 @@ export struct AllPlaylists {
     }
     .width('100%')
     .height('100%')
+    .clip(false)
     .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
   }
 }

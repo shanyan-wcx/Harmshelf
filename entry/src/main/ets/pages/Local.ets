@@ -10,6 +10,7 @@ import { Logger } from '../utils/Logger';
 @ComponentV2
 export struct LocalMedia {
   @Consumer() LocalMediaScroller: Scroller = new Scroller()
+  @Consumer() statusBarHeight: number = 0
   @Consumer() colorMode: ColorMode | undefined = PersistenceV2.connect(ColorMode, () => new ColorMode());
   @Consumer() isStartPlaying: boolean = false
   @Consumer() isPlaying: boolean = false
@@ -419,7 +420,7 @@ export struct LocalMedia {
       }
       .width('100%')
       .height('100%')
-      .padding({ left: 20, right: 20, top: 69, bottom: this.isStartPlaying ? 104 : 25 })
+      .padding({ left: 20, right: 20, top: this.statusBarHeight + 69, bottom: this.isStartPlaying ? 104 : 25 })
       .align(Alignment.Top)
     }
     .width('100%')

@@ -18,6 +18,7 @@ export struct SubHome {
   @Consumer() homeData: HomeSection[] = []
   @Consumer() progress: Progress[] = []
   @Consumer() isStartPlaying: boolean = false
+  @Consumer() statusBarHeight: number = 0
 
   build() {
     Stack() {
@@ -330,7 +331,7 @@ export struct SubHome {
       }
       .width('100%')
       .height('100%')
-      .padding({ top: 36, bottom: this.isStartPlaying ? 104 : 20 })
+      .padding({ top: this.statusBarHeight + 56 + 31, bottom: this.isStartPlaying ? 104 : 20 })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)

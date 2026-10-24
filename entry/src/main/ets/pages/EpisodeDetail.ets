@@ -19,7 +19,7 @@ import { env } from '../utils/Class'
 import { media } from '@kit.MediaKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
-import { reportBuilder } from '../utils/Component'
+import { reportBuilder, transparentTitleBarStyle } from '../utils/Component'
 import { DownloadSetting, OtherSetting } from './Index'
 import { Logger } from '../utils/Logger'
 
@@ -799,6 +799,8 @@ export struct EpisodeDetail {
     }
     .width('100%')
     .height('100%')
+    .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP])
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
     .titleBar({
       avoidLayoutSafeArea: true,
       enableComponentSafeArea: false,
@@ -812,12 +814,7 @@ export struct EpisodeDetail {
           subTitle: this.episode!.subtitle ?? ""
         }
       },
-      style: {
-        scrollEffectOpts: {
-          enableScrollEffect: true,
-          blurEffectiveStartOffset: LengthMetrics.vp(10)
-        }
-      }
+      style: transparentTitleBarStyle()
     })
     .hideBackButton(false)
     .backgroundColor($r('sys.color.background_secondary'))

@@ -11,6 +11,7 @@ import { uniformTypeDescriptor as utd } from '@kit.ArkData';
 @ComponentV2
 export struct Log {
   @Consumer() logScroller: Scroller = new Scroller()
+  @Consumer() statusBarHeight: number = 0
   @Consumer() isStartPlaying: boolean = false
   @Consumer() logs: LogEntry[] = []
   @Consumer() context: common.UIAbilityContext | undefined = undefined
@@ -164,7 +165,7 @@ export struct Log {
           }
           .width('100%')
           .padding({ left: 20, right: 20, top: 4, bottom: 4 })
-          .margin({ top: index === 0 ? 56 : 0, bottom: index === this.displayLogs.length - 1 ? (this.isStartPlaying ? 150 : (deviceInfo.deviceType === '2in1' ? 71 : 79)) : 0 })
+          .margin({ top: index === 0 ? this.statusBarHeight + 56 : 0, bottom: index === this.displayLogs.length - 1 ? (this.isStartPlaying ? 150 : (deviceInfo.deviceType === '2in1' ? 71 : 79)) : 0 })
           })
         }
         .width('100%')

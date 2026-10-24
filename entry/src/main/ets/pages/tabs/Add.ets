@@ -12,6 +12,7 @@ export struct Add {
   @Consumer() isStartPlaying: boolean = false
   @Consumer() searchPodcasts: SearchPodcast[] = []
   @Consumer() term: string = ""
+  @Consumer() statusBarHeight: number = 0
   @Local showConfirm: boolean[] = []
   @Local podcast: Podcast | undefined = undefined
   @Local autoDownload: boolean[] = []
@@ -278,7 +279,7 @@ export struct Add {
       .width('100%')
       .height('100%')
       .layoutWeight(1)
-      .padding({ top: 36 + 80, bottom: this.isStartPlaying ? 84 : 0 })
+      .padding({ top: this.statusBarHeight + 56 + 36 + 80, bottom: this.isStartPlaying ? 84 : 0 })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
@@ -287,7 +288,7 @@ export struct Add {
         .width('100%')
         .height(45)
         .borderRadius(8)
-        .margin({ top: 56, bottom: 20 })
+        .margin({ top: this.statusBarHeight + 56 + 56, bottom: 20 })
         .backgroundBlurStyle(BlurStyle.BACKGROUND_THICK)
         .backgroundBrightness({
           rate: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.2 : 0.5,

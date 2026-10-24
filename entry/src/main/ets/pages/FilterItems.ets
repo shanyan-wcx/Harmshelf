@@ -1,4 +1,4 @@
-import { LibraryItemComponent1, GlassFloatingButton } from "../utils/Component";
+import { transparentTitleBarStyle, LibraryItemComponent1, GlassFloatingButton } from "../utils/Component";
 import { Filter1, LibraryItem, Progress, Media, Series } from "../utils/Interface";
 import { LengthMetrics } from "@kit.ArkUI";
 import { HdsNavDestination, HdsNavDestinationAttribute } from "@kit.UIDesignKit";
@@ -179,18 +179,16 @@ export struct FilterItems {
     }
     .width('100%')
     .height('100%')
+    .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP])
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
     .titleBar({
-      avoidLayoutSafeArea:true,
+      avoidLayoutSafeArea: true,
       enableComponentSafeArea: false,
       padding: {
         start: LengthMetrics.vp(16),
         end: LengthMetrics.vp(16)
       },
-      style: {
-        scrollEffectOpts: {
-          enableScrollEffect: true
-        }
-      },
+      style: transparentTitleBarStyle(),
       content: {
         title: {
           mainTitle: this.criteria

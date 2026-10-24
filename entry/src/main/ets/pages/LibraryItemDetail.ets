@@ -19,6 +19,7 @@ import {
 } from "../utils/Interface";
 import { HdsNavDestination, HdsNavDestinationAttribute } from "@kit.UIDesignKit";
 import { LengthMetrics, PersistenceV2, SymbolGlyphModifier } from "@kit.ArkUI";
+import { gradientBlurTitleBarStyle } from "../utils/Component";
 import {
   addToCollection,
   addToPlaylist,
@@ -2131,8 +2132,10 @@ export struct LibraryItemDetail {
     }
     .width('100%')
     .height('100%')
+    .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP])
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
     .titleBar({
-      avoidLayoutSafeArea:true,
+      avoidLayoutSafeArea: true,
       enableComponentSafeArea: false,
       padding: {
         start: LengthMetrics.vp(16),
@@ -2144,12 +2147,7 @@ export struct LibraryItemDetail {
           subTitle: this.libraryItem!.media.metadata.subtitle ?? ""
         }
       },
-      style: {
-        scrollEffectOpts: {
-          enableScrollEffect: true,
-          blurEffectiveStartOffset: LengthMetrics.vp(20)
-        }
-      }
+      style: gradientBlurTitleBarStyle()
     })
     .hideBackButton(false)
     .backgroundColor($r('sys.color.background_secondary'))

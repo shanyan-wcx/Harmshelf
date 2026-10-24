@@ -8,11 +8,26 @@ export struct AllAuthors {
   @Consumer() showLoadingProgress: boolean = false
   @Consumer() authors: Author[] = []
   @Consumer() isStartPlaying: boolean = false
+  @Consumer() statusBarHeight: number = 0
 
   build() {
     Stack() {
       Column() {
         Grid(this.authorScroller) {
+          GridItem() {
+            Row() {
+              Blank()
+                .width('100%')
+                .height(this.statusBarHeight + 56 + 31)
+            }
+          }
+          .columnStart(0)
+          .columnEnd(this.displayWidth >= 1400 ? 7 :
+            (this.displayWidth >= 1200 ? 6 :
+              (this.displayWidth >= 1000 ? 5 :
+                (this.displayWidth >= 800 ? 4 :
+                  (this.displayWidth >= 400 ? 3 : 2)))))
+
           ForEach(this.authors, (author: Author, index) => {
             GridItem() {
               AuthorComponent1({
@@ -35,9 +50,9 @@ export struct AllAuthors {
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .padding({
           left: 20,
-          right: 20,
-          top: 56
+          right: 20
         })
+        .clip(false)
         .onReachEnd(async () => {
 
         })
@@ -58,6 +73,7 @@ export struct AllAuthors {
       }
       .width('100%')
       .height('100%')
+      .clip(false)
 
 
       GlassFloatingButton({
@@ -71,6 +87,7 @@ export struct AllAuthors {
     }
     .width('100%')
     .height('100%')
+    .clip(false)
     .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
 
   }

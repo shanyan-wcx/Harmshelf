@@ -9,6 +9,10 @@
       "tablet",
       "2in1"
     ],
+    "metadata": [{
+      "name": "ohos.arkui.UIMaterial.state",
+      "value": "enable"
+    }],
     "deliveryWithInstall": true,
     "installationFree": false,
     "pages": "$profile:main_pages",

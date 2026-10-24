@@ -1,5 +1,5 @@
 import { ColorMode } from "./Index";
-import { PersistenceV2 } from "@kit.ArkUI";
+import { PersistenceV2, uiMaterial } from "@kit.ArkUI";
 import { Author, Collection,
   Episode,
   HomeSection,
@@ -80,6 +80,115 @@ export struct Home {
 
   private tabLabels(): string[] {
     return getHomeTabLabels(this.library?.mediaType, this.user?.type, this.playlists.length > 0)
+  }
+
+  private homeTabContentWidth(): number {
+    let width = this.sideBarContentWidth > 0 ? this.sideBarContentWidth : this.displayWidth
+    return Math.max(width - 32, 1)
+  }
+
+  private homeTabItemWidth(label: string): number {
+    return label.length * 14 + 8
+  }
+
+  private homeTabMaxItemWidth(labels: string[]): number {
+    let width = 0
+    labels.forEach((label: string) => width = Math.max(width, this.homeTabItemWidth(label)))
+    return width
+  }
+
+  private homeTabOverflow(labels: string[]): boolean {
+    return this.homeTabMaxItemWidth(labels) * labels.length > this.homeTabContentWidth()
+  }
+
+  @Builder
+  homeTabContents() {
+    ForEach(this.tabLabels(), (label: string, index: number) => {
+      TabContent() {
+      }
+      .tabBar(this.homeTabLabelBuilder(label, index, this.homeTabOverflow(this.tabLabels())))
+    }, (label: string) => label)
+  }
+
+  @Builder
+  homeTabLabelBuilder(label: string, index: number, overflow: boolean) {
+    Stack({ alignContent: Alignment.Center }) {
+      Text(label)
+        .textAlign(TextAlign.Center)
+        .fontSize(14)
+        .fontColor(this.topTabIndex === index ?
+          $r('sys.color.select_font_color') : $r('sys.color.font_secondary'))
+        .fontWeight(this.topTabIndex === index ? FontWeight.Medium : FontWeight.Normal)
+        .maxLines(1)
+        .textOverflow({ overflow: TextOverflow.None })
+        .animation({ duration: 180, curve: Curve.Friction })
+
+      Row()
+        .width(20)
+        .height(3)
+        .borderRadius(1.5)
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .opacity(this.topTabIndex === index ? 1 : 0)
+        .translate({ x: 0, y: 11 })
+        .animation({ duration: 280, curve: Curve.Friction })
+    }
+    .width(overflow ? this.homeTabMaxItemWidth(this.tabLabels()) : 'auto')
+    .layoutWeight(overflow ? 0 : 1)
+    .height(36)
+    .clip(false)
+    .padding({ left: 4, right: 4 })
+  }
+
+  @Builder
+  homeTabsBuilder() {
+    Stack({ alignContent: Alignment.TopStart }) {
+      Tabs({ barPosition: BarPosition.End, index: this.topTabIndex }) {
+        this.homeTabContents()
+      }
+      .width('100%')
+      .height(36)
+      .barWidth('100%')
+      .barOverlap(true)
+      .vertical(false)
+      .scrollable(false)
+      .barMode(BarMode.Scrollable, {
+        nonScrollableLayoutStyle: LayoutStyle.ALWAYS_AVERAGE_SPLIT
+      })
+      .barHeight(36)
+      .clip(false)
+      .animationCurve(Curve.Friction)
+      .animationDuration(280)
+      .barBackgroundColor(Color.Transparent)
+      .barFloatingStyle({
+        barBottomMargin: 0,
+        maskColor: Color.Transparent,
+        maskHeight: 0,
+        systemMaterial: new uiMaterial.ImmersiveMaterial({
+          style: uiMaterial.ImmersiveStyle.ULTRA_THIN,
+          applyShadow: false,
+          interactive: true,
+          lightEffect: { color: Color.White }
+        })
+      })
+      .fadingEdge(true)
+      .onChange((index: number) => {
+        if (index !== this.topTabIndex) {
+          this.onHomeTabClick(index)
+        }
+      })
+
+    }
+    .width('100%')
+    .height(36)
+    .clip(false)
+  }
+
+  private onHomeTabClick(index: number) {
+    if (index === this.topTabIndex) {
+      return
+    }
+    this.topTabIndex = index
+    this.needUpdate = !this.needUpdate
   }
 
   @Monitor('needUpdate')
@@ -220,6 +329,18 @@ export struct Home {
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
       }
 
+      if (this.baseUrl !== "" && this.library) {
+        Row() {
+          this.homeTabsBuilder()
+        }
+        .width('100%')
+        .padding({left: 16, right: 16})
+        .margin({ top: this.statusBarHeight + 56 })
+        .alignItems(VerticalAlign.Top)
+        .justifyContent(FlexAlign.Center)
+        .clip(false)
+      }
+
       // Row() {
       //   Text(this.LibraryItems.length.toString() + " 图书")
       //     .fontSize(16)
@@ -243,7 +364,11 @@ export struct Home {
       //   color: $r('sys.color.font'),
       // })
     }
+    .width('100%')
+    .height('100%')
     .alignContent(Alignment.Top)
-    .margin({ top: 56 })
+    .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP])
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
+    .clip(false)
   }
 }

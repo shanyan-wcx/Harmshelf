@@ -10,11 +10,25 @@ export struct MediaLibrary {
   @Consumer() libraryItems: LibraryItem[] = []
   @Consumer() progress: Progress[] = []
   @Consumer() isStartPlaying: boolean = false
+  @Consumer() statusBarHeight: number = 0
 
   build() {
     Stack() {
       Column() {
         Grid(this.mediaLibraryScroller) {
+          GridItem() {
+            Row() {
+              Blank()
+                .width('100%')
+                .height(this.statusBarHeight + 56 + 36)
+            }
+          }
+          .columnStart(0)
+          .columnEnd(this.displayWidth >= 1400 ? 5 :
+            (this.displayWidth >= 1000 ? 4 :
+              (this.displayWidth >= 800 ? 3 :
+                (this.displayWidth >= 400 ? 2 : 1))))
+
           ForEach(this.libraryItems, (libraryItem: LibraryItem, index) => {
             GridItem() {
               LibraryItemComponent1({
@@ -37,9 +51,9 @@ export struct MediaLibrary {
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .padding({
           left: 20,
-          right: 20,
-          top: 56
+          right: 20
         })
+        .clip(false)
         .onReachEnd(async () => {
 
         })
@@ -58,6 +72,7 @@ export struct MediaLibrary {
       }
       .width('100%')
       .height('100%')
+      .clip(false)
 
       GlassFloatingButton({
         scroller: this.mediaLibraryScroller,
@@ -70,6 +85,7 @@ export struct MediaLibrary {
     }
     .width('100%')
     .height('100%')
+    .clip(false)
     .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
   }
 }

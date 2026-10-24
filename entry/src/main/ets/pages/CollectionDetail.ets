@@ -3,6 +3,7 @@ import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit'
 import { LengthMetrics, PersistenceV2, RectShape } from '@kit.ArkUI';
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import { env } from '../utils/Class';
+import { transparentTitleBarStyle } from '../utils/Component';
 import { ColorMode } from "../pages/Index";
 import { deleteCollection, getCollections, getPlayItem, removeFromCollection, updateCollection } from '../utils/Api';
 import { media } from '@kit.MediaKit';
@@ -535,6 +536,8 @@ export struct CollectionDetail {
     }
     .width('100%')
     .height('100%')
+    .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP])
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
     .titleBar({
       avoidLayoutSafeArea: true,
       enableComponentSafeArea: false,
@@ -567,12 +570,7 @@ export struct CollectionDetail {
           }]
         }
       },
-      style: {
-        scrollEffectOpts: {
-          enableScrollEffect: true,
-          blurEffectiveStartOffset: LengthMetrics.vp(10)
-        }
-      }
+      style: transparentTitleBarStyle()
     })
     .hideBackButton(false)
     .backgroundColor($r('sys.color.background_secondary'))

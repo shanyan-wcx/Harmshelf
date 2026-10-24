@@ -1,6 +1,7 @@
 import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit';
 import { LengthMetrics } from '@kit.ArkUI';
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
+import { transparentTitleBarStyle } from '../utils/Component';
 
 @Builder
 export function downloadTaskBuilder(name: string, param: Object) {
@@ -94,6 +95,8 @@ export struct DownloadTask {
     }
     .width('100%')
     .height('100%')
+    .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP])
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
     .titleBar({
       avoidLayoutSafeArea: true,
       enableComponentSafeArea: false,
@@ -101,12 +104,7 @@ export struct DownloadTask {
         start: LengthMetrics.vp(16),
         end: LengthMetrics.vp(16)
       },
-      style: {
-        scrollEffectOpts: {
-          enableScrollEffect: true,
-          blurEffectiveStartOffset: LengthMetrics.vp(8)
-        }
-      },
+      style: transparentTitleBarStyle(),
       content: {
         title: {
           mainTitle: "下载队列 " + this.downloadTasks.length

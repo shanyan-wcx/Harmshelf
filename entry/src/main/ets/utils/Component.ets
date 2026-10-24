@@ -8,11 +8,12 @@ import {
   HdsNavigationTitleMode,
   HdsNavigationAttribute,
   HdsNavigationMenuItemOptions,
-  HdsTabs,
   hdsMaterial,
-  BottomBuilderShowType,
+  ScrollEffectOptions,
+  ScrollEffectType,
+  TitleBarStyleOptions,
 } from "@kit.UIDesignKit"
-import { Home, getHomeTabLabels } from "../pages/Home";
+import { Home } from "../pages/Home";
 import { LocalMedia } from "../pages/Local";
 import { Log } from "../pages/Log";
 import { Setting } from "../pages/Setting";
@@ -51,6 +52,34 @@ import { Logger } from './Logger';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
+export function transparentTitleBarStyle(): TitleBarStyleOptions {
+  return titleBarStyle({
+    enableScrollEffect: false
+  })
+}
+
+export function gradientBlurTitleBarStyle(): TitleBarStyleOptions {
+  return titleBarStyle({
+    enableScrollEffect: true,
+    scrollEffectType: ScrollEffectType.GRADIENT_BLUR
+  })
+}
+
+function titleBarStyle(scrollEffectOpts: ScrollEffectOptions): TitleBarStyleOptions {
+  return {
+    scrollEffectOpts,
+    originalStyle: {
+      backgroundStyle: {
+        backgroundColor: $r('sys.color.ohos_id_color_background_transparent')
+      }
+    },
+    systemMaterialEffect: {
+      materialType: hdsMaterial.MaterialType.IMMERSIVE,
+      materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+    }
+  }
+}
+
 @ComponentV2
 export struct MyNavigation {
   @Consumer() statsScroller: Scroller = new Scroller()
@@ -68,9 +97,7 @@ export struct MyNavigation {
   @Consumer() selectLibraryIndex: number = 0
   @Consumer() topTabIndex: number = 0
   @Consumer() needUpdate: boolean = false
-  @Consumer() isOnFocus: boolean = true
   @Consumer() user: User | undefined = undefined
-  @Consumer() playlists: Playlist[] = []
   @Consumer() isConnect: boolean = true
   @Consumer() isShowSidebar: boolean = false
   @Consumer() sidebarType: number = SideBarContainerType.Overlay
@@ -123,7 +150,6 @@ export struct MyNavigation {
           .fontWeight(FontWeight.Medium)
           .fontColor([this.isConnect ? Color.Green : Color.Orange])
       }
-      .clip(true)
       .width(!this.isDownloadEmpty ?
         (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 225 : this.sideBarContentWidth - 149) :
         (deviceTypeInfo === '2in1' ? this.sideBarContentWidth - 177 : this.sideBarContentWidth - 101))
@@ -131,100 +157,6 @@ export struct MyNavigation {
     }
     .width('100%')
     .justifyContent(FlexAlign.Start)
-  }
-
-  private homeTabLabels(): string[] {
-    return getHomeTabLabels(
-      this.library?.mediaType,
-      this.user?.type,
-      this.playlists.length > 0
-    )
-  }
-
-  private homeTabBarStyle(label: string, index: number) {
-    return new SubTabBarStyle(label)
-      .selectedMode(SelectedMode.BOARD)
-      .padding(0)
-      .board({
-        borderRadius: 5
-      })
-      .labelStyle({
-        font: {
-          size: 14,
-          weight: this.topTabIndex === index ? FontWeight.Bold : FontWeight.Medium
-        },
-        selectedColor: $r('sys.color.select_font_color')
-      })
-      .indicator({
-        color: this.isOnFocus ? $r('sys.color.comp_emphasize_secondary') : $r('sys.color.ohos_id_color_hover')
-      })
-  }
-
-  @Builder
-  homeTabContents() {
-    ForEach(this.homeTabLabels(), (label: string, index: number) => {
-      TabContent() {
-      }
-      .tabBar(this.homeTabBarStyle(label, index))
-    }, (label: string) => label)
-  }
-
-  @Builder
-  homeTabsBuilder() {
-    if (deviceInfo.apiAvailable(23)) {
-      HdsTabs({ index: this.topTabIndex }) {
-        this.homeTabContents()
-      }
-      .width('100%')
-      .height(36)
-      .barOverlap(true)
-      .barPosition(BarPosition.Start)
-      .vertical(false)
-      .scrollable(false)
-      .barMode(BarMode.Scrollable)
-      .barHeight(36)
-      .barFloatingStyle({
-        barBottomMargin: 0,
-        systemMaterialEffect: {
-          materialType: hdsMaterial.MaterialType.IMMERSIVE,
-          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
-        }
-      })
-      .onTabBarClick((index: number) => this.onHomeTabClick(index))
-    } else {
-      HdsTabs({ index: this.topTabIndex }) {
-        this.homeTabContents()
-      }
-      .width('100%')
-      .height(36)
-      .barOverlap(true)
-      .barPosition(BarPosition.Start)
-      .vertical(false)
-      .scrollable(false)
-      .barMode(BarMode.Scrollable)
-      .barHeight(36)
-      .barBackgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK, {
-        policy: BlurStyleActivePolicy.FOLLOWS_WINDOW_ACTIVE_STATE,
-        inactiveColor: $r('sys.color.ohos_id_color_hover')
-      })
-      .onTabBarClick((index: number) => this.onHomeTabClick(index))
-    }
-  }
-
-  private onHomeTabClick(index: number) {
-    this.topTabIndex = index
-    this.needUpdate = !this.needUpdate
-  }
-
-  @Builder
-  titleBarBottomBuilder() {
-    Row() {
-      this.homeTabsBuilder()
-    }
-    .width('100%')
-    .padding({left: 16, right: 16})
-    .alignItems(VerticalAlign.Top)
-    .justifyContent(FlexAlign.Center)
   }
 
   build() {
@@ -244,10 +176,11 @@ export struct MyNavigation {
       }
       .width('100%')
       .height('100%')
-      .padding({ top: this.statusBarHeight })
     }
     .width(this.sidebarType === SideBarContainerType.Overlay ? '100%' : this.displayWidth - this.sideBarWidth)
     .height('100%')
+    .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP])
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
     .backgroundColor($r('sys.color.background_secondary'))
     .mode(NavigationMode.Stack)
     .titleBar({
@@ -256,19 +189,9 @@ export struct MyNavigation {
       padding: {
         end: deviceTypeInfo === '2in1' ? LengthMetrics.vp(168) : LengthMetrics.vp(16)
       },
-      style: {
-        scrollEffectOpts: {
-          enableScrollEffect: this.pageIndex === 0 ? false : true,
-          blurEffectiveStartOffset: LengthMetrics.vp(12)
-        }
-      },
+      style: transparentTitleBarStyle(),
       content: {
         stackBuilder: (): void => this.titleBarBuilder(),
-        bottomBuilder: this.pageIndex === 0 && this.library !== undefined && this.baseUrl !== "" ? {
-          builder: (): void => this.titleBarBottomBuilder(),
-          height: 56,
-          showType: BottomBuilderShowType.DIRECTLY_SHOW
-        } : undefined,
         menu: {
           value: this.sidebarType === SideBarContainerType.Embed ?
             (this.isDownloadEmpty ?

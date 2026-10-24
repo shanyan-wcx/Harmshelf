@@ -16,6 +16,7 @@ let bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleFlags)
 @ComponentV2
 export struct Setting {
   @Consumer() settingScroller: Scroller = new Scroller();
+  @Consumer() statusBarHeight: number = 0
   @Consumer() selectThemeIndex: number = 0
   @Consumer() serverIndex: ServerIndex | undefined = PersistenceV2.connect(ServerIndex, () => new ServerIndex());
   @Consumer() serverSetting: ServerSetting | undefined = PersistenceV2.connect(ServerSetting, () => new ServerSetting());
@@ -1111,7 +1112,7 @@ export struct Setting {
     .height('100%')
     .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
     .scrollBar(BarState.Off)
-    .padding({ left: 20, right: 20, top: 56, bottom: this.isStartPlaying ? 104 : 20 })
+    .padding({ left: 20, right: 20, top: this.statusBarHeight + 56, bottom: this.isStartPlaying ? 104 : 20 })
     .align(Alignment.Top)
   }
 }

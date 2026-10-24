@@ -10,6 +10,7 @@ export struct RecentEpisodes {
   @Consumer() recentEpisodesPage: number = 0
   @Consumer() isStartPlaying: boolean = false
   @Consumer() showLoadingProgress: boolean = false
+  @Consumer() statusBarHeight: number = 0
 
   build() {
     Stack() {
@@ -42,7 +43,7 @@ export struct RecentEpisodes {
       }
       .width('100%')
       .height('100%')
-      .padding({ top: 36, left: 20, right: 20, bottom: this.isStartPlaying ? 104 : 20 })
+      .padding({ top: this.statusBarHeight + 56 + 36, left: 20, right: 20, bottom: this.isStartPlaying ? 104 : 20 })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .onReachEnd(async () => {

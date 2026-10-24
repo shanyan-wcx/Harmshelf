@@ -3,6 +3,7 @@ import { LengthMetrics } from '@kit.ArkUI';
 import { Author, Library, LibraryItem, LibraryItemSearchResult, SearchResult, Series } from '../utils/Interface';
 import { searchLibrary } from '../utils/Api';
 import { deviceInfo } from '@kit.BasicServicesKit';
+import { transparentTitleBarStyle } from '../utils/Component';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -194,6 +195,8 @@ export struct SearchMedia {
     }
     .width('100%')
     .height('100%')
+    .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP])
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
     .titleBar({
       avoidLayoutSafeArea: true,
       enableComponentSafeArea: false,
@@ -201,12 +204,7 @@ export struct SearchMedia {
         start: LengthMetrics.vp(16),
         end: LengthMetrics.vp(16)
       },
-      style: {
-        scrollEffectOpts: {
-          enableScrollEffect: true,
-          blurEffectiveStartOffset: LengthMetrics.vp(10)
-        }
-      },
+      style: transparentTitleBarStyle(),
       content: {
         stackBuilder: (): void => this.titleBarBuilder()
       }

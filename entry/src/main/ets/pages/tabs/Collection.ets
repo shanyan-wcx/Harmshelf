@@ -8,11 +8,22 @@ export struct AllCollections {
   @Consumer() showLoadingProgress: boolean = false
   @Consumer() isStartPlaying: boolean = false
   @Consumer() collections: Collection[] = []
+  @Consumer() statusBarHeight: number = 0
 
   build() {
     Stack() {
       Column() {
         Grid(this.collectionScroller) {
+          GridItem() {
+            Row() {
+              Blank()
+                .width('100%')
+                .height(this.statusBarHeight + 56 + 36)
+            }
+          }
+          .columnStart(0)
+          .columnEnd(this.displayWidth >= 1200 ? 2 : (this.displayWidth >= 800 ? 1 : 0))
+
           ForEach(this.collections, (collection: Collection, index) => {
             GridItem() {
               CollectionItemComponent({
@@ -31,9 +42,9 @@ export struct AllCollections {
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .padding({
           left: 20,
-          right: 20,
-          top: 56
+          right: 20
         })
+        .clip(false)
         .visibility(this.collections.length > 0 ? Visibility.Visible : Visibility.None)
 
 
@@ -50,6 +61,7 @@ export struct AllCollections {
       }
       .width('100%')
       .height('100%')
+      .clip(false)
 
 
       GlassFloatingButton({
@@ -63,6 +75,7 @@ export struct AllCollections {
     }
     .width('100%')
     .height('100%')
+    .clip(false)
     .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
   }
 }
