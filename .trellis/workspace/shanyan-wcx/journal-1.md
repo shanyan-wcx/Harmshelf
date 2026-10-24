@@ -339,3 +339,24 @@ LibraryItemDetail.ets: 下载弹窗增加起始/结束章节输入框，校验�
 ### Status
 
 [OK] **Completed**
+
+
+## Session 11: 同步分段按钮选中背景色
+
+**Date**: 2026-10-24
+**Task**: 同步分段按钮选中背景色
+**Branch**: `main`
+
+### Summary
+
+使用 ColorMetrics.resourceColor 复用首页 HdsTabs 的焦点/失焦颜色，设置首页标题栏 TabSegmentButtonV2 的 itemSelectedBackgroundColor；devecocli build 与 git diff --check 通过。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `fd06d3b` | (see git log) |
+
+### Status
+
+[OK] **Completed**
