@@ -1,0 +1,3 @@
+{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "保留首页 TabSegmentButtonV2 与 topTabIndex/needUpdate 的现有同步契约。"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "核对 ScrollDirection、DividerShowType 和 TabSegmentButtonV2 参数的 ArkTS 类型。"}
