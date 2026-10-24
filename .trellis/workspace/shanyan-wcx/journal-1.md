@@ -402,3 +402,25 @@ LibraryItemDetail.ets: 下载弹窗增加起始/结束章节输入框，校验�
 ### Status
 
 [OK] **Completed**
+
+
+## Session 14: Refine immersive titlebar and home layout
+
+**Date**: 2026-10-24
+**Task**: Refine immersive titlebar and home layout
+**Branch**: `main`
+
+### Summary
+
+Implemented and pushed transparent immersive titlebars, home tabs, Grid spacer scrolling, page safe-area offsets, and corrected Author spacing/top offset. ArkTS assembleHap passed with existing warnings.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `e2ad4f5` | (see git log) |
+| `0c13e2e` | (see git log) |
+
+### Status
+
+[OK] **Completed**
