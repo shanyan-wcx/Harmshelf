@@ -1,11 +1,6 @@
 import {
   LengthMetrics,
-  ColorMetrics,
   RectShape,
-  SegmentButtonV2ItemOptions,
-  SegmentButtonV2Items,
-  TabSegmentButtonV2,
-  uiMaterial
 } from "@kit.ArkUI"
 import { deviceInfo } from "@kit.BasicServicesKit";
 import {
@@ -13,6 +8,8 @@ import {
   HdsNavigationTitleMode,
   HdsNavigationAttribute,
   HdsNavigationMenuItemOptions,
+  HdsTabs,
+  hdsMaterial,
   BottomBuilderShowType,
 } from "@kit.UIDesignKit"
 import { Home, getHomeTabLabels } from "../pages/Home";
@@ -136,38 +133,93 @@ export struct MyNavigation {
     .justifyContent(FlexAlign.Start)
   }
 
-  private homeTabItems(): SegmentButtonV2Items {
-    return new SegmentButtonV2Items(getHomeTabLabels(
+  private homeTabLabels(): string[] {
+    return getHomeTabLabels(
       this.library?.mediaType,
       this.user?.type,
       this.playlists.length > 0
-    ).map((label: string): SegmentButtonV2ItemOptions => ({ text: label })))
+    )
   }
 
-  private immersiveMaterial(): uiMaterial.Material | undefined {
-    if (deviceInfo.apiAvailable('26.0.0')) {
-      return new uiMaterial.ImmersiveMaterial({
-        style: uiMaterial.ImmersiveStyle.ULTRA_THICK
+  private homeTabBarStyle(label: string, index: number) {
+    return new SubTabBarStyle(label)
+      .selectedMode(SelectedMode.BOARD)
+      .padding(0)
+      .board({
+        borderRadius: 5
       })
+      .labelStyle({
+        font: {
+          size: 14,
+          weight: this.topTabIndex === index ? FontWeight.Bold : FontWeight.Medium
+        },
+        selectedColor: $r('sys.color.select_font_color')
+      })
+      .indicator({
+        color: this.isOnFocus ? $r('sys.color.comp_emphasize_secondary') : $r('sys.color.ohos_id_color_hover')
+      })
+  }
+
+  @Builder
+  homeTabContents() {
+    ForEach(this.homeTabLabels(), (label: string, index: number) => {
+      TabContent() {
+      }
+      .tabBar(this.homeTabBarStyle(label, index))
+    }, (label: string) => label)
+  }
+
+  @Builder
+  homeTabsBuilder() {
+    if (deviceInfo.apiAvailable(23)) {
+      HdsTabs({ index: this.topTabIndex }) {
+        this.homeTabContents()
+      }
+      .width('100%')
+      .height(36)
+      .barOverlap(true)
+      .barPosition(BarPosition.Start)
+      .vertical(false)
+      .scrollable(false)
+      .barMode(BarMode.Scrollable)
+      .barHeight(36)
+      .barFloatingStyle({
+        barBottomMargin: 0,
+        systemMaterialEffect: {
+          materialType: hdsMaterial.MaterialType.IMMERSIVE,
+          materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+        }
+      })
+      .onTabBarClick((index: number) => this.onHomeTabClick(index))
+    } else {
+      HdsTabs({ index: this.topTabIndex }) {
+        this.homeTabContents()
+      }
+      .width('100%')
+      .height(36)
+      .barOverlap(true)
+      .barPosition(BarPosition.Start)
+      .vertical(false)
+      .scrollable(false)
+      .barMode(BarMode.Scrollable)
+      .barHeight(36)
+      .barBackgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK, {
+        policy: BlurStyleActivePolicy.FOLLOWS_WINDOW_ACTIVE_STATE,
+        inactiveColor: $r('sys.color.ohos_id_color_hover')
+      })
+      .onTabBarClick((index: number) => this.onHomeTabClick(index))
     }
-    return undefined
+  }
+
+  private onHomeTabClick(index: number) {
+    this.topTabIndex = index
+    this.needUpdate = !this.needUpdate
   }
 
   @Builder
   titleBarBottomBuilder() {
     Row() {
-      TabSegmentButtonV2({
-        items: this.homeTabItems(),
-        selectedIndex: this.topTabIndex,
-        itemSelectedBackgroundColor: ColorMetrics.resourceColor(
-          this.isOnFocus ? $r('sys.color.comp_emphasize_secondary') : $r('sys.color.ohos_id_color_hover')
-        ),
-        $selectedIndex: (index: number) => {
-          this.topTabIndex = index
-          this.needUpdate = !this.needUpdate
-        },
-        backgroundSystemMaterial: this.immersiveMaterial()
-      })
+      this.homeTabsBuilder()
     }
     .width('100%')
     .padding({left: 16, right: 16})
