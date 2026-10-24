@@ -381,3 +381,24 @@ LibraryItemDetail.ets: 下载弹窗增加起始/结束章节输入框，校验�
 ### Status
 
 [OK] **Completed**
+
+
+## Session 13: 首页标题栏悬浮 Tabs
+
+**Date**: 2026-10-24
+**Task**: 首页标题栏悬浮 Tabs
+**Branch**: `main`
+
+### Summary
+
+将首页标题栏 bottomBuilder 的 TabSegmentButtonV2 替换为 HDS HdsTabs 悬浮 TabBar，使用可滚动布局处理长标签，API 23+ 启用沉浸材质，旧版本回退到模糊样式，保留 topTabIndex/needUpdate 同步；devecocli build 与 git diff --check 通过。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `ea3227d` | (see git log) |
+
+### Status
+
+[OK] **Completed**
