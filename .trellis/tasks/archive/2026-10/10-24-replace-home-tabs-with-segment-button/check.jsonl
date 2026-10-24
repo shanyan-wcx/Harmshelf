@@ -1,0 +1,4 @@
+{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "核对首页标题栏控件与 Home 页面内容的状态同步约定。"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "核对删除 HdsTabs 后的导入和 ArkTS 类型安全。"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "复核标题栏控件、Provider 状态和页面内容的跨组件数据流。"}

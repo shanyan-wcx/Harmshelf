@@ -1,0 +1,4 @@
+{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "复用 Index.ets 的 Provider 状态，让首页内容与标题栏 TabSegmentButtonV2 共用 topTabIndex/needUpdate。"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "检查 ArkTS @Consumer 状态、动态索引和组件移除后的导入类型。"}
+{"file": ".trellis/spec/guides/cross-layer-thinking-guide.md", "reason": "追踪 Index -> MyNavigation/Home -> tabs 的共享状态和页面渲染边界。"}
