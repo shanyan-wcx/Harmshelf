@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 9
-- **Last Active**: 2026-07-15
+- **Total Sessions**: 10
+- **Last Active**: 2026-10-24
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~320 | Active |
+| `journal-1.md` | ~341 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 10 | 2026-10-24 | 首页标题栏沉浸光感分段按钮 | `2b8d2aa` | `main` |
 | 9 | 2026-07-15 | 修复AVSession进度条同步 | `22e0210` | `main` |
 | 8 | 2026-07-15 | 修复按钮位置+搜索框玻璃质感 | `8c96a21`, `5d9d97f`, `87e0557`, `db936ac` | `main` |
 | 7 | 2026-06-15 | 修复收听时长异常的bug | `c000aac` | `main` |

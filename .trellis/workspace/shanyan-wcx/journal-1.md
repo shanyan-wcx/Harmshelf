@@ -318,3 +318,24 @@ LibraryItemDetail.ets: 下载弹窗增加起始/结束章节输入框，校验�
 ### Next Steps
 
 - None - task complete
+
+
+## Session 10: 首页标题栏沉浸光感分段按钮
+
+**Date**: 2026-10-24
+**Task**: 首页标题栏沉浸光感分段按钮
+**Branch**: `main`
+
+### Summary
+
+使用 HdsNavigation bottomBuilder 添加仅首页显示的 TabSegmentButtonV2；按书籍/播客、权限和播放列表动态同步首页 tabs，通过 topTabIndex 双向切换，并以 apiAvailable 保护 API 26 沉浸材质。devecocli build 成功。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `2b8d2aa` | (see git log) |
+
+### Status
+
+[OK] **Completed**
