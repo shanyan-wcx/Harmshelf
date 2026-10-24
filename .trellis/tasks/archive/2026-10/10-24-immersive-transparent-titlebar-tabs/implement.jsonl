@@ -1,0 +1,3 @@
+{"file":".trellis/spec/frontend/state-management.md","reason":"首页标准 Tabs 的 topTabIndex/needUpdate 共享状态同步约束"}
+{"file":".trellis/spec/frontend/type-safety.md","reason":"ArkTS API23-only 组件属性与类型安全约束"}
+{"file":".trellis/tasks/10-24-immersive-transparent-titlebar-tabs/research/qingye-reader-and-harmony.md","reason":"参考项目与官方沉浸标题栏、HDS Tabs、安全区 API 研究结论"}
