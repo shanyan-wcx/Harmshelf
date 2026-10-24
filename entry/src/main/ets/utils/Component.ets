@@ -170,6 +170,8 @@ export struct MyNavigation {
       })
     }
     .width('100%')
+    .padding({left: 16, right: 16})
+    .alignItems(VerticalAlign.Top)
     .justifyContent(FlexAlign.Center)
   }
 
