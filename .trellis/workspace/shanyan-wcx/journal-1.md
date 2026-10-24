@@ -360,3 +360,24 @@ LibraryItemDetail.ets: 下载弹窗增加起始/结束章节输入框，校验�
 ### Status
 
 [OK] **Completed**
+
+
+## Session 12: 首页仅使用标题栏分段按钮切换
+
+**Date**: 2026-10-24
+**Task**: 首页仅使用标题栏分段按钮切换
+**Branch**: `main`
+
+### Summary
+
+移除 Home.ets 的 HdsTabs，改由标题栏 TabSegmentButtonV2 通过共享 topTabIndex/needUpdate 直接切换书籍与播客内容；保留 16 padding 并设置 VerticalAlign.Top 对齐。devecocli build、git diff --check 和 Trellis 复核通过。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `7805b9a` | (see git log) |
+
+### Status
+
+[OK] **Completed**
