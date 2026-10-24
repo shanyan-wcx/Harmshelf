@@ -1,5 +1,6 @@
 import {
   LengthMetrics,
+  ColorMetrics,
   RectShape,
   SegmentButtonV2ItemOptions,
   SegmentButtonV2Items,
@@ -70,6 +71,7 @@ export struct MyNavigation {
   @Consumer() selectLibraryIndex: number = 0
   @Consumer() topTabIndex: number = 0
   @Consumer() needUpdate: boolean = false
+  @Consumer() isOnFocus: boolean = true
   @Consumer() user: User | undefined = undefined
   @Consumer() playlists: Playlist[] = []
   @Consumer() isConnect: boolean = true
@@ -157,6 +159,9 @@ export struct MyNavigation {
       TabSegmentButtonV2({
         items: this.homeTabItems(),
         selectedIndex: this.topTabIndex,
+        itemSelectedBackgroundColor: ColorMetrics.resourceColor(
+          this.isOnFocus ? $r('sys.color.comp_emphasize_secondary') : $r('sys.color.ohos_id_color_hover')
+        ),
         $selectedIndex: (index: number) => {
           this.topTabIndex = index
           this.needUpdate = !this.needUpdate
