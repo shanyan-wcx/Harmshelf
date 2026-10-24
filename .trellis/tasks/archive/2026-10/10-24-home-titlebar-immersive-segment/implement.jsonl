@@ -1,0 +1,7 @@
+{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend conventions and pre-development checklist for the ArkUI page and navigation changes."}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Project file ownership and page/component placement conventions."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Provider/Consumer V2 state flow used by topTabIndex synchronization."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "ArkTS and SDK import/type conventions for the new UI component."}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "Required reuse check before duplicating tab option logic."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Shared thinking-guide routing and pre-modification rule."}

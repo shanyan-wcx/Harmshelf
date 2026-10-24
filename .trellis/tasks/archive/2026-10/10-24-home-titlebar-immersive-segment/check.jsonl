@@ -1,0 +1,7 @@
+{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file": ".trellis/spec/frontend/index.md", "reason": "Frontend quality-check entry point for the changed ArkUI files."}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Verify changed files stay in their existing page/component boundaries."}
+{"file": ".trellis/spec/frontend/state-management.md", "reason": "Verify the shared topTabIndex data flow remains reactive and bidirectional."}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Verify HarmonyOS imports, callback types, and SDK API usage."}
+{"file": ".trellis/spec/guides/code-reuse-thinking-guide.md", "reason": "Check for unnecessary duplicated tab configuration or abstraction."}
+{"file": ".trellis/spec/guides/index.md", "reason": "Shared quality and reuse checks."}
