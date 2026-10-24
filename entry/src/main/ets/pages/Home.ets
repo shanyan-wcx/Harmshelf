@@ -29,6 +29,21 @@ import {
   getUser} from "../utils/Api";
 import { AllPlaylists } from "./tabs/Playlist";
 
+export function getHomeTabLabels(mediaType: string | undefined, userType: string | undefined,
+  hasPlaylists: boolean): string[] {
+  let labels: string[] = mediaType === 'podcast' ? ['首页', '最新', '媒体库'] : ['首页', '媒体库', '系列'];
+  if (userType === "root" || userType === "admin") {
+    labels.push(mediaType === 'podcast' ? '添加' : '收藏');
+  }
+  if (mediaType !== 'podcast') {
+    labels.push('作者');
+  }
+  if (hasPlaylists) {
+    labels.push('播放列表');
+  }
+  return labels;
+}
+
 @ComponentV2
 export struct Home {
   private tabsController: HdsTabsController = new HdsTabsController()
@@ -65,6 +80,11 @@ export struct Home {
   @Consumer() apiToken: string = ""
   @Consumer() isConnect: boolean = false
   @Consumer() selectOptions: SelectOption[] = []
+
+  private tabLabels(): string[] {
+    return getHomeTabLabels(this.library?.mediaType, this.user?.type, this.playlists.length > 0)
+  }
+
   @Monitor('needUpdate')
   async updateData(monitor: IMonitor) {
     this.showLoadingProgress = true
@@ -159,7 +179,7 @@ export struct Home {
             TabContent() {
               SubHome()
             }
-            .tabBar(new SubTabBarStyle('首页')
+            .tabBar(new SubTabBarStyle(this.tabLabels()[0])
               .selectedMode(SelectedMode.BOARD)
               .padding(0)
               .board({
@@ -179,7 +199,7 @@ export struct Home {
             TabContent() {
               MediaLibrary()
             }
-            .tabBar(new SubTabBarStyle('媒体库')
+            .tabBar(new SubTabBarStyle(this.tabLabels()[1])
               .selectedMode(SelectedMode.BOARD)
               .padding(0)
               .board({
@@ -199,7 +219,7 @@ export struct Home {
             TabContent() {
               AllSeries()
             }
-            .tabBar(new SubTabBarStyle('系列')
+            .tabBar(new SubTabBarStyle(this.tabLabels()[2])
               .selectedMode(SelectedMode.BOARD)
               .padding(0)
               .board({
@@ -220,7 +240,7 @@ export struct Home {
               TabContent() {
                 AllCollections()
               }
-              .tabBar(new SubTabBarStyle('收藏')
+              .tabBar(new SubTabBarStyle(this.tabLabels()[3])
                 .selectedMode(SelectedMode.BOARD)
                 .padding(0)
                 .board({
@@ -241,7 +261,7 @@ export struct Home {
             TabContent() {
               AllAuthors()
             }
-            .tabBar(new SubTabBarStyle('作者')
+            .tabBar(new SubTabBarStyle(this.tabLabels()[this.user?.type === "root" || this.user?.type === "admin" ? 4 : 3])
               .selectedMode(SelectedMode.BOARD)
               .padding(0)
               .board({
@@ -262,7 +282,7 @@ export struct Home {
               TabContent() {
                 AllPlaylists()
               }
-              .tabBar(new SubTabBarStyle('播放列表')
+              .tabBar(new SubTabBarStyle(this.tabLabels()[this.tabLabels().length - 1])
                 .selectedMode(SelectedMode.BOARD)
                 .padding(0)
                 .board({
@@ -299,7 +319,7 @@ export struct Home {
             TabContent() {
               SubHome()
             }
-            .tabBar(new SubTabBarStyle('首页')
+            .tabBar(new SubTabBarStyle(this.tabLabels()[0])
               .selectedMode(SelectedMode.BOARD)
               .padding(0)
               .board({
@@ -319,7 +339,7 @@ export struct Home {
             TabContent() {
               RecentEpisodes()
             }
-            .tabBar(new SubTabBarStyle('最新')
+            .tabBar(new SubTabBarStyle(this.tabLabels()[1])
               .selectedMode(SelectedMode.BOARD)
               .padding(0)
               .board({
@@ -339,7 +359,7 @@ export struct Home {
             TabContent() {
               MediaLibrary()
             }
-            .tabBar(new SubTabBarStyle('媒体库')
+            .tabBar(new SubTabBarStyle(this.tabLabels()[2])
               .selectedMode(SelectedMode.BOARD)
               .padding(0)
               .board({
@@ -360,7 +380,7 @@ export struct Home {
               TabContent() {
                 Add()
               }
-              .tabBar(new SubTabBarStyle('添加')
+              .tabBar(new SubTabBarStyle(this.tabLabels()[3])
                 .selectedMode(SelectedMode.BOARD)
                 .padding(0)
                 .board({
@@ -382,7 +402,7 @@ export struct Home {
               TabContent() {
                 AllPlaylists()
               }
-              .tabBar(new SubTabBarStyle('播放列表')
+              .tabBar(new SubTabBarStyle(this.tabLabels()[this.tabLabels().length - 1])
                 .selectedMode(SelectedMode.BOARD)
                 .padding(0)
                 .board({

@@ -1,12 +1,20 @@
-import { LengthMetrics, RectShape } from "@kit.ArkUI"
+import {
+  LengthMetrics,
+  RectShape,
+  SegmentButtonV2ItemOptions,
+  SegmentButtonV2Items,
+  TabSegmentButtonV2,
+  uiMaterial
+} from "@kit.ArkUI"
 import { deviceInfo } from "@kit.BasicServicesKit";
 import {
   HdsNavigation,
   HdsNavigationTitleMode,
   HdsNavigationAttribute,
   HdsNavigationMenuItemOptions,
+  BottomBuilderShowType,
 } from "@kit.UIDesignKit"
-import { Home } from "../pages/Home";
+import { Home, getHomeTabLabels } from "../pages/Home";
 import { LocalMedia } from "../pages/Local";
 import { Log } from "../pages/Log";
 import { Setting } from "../pages/Setting";
@@ -62,6 +70,8 @@ export struct MyNavigation {
   @Consumer() selectLibraryIndex: number = 0
   @Consumer() topTabIndex: number = 0
   @Consumer() needUpdate: boolean = false
+  @Consumer() user: User | undefined = undefined
+  @Consumer() playlists: Playlist[] = []
   @Consumer() isConnect: boolean = true
   @Consumer() isShowSidebar: boolean = false
   @Consumer() sidebarType: number = SideBarContainerType.Overlay
@@ -124,6 +134,40 @@ export struct MyNavigation {
     .justifyContent(FlexAlign.Start)
   }
 
+  private homeTabItems(): SegmentButtonV2Items {
+    return new SegmentButtonV2Items(getHomeTabLabels(
+      this.library?.mediaType,
+      this.user?.type,
+      this.playlists.length > 0
+    ).map((label: string): SegmentButtonV2ItemOptions => ({ text: label })))
+  }
+
+  private immersiveMaterial(): uiMaterial.Material | undefined {
+    if (deviceInfo.apiAvailable('26.0.0')) {
+      return new uiMaterial.ImmersiveMaterial({
+        style: uiMaterial.ImmersiveStyle.ULTRA_THICK
+      })
+    }
+    return undefined
+  }
+
+  @Builder
+  titleBarBottomBuilder() {
+    Row() {
+      TabSegmentButtonV2({
+        items: this.homeTabItems(),
+        selectedIndex: this.topTabIndex,
+        $selectedIndex: (index: number) => {
+          this.topTabIndex = index
+          this.needUpdate = !this.needUpdate
+        },
+        backgroundSystemMaterial: this.immersiveMaterial()
+      })
+    }
+    .width('100%')
+    .justifyContent(FlexAlign.Center)
+  }
+
   build() {
     HdsNavigation(this.pageInfos) {
       Column() {
@@ -161,6 +205,11 @@ export struct MyNavigation {
       },
       content: {
         stackBuilder: (): void => this.titleBarBuilder(),
+        bottomBuilder: this.pageIndex === 0 && this.library !== undefined && this.baseUrl !== "" ? {
+          builder: (): void => this.titleBarBottomBuilder(),
+          height: 56,
+          showType: BottomBuilderShowType.DIRECTLY_SHOW
+        } : undefined,
         menu: {
           value: this.sidebarType === SideBarContainerType.Embed ?
             (this.isDownloadEmpty ?
