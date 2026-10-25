@@ -1,0 +1,5 @@
+{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file":".trellis/spec/frontend/state-management.md","reason":"Preserve shared tab synchronization."}
+{"file":".trellis/spec/frontend/directory-structure.md","reason":"Confirm the home page implementation boundary and keep the change in the existing pages/Home.ets location."}
+{"file":".trellis/spec/frontend/type-safety.md","reason":"Keep BarMode, LayoutStyle, and TabBar option values in the existing ArkTS type conventions."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Remove obsolete width/overflow branching instead of adding a second tab layout mechanism."}

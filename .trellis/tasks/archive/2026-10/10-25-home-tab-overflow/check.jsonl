@@ -1,0 +1,4 @@
+{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file":".trellis/spec/frontend/state-management.md","reason":"Check that topTabIndex, needUpdate, dynamic labels, and content builders remain unchanged and synchronized."}
+{"file":".trellis/spec/frontend/type-safety.md","reason":"Check ArkTS enum/options usage and avoid introducing unsupported conversions or API compatibility changes."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Check that the fix reuses native Tabs layout behavior and does not leave duplicate overflow logic behind."}
