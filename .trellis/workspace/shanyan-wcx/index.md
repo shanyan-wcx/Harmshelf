@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 14
-- **Last Active**: 2026-10-24
+- **Total Sessions**: 15
+- **Last Active**: 2026-10-25
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~426 | Active |
+| `journal-1.md` | ~447 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 15 | 2026-10-25 | Fix native home tab overflow layout | `08c00f5` | `main` |
 | 14 | 2026-10-24 | Refine immersive titlebar and home layout | `e2ad4f5`, `0c13e2e` | `main` |
 | 13 | 2026-10-24 | 首页标题栏悬浮 Tabs | `ea3227d` | `main` |
 | 12 | 2026-10-24 | 首页仅使用标题栏分段按钮切换 | `7805b9a` | `main` |

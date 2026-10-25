@@ -424,3 +424,24 @@ Implemented and pushed transparent immersive titlebars, home tabs, Grid spacer s
 ### Status
 
 [OK] **Completed**
+
+
+## Session 15: Fix native home tab overflow layout
+
+**Date**: 2026-10-25
+**Task**: Fix native home tab overflow layout
+**Branch**: `main`
+
+### Summary
+
+Updated Home.ets to constrain the native TabBar with barWidth, move side spacing to ScrollableBarModeOptions.margin, use ALWAYS_AVERAGE_SPLIT, and remove manual tab width/overflow weighting. DevEco API 23 debug build passed with existing warnings.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `08c00f5` | (see git log) |
+
+### Status
+
+[OK] **Completed**
