@@ -137,10 +137,9 @@ export struct Home {
       .vertical(false)
       .scrollable(false)
       .barMode(BarMode.Scrollable, {
-        margin: 16,
         nonScrollableLayoutStyle: LayoutStyle.ALWAYS_AVERAGE_SPLIT
       })
-      .barHeight(36)
+      .barHeight('auto')
       .clip(false)
       .animationCurve(Curve.Friction)
       .animationDuration(280)
