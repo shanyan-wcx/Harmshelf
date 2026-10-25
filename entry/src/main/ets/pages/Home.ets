@@ -87,31 +87,17 @@ export struct Home {
     return Math.max(width - 32, 1)
   }
 
-  private homeTabItemWidth(label: string): number {
-    return label.length * 14 + 8
-  }
-
-  private homeTabMaxItemWidth(labels: string[]): number {
-    let width = 0
-    labels.forEach((label: string) => width = Math.max(width, this.homeTabItemWidth(label)))
-    return width
-  }
-
-  private homeTabOverflow(labels: string[]): boolean {
-    return this.homeTabMaxItemWidth(labels) * labels.length > this.homeTabContentWidth()
-  }
-
   @Builder
   homeTabContents() {
     ForEach(this.tabLabels(), (label: string, index: number) => {
       TabContent() {
       }
-      .tabBar(this.homeTabLabelBuilder(label, index, this.homeTabOverflow(this.tabLabels())))
+      .tabBar(this.homeTabLabelBuilder(label, index))
     }, (label: string) => label)
   }
 
   @Builder
-  homeTabLabelBuilder(label: string, index: number, overflow: boolean) {
+  homeTabLabelBuilder(label: string, index: number) {
     Stack({ alignContent: Alignment.Center }) {
       Text(label)
         .textAlign(TextAlign.Center)
@@ -132,8 +118,7 @@ export struct Home {
         .translate({ x: 0, y: 11 })
         .animation({ duration: 280, curve: Curve.Friction })
     }
-    .width(overflow ? this.homeTabMaxItemWidth(this.tabLabels()) : 'auto')
-    .layoutWeight(overflow ? 0 : 1)
+    .width('auto')
     .height(36)
     .clip(false)
     .padding({ left: 4, right: 4 })
@@ -147,11 +132,12 @@ export struct Home {
       }
       .width('100%')
       .height(36)
-      .barWidth('100%')
+      .barWidth(this.homeTabContentWidth())
       .barOverlap(true)
       .vertical(false)
       .scrollable(false)
       .barMode(BarMode.Scrollable, {
+        margin: 16,
         nonScrollableLayoutStyle: LayoutStyle.ALWAYS_AVERAGE_SPLIT
       })
       .barHeight(36)
@@ -334,7 +320,6 @@ export struct Home {
           this.homeTabsBuilder()
         }
         .width('100%')
-        .padding({left: 16, right: 16})
         .margin({ top: this.statusBarHeight + 56 })
         .alignItems(VerticalAlign.Top)
         .justifyContent(FlexAlign.Center)
