@@ -1,6 +1,7 @@
 import { getRecentEpisodes } from "../../utils/Api";
-import { EpisodeComponent, GlassFloatingButton } from "../../utils/Component";
+import { EpisodeComponent } from "../../utils/Component";
 import { Episode, Library } from "../../utils/Interface";
+import { getBottomContentInset } from '../../utils/Layout';
 
 @ComponentV2
 export struct RecentEpisodes {
@@ -11,7 +12,6 @@ export struct RecentEpisodes {
   @Consumer() isStartPlaying: boolean = false
   @Consumer() showLoadingProgress: boolean = false
   @Consumer() statusBarHeight: number = 0
-
   build() {
     Stack() {
       Scroll(this.recentEpisodesScroller) {
@@ -46,7 +46,7 @@ export struct RecentEpisodes {
       }
       .width('100%')
       .height('100%')
-      .padding({ top: this.statusBarHeight + 56 + 31, left: 20, right: 20, bottom: this.isStartPlaying ? 104 : 20 })
+      .padding({ top: this.statusBarHeight + 56 + 31, left: 20, right: 20, bottom: getBottomContentInset(20, this.isStartPlaying, 104) })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .onReachEnd(async () => {
@@ -55,15 +55,6 @@ export struct RecentEpisodes {
           this.recentEpisodesPage++
           this.recentEpisodes.push(...tmpEpisodes)
         }
-      })
-
-      GlassFloatingButton({
-        scroller: this.recentEpisodesScroller,
-        isStartPlaying: this.isStartPlaying
-      })
-      .position({
-        right: 15,
-        bottom: this.isStartPlaying ? 99 : 15
       })
     }
     .width('100%')

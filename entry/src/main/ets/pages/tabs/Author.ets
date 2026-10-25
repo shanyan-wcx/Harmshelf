@@ -1,5 +1,6 @@
-import { AuthorComponent1, GlassFloatingButton } from "../../utils/Component";
+import { AuthorComponent1 } from "../../utils/Component";
 import { Author } from "../../utils/Interface";
+import { getBottomContentInset } from '../../utils/Layout';
 
 @ComponentV2
 export struct AllAuthors {
@@ -9,7 +10,6 @@ export struct AllAuthors {
   @Consumer() authors: Author[] = []
   @Consumer() isStartPlaying: boolean = false
   @Consumer() statusBarHeight: number = 0
-
   build() {
     Stack() {
       Column() {
@@ -33,7 +33,7 @@ export struct AllAuthors {
               AuthorComponent1({
                 author: author
               })
-                .margin({ bottom: index === this.authors.length - 1 ? (this.isStartPlaying ? 104 : 20) : 0 })
+                .margin({ bottom: index === this.authors.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
             }
           })
         }
@@ -75,15 +75,6 @@ export struct AllAuthors {
       .height('100%')
       .clip(false)
 
-
-      GlassFloatingButton({
-        scroller: this.authorScroller,
-        isStartPlaying: this.isStartPlaying
-      })
-      .position({
-        right: 15,
-        bottom: this.isStartPlaying ? 99 : 15
-      })
     }
     .width('100%')
     .height('100%')

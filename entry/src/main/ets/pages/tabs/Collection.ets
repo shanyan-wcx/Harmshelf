@@ -1,5 +1,6 @@
-import { CollectionItemComponent, GlassFloatingButton } from "../../utils/Component";
+import { CollectionItemComponent } from "../../utils/Component";
 import { Collection } from "../../utils/Interface"
+import { getBottomContentInset } from '../../utils/Layout';
 
 @ComponentV2
 export struct AllCollections {
@@ -9,7 +10,6 @@ export struct AllCollections {
   @Consumer() isStartPlaying: boolean = false
   @Consumer() collections: Collection[] = []
   @Consumer() statusBarHeight: number = 0
-
   build() {
     Stack() {
       Column() {
@@ -29,7 +29,7 @@ export struct AllCollections {
               CollectionItemComponent({
                 collection: collection
               })
-                .margin({ bottom: index === this.collections.length - 1 ? (this.isStartPlaying ? 104 : 20 ): 0 })
+                .margin({ bottom: index === this.collections.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
             }
           })
         }
@@ -63,15 +63,6 @@ export struct AllCollections {
       .height('100%')
       .clip(false)
 
-
-      GlassFloatingButton({
-        scroller: this.collectionScroller,
-        isStartPlaying: this.isStartPlaying
-      })
-      .position({
-        right: 15,
-        bottom: this.isStartPlaying ? 99 : 15
-      })
     }
     .width('100%')
     .height('100%')

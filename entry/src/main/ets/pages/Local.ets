@@ -6,6 +6,7 @@ import { ColorMode } from "../pages/Index";
 import { LocalPlayItem, LocalTrack, PlayItem } from '../utils/Interface';
 import { media } from '@kit.MediaKit';
 import { Logger } from '../utils/Logger';
+import { getBottomContentInset } from '../utils/Layout';
 
 @ComponentV2
 export struct LocalMedia {
@@ -420,7 +421,7 @@ export struct LocalMedia {
       }
       .width('100%')
       .height('100%')
-      .padding({ left: 20, right: 20, top: this.statusBarHeight + 69, bottom: this.isStartPlaying ? 104 : 25 })
+      .padding({ left: 20, right: 20, top: this.statusBarHeight + 69, bottom: getBottomContentInset(25, this.isStartPlaying, 104) })
       .align(Alignment.Top)
     }
     .width('100%')

@@ -2,6 +2,7 @@ import {
   AuthorComponent, LibraryItemComponent, pageUpDown, RecentEpisodeComponent
 } from "../../utils/Component"
 import { Author, HomeSection, Library, LibraryItem, Progress } from "../../utils/Interface"
+import { getBottomContentInset } from '../../utils/Layout';
 
 @ComponentV2
 export struct SubHome {
@@ -19,7 +20,6 @@ export struct SubHome {
   @Consumer() progress: Progress[] = []
   @Consumer() isStartPlaying: boolean = false
   @Consumer() statusBarHeight: number = 0
-
   build() {
     Stack() {
       Scroll(this.homeScroller) {
@@ -331,7 +331,7 @@ export struct SubHome {
       }
       .width('100%')
       .height('100%')
-      .padding({ top: this.statusBarHeight + 56 + 31, bottom: this.isStartPlaying ? 104 : 20 })
+      .padding({ top: this.statusBarHeight + 56 + 31, bottom: getBottomContentInset(20, this.isStartPlaying, 104) })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)

@@ -3,6 +3,7 @@ import { Library, ListeningStats, RecentSession } from "../utils/Interface"
 import { UChartsV2, UChartsController, ChartOptions } from '@ibestservices/ucharts'
 import { env } from "../utils/Class";
 import { ConfigurationConstant } from "@kit.AbilityKit";
+import { getBottomContentInset } from '../utils/Layout';
 
 @ComponentV2
 export struct Stats {
@@ -337,7 +338,7 @@ export struct Stats {
       }
       .width('100%')
       .height('100%')
-      .padding({ top: this.statusBarHeight + (this.displayWidth >= 1000 ? 86 : 66), bottom: this.isStartPlaying ? 99 : 20 })
+      .padding({ top: this.statusBarHeight + (this.displayWidth >= 1000 ? 86 : 66), bottom: getBottomContentInset(20, this.isStartPlaying, 99) })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)

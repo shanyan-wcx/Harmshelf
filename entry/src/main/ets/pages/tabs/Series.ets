@@ -1,5 +1,6 @@
-import { SeriesItemComponent, GlassFloatingButton } from "../../utils/Component";
+import { SeriesItemComponent } from "../../utils/Component";
 import { Series } from "../../utils/Interface"
+import { getBottomContentInset } from '../../utils/Layout';
 
 @ComponentV2
 export struct AllSeries {
@@ -10,7 +11,6 @@ export struct AllSeries {
   @Consumer() series1: Series | undefined = undefined
   @Consumer() isStartPlaying: boolean = false
   @Consumer() statusBarHeight: number = 0
-
   build() {
     Stack() {
       Column() {
@@ -30,7 +30,7 @@ export struct AllSeries {
               SeriesItemComponent({
                 series: series
               })
-                .margin({ bottom: index === this.series.length - 1 ? (this.isStartPlaying ? 104 : 20 ): 0 })
+                .margin({ bottom: index === this.series.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
             }
           })
         }
@@ -66,14 +66,6 @@ export struct AllSeries {
       .height('100%')
       .clip(false)
 
-      GlassFloatingButton({
-        scroller: this.seriesScroller,
-        isStartPlaying: this.isStartPlaying
-      })
-      .position({
-        right: 15,
-        bottom: this.isStartPlaying ? 99 : 15
-      })
     }
     .width('100%')
     .height('100%')

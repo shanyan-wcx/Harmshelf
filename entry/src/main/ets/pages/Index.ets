@@ -2,7 +2,7 @@ import app from '@system.app';
 import { HdsSideBar, HdsSideMenu, HdsSideMenuMainItem } from '@kit.UIDesignKit';
 import { common, ConfigurationConstant, WantAgent, wantAgent } from '@kit.AbilityKit';
 import { PersistenceV2, SymbolGlyphModifier, Type, window } from '@kit.ArkUI';
-import { MyNavigation } from '../utils/Component';
+import { getMainNavigationItems, MyNavigation } from '../utils/Component';
 import {
   Episode,
   Library,
@@ -10,6 +10,7 @@ import {
   LocalPlayItem,
   PlayItem,
   SearchResult,
+  SearchPodcast,
   Series,
   Progress,
   LoginInfo,
@@ -147,6 +148,8 @@ struct Index {
   @Provider() playlist1: Playlist | undefined = undefined
   @Provider() episode: Episode | undefined = undefined
   @Provider() searchResult: SearchResult | undefined = undefined
+  @Provider() searchPodcasts: SearchPodcast[] = []
+  @Provider() term: string = ""
   @Provider() showLoadingProgress: boolean = false
   @Provider() firstAppear: boolean = false
   @Provider() speed: media.PlaybackSpeed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
@@ -269,28 +272,10 @@ struct Index {
     } catch (_) {}
   }
 
-  pages?: HdsSideMenuMainItem[] = [
-    new HdsSideMenuMainItem({
-      symbol: new SymbolGlyphModifier($r('sys.symbol.house')),
-      label: '首页',
-    }),
-    new HdsSideMenuMainItem({
-      symbol: new SymbolGlyphModifier($r('sys.symbol.arrow_counterclockwise_clock')),
-      label: '统计',
-    }),
-    new HdsSideMenuMainItem({
-      symbol: new SymbolGlyphModifier($r('sys.symbol.folder')),
-      label: '本地',
-    }),
-    new HdsSideMenuMainItem({
-      symbol: new SymbolGlyphModifier($r('sys.symbol.doc_text')),
-      label: '日志',
-    }),
-    new HdsSideMenuMainItem({
-      symbol: new SymbolGlyphModifier($r('sys.symbol.slider_vertical_3')),
-      label: '设置',
-    }),
-  ]
+  pages: HdsSideMenuMainItem[] = getMainNavigationItems().map(item => new HdsSideMenuMainItem({
+    symbol: new SymbolGlyphModifier(item.symbol),
+    label: item.label,
+  }))
 
   registerInterception() {
     this.pageInfos.setInterception({
@@ -312,6 +297,10 @@ struct Index {
         this.statusBarHeight = this.uiContext!.px2vp(area.topRect.height)
       }
     });
+  }
+
+  private isBottomTabDevice(): boolean {
+    return deviceTypeInfo === 'phone' || deviceTypeInfo === 'tablet'
   }
 
   fadeIn() {
@@ -1230,24 +1219,28 @@ struct Index {
   @Builder
   build() {
     Stack() {
-      HdsSideBar({
-        sideBarPanelBuilder: (): void => {
-          this.sideBarBuilder()
-        },
-        contentPanelBuilder: (): void => {
-          this.contentBuilder()
-        },
-        autoHide: false,
-        contentAreaMask: this.sidebarType === SideBarContainerType.Embed ? false : true,
-        sideBarContainerType: this.sidebarType,
-        isShowSideBar: this.sidebarType === SideBarContainerType.Embed ? true : this.isShowSidebar,
-        $isShowSideBar: (isShowSidebar: boolean) => {
-          this.isShowSidebar = !isShowSidebar
-        },
-        minSideBarWidth: this.sideBarWidth,
-        maxSideBarWidth: this.sideBarWidth,
-        sideBarPosition: this.sidebarType === SideBarContainerType.Embed ? SideBarPosition.Start : SideBarPosition.End
-      })
+      if (this.isBottomTabDevice()) {
+        this.contentBuilder()
+      } else {
+        HdsSideBar({
+          sideBarPanelBuilder: (): void => {
+            this.sideBarBuilder()
+          },
+          contentPanelBuilder: (): void => {
+            this.contentBuilder()
+          },
+          autoHide: false,
+          contentAreaMask: this.sidebarType === SideBarContainerType.Embed ? false : true,
+          sideBarContainerType: this.sidebarType,
+          isShowSideBar: this.sidebarType === SideBarContainerType.Embed ? true : this.isShowSidebar,
+          $isShowSideBar: (isShowSidebar: boolean) => {
+            this.isShowSidebar = !isShowSidebar
+          },
+          minSideBarWidth: this.sideBarWidth,
+          maxSideBarWidth: this.sideBarWidth,
+          sideBarPosition: this.sidebarType === SideBarContainerType.Embed ? SideBarPosition.Start : SideBarPosition.End
+        })
+      }
     }
     .width('100%')
     .height('100%')

@@ -9,6 +9,7 @@ import { BusinessError } from '@kit.BasicServicesKit';
 import { bundleManager } from '@kit.AbilityKit';
 import { media } from "@kit.MediaKit";
 import { Logger } from '../utils/Logger';
+import { getBottomContentInset } from '../utils/Layout';
 
 let bundleFlags = bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT;
 let bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleFlags)
@@ -16,6 +17,7 @@ let bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleFlags)
 @ComponentV2
 export struct Setting {
   @Consumer() settingScroller: Scroller = new Scroller();
+  @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() statusBarHeight: number = 0
   @Consumer() selectThemeIndex: number = 0
   @Consumer() serverIndex: ServerIndex | undefined = PersistenceV2.connect(ServerIndex, () => new ServerIndex());
@@ -1071,6 +1073,33 @@ export struct Setting {
 
         Button({ type: ButtonType.Normal }) {
           Row() {
+            Text("日志")
+              .fontSize(20)
+              .fontColor($r('sys.color.font'))
+
+            SymbolGlyph($r('sys.symbol.chevron_right'))
+              .fontSize(26)
+              .fontColor([$r('sys.color.font')])
+              .hitTestBehavior(HitTestMode.None)
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.SpaceBetween)
+          .padding({ left: 20, right: 20 })
+        }
+        .width('100%')
+        .height(60)
+        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
+          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
+          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
+          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
+        .borderRadius(8)
+        .margin({ left: 20, right: 20 ,top: 20 })
+        .onClick(() => {
+          this.pageInfos.pushPathByName('log', null)
+        })
+
+        Button({ type: ButtonType.Normal }) {
+          Row() {
             Text("关于")
               .fontSize(20)
               .fontColor($r('sys.color.font'))
@@ -1112,7 +1141,7 @@ export struct Setting {
     .height('100%')
     .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
     .scrollBar(BarState.Off)
-    .padding({ left: 20, right: 20, top: this.statusBarHeight + 56, bottom: this.isStartPlaying ? 104 : 20 })
+    .padding({ left: 20, right: 20, top: this.statusBarHeight + 56, bottom: getBottomContentInset(20, this.isStartPlaying, 104) })
     .align(Alignment.Top)
   }
 }

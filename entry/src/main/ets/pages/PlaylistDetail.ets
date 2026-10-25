@@ -3,10 +3,11 @@ import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit'
 import { LengthMetrics, PersistenceV2, RectShape } from '@kit.ArkUI';
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import { env } from '../utils/Class';
-import { transparentTitleBarStyle } from '../utils/Component';
+import { gradientBlurTitleBarStyle } from '../utils/Component';
 import { ColorMode } from "../pages/Index";
 import { deletePlaylist, getPlayItem, getPlaylists, removeFromPlaylist, updatePlaylist } from '../utils/Api';
 import { media } from '@kit.MediaKit';
+import { getBottomContentInset } from '../utils/Layout';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { Logger } from '../utils/Logger';
 
@@ -563,7 +564,7 @@ export struct PlaylistDetail {
             }
             .width('100%')
             .margin({ top: 15 })
-            .padding({ left: 20, right: 20, bottom: this.isStartPlaying ? 104 : deviceTypeInfo === '2in1' ? 20 : 25 })
+            .padding({ left: 20, right: 20, bottom: getBottomContentInset(deviceTypeInfo === '2in1' ? 20 : 25, this.isStartPlaying, 104, false) })
             .borderRadius({ topLeft: 32, topRight: 32 })
             .clip(true)
             .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
@@ -630,7 +631,7 @@ export struct PlaylistDetail {
           }]
         }
       },
-      style: transparentTitleBarStyle()
+      style: gradientBlurTitleBarStyle()
     })
     .hideBackButton(false)
     .backgroundColor($r('sys.color.background_secondary'))

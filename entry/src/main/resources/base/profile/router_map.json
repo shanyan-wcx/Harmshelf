@@ -34,6 +34,11 @@
       "name": "downloadTask",
       "pageSourceFile": "src/main/ets/pages/Download.ets",
       "buildFunction": "downloadTaskBuilder"
+    },
+    {
+      "name": "log",
+      "pageSourceFile": "src/main/ets/pages/Log.ets",
+      "buildFunction": "logBuilder"
     }
   ]
 }

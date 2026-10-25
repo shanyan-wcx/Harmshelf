@@ -1,6 +1,8 @@
 import {
   LengthMetrics,
   RectShape,
+  SymbolGlyphModifier,
+  uiMaterial,
 } from "@kit.ArkUI"
 import { deviceInfo } from "@kit.BasicServicesKit";
 import {
@@ -8,14 +10,14 @@ import {
   HdsNavigationTitleMode,
   HdsNavigationAttribute,
   HdsNavigationMenuItemOptions,
+  BottomBuilderShowType,
   hdsMaterial,
   ScrollEffectOptions,
   ScrollEffectType,
   TitleBarStyleOptions,
 } from "@kit.UIDesignKit"
-import { Home } from "../pages/Home";
+import { Home, HomeTopTabs } from "../pages/Home";
 import { LocalMedia } from "../pages/Local";
-import { Log } from "../pages/Log";
 import { Setting } from "../pages/Setting";
 import { Stats } from "../pages/Stat";
 import {
@@ -26,6 +28,7 @@ import {
   getPlaylists,
   getUser,
   removeFromPlaylist,
+  searchPodcasts as searchPodcastLibrary,
   updateProgress
 } from "./Api";
 import {
@@ -42,6 +45,7 @@ import {
   Collection,
   Playlist,
   PlaylistItem,
+  SearchPodcast,
   User
 } from "./Interface"
 import { media } from "@kit.MediaKit";
@@ -49,8 +53,22 @@ import { DownloadStatus, DownloadTaskInfo, DownloadManager } from "./Class";
 import { DownloadSetting } from "../pages/Index";
 import { fileUri, fileIo as fs } from "@kit.CoreFileKit";
 import { Logger } from './Logger';
+import { MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN } from './Layout';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
+
+export interface MainNavigationItem {
+  symbol: Resource
+  label: string
+}
+export function getMainNavigationItems(): MainNavigationItem[] {
+  return [
+    { symbol: $r('sys.symbol.house'), label: '首页' },
+    { symbol: $r('sys.symbol.arrow_counterclockwise_clock'), label: '统计' },
+    { symbol: $r('sys.symbol.folder'), label: '本地' },
+    { symbol: $r('sys.symbol.slider_vertical_3'), label: '设置' },
+  ]
+}
 
 export function transparentTitleBarStyle(): TitleBarStyleOptions {
   return titleBarStyle({
@@ -104,9 +122,13 @@ export struct MyNavigation {
   @Consumer() sideBarContentWidth: number = 0
   @Consumer() libraries: Library[] = []
   @Consumer() library: Library | undefined = undefined
+  @Consumer() searchPodcasts: SearchPodcast[] = []
+  @Consumer() term: string = ""
+  @Consumer() showLoadingProgress: boolean = false
   @Consumer() downloadTasks: DownloadTaskInfo[] = []
   @Consumer() downloadCount: number = 0
   @Local isDownloadEmpty: boolean = true
+  private navigationItems: MainNavigationItem[] = getMainNavigationItems()
 
   @Monitor('downloadCount')
   async updateMenus(monitor: IMonitor) {
@@ -119,6 +141,95 @@ export struct MyNavigation {
 
   aboutToAppear() {
     this.firstAppear = true
+  }
+
+  private isBottomTabDevice(): boolean {
+    return deviceTypeInfo === 'phone' || deviceTypeInfo === 'tablet'
+  }
+
+  private isAddSearchVisible(): boolean {
+    return this.pageIndex === 0 &&
+      this.library?.mediaType === 'podcast' &&
+      (this.user?.type === 'root' || this.user?.type === 'admin') &&
+      this.topTabIndex === 3
+  }
+
+  private isHomeTabsVisible(): boolean {
+    return this.pageIndex === 0 && this.baseUrl !== "" && this.library !== undefined
+  }
+
+  private addSearchRadius(): number {
+    return this.isBottomTabDevice() ? 22.5 : 8
+  }
+
+  private bottomTabBarStyle(item: MainNavigationItem): BottomTabBarStyle {
+    return new BottomTabBarStyle({
+      normal: new SymbolGlyphModifier(item.symbol)
+        .fontColor([$r('sys.color.font_secondary')]),
+      selected: new SymbolGlyphModifier(item.symbol)
+        .fontColor([$r('sys.color.comp_emphasize_secondary')])
+    }, item.label).labelStyle({
+      selectedColor: $r('sys.color.comp_emphasize_secondary'),
+      unselectedColor: $r('sys.color.font_secondary')
+    })
+  }
+
+  private onBottomTabChange(index: number) {
+    if (index === this.pageIndex) {
+      return
+    }
+    this.pageIndex = index
+    this.pageInfos.clear()
+  }
+
+  @Builder
+  bottomTabBarBuilder() {
+    Tabs({ barPosition: BarPosition.End, index: this.pageIndex }) {
+      TabContent() {
+        Home()
+      }
+      .tabBar(this.bottomTabBarStyle(this.navigationItems[0]))
+
+      TabContent() {
+        Stats()
+      }
+      .tabBar(this.bottomTabBarStyle(this.navigationItems[1]))
+
+      TabContent() {
+        LocalMedia()
+      }
+      .tabBar(this.bottomTabBarStyle(this.navigationItems[2]))
+
+      TabContent() {
+        Setting()
+      }
+      .tabBar(this.bottomTabBarStyle(this.navigationItems[3]))
+    }
+    .width('100%')
+    .height('100%')
+    .barGridAlign({ sm: 4, md: 4, lg: 4, margin: 16 })
+    .barOverlap(true)
+    .vertical(false)
+    .scrollable(false)
+    .animationCurve(Curve.Friction)
+    .animationDuration(280)
+    .barHeight('auto')
+    .barBackgroundColor(Color.Transparent)
+    .barFloatingStyle({
+      barSideMargin: 16,
+      barBottomMargin: MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN,
+      maskColor: Color.Transparent,
+      maskHeight: 0,
+      systemMaterial: new uiMaterial.ImmersiveMaterial({
+        style: uiMaterial.ImmersiveStyle.ULTRA_THIN,
+        applyShadow: true,
+        interactive: true,
+        lightEffect: { color: Color.White }
+      })
+    })
+    .onChange((index: number) => {
+      this.onBottomTabChange(index)
+    })
   }
 
   @Builder
@@ -158,25 +269,79 @@ export struct MyNavigation {
     .justifyContent(FlexAlign.Start)
   }
 
+  @Builder
+  addSearchBuilder() {
+    Row() {
+      Search({ value: this.term })
+        .width('100%')
+        .height(45)
+        .borderRadius(this.addSearchRadius())
+        .margin({ top: 15, bottom: 20 })
+        .systemMaterial(new uiMaterial.ImmersiveMaterial({
+          style: uiMaterial.ImmersiveStyle.ULTRA_THIN,
+          applyShadow: true,
+          interactive: true,
+          lightEffect: { color: Color.White }
+        }))
+        .caretStyle({
+          color: $r('sys.color.font')
+        })
+        .searchButton("   搜索   ", {
+          fontColor: $r('sys.color.font'),
+          autoDisable: true
+        })
+        .onChange((value: string) => {
+          this.term = value
+        })
+        .onSubmit(async (query) => {
+          if (query.length !== 0) {
+            this.showLoadingProgress = true
+            this.searchPodcasts = await searchPodcastLibrary(this.term)
+            this.showLoadingProgress = false
+          }
+        })
+    }
+    .width('100%')
+    .height(80)
+    .padding({ left: 20, right: 20 })
+  }
+
+  @Builder
+  homeTitleBottomBuilder() {
+    Column() {
+      HomeTopTabs()
+      if (this.isAddSearchVisible()) {
+        this.addSearchBuilder()
+      }
+    }
+    .width('100%')
+    .height(this.isAddSearchVisible() ? 116 : 36)
+    .clip(false)
+    .hitTestBehavior(HitTestMode.Transparent)
+  }
+
   build() {
     HdsNavigation(this.pageInfos) {
-      Column() {
-        if (this.pageIndex === 0) {
-          Home()
-        } else if (this.pageIndex === 1) {
-          Stats()
-        } else if (this.pageIndex === 2) {
-          LocalMedia()
-        } else if (this.pageIndex === 3) {
-          Log()
-        } else if (this.pageIndex === 4) {
-          Setting()
+      if (this.isBottomTabDevice()) {
+        this.bottomTabBarBuilder()
+      } else {
+        Column() {
+          if (this.pageIndex === 0) {
+            Home()
+          } else if (this.pageIndex === 1) {
+            Stats()
+          } else if (this.pageIndex === 2) {
+            LocalMedia()
+          } else if (this.pageIndex === 3) {
+            Setting()
+          }
         }
+        .width('100%')
+        .height('100%')
       }
-      .width('100%')
-      .height('100%')
     }
-    .width(this.sidebarType === SideBarContainerType.Overlay ? '100%' : this.displayWidth - this.sideBarWidth)
+    .width(this.isBottomTabDevice() || this.sidebarType === SideBarContainerType.Overlay ?
+      '100%' : this.displayWidth - this.sideBarWidth)
     .height('100%')
     .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP])
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
@@ -191,8 +356,13 @@ export struct MyNavigation {
       style: transparentTitleBarStyle(),
       content: {
         stackBuilder: (): void => this.titleBarBuilder(),
+        bottomBuilder: this.isHomeTabsVisible() ? {
+          builder: (): void => this.homeTitleBottomBuilder(),
+          height: this.isAddSearchVisible() ? 116 : 36,
+          showType: BottomBuilderShowType.DIRECTLY_SHOW
+        } : undefined,
         menu: {
-          value: this.sidebarType === SideBarContainerType.Embed ?
+          value: this.sidebarType === SideBarContainerType.Embed || this.isBottomTabDevice() ?
             (this.isDownloadEmpty ?
               [{
                 content: {
@@ -2350,42 +2520,5 @@ export struct reportBuilder {
     }
     .width('100%')
     .height('100%')
-  }
-}
-
-@ComponentV2
-export struct GlassFloatingButton {
-  @Require @Param scroller: Scroller
-  @Param icon: Resource = $r('sys.symbol.arrow_up_to_line')
-  @Param isStartPlaying: boolean = false
-
-  build() {
-    Button({ type: ButtonType.Normal }) {
-      SymbolGlyph(this.icon)
-        .fontWeight(FontWeight.Normal)
-        .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-        .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
-        .hitTestBehavior(HitTestMode.None)
-    }
-    .animation({ duration: 510, curve: Curve.EaseInOut })
-    .width(36)
-    .height(36)
-    .borderRadius(6)
-    .backgroundColor('rgba(255, 255, 255, 0.3)')
-    .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-    .shadow({
-      radius: 16,
-      offsetX: 0,
-      offsetY: 0,
-      color: 'rgba(0, 0, 0, 0.25)'
-    })
-    .border({
-      width: 0.5,
-      color: 'rgba(255, 255, 255, 0.2)',
-      radius: 6
-    })
-    .onClick(async () => {
-      this.scroller.scrollEdge(Edge.Top)
-    })
   }
 }

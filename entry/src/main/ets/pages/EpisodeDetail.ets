@@ -19,7 +19,8 @@ import { env } from '../utils/Class'
 import { media } from '@kit.MediaKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
-import { reportBuilder, transparentTitleBarStyle } from '../utils/Component'
+import { reportBuilder, gradientBlurTitleBarStyle } from '../utils/Component'
+import { getBottomContentInset } from '../utils/Layout'
 import { DownloadSetting, OtherSetting } from './Index'
 import { Logger } from '../utils/Logger'
 
@@ -764,7 +765,7 @@ export struct EpisodeDetail {
           top: 56 + this.statusBarHeight,
           left: 20,
           right: 20,
-          bottom: this.isStartPlaying ? 89 : 10
+          bottom: getBottomContentInset(10, this.isStartPlaying, 89, false)
         })
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .scrollBar(BarState.Off)
@@ -814,7 +815,7 @@ export struct EpisodeDetail {
           subTitle: this.episode!.subtitle ?? ""
         }
       },
-      style: transparentTitleBarStyle()
+      style: gradientBlurTitleBarStyle()
     })
     .hideBackButton(false)
     .backgroundColor($r('sys.color.background_secondary'))

@@ -1,0 +1,3 @@
+{"file":".trellis/spec/frontend/directory-structure.md","reason":"Review that mobile navigation changes stay in the existing Index and Component boundaries."}
+{"file":".trellis/spec/frontend/type-safety.md","reason":"Review the direct API 26 Tabs, symbol, and material declarations used by the mobile navigation."}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"Review that sidebar labels and symbols are shared rather than duplicated in the bottom tab bar."}

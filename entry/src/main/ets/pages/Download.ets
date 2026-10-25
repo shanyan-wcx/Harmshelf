@@ -1,7 +1,8 @@
 import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit';
 import { LengthMetrics } from '@kit.ArkUI';
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
-import { transparentTitleBarStyle } from '../utils/Component';
+import { gradientBlurTitleBarStyle } from '../utils/Component';
+import { getBottomContentInset } from '../utils/Layout';
 
 @Builder
 export function downloadTaskBuilder(name: string, param: Object) {
@@ -71,7 +72,7 @@ export struct DownloadTask {
               }
               .margin({
                 top: task.index === 0 ? this.statusBarHeight + 49 : 0,
-                bottom: task.index === this.downloadTasks.length - 1 ? (this.isStartPlaying ? 89 : 10) : 0
+                bottom: task.index === this.downloadTasks.length - 1 ? getBottomContentInset(10, this.isStartPlaying, 89, false) : 0
               })
             })
             .virtualScroll({ totalCount: this.downloadTasks.length })
@@ -104,7 +105,7 @@ export struct DownloadTask {
         start: LengthMetrics.vp(16),
         end: LengthMetrics.vp(16)
       },
-      style: transparentTitleBarStyle(),
+      style: gradientBlurTitleBarStyle(),
       content: {
         title: {
           mainTitle: "下载队列 " + this.downloadTasks.length

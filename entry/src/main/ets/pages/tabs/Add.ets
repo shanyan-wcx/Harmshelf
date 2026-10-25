@@ -1,7 +1,6 @@
-import { addPodcast, getFeed, searchPodcasts } from "../../utils/Api"
+import { addPodcast, getFeed } from "../../utils/Api"
 import { Library, Podcast, SearchPodcast } from "../../utils/Interface"
-import { ConfigurationConstant } from "@kit.AbilityKit"
-import { env } from "../../utils/Class"
+import { getBottomContentInset } from '../../utils/Layout';
 
 @ComponentV2
 export struct Add {
@@ -11,11 +10,20 @@ export struct Add {
   @Consumer() showLoadingProgress: boolean = false
   @Consumer() isStartPlaying: boolean = false
   @Consumer() searchPodcasts: SearchPodcast[] = []
-  @Consumer() term: string = ""
   @Consumer() statusBarHeight: number = 0
   @Local showConfirm: boolean[] = []
   @Local podcast: Podcast | undefined = undefined
   @Local autoDownload: boolean[] = []
+
+  @Monitor('searchPodcasts')
+  resetSearchState() {
+    this.showConfirm = []
+    this.autoDownload = []
+    for (let index = 0; index < this.searchPodcasts.length; index++) {
+      this.showConfirm.push(false)
+      this.autoDownload.push(false)
+    }
+  }
 
   @Builder
   confirmBuilder(searchPodcast: SearchPodcast, podcast: Podcast, index: number) {
@@ -235,7 +243,7 @@ export struct Add {
                   .margin({ top: 15 })
               }
               .width('100%')
-              .margin({ bottom: index === this.searchPodcasts.length - 1 ? (this.isStartPlaying ? 109 : 25) : 15 })
+              .margin({ bottom: index === this.searchPodcasts.length - 1 ? getBottomContentInset(25, this.isStartPlaying, 109) : 15 })
               .onClick(async () => {
                 let podcast1 = await getFeed(searchPodcast.feedUrl)
                 if (podcast1) {
@@ -279,55 +287,11 @@ export struct Add {
       .width('100%')
       .height('100%')
       .layoutWeight(1)
-      .padding({ top: this.statusBarHeight + 56 + 36 + 80, bottom: this.isStartPlaying ? 84 : 0 })
+      .padding({ top: this.statusBarHeight + 56 + 36 + 75, bottom: 0 })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
 
-      Search({ value: this.term })
-        .width('100%')
-        .height(45)
-        .borderRadius(8)
-        .margin({ top: this.statusBarHeight + 56 + 56, bottom: 20 })
-        .backgroundBlurStyle(BlurStyle.BACKGROUND_THICK)
-        .backgroundBrightness({
-          rate: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.2 : 0.5,
-          lightUpDegree: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.1 : 0.5
-        })
-        .shadow({
-          radius: 16,
-          offsetX: 0,
-          offsetY: 0,
-          color: 'rgba(0, 0, 0, 0.25)'
-        })
-        .border({
-          width: 0.5,
-          color: 'rgba(255, 255, 255, 0.2)',
-          radius: 8
-        })
-        .caretStyle({
-          color: $r('sys.color.font')
-        })
-        .searchButton("   搜索   ", {
-          fontColor: $r('sys.color.font'),
-          autoDisable: true
-        })
-        .onChange((value: string) => {
-          this.term = value
-        })
-        .onSubmit(async (query) => {
-          if (query.length !== 0) {
-            this.showLoadingProgress = true
-            this.searchPodcasts = await searchPodcasts(this.term)
-            this.showConfirm = []
-            this.autoDownload = []
-            for(let item of this.searchPodcasts) {
-              this.showConfirm.push(false)
-              this.autoDownload.push(false)
-            }
-            this.showLoadingProgress = false
-          }
-        })
     }
     .width('100%')
     .height('100%')

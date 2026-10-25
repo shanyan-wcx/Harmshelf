@@ -1,4 +1,6 @@
 import { LogEntry, LogLevel, Logger } from '../utils/Logger';
+import { HdsNavDestination } from '@kit.UIDesignKit';
+import { LengthMetrics, uiMaterial } from '@kit.ArkUI';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { pasteboard } from '@kit.BasicServicesKit';
 import { fileIo } from '@kit.CoreFileKit';
@@ -7,6 +9,13 @@ import { common } from '@kit.AbilityKit';
 import { BusinessError } from '@kit.BasicServicesKit';
 import { systemShare } from '@kit.ShareKit';
 import { uniformTypeDescriptor as utd } from '@kit.ArkData';
+import { gradientBlurTitleBarStyle } from '../utils/Component';
+import { getBottomContentInset } from '../utils/Layout';
+
+@Builder
+export function logBuilder(name: string, param: Object) {
+  Log()
+}
 
 @ComponentV2
 export struct Log {
@@ -129,138 +138,127 @@ export struct Log {
   }
 
   build() {
-    Stack() {
-      if (this.showLoadingProgress) {
-        Column() {
-          LoadingProgress()
-            .width(56)
-            .height(56)
-            .color($r('sys.color.loading_progress_focused_color'))
-        }
-        .height('100%')
-        .width('100%')
-        .justifyContent(FlexAlign.Center)
-      } else if (this.displayLogs.length > 0) {
-        List({ scroller: this.logScroller }) {
-          ForEach(this.displayLogs, (log: LogEntry, index: number) => {
-          ListItem() {
-            Row() {
-              Text(log.timestamp)
-                .fontColor($r('sys.color.font_secondary'))
-                .fontSize(16)
-                .margin({ right: 15 })
-                .copyOption(CopyOptions.LocalDevice)
-                .textSelectable(TextSelectableMode.SELECTABLE_FOCUSABLE)
-              Text(log.message)
-                .fontSize(16)
-                .fontColor(this.getColor(log.level))
-                .wordBreak(WordBreak.BREAK_ALL)
-                .layoutWeight(1)
-                .textAlign(TextAlign.JUSTIFY)
-                .copyOption(CopyOptions.LocalDevice)
-                .textSelectable(TextSelectableMode.SELECTABLE_FOCUSABLE)
+    HdsNavDestination() {
+      Stack() {
+        if (this.showLoadingProgress) {
+          Column() {
+            LoadingProgress()
+              .width(56)
+              .height(56)
+              .color($r('sys.color.loading_progress_focused_color'))
+          }
+          .height('100%')
+          .width('100%')
+          .justifyContent(FlexAlign.Center)
+        } else if (this.displayLogs.length > 0) {
+          List({ scroller: this.logScroller }) {
+            ForEach(this.displayLogs, (log: LogEntry, index: number) => {
+              ListItem() {
+                Row() {
+                  Text(log.timestamp)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .fontSize(16)
+                    .margin({ right: 15 })
+                    .copyOption(CopyOptions.LocalDevice)
+                    .textSelectable(TextSelectableMode.SELECTABLE_FOCUSABLE)
+                  Text(log.message)
+                    .fontSize(16)
+                    .fontColor(this.getColor(log.level))
+                    .wordBreak(WordBreak.BREAK_ALL)
+                    .layoutWeight(1)
+                    .textAlign(TextAlign.JUSTIFY)
+                    .copyOption(CopyOptions.LocalDevice)
+                    .textSelectable(TextSelectableMode.SELECTABLE_FOCUSABLE)
+                }
+                .width('100%')
+                .alignItems(VerticalAlign.Top)
             }
-            .width('100%')
-            .alignItems(VerticalAlign.Top)
+              .width('100%')
+              .padding({ left: 20, right: 20, top: 4, bottom: 4 })
+              .margin({ top: index === 0 ? this.statusBarHeight + 56 : 0, bottom: index === this.displayLogs.length - 1 ? getBottomContentInset(deviceInfo.deviceType === '2in1' ? 71 : 79, this.isStartPlaying, 150, false) : 0 })
+            })
           }
           .width('100%')
-          .padding({ left: 20, right: 20, top: 4, bottom: 4 })
-          .margin({ top: index === 0 ? this.statusBarHeight + 56 : 0, bottom: index === this.displayLogs.length - 1 ? (this.isStartPlaying ? 150 : (deviceInfo.deviceType === '2in1' ? 71 : 79)) : 0 })
-          })
+          .height('100%')
+          .scrollBar(BarState.Off)
+          .edgeEffect(EdgeEffect.None)
         }
+
+        if (!this.showLoadingProgress && this.displayLogs.length === 0) {
+          Text('没有日志')
+            .fontSize(32)
+            .fontColor($r('sys.color.font'))
+            .margin({ bottom: 56 })
+        }
+
+        Row() {
+          Select(this.filterOptions)
+            .selected(this.selectedFilter)
+            .value(this.filterOptions[this.selectedFilter].value)
+            .onSelect((index: number) => {
+              this.selectedFilter = index
+              this.refreshDisplay()
+            })
+            .width(120)
+            .margin({ left: 20 })
+            .systemMaterial(new uiMaterial.ImmersiveMaterial({
+              style: uiMaterial.ImmersiveStyle.ULTRA_THIN,
+              applyShadow: true,
+              interactive: true,
+              lightEffect: { color: Color.White }
+            }))
+        }
+        .position({ bottom: getBottomContentInset(deviceInfo.deviceType === '2in1' ? 20 : 28, this.isStartPlaying, 99, false) })
         .width('100%')
-        .height('100%')
-        .scrollBar(BarState.Off)
-        .edgeEffect(EdgeEffect.None)
+        .justifyContent(FlexAlign.End)
+        .alignItems(VerticalAlign.Center)
+        .padding({ right: 20 })
       }
-
-      if (!this.showLoadingProgress && this.displayLogs.length === 0) {
-        Text('没有日志')
-          .fontSize(32)
-          .fontColor($r('sys.color.font'))
-          .margin({ bottom: 56 })
-      }
-
-      Row() {
-        Select(this.filterOptions)
-          .selected(this.selectedFilter)
-          .value(this.filterOptions[this.selectedFilter].value)
-          .onSelect((index: number) => {
-            this.selectedFilter = index
-            this.refreshDisplay()
-          })
-          .width(120)
-          .margin({ left: 20 })
-          .backgroundColor('rgba(255, 255, 255, 0.2)')
-          .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-          .shadow({
-            radius: 16,
-            offsetX: 0,
-            offsetY: 0,
-            color: 'rgba(0, 0, 0, 0.25)'
-          })
-          .border({
-            width: 0.5,
-            color: 'rgba(255, 255, 255, 0.2)'
-          })
-
-        Blank()
-        Button({ type: ButtonType.Circle }) {
-          SymbolGlyph($r('sys.symbol.doc'))
-            .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-            .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
-        }
-        .width(36)
-        .height(36)
-        .onClick(() => {
-          this.copyAllLogs()
-        })
-        .backgroundColor('rgba(255, 255, 255, 0.3)')
-        .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-        .shadow({
-          radius: 16,
-          offsetX: 0,
-          offsetY: 0,
-          color: 'rgba(0, 0, 0, 0.25)'
-        })
-        .border({
-          width: 0.5,
-          color: 'rgba(255, 255, 255, 0.2)'
-        })
-        .margin({ right: 12 })
-
-        Button({ type: ButtonType.Circle }) {
-          SymbolGlyph($r('sys.symbol.share'))
-            .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-            .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
-        }
-        .width(36)
-        .height(36)
-        .onClick(() => {
-          this.shareLogs()
-        })
-        .backgroundColor('rgba(255, 255, 255, 0.3)')
-        .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-        .shadow({
-          radius: 16,
-          offsetX: 0,
-          offsetY: 0,
-          color: 'rgba(0, 0, 0, 0.25)'
-        })
-        .border({
-          width: 0.5,
-          color: 'rgba(255, 255, 255, 0.2)'
-        })
-        .margin({ right: 20 })
-      }
-      .position({ bottom: this.isStartPlaying ? 99 : (deviceInfo.deviceType === '2in1' ? 20 : 28) })
       .width('100%')
-      .alignItems(VerticalAlign.Center)
+      .height('100%')
+      .onAppear(() => {
+        this.refreshDisplay()
+      })
+      }
+      .width('100%')
+      .height('100%')
+      .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP])
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
+      .titleBar({
+        avoidLayoutSafeArea: true,
+        enableComponentSafeArea: false,
+        padding: {
+          start: LengthMetrics.vp(16),
+          end: deviceInfo.deviceType === '2in1' ? LengthMetrics.vp(4) : LengthMetrics.vp(16)
+        },
+        content: {
+          title: {
+            mainTitle: '日志'
+          },
+          menu: {
+            value: [{
+              content: {
+                icon: $r('sys.symbol.doc'),
+                label: 'copy',
+                action: () => {
+                  this.copyAllLogs()
+                }
+              }
+            }, {
+              content: {
+                icon: $r('sys.symbol.share'),
+                label: 'share',
+                action: () => {
+                  this.shareLogs()
+                }
+              }
+            }]
+          }
+        },
+        style: gradientBlurTitleBarStyle()
+      })
+      .hideBackButton(false)
+      .backgroundColor($r('sys.color.background_secondary'))
+      .bindToScrollable([this.logScroller])
     }
-    .width('100%')
-    .height('100%')
-    .onAppear(() => {
-      this.refreshDisplay()
-    })
   }
-}

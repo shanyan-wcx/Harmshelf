@@ -1,7 +1,8 @@
-import { transparentTitleBarStyle, LibraryItemComponent1, GlassFloatingButton } from "../utils/Component";
+import { gradientBlurTitleBarStyle, LibraryItemComponent1 } from "../utils/Component";
 import { Filter1, LibraryItem, Progress, Media, Series } from "../utils/Interface";
 import { LengthMetrics } from "@kit.ArkUI";
 import { HdsNavDestination, HdsNavDestinationAttribute } from "@kit.UIDesignKit";
+import { getBottomContentInset } from '../utils/Layout';
 
 @Builder
 export function filterItemsBuilder(name: string, filter: Filter1) {
@@ -132,7 +133,7 @@ export struct FilterItems {
             left: 20,
             right: 20,
             top: 64 + this.statusBarHeight,
-            bottom: this.isStartPlaying ? 84 : 0
+            bottom: getBottomContentInset(0, this.isStartPlaying, 84, false)
           })
           .onReachEnd(async () => {
 
@@ -151,16 +152,6 @@ export struct FilterItems {
         }
         .width('100%')
         .height('100%')
-        .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
-
-        GlassFloatingButton({
-          scroller: this.filterItemsScroller,
-          isStartPlaying: this.isStartPlaying
-        })
-        .position({
-          right: 15,
-          bottom: this.isStartPlaying ? 99 : 15
-        })
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
 
         Column() {
@@ -188,7 +179,7 @@ export struct FilterItems {
         start: LengthMetrics.vp(16),
         end: LengthMetrics.vp(16)
       },
-      style: transparentTitleBarStyle(),
+      style: gradientBlurTitleBarStyle(),
       content: {
         title: {
           mainTitle: this.criteria

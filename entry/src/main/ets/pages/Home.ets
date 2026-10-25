@@ -44,39 +44,14 @@ export function getHomeTabLabels(mediaType: string | undefined, userType: string
 }
 
 @ComponentV2
-export struct Home {
-  @Provider() homeData: HomeSection[] = []
-  @Provider() recentEpisodes: Episode[] = []
-  @Provider() authors: Author[] = []
-  @Provider() searchPodcasts: SearchPodcast[] = []
-  @Provider() recentEpisodesPage: number = 0
-  @Provider() term: string = ""
-  @Consumer() user: User | undefined = undefined
-  @Consumer() libraryItems: LibraryItem[] = []
-  @Consumer() playlists: Playlist[] = []
-  @Consumer() collections: Collection[] = []
-  @Consumer() showLoadingProgress: boolean = false
-  @Consumer() needUpdate: boolean = false
-  @Consumer() statusBarHeight: number = 0
-  @Consumer() sidebarType: number = SideBarContainerType.Overlay
-  @Consumer() displayWidth: number = 0
-  @Consumer() colorMode: ColorMode | undefined = PersistenceV2.connect(ColorMode, () => new ColorMode());
-  @Consumer() selectLibraryIndex: number = 0
+export struct HomeTopTabs {
   @Consumer() topTabIndex: number = 0
-  @Consumer() sideBarContentWidth: number = 0
-  @Consumer() firstAppear: boolean = false
-  @Consumer() showAddServer: boolean = false
-  @Consumer() libraries: Library[] = []
   @Consumer() library: Library | undefined = undefined
-  @Consumer() progress: Progress[] = []
-  @Consumer() series: Series[] = []
-  @Consumer() serverName: string = ""
-  @Consumer() baseUrl: string = ""
-  @Consumer() username: string = ""
-  @Consumer() password: string = ""
-  @Consumer() apiToken: string = ""
-  @Consumer() isConnect: boolean = false
-  @Consumer() selectOptions: SelectOption[] = []
+  @Consumer() user: User | undefined = undefined
+  @Consumer() playlists: Playlist[] = []
+  @Consumer() sideBarContentWidth: number = 0
+  @Consumer() displayWidth: number = 0
+  @Consumer() needUpdate: boolean = false
 
   private tabLabels(): string[] {
     return getHomeTabLabels(this.library?.mediaType, this.user?.type, this.playlists.length > 0)
@@ -124,8 +99,7 @@ export struct Home {
     .padding({ left: 4, right: 4 })
   }
 
-  @Builder
-  homeTabsBuilder() {
+  build() {
     Stack({ alignContent: Alignment.TopStart }) {
       Tabs({ barPosition: BarPosition.End, index: this.topTabIndex }) {
         this.homeTabContents()
@@ -158,22 +132,59 @@ export struct Home {
       .fadingEdge(true)
       .onChange((index: number) => {
         if (index !== this.topTabIndex) {
-          this.onHomeTabClick(index)
+          this.topTabIndex = index
+          this.needUpdate = !this.needUpdate
         }
       })
-
     }
     .width('100%')
     .height(36)
     .clip(false)
   }
+}
 
-  private onHomeTabClick(index: number) {
-    if (index === this.topTabIndex) {
-      return
-    }
-    this.topTabIndex = index
-    this.needUpdate = !this.needUpdate
+@ComponentV2
+export struct Home {
+  @Provider() homeData: HomeSection[] = []
+  @Provider() recentEpisodes: Episode[] = []
+  @Provider() authors: Author[] = []
+  @Consumer() searchPodcasts: SearchPodcast[] = []
+  @Provider() recentEpisodesPage: number = 0
+  @Consumer() term: string = ""
+  @Consumer() user: User | undefined = undefined
+  @Consumer() libraryItems: LibraryItem[] = []
+  @Consumer() playlists: Playlist[] = []
+  @Consumer() collections: Collection[] = []
+  @Consumer() showLoadingProgress: boolean = false
+  @Consumer() needUpdate: boolean = false
+  @Consumer() statusBarHeight: number = 0
+  @Consumer() sidebarType: number = SideBarContainerType.Overlay
+  @Consumer() displayWidth: number = 0
+  @Consumer() colorMode: ColorMode | undefined = PersistenceV2.connect(ColorMode, () => new ColorMode());
+  @Consumer() selectLibraryIndex: number = 0
+  @Consumer() topTabIndex: number = 0
+  @Consumer() sideBarContentWidth: number = 0
+  @Consumer() firstAppear: boolean = false
+  @Consumer() showAddServer: boolean = false
+  @Consumer() libraries: Library[] = []
+  @Consumer() library: Library | undefined = undefined
+  @Consumer() progress: Progress[] = []
+  @Consumer() series: Series[] = []
+  @Consumer() serverName: string = ""
+  @Consumer() baseUrl: string = ""
+  @Consumer() username: string = ""
+  @Consumer() password: string = ""
+  @Consumer() apiToken: string = ""
+  @Consumer() isConnect: boolean = false
+  @Consumer() selectOptions: SelectOption[] = []
+
+  private tabLabels(): string[] {
+    return getHomeTabLabels(this.library?.mediaType, this.user?.type, this.playlists.length > 0)
+  }
+
+  private homeTabContentWidth(): number {
+    let width = this.sideBarContentWidth > 0 ? this.sideBarContentWidth : this.displayWidth
+    return Math.max(width - 32, 1)
   }
 
   @Monitor('needUpdate')
@@ -312,17 +323,6 @@ export struct Home {
         .padding({ bottom: 92 })
         .justifyContent(FlexAlign.Center)
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
-      }
-
-      if (this.baseUrl !== "" && this.library) {
-        Row() {
-          this.homeTabsBuilder()
-        }
-        .width('100%')
-        .margin({ top: this.statusBarHeight + 56 })
-        .alignItems(VerticalAlign.Top)
-        .justifyContent(FlexAlign.Center)
-        .clip(false)
       }
 
       // Row() {

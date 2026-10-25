@@ -1,9 +1,10 @@
 import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit';
-import { LengthMetrics } from '@kit.ArkUI';
+import { LengthMetrics, uiMaterial } from '@kit.ArkUI';
 import { Author, Library, LibraryItem, LibraryItemSearchResult, SearchResult, Series } from '../utils/Interface';
 import { searchLibrary } from '../utils/Api';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { transparentTitleBarStyle } from '../utils/Component';
+import { getBottomContentInset } from '../utils/Layout';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -39,6 +40,12 @@ export struct SearchMedia {
         Search()
           .width('100%')
           .height(40)
+          .systemMaterial(new uiMaterial.ImmersiveMaterial({
+            style: uiMaterial.ImmersiveStyle.ULTRA_THIN,
+            applyShadow: true,
+            interactive: true,
+            lightEffect: { color: Color.White }
+          }))
           .caretStyle({
             color: $r('sys.color.font')
           })
@@ -104,7 +111,7 @@ export struct SearchMedia {
                   }
                   .width('100%')
                   .padding({ left: 20, right: 20 })
-                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 10, bottom: index === this.searchResult!.book!.length - 1 ? (this.isStartPlaying ? 99 : 20) : 10 })
+                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 10, bottom: index === this.searchResult!.book!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 10 })
                   .onClick(() => {
                     this.libraryItem = libraryItemSearchResult.libraryItem
                     this.pageInfos.pushPathByName('libraryItemDetail', null)
@@ -144,7 +151,7 @@ export struct SearchMedia {
                   }
                   .width('100%')
                   .padding({ left: 20, right: 20 })
-                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 10, bottom: index === this.searchResult!.podcast!.length - 1 ? (this.isStartPlaying ? 99 : 20) : 10 })
+                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 10, bottom: index === this.searchResult!.podcast!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 10 })
                   .onClick(() => {
                     this.libraryItem = libraryItemSearchResult.libraryItem
                     this.pageInfos.pushPathByName('libraryItemDetail', null)

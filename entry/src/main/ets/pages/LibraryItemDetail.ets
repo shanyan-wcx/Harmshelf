@@ -32,7 +32,8 @@ import {
   removeFromCollection,
   removeFromPlaylist,
   updateProgress } from "../utils/Api";
-import { reportBuilder, EpisodeComponent1, GlassFloatingButton } from "../utils/Component";
+import { reportBuilder, EpisodeComponent1 } from "../utils/Component";
+import { getBottomContentInset } from '../utils/Layout';
 import { media } from "@kit.MediaKit";
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
@@ -2097,24 +2098,12 @@ export struct LibraryItemDetail {
           top: 76 + this.statusBarHeight,
           left: 20,
           right: 20,
-          bottom: this.isStartPlaying ? 84 : 0
+          bottom: getBottomContentInset(0, this.isStartPlaying, 84, false)
         })
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .scrollBar(BarState.Off)
         .align(Alignment.Top)
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
-
-        if (this.library?.mediaType === 'podcast') {
-          GlassFloatingButton({
-            scroller: this.libraryDetailScroller,
-            isStartPlaying: this.isStartPlaying
-          })
-          .position({
-            right: 15,
-            bottom: this.isStartPlaying ? 99 : 15
-          })
-          .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
-        }
 
         Column() {
           LoadingProgress()

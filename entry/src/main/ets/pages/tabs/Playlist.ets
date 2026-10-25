@@ -1,5 +1,6 @@
-import { PlaylistItemComponent, GlassFloatingButton } from "../../utils/Component";
+import { PlaylistItemComponent } from "../../utils/Component";
 import { Playlist } from "../../utils/Interface";
+import { getBottomContentInset } from '../../utils/Layout';
 
 @ComponentV2
 export struct AllPlaylists {
@@ -9,7 +10,6 @@ export struct AllPlaylists {
   @Consumer() isStartPlaying: boolean = false
   @Consumer() playlists: Playlist[] = []
   @Consumer() statusBarHeight: number = 0
-
   build() {
     Stack() {
       Column() {
@@ -32,7 +32,7 @@ export struct AllPlaylists {
               PlaylistItemComponent({
                 playlist: playlist
               })
-                .margin({ bottom: index === this.playlists.length - 1 ? (this.isStartPlaying ? 104 : 20 ): 0 })
+                .margin({ bottom: index === this.playlists.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
             }
           })
         }
@@ -73,15 +73,6 @@ export struct AllPlaylists {
       .height('100%')
       .clip(false)
 
-
-      GlassFloatingButton({
-        scroller: this.playlistScroller,
-        isStartPlaying: this.isStartPlaying
-      })
-      .position({
-        right: 15,
-        bottom: this.isStartPlaying ? 99 : 15
-      })
     }
     .width('100%')
     .height('100%')
