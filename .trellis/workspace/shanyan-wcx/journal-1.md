@@ -445,3 +445,24 @@ Updated Home.ets to constrain the native TabBar with barWidth, move side spacing
 ### Status
 
 [OK] **Completed**
+
+
+## Session 16: Complete immersive tab navigation
+
+**Date**: 2026-10-25
+**Task**: Complete immersive tab navigation
+**Branch**: `main`
+
+### Summary
+
+Moved the Home top tabs into the titlebar bottomBuilder alongside the Add-page search so the tabs remain interactive; preserved titlebar controls and verified the fix on the API 26 emulator.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `a79ddcc` | (see git log) |
+
+### Status
+
+[OK] **Completed**

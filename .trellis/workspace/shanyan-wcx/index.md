@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 15
+- **Total Sessions**: 16
 - **Last Active**: 2026-10-25
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~447 | Active |
+| `journal-1.md` | ~468 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 16 | 2026-10-25 | Complete immersive tab navigation | `a79ddcc` | `main` |
 | 15 | 2026-10-25 | Fix native home tab overflow layout | `08c00f5` | `main` |
 | 14 | 2026-10-24 | Refine immersive titlebar and home layout | `e2ad4f5`, `0c13e2e` | `main` |
 | 13 | 2026-10-24 | 首页标题栏悬浮 Tabs | `ea3227d` | `main` |
