@@ -466,3 +466,24 @@ Moved the Home top tabs into the titlebar bottomBuilder alongside the Add-page s
 ### Status
 
 [OK] **Completed**
+
+
+## Session 17: Native immersive detail controls
+
+**Date**: 2026-10-27
+**Task**: Native immersive detail controls
+**Branch**: `main`
+
+### Summary
+
+Implemented and verified native immersive controls on project and episode detail pages, aligned cover spacing, button sizing, circular icon controls, chapter/audio padding, and episode-item symbol centering; archived the completed task.
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `7061aba` | (see git log) |
+
+### Status
+
+[OK] **Completed**
