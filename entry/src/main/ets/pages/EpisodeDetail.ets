@@ -19,7 +19,7 @@ import { env } from '../utils/Class'
 import { media } from '@kit.MediaKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
-import { reportBuilder, gradientBlurTitleBarStyle } from '../utils/Component'
+import { reportBuilder, gradientBlurTitleBarStyle, ImmersiveActionButton } from '../utils/Component'
 import { getBottomContentInset } from '../utils/Layout'
 import { DownloadSetting, OtherSetting } from './Index'
 import { Logger } from '../utils/Logger'
@@ -582,65 +582,49 @@ export struct EpisodeDetail {
               .alignItems(HorizontalAlign.Start)
             }
             .width('100%')
-            .margin({ top: 10, bottom: 20 })
+            .margin({ top: 10, bottom: 16 })
             .justifyContent(FlexAlign.Start)
 
-            Column() {
-              Text("你的进度：" + Math.round((this.itemProgress?.progress ?? 0) * 100) + "%")
-                .fontSize(17)
-                .fontWeight(FontWeight.Medium)
-                .maxLines(1)
-                .textOverflow({ overflow: TextOverflow.Ellipsis })
+            Row() {
+              ImmersiveActionButton({
+                barWidth: '100%',
+                barHeight: 45,
+                monopolizeActionEvents: false
+              }) {
+                Column() {
+                  Text("你的进度：" + Math.round((this.itemProgress?.progress ?? 0) * 100) + "%")
+                    .fontSize(17)
+                    .fontWeight(FontWeight.Medium)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-              Text(this.itemProgress?.isFinished ?
-                "已听完 " + (this.itemProgress ? this.formatTime(this.itemProgress?.finishedAt) : "未知") : "剩余 " +
-                  (this.itemProgress ?
-                    this.formatDuration(this.itemProgress.duration - this.itemProgress.currentTime) : "未知"))
-                .fontSize(15)
-                .fontColor($r('sys.color.font_secondary'))
-                .maxLines(1)
-                .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  Text(this.itemProgress?.isFinished ?
+                    "已听完 " + (this.itemProgress ? this.formatTime(this.itemProgress?.finishedAt) : "未知") : "剩余 " +
+                      (this.itemProgress ?
+                        this.formatDuration(this.itemProgress.duration - this.itemProgress.currentTime) : "未知"))
+                    .fontSize(15)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                }
+                .width('100%')
+                .height('100%')
+                .justifyContent(FlexAlign.Center)
+                .clip(false)
+              }
             }
             .width('100%')
             .padding({ top: 5, bottom: 5 })
-            .margin({ bottom: 20 })
-            .borderRadius(8)
-            .backgroundColor($r('sys.color.comp_background_tertiary'))
-            .justifyContent(FlexAlign.Center)
+            .margin({ bottom: 16 })
+            .clip(false)
             .visibility(this.itemProgress && this.itemProgress.currentTime > 0 ? Visibility.Visible : Visibility.None)
 
             Row() {
-              Button({ type: ButtonType.Normal }) {
-                if (this.showPlayLoading) {
-                  Column() {
-                    LoadingProgress()
-                      .width(30)
-                      .height(30)
-                      .color($r('sys.color.ohos_id_color_titlebar_icon'))
-                  }
-                } else {
-                  Row() {
-                    SymbolGlyph($r('sys.symbol.play_fill'))
-                      .fontWeight(FontWeight.Normal)
-                      .fontSize(18)
-                      .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
-                      .hitTestBehavior(HitTestMode.None)
-                      .margin({ bottom: 1 })
-
-                    Text(" 播放")
-                      .fontSize(18)
-                      .fontWeight(FontWeight.Medium)
-                      .maxLines(1)
-                      .textOverflow({ overflow: TextOverflow.Ellipsis })
-                  }
-                }
-              }
-              .backgroundColor($r('sys.color.comp_emphasize_secondary'))
-              .height(40)
-              .width('100%')
-              .layoutWeight(1)
-              .borderRadius(8)
-              .onClick(async () => {
+              Row() {
+                ImmersiveActionButton({
+                barWidth: '100%',
+                barHeight: 45,
+                onButtonClick: async () => {
                 this.showPlayLoading = true
                 this.toCloseIndex = this.playingIndex
                 this.toCloseSession = this.playingItem
@@ -658,30 +642,70 @@ export struct EpisodeDetail {
                   Logger.info(`起始位置为this.playStartTime`)
                 }
                 this.showPlayLoading = false
-              })
+                }
+              }) {
+                Row() {
+                  if (this.showPlayLoading) {
+                    LoadingProgress()
+                      .width(30)
+                      .height(30)
+                      .color($r('sys.color.ohos_id_color_titlebar_icon'))
+                  } else {
+                    Row() {
+                      SymbolGlyph($r('sys.symbol.play_fill'))
+                        .fontWeight(FontWeight.Normal)
+                        .fontSize(18)
+                        .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                        .hitTestBehavior(HitTestMode.None)
+                        .margin({ bottom: 1 })
 
-              Button({ type: ButtonType.Normal }) {
+                      Text(" 播放")
+                        .fontSize(18)
+                        .fontWeight(FontWeight.Medium)
+                        .fontColor($r('sys.color.ohos_id_color_titlebar_icon'))
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    }
+                    .clip(false)
+                  }
+                }
+                .width('100%')
+                .height('100%')
+                .justifyContent(FlexAlign.Center)
+                .alignItems(VerticalAlign.Center)
+                .clip(false)
+                }
+              }
+              .layoutWeight(1)
+              .height(45)
+              .clip(false)
+
+              Row() {
+                ImmersiveActionButton({
+                barWidth: 45,
+                barHeight: 45,
+                onButtonClick: async () => {
+                  if (!this.user?.permissions.download) {
+                    this.getUIContext().getPromptAction().showToast({
+                      message: '当前用户没有下载权限！',
+                      duration: 500
+                    });
+                  } else {
+                    this.showConfirmDownload = true
+                  }
+                }
+              }) {
                 SymbolGlyph($r('sys.symbol.download'))
                   .fontWeight(FontWeight.Normal)
                   .fontSize($r('sys.float.ohos_id_text_size_headline7'))
                   .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
                   .hitTestBehavior(HitTestMode.None)
+                }
               }
               .margin({ left: 16 })
-              .backgroundColor($r('sys.color.comp_background_tertiary'))
-              .height(40)
-              .width(40)
-              .borderRadius(8)
-              .onClick(() => {
-                if (!this.user?.permissions.download) {
-                  this.getUIContext().getPromptAction().showToast({
-                    message: '当前用户没有下载权限！',
-                    duration: 500
-                  });
-                } else {
-                  this.showConfirmDownload = true
-                }
-              })
+              .width(45)
+              .height(45)
+              .clip(false)
               .bindSheet(this.showConfirmDownload, this.confirmDownloadBuilder(), {
                 height: SheetSize.FIT_CONTENT,
                 preferType: SheetType.CENTER,
@@ -694,21 +718,26 @@ export struct EpisodeDetail {
                 }
               })
 
-              Button({ type: ButtonType.Normal }) {
+              Row() {
+                ImmersiveActionButton({
+                barWidth: 45,
+                barHeight: 45,
+                menuItems: this.moreMenus,
+              }) {
                 SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
                   .fontWeight(FontWeight.Normal)
                   .fontSize($r('sys.float.ohos_id_text_size_headline7'))
                   .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
                   .hitTestBehavior(HitTestMode.None)
+                }
               }
               .margin({ left: 16 })
-              .backgroundColor($r('sys.color.comp_background_tertiary'))
-              .height(40)
-              .width(40)
-              .borderRadius(8)
-              .bindMenu(this.moreMenus)
+              .width(45)
+              .height(45)
+              .clip(false)
             }
             .width('100%')
+            .clip(false)
             .bindSheet(this.showPlaylists, this.playlistsBuilder(), {
               height: SheetSize.MEDIUM,
               preferType: SheetType.CENTER,

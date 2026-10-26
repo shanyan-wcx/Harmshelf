@@ -19,7 +19,12 @@ import {
 } from "../utils/Interface";
 import { HdsNavDestination, HdsNavDestinationAttribute } from "@kit.UIDesignKit";
 import { LengthMetrics, PersistenceV2, SymbolGlyphModifier } from "@kit.ArkUI";
-import { gradientBlurTitleBarStyle } from "../utils/Component";
+import {
+  gradientBlurTitleBarStyle,
+  reportBuilder,
+  EpisodeComponent1,
+  ImmersiveActionButton
+} from "../utils/Component";
 import {
   addToCollection,
   addToPlaylist,
@@ -32,7 +37,6 @@ import {
   removeFromCollection,
   removeFromPlaylist,
   updateProgress } from "../utils/Api";
-import { reportBuilder, EpisodeComponent1 } from "../utils/Component";
 import { getBottomContentInset } from '../utils/Layout';
 import { media } from "@kit.MediaKit";
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
@@ -1110,6 +1114,62 @@ export struct LibraryItemDetail {
     .padding({ left: 20, right: 20, bottom: 25 })
   }
 
+  sortEpisodes(sortBy: number, sortByStr: string) {
+    if (this.sortBy === sortBy) {
+      this.order = !this.order
+    } else {
+      this.sortBy = sortBy
+      this.sortByStr = sortByStr
+      this.order = true
+    }
+    if (sortBy === 0) {
+      this.episodes.sort((a, b) => this.order ?
+        (b.publishedAt ?? 0) - (a.publishedAt ?? 0) :
+        (a.publishedAt ?? 0) - (b.publishedAt ?? 0))
+    } else if (sortBy === 1) {
+      this.episodes.sort((a, b) => this.order ?
+        String(b.title).localeCompare(String(a.title), 'en', { numeric: true }) :
+        String(a.title).localeCompare(String(b.title), 'en', { numeric: true }))
+    } else if (sortBy === 2) {
+      this.episodes.sort((a, b) => this.order ?
+        String(b.season).localeCompare(String(a.season), 'en', { numeric: true }) :
+        String(a.season).localeCompare(String(b.season), 'en', { numeric: true }))
+    } else if (sortBy === 3) {
+      this.episodes.sort((a, b) => this.order ?
+        String(b.episode).localeCompare(String(a.episode), 'en', { numeric: true }) :
+        String(a.episode).localeCompare(String(b.episode), 'en', { numeric: true }))
+    } else {
+      this.episodes.sort((a, b) => this.order ?
+        String(b.audioFile?.metadata?.filename ?? '').localeCompare(
+          String(a.audioFile?.metadata?.filename ?? ''), 'en', { numeric: true }) :
+        String(a.audioFile?.metadata?.filename ?? '').localeCompare(
+          String(b.audioFile?.metadata?.filename ?? ''), 'en', { numeric: true }))
+    }
+  }
+
+  sortMenus(): Array<MenuElement> {
+    return [
+      { value: "出版日期", action: () => this.sortEpisodes(0, "出版日期") },
+      { value: "标题", action: () => this.sortEpisodes(1, "标题") },
+      { value: "季", action: () => this.sortEpisodes(2, "季") },
+      { value: "剧集", action: () => this.sortEpisodes(3, "剧集") },
+      { value: "文件名", action: () => this.sortEpisodes(4, "文件名") }
+    ]
+  }
+
+  getSortButtonWidth(): number {
+    if (this.sortBy === 0) {
+      return 120
+    } else if (this.sortBy === 1) {
+      return 92
+    } else if (this.sortBy === 2) {
+      return 76
+    } else if (this.sortBy === 3) {
+      return 92
+    }
+    return 108
+  }
+
   build() {
     HdsNavDestination() {
       Stack() {
@@ -1132,44 +1192,18 @@ export struct LibraryItemDetail {
                 Image(this.baseUrl + `/api/items/${this.libraryItem!.id}/cover?token=${this.apiToken}`)
                   .alt($rawfile('nocover.jpg'))
                   .objectFit(ImageFit.Cover)
-                  .width(this.sideBarContentWidth / this.displayHeight >= 3 / 5 ? this.displayHeight * 0.38 : '100%')
+                  .width(this.sideBarContentWidth / this.displayHeight >= 3 / 5 ? this.displayHeight * 0.38 : '78%')
                   .aspectRatio(1)
                   .borderRadius(10)
                   .margin({ bottom: 20 })
                   .draggable(false)
 
                 Row() {
-                  Button({ type: ButtonType.Normal }) {
-                    if (this.showPlayLoading) {
-                      Column() {
-                        LoadingProgress()
-                          .width(30)
-                          .height(30)
-                          .color($r('sys.color.ohos_id_color_titlebar_icon'))
-                      }
-                    } else {
-                      Row() {
-                        SymbolGlyph($r('sys.symbol.play_fill'))
-                          .fontWeight(FontWeight.Normal)
-                          .fontSize(18)
-                          .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
-                          .hitTestBehavior(HitTestMode.None)
-                          .margin({ bottom: 1 })
-
-                        Text(this.library?.mediaType === 'book' ? " 播放" : " 下一首")
-                          .fontSize(18)
-                          .fontWeight(FontWeight.Medium)
-                          .maxLines(1)
-                          .textOverflow({ overflow: TextOverflow.Ellipsis })
-                      }
-                    }
-                  }
-                  .backgroundColor($r('sys.color.comp_emphasize_secondary'))
-                  .height(40)
-                  .width('100%')
-                  .layoutWeight(1)
-                  .borderRadius(8)
-                  .onClick(async () => {
+                  Row() {
+                    ImmersiveActionButton({
+                      barWidth: '100%',
+                      barHeight: 45,
+                      onButtonClick: async () => {
                     this.showPlayLoading = true
                     this.toCloseIndex = this.playingIndex
                     this.toCloseSession = this.playingItem
@@ -1197,31 +1231,71 @@ export struct LibraryItemDetail {
                       }
                     }
                     this.showPlayLoading = false
-                  })
+                      }
+                    }) {
+                      Row() {
+                        if (this.showPlayLoading) {
+                          LoadingProgress()
+                            .width(30)
+                            .height(30)
+                            .color($r('sys.color.ohos_id_color_titlebar_icon'))
+                        } else {
+                          Row() {
+                            SymbolGlyph($r('sys.symbol.play_fill'))
+                              .fontWeight(FontWeight.Normal)
+                              .fontSize(18)
+                              .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                              .hitTestBehavior(HitTestMode.None)
+                              .margin({ bottom: 1 })
+
+                            Text(this.library?.mediaType === 'book' ? " 播放" : " 下一首")
+                              .fontSize(18)
+                              .fontWeight(FontWeight.Medium)
+                              .fontColor($r('sys.color.ohos_id_color_titlebar_icon'))
+                              .maxLines(1)
+                              .textOverflow({ overflow: TextOverflow.Ellipsis })
+                          }
+                          .clip(false)
+                        }
+                      }
+                      .width('100%')
+                      .height('100%')
+                      .justifyContent(FlexAlign.Center)
+                      .alignItems(VerticalAlign.Center)
+                      .clip(false)
+                    }
+                  }
+                  .layoutWeight(1)
+                  .height(45)
+                  .clip(false)
 
                   if (this.library?.mediaType === 'book') {
-                    Button({ type: ButtonType.Normal }) {
-                      SymbolGlyph($r('sys.symbol.download'))
-                        .fontWeight(FontWeight.Normal)
-                        .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-                        .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
-                        .hitTestBehavior(HitTestMode.None)
+                    Row() {
+                      ImmersiveActionButton({
+                        barWidth: 45,
+                        barHeight: 45,
+                        onButtonClick: async () => {
+                          if (!this.user?.permissions.download) {
+                            this.getUIContext().getPromptAction().showToast({
+                              message: '当前用户没有下载权限！',
+                              duration: 500
+                            });
+                          } else {
+                            this.showConfirmDownload = true
+                          }
+                        }
+                      }) {
+                        SymbolGlyph($r('sys.symbol.download'))
+                          .fontWeight(FontWeight.Normal)
+                          .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+                          .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                          .hitTestBehavior(HitTestMode.None)
+                      }
                     }
                     .margin({ left: 16 })
-                    .backgroundColor($r('sys.color.comp_background_tertiary'))
-                    .height(40)
-                    .width(40)
-                    .borderRadius(8)
-                    .onClick(async () => {
-                      if (!this.user?.permissions.download) {
-                        this.getUIContext().getPromptAction().showToast({
-                          message: '当前用户没有下载权限！',
-                          duration: 500
-                        });
-                      } else {
-                        this.showConfirmDownload = true
-                      }
-                    })
+                    .width(45)
+                    .height(45)
+                    .clip(false)
                     .bindSheet(this.showConfirmDownload, this.confirmDownloadBuilder(), {
                       height: SheetSize.FIT_CONTENT,
                       preferType: SheetType.CENTER,
@@ -1235,19 +1309,23 @@ export struct LibraryItemDetail {
                     })
                   }
 
-                  Button({ type: ButtonType.Normal }) {
-                    SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
-                      .fontWeight(FontWeight.Normal)
-                      .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-                      .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
-                      .hitTestBehavior(HitTestMode.None)
+                  Row() {
+                    ImmersiveActionButton({
+                      barWidth: 45,
+                      barHeight: 45,
+                      menuItems: this.moreMenus,
+                    }) {
+                      SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
+                        .fontWeight(FontWeight.Normal)
+                        .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+                        .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                        .hitTestBehavior(HitTestMode.None)
+                    }
                   }
                   .margin({ left: 16 })
-                  .backgroundColor($r('sys.color.comp_background_tertiary'))
-                  .height(40)
-                  .width(40)
-                  .borderRadius(8)
-                  .bindMenu(this.moreMenus)
+                  .width(45)
+                  .height(45)
+                  .clip(false)
                   .bindSheet(this.showPlaylists, this.playlistsBuilder(), {
                     height: SheetSize.MEDIUM,
                     preferType: SheetType.CENTER,
@@ -1266,7 +1344,8 @@ export struct LibraryItemDetail {
                   })
                 }
                 .width('100%')
-                .margin({ top: 5 })
+                .margin({ top: 0 })
+                .clip(false)
                 .bindSheet(this.showCreatePlaylist, this.createPlaylistBuilder(), {
                   height: SheetSize.FIT_CONTENT,
                   preferType: SheetType.CENTER,
@@ -1280,29 +1359,39 @@ export struct LibraryItemDetail {
                 })
 
                 if (this.library?.mediaType === 'book') {
-                  Column() {
-                    Text("你的进度：" + Math.round((this.itemProgress?.progress ?? 0) * 100) + "%")
-                      .fontSize(17)
-                      .fontWeight(FontWeight.Medium)
-                      .maxLines(1)
-                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  Row() {
+                    ImmersiveActionButton({
+                      barWidth: '100%',
+                      barHeight: 45,
+                      monopolizeActionEvents: false
+                    }) {
+                      Column() {
+                        Text("你的进度：" + Math.round((this.itemProgress?.progress ?? 0) * 100) + "%")
+                          .fontSize(17)
+                          .fontWeight(FontWeight.Medium)
+                          .maxLines(1)
+                          .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                    Text(this.itemProgress?.isFinished ?
-                      "已听完 " + (this.itemProgress ? this.formatTime(this.itemProgress?.finishedAt) : "未知") :
-                      "剩余 " +
-                        (this.itemProgress ?
-                          this.formatDuration(this.itemProgress.duration - this.itemProgress.currentTime) : "未知"))
-                      .fontSize(15)
-                      .fontColor($r('sys.color.font_secondary'))
-                      .maxLines(1)
-                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        Text(this.itemProgress?.isFinished ?
+                          "已听完 " + (this.itemProgress ? this.formatTime(this.itemProgress?.finishedAt) : "未知") :
+                          "剩余 " +
+                            (this.itemProgress ?
+                              this.formatDuration(this.itemProgress.duration - this.itemProgress.currentTime) : "未知"))
+                          .fontSize(15)
+                          .fontColor($r('sys.color.font_secondary'))
+                          .maxLines(1)
+                          .textOverflow({ overflow: TextOverflow.Ellipsis })
+                      }
+                      .width('100%')
+                      .height('100%')
+                      .justifyContent(FlexAlign.Center)
+                      .clip(false)
+                    }
                   }
                   .width('100%')
                   .padding({ top: 5, bottom: 5 })
-                  .margin({ top: 20 })
-                  .borderRadius(8)
-                  .backgroundColor($r('sys.color.comp_background_tertiary'))
-                  .justifyContent(FlexAlign.Center)
+                  .margin({ top: 16 })
+                  .clip(false)
                   .visibility(this.itemProgress && this.itemProgress.currentTime > 0 ? Visibility.Visible :
                     Visibility.None)
                 }
@@ -1696,27 +1785,31 @@ export struct LibraryItemDetail {
             GridCol({ span: 1 }) {
               if (this.library?.mediaType === 'book') {
                 Column() {
-                  Button({ type: ButtonType.Normal }) {
-                    Row() {
-                      Text("章节 " + this.libraryItem?.media.chapters?.length)
-                        .fontSize(18)
-                        .fontWeight(FontWeight.Medium)
-                      SymbolGlyph(this.showChapters ? $r('sys.symbol.arrowtriangle_up_fill') :
-                        $r('sys.symbol.arrowtriangle_down_fill'))
-                        .fontColor([$r('sys.color.font')])
-                        .margin({ left: 10 })
+                  Row() {
+                    ImmersiveActionButton({
+                      barWidth: '100%',
+                      barHeight: 60,
+                      onButtonClick: () => {
+                        this.showChapters = !this.showChapters
+                      }
+                    }) {
+                      Row() {
+                        Text("章节 " + this.libraryItem?.media.chapters?.length)
+                          .fontSize(18)
+                          .fontWeight(FontWeight.Medium)
+                        SymbolGlyph(this.showChapters ? $r('sys.symbol.arrowtriangle_up_fill') :
+                          $r('sys.symbol.arrowtriangle_down_fill'))
+                          .fontColor([$r('sys.color.font')])
+                          .margin({ left: 10 })
+                      }
+                      .width('100%')
+                      .padding({ left: 8, right: 8 })
+                      .justifyContent(FlexAlign.SpaceBetween)
                     }
-                    .width('100%')
-                    .justifyContent(FlexAlign.SpaceBetween)
                   }
                   .width('100%')
-                  .padding(20)
                   .margin({ bottom: 20 })
-                  .borderRadius(8)
-                  .backgroundColor($r('sys.color.comp_background_tertiary'))
-                  .onClick(() => {
-                    this.showChapters = !this.showChapters
-                  })
+                  .clip(false)
                   .bindSheet(this.showConfirm, this.confirmBuilder(), {
                     height: SheetSize.FIT_CONTENT,
                     preferType: SheetType.CENTER,
@@ -1797,27 +1890,31 @@ export struct LibraryItemDetail {
                   .visibility(this.showChapters ? Visibility.Visible : Visibility.None)
                   .height(this.contentHeight - 158)
 
-                  Button({ type: ButtonType.Normal }) {
-                    Row() {
-                      Text("音轨 " + this.libraryItem?.media.audioFiles?.length)
-                        .fontSize(18)
-                        .fontWeight(FontWeight.Medium)
-                      SymbolGlyph(this.showAudioFiles ? $r('sys.symbol.arrowtriangle_up_fill') :
-                        $r('sys.symbol.arrowtriangle_down_fill'))
-                        .fontColor([$r('sys.color.font')])
-                        .margin({ left: 10 })
+                  Row() {
+                    ImmersiveActionButton({
+                      barWidth: '100%',
+                      barHeight: 60,
+                      onButtonClick: () => {
+                        this.showAudioFiles = !this.showAudioFiles
+                      }
+                    }) {
+                      Row() {
+                        Text("音轨 " + this.libraryItem?.media.audioFiles?.length)
+                          .fontSize(18)
+                          .fontWeight(FontWeight.Medium)
+                        SymbolGlyph(this.showAudioFiles ? $r('sys.symbol.arrowtriangle_up_fill') :
+                          $r('sys.symbol.arrowtriangle_down_fill'))
+                          .fontColor([$r('sys.color.font')])
+                          .margin({ left: 10 })
+                      }
+                      .width('100%')
+                      .padding({ left: 8, right: 8 })
+                      .justifyContent(FlexAlign.SpaceBetween)
                     }
-                    .width('100%')
-                    .justifyContent(FlexAlign.SpaceBetween)
                   }
                   .width('100%')
-                  .padding(20)
                   .margin({ bottom: 20 })
-                  .borderRadius(8)
-                  .backgroundColor($r('sys.color.comp_background_tertiary'))
-                  .onClick(() => {
-                    this.showAudioFiles = !this.showAudioFiles
-                  })
+                  .clip(false)
 
                   List() {
                     ListItem() {
@@ -1880,44 +1977,62 @@ export struct LibraryItemDetail {
               } else if (this.library?.mediaType === 'podcast') {
                 Column() {
                   Row() {
-                    Text("剧集 (" + this.libraryItem?.media.episodes?.length + ")")
-                      .fontSize(20)
-                      .fontWeight(FontWeight.Medium)
-
                     Row() {
-                      Button({ type: ButtonType.Normal }) {
-                        if (this.loadingFeed) {
-                          LoadingProgress()
-                            .width(20)
-                            .height(20)
-                            .color($r('sys.color.ohos_id_color_titlebar_icon'))
-                        } else {
-                          SymbolGlyph($r('sys.symbol.magnifyingglass'))
-                            .fontSize(20)
-                            .fontColor([$r('sys.color.font')])
-                        }
+                      Text("剧集 (" + this.libraryItem?.media.episodes?.length + ")")
+                        .fontSize(20)
+                        .fontWeight(FontWeight.Medium)
+                    }
+                    .height(18)
+
+                    Row({ space: 16 }) {
+                      Row() {
+                        Row() {
+                          ImmersiveActionButton({
+                            barWidth: 32,
+                            barHeight: 32,
+                            onButtonClick: async () => {
+                              this.loadingFeed = true
+                              this.feedEpisodes = []
+                              this.addToServer = []
+                              let podcast = await getFeed(this.libraryItem!.media.metadata.feedUrl!)
+                              if (podcast) {
+                                this.feedEpisodes = podcast.episodes
+                                this.showFeedEpisodes = true
+                                this.loadingFeed = false
+                              } else {
+                                this.getUIContext().getPromptAction().showToast({
+                                  message: '获取剧集失败，请检查网络！',
+                                  duration: 500
+                                });
+                              }
+                            }
+                          }) {
+                            Row() {
+                              if (this.loadingFeed) {
+                                LoadingProgress()
+                                  .width(20)
+                                  .height(20)
+                                  .color($r('sys.color.ohos_id_color_titlebar_icon'))
+                              } else {
+                                SymbolGlyph($r('sys.symbol.magnifyingglass'))
+                                  .fontSize(18)
+                                  .fontColor([$r('sys.color.font')])
+                                  .clip(false)
+                                  .hitTestBehavior(HitTestMode.None)
+                              }
+                            }
+                            .width('100%')
+                            .height('100%')
+                            .justifyContent(FlexAlign.Center)
+                            .alignItems(VerticalAlign.Center)
+                            .clip(false)
+                          }
                       }
-                      .width(31)
-                      .height(31)
-                      .borderRadius(8)
-                      .margin({ right: 10, left: 10 })
-                      .backgroundColor(Color.Transparent)
-                      .onClick(async () => {
-                        this.loadingFeed = true
-                        this.feedEpisodes = []
-                        this.addToServer = []
-                        let podcast = await getFeed(this.libraryItem!.media.metadata.feedUrl!)
-                        if (podcast) {
-                          this.feedEpisodes = podcast.episodes
-                          this.showFeedEpisodes = true
-                          this.loadingFeed = false
-                        } else {
-                          this.getUIContext().getPromptAction().showToast({
-                            message: '获取剧集失败，请检查网络！',
-                            duration: 500
-                          });
-                        }
-                      })
+                      .clip(false)
+                    }
+                      .width(32)
+                      .height(32)
+                      .clip(false)
                       .bindSheet(this.showFeedEpisodes, this.feedEpisodesBuilder(), {
                         height: SheetSize.MEDIUM,
                         preferType: SheetType.CENTER,
@@ -1930,131 +2045,41 @@ export struct LibraryItemDetail {
                         }
                       })
 
-                      Button({ type: ButtonType.Normal }) {
+                      Row() {
                         Row() {
-                          Text(this.sortByStr)
-                            .fontSize(15)
-                            .fontWeight(FontWeight.Medium)
+                          ImmersiveActionButton({
+                            barWidth: this.getSortButtonWidth(),
+                            barHeight: 32,
+                            menuItems: this.sortMenus()
+                          }) {
+                            Row() {
+                              Text(this.sortByStr)
+                                .fontSize(15)
+                                .fontWeight(FontWeight.Medium)
+                                .hitTestBehavior(HitTestMode.None)
 
-                          SymbolGlyph(this.order ? $r('sys.symbol.text_and_arrow_down') :
-                            $r('sys.symbol.text_and_arrow_up'))
-                            .fontColor([$r('sys.color.font')])
-                            .margin({ left: 6 })
+                              SymbolGlyph(this.order ? $r('sys.symbol.text_and_arrow_down') :
+                                $r('sys.symbol.text_and_arrow_up'))
+                                .fontColor([$r('sys.color.font')])
+                                .margin({ left: 6 })
+                                .hitTestBehavior(HitTestMode.None)
+                            }
+                            .clip(false)
+                            .padding({ left: 8, right: 8 })
+                          }
                         }
+                        .clip(false)
                       }
-                      .height(31)
-                      .padding(8)
-                      .borderRadius(8)
-                      .backgroundColor($r('sys.color.comp_background_tertiary'))
-                      .bindMenu([
-                        {
-                          value: "出版日期",
-                          action: () => {
-                            if (this.sortBy === 0) {
-                              this.order = !this.order
-                            } else {
-                              this.sortBy = 0
-                              this.sortByStr = "出版日期"
-                              this.order = true
-                            }
-                            if (this.order) {
-                              this.episodes.sort((a, b) => (b.publishedAt ?? 0) - (a.publishedAt ?? 0))
-                            } else {
-                              this.episodes.sort((a, b) => (a.publishedAt ?? 0) - (b.publishedAt ?? 0))
-                            }
-                          }
-                        },
-                        {
-                          value: "标题",
-                          action: () => {
-                            if (this.sortBy === 1) {
-                              this.order = !this.order
-                            } else {
-                              this.sortBy = 1
-                              this.sortByStr = "标题"
-                              this.order = true
-                            }
-                            if (this.order) {
-                              this.episodes.sort((a, b) => String(b.title)
-                                .localeCompare(String(a.title), 'en', { numeric: true }))
-                            } else {
-                              this.episodes.sort((a, b) => String(a.title)
-                                .localeCompare(String(b.title), 'en', { numeric: true }))
-                            }
-                          }
-                        },
-                        {
-                          value: "季",
-                          action: () => {
-                            if (this.sortBy === 2) {
-                              this.order = !this.order
-                            } else {
-                              this.sortBy = 2
-                              this.sortByStr = "季"
-                              this.order = true
-                            }
-                            if (this.order) {
-                              this.episodes.sort((a, b) => String(b.season)
-                                .localeCompare(String(a.season), 'en', { numeric: true }))
-                            } else {
-                              this.episodes.sort((a, b) => String(a.season)
-                                .localeCompare(String(b.season), 'en', { numeric: true }))
-                            }
-                          }
-                        },
-                        {
-                          value: "剧集",
-                          action: () => {
-                            if (this.sortBy === 3) {
-                              this.order = !this.order
-                            } else {
-                              this.sortBy = 3
-                              this.sortByStr = "剧集"
-                              this.order = true
-                            }
-                            if (this.order) {
-                              this.episodes.sort((a, b) => String(b.episode)
-                                .localeCompare(String(a.episode), 'en', { numeric: true }))
-                            } else {
-                              this.episodes.sort((a, b) => String(a.episode)
-                                .localeCompare(String(b.episode), 'en', { numeric: true }))
-                            }
-                          }
-                        },
-                        {
-                          value: "文件名",
-                          action: () => {
-                            if (this.sortBy === 4) {
-                              this.order = !this.order
-                            } else {
-                              this.sortBy = 4
-                              this.sortByStr = "文件名"
-                              this.order = true
-                            }
-                            if (this.order) {
-                              this.episodes.sort((a, b) =>
-                              String(b.audioFile?.metadata?.filename ?? '').localeCompare(
-                                String(a.audioFile?.metadata?.filename ?? ''),
-                                'en',
-                                { numeric: true }
-                              )
-                              )
-                            } else {
-                              this.episodes.sort((a, b) =>
-                              String(a.audioFile?.metadata?.filename ?? '').localeCompare(
-                                String(b.audioFile?.metadata?.filename ?? ''),
-                                'en',
-                                { numeric: true }
-                              )
-                              )
-                            }
-                          }
-                        }
-                      ])
+                      .width(this.getSortButtonWidth())
+                      .height(32)
+                      .clip(false)
                     }
+                    .clip(false)
+                    .height(32)
                   }
                   .width('100%')
-                  .height(18)
+                  .height(32)
+                  .alignItems(VerticalAlign.Top)
                   .clip(false)
                   .justifyContent(FlexAlign.SpaceBetween)
 
@@ -2066,6 +2091,7 @@ export struct LibraryItemDetail {
                         .margin({ bottom: index === this.episodes.length - 1 ? 20 : 0 })
                     })
                   }
+                  .margin({ top: -14 })
                 }
               }
             }
@@ -2095,7 +2121,7 @@ export struct LibraryItemDetail {
         .width('100%')
         .height('100%')
         .padding({
-          top: 76 + this.statusBarHeight,
+          top: 64 + this.statusBarHeight,
           left: 20,
           right: 20,
           bottom: getBottomContentInset(0, this.isStartPlaying, 84, false)

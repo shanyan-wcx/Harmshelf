@@ -8,8 +8,9 @@ import { deviceInfo } from "@kit.BasicServicesKit";
 import {
   HdsNavigation,
   HdsNavigationTitleMode,
-  HdsNavigationAttribute,
   HdsNavigationMenuItemOptions,
+  HdsTabs,
+  DividerMode,
   BottomBuilderShowType,
   hdsMaterial,
   ScrollEffectOptions,
@@ -57,6 +58,10 @@ import { MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN } from './Layout';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
+export function getImmersiveActionRadius(height: number): number {
+  return deviceTypeInfo === 'phone' || deviceTypeInfo === 'tablet' ? height / 2 : 8
+}
+
 export interface MainNavigationItem {
   symbol: Resource
   label: string
@@ -95,6 +100,97 @@ function titleBarStyle(scrollEffectOpts: ScrollEffectOptions): TitleBarStyleOpti
       materialType: hdsMaterial.MaterialType.IMMERSIVE,
       materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
     }
+  }
+}
+
+@ComponentV2
+export struct ImmersiveActionButton {
+  @Param barWidth: number | '100%' = '100%'
+  @Param barHeight: number = 50
+  @Param menuItems: Array<MenuElement> | undefined = undefined
+  @Param onButtonClick: (() => void) | undefined = undefined
+  @Param monopolizeActionEvents: boolean = true
+  @Local measuredBarWidth: number = 1
+
+  private resolvedBarWidth(): number {
+    if (this.barWidth === '100%') {
+      return this.measuredBarWidth
+    }
+    return this.barWidth
+  }
+
+  @Builder
+  defaultButtonBuilder() {
+    Blank()
+  }
+
+  @BuilderParam buttonContent: () => void = this.defaultButtonBuilder
+
+  @Builder
+  buttonTabBarBuilder() {
+    Stack({ alignContent: Alignment.Center }) {
+      this.buttonContent()
+    }
+    .width(this.barWidth)
+    .height('100%')
+    .borderRadius(getImmersiveActionRadius(this.barHeight))
+    .clip(false)
+    .onClick(() => {
+      if (this.onButtonClick) {
+        this.onButtonClick()
+      }
+    })
+    .bindMenu(this.menuItems ?? [])
+  }
+
+  build() {
+    HdsTabs() {
+      TabContent() {
+        Column()
+          .width(0)
+          .height(0)
+          .clip(false)
+      }
+      .clip(false)
+      .tabBar(this.buttonTabBarBuilder())
+    }
+    .width(this.barWidth)
+    .height(this.barHeight)
+    .layoutWeight(this.barWidth === '100%' ? 1 : 0)
+    .barWidth(this.resolvedBarWidth())
+    .barHeight(this.barHeight)
+    .barOverlap(true)
+    .barBackgroundColor(Color.Transparent)
+    .barBackgroundBlurStyle(BlurStyle.NONE)
+    .divider({ mode: DividerMode.NONE })
+    .barPosition(BarPosition.End)
+    .vertical(false)
+    .scrollable(false)
+    .barMode(BarMode.Fixed)
+    .barFloatingStyle({
+      barWidth: {
+        smallWidth: this.resolvedBarWidth(),
+        mediumWidth: this.resolvedBarWidth(),
+        largeWidth: this.resolvedBarWidth()
+      },
+      barSideMargin: 0,
+      barBottomMargin: 0,
+      gradientMask: {
+        maskColor: Color.Transparent
+      },
+      systemMaterialEffect: {
+        materialType: hdsMaterial.MaterialType.IMMERSIVE,
+        materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+      }
+    })
+    .clip(false)
+    .onAreaChange((oldArea, newArea) => {
+      let measuredWidth: number = Number(newArea.width)
+      if (this.barWidth === '100%' && this.measuredBarWidth !== measuredWidth) {
+        this.measuredBarWidth = measuredWidth
+      }
+    })
+    .monopolizeEvents(this.monopolizeActionEvents)
   }
 }
 
@@ -1795,6 +1891,51 @@ export struct EpisodeComponent1 {
   @Local tmpPlaylistName: string = ""
   @Local tmpPlaylistDescription: string = ""
 
+  async playEpisodeItem() {
+    this.showPlayLoading = true
+    this.toCloseIndex = this.playingIndex
+    this.toCloseSession = this.playingItem
+    this.playingItem = await getPlayItem(this.item.libraryItemId!, this.item.id)
+    if (this.playingItem) {
+      await this.avPlayer!.reset();
+      this.isStartPlaying = true
+      this.isPlaying = true
+      this.playingIndex = 0
+      this.playingTitle = this.playingItem!.displayTitle.trim()
+      this.playStartTime = this.playingItem!.currentTime - this.playingItem!.audioTracks[0].startOffset
+      this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[0].contentUrl + "?token=" + this.apiToken
+      Logger.info(`共this.playingItem!.audioTracks.length条音轨`)
+      Logger.info(`播放序号为this.playingIndex`)
+      Logger.info(`起始位置为this.playStartTime`)
+    }
+    this.showPlayLoading = false
+  }
+
+  async toggleEpisodeProgress() {
+    let tmpProgress: UpdateProgress = {
+      duration: this.item.duration!,
+      currentTime: this.itemProgress?.isFinished ? 0 : this.item.duration!,
+      progress: this.itemProgress?.isFinished ? 0 : 1,
+      isFinished: !this.itemProgress?.isFinished
+    }
+    let status = await updateProgress(tmpProgress, this.item.libraryItemId!, this.item.id)
+    if (status) {
+      this.progress = (await getUser())?.mediaProgress ?? this.progress
+      this.itemProgress = this.progress.find(p => p.episodeId === this.item.id)
+    }
+  }
+
+  async requestEpisodeDownload() {
+    if (!this.user?.permissions.download) {
+      this.getUIContext().getPromptAction().showToast({
+        message: '当前用户没有下载权限！',
+        duration: 500
+      });
+    } else {
+      this.showConfirmDownload = true
+    }
+  }
+
   @Monitor('syncTime')
   async refreshProgress(monitor: IMonitor) {
     this.itemProgress = undefined
@@ -2173,8 +2314,15 @@ export struct EpisodeComponent1 {
         .maxLines(3)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-      Row() {
-        Button({ type: ButtonType.Normal }) {
+      Row({ space: 16 }) {
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            onButtonClick: (): void => {
+              this.playEpisodeItem()
+            }
+          }) {
           Row() {
             if (this.showPlayLoading) {
               Column() {
@@ -2188,6 +2336,7 @@ export struct EpisodeComponent1 {
                 .fontWeight(FontWeight.Normal)
                 .fontSize(18)
                 .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                .clip(false)
                 .hitTestBehavior(HitTestMode.None)
                 .margin({ bottom: 1 })
             }
@@ -2199,82 +2348,71 @@ export struct EpisodeComponent1 {
               .textOverflow({ overflow: TextOverflow.Ellipsis })
               .margin({ left: 5 })
           }
+          .width('100%')
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
+          .alignItems(VerticalAlign.Center)
+          .padding({ left: 10, right: 10 })
+          .clip(false)
         }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
-        .height(38)
-        .padding({ left: 10, right: 10 })
-        .borderRadius(8)
-        .onClick(async () => {
-          this.showPlayLoading = true
-          this.toCloseIndex = this.playingIndex
-          this.toCloseSession = this.playingItem
-          this.playingItem = await getPlayItem(this.item.libraryItemId!, this.item.id)
-          if (this.playingItem) {
-            await this.avPlayer!.reset();
-            this.isStartPlaying = true
-            this.isPlaying = true
-            this.playingIndex = 0
-            this.playingTitle = this.playingItem!.displayTitle.trim()
-            this.playStartTime = this.playingItem!.currentTime - this.playingItem!.audioTracks[0].startOffset
-            this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[0].contentUrl + "?token=" + this.apiToken
-            Logger.info(`共this.playingItem!.audioTracks.length条音轨`)
-            Logger.info(`播放序号为this.playingIndex`)
-            Logger.info(`起始位置为this.playStartTime`)
-          }
-          this.showPlayLoading = false
-        })
+        }
+        .clip(false)
+        .layoutWeight(1)
+        .height(40)
+        .clip(false)
 
-        Button({ type: ButtonType.Normal }) {
-          SymbolGlyph(this.itemProgress?.isFinished ? $r('sys.symbol.checkmark_square_fill') :
-            $r('sys.symbol.checkmark_square'))
-            .fontSize(20)
-            .fontColor([$r('sys.color.font')])
-        }
-        .backgroundColor(Color.Transparent)
-        .width(38)
-        .height(38)
-        .borderRadius(8)
-        .margin({ left: 5 })
-        .onClick(async () => {
-          if (this.itemProgress?.isFinished) {
-            let tmpProgress: UpdateProgress = {
-              duration: this.item.duration!,
-              currentTime: 0,
-              progress: 0,
-              isFinished: false
+        Row() {
+          ImmersiveActionButton({
+            barWidth: 40,
+            barHeight: 40,
+            onButtonClick: (): void => {
+              this.toggleEpisodeProgress()
             }
-            let status = await updateProgress(tmpProgress, this.item.libraryItemId!, this.item.id)
-            if (status) {
-              this.progress = (await getUser())?.mediaProgress ?? this.progress
-              this.itemProgress = this.progress.find(p => p.episodeId === this.item.id)
+          }) {
+            Row() {
+              SymbolGlyph(this.itemProgress?.isFinished ? $r('sys.symbol.checkmark_square_fill') :
+                $r('sys.symbol.checkmark_square'))
+                .fontSize(18)
+                .fontColor([$r('sys.color.font')])
+                .clip(false)
+                .hitTestBehavior(HitTestMode.None)
             }
-          } else {
-            let tmpProgress: UpdateProgress = {
-              duration: this.item.duration!,
-              currentTime: this.item.duration!,
-              progress: 1,
-              isFinished: true
-            }
-            let status = await updateProgress(tmpProgress, this.item.libraryItemId!, this.item.id)
-            if (status) {
-              this.progress = (await getUser())?.mediaProgress ?? this.progress
-              this.itemProgress = this.progress.find(p => p.episodeId === this.item.id)
-            }
+            .width('100%')
+            .height('100%')
+            .justifyContent(FlexAlign.Center)
+            .alignItems(VerticalAlign.Center)
+            .clip(false)
           }
-        })
-
-        Button({ type: ButtonType.Normal }) {
-          SymbolGlyph($r('sys.symbol.music_note_list'))
-            .fontSize(20)
-            .fontColor([$r('sys.color.font')])
         }
-        .backgroundColor(Color.Transparent)
-        .width(38)
-        .height(38)
-        .borderRadius(8)
-        .onClick(async () => {
-          this.showPlaylists = true
-        })
+        .width(40)
+        .height(40)
+        .clip(false)
+
+        Row() {
+          ImmersiveActionButton({
+            barWidth: 40,
+            barHeight: 40,
+            onButtonClick: (): void => {
+              this.showPlaylists = true
+            }
+          }) {
+            Row() {
+              SymbolGlyph($r('sys.symbol.music_note_list'))
+                .fontSize(18)
+                .fontColor([$r('sys.color.font')])
+                .clip(false)
+                .hitTestBehavior(HitTestMode.None)
+            }
+            .width('100%')
+            .height('100%')
+            .justifyContent(FlexAlign.Center)
+            .alignItems(VerticalAlign.Center)
+            .clip(false)
+          }
+        }
+        .width(40)
+        .height(40)
+        .clip(false)
         .bindSheet(this.showPlaylists, this.playlistsBuilder(), {
           height: SheetSize.MEDIUM,
           preferType: SheetType.CENTER,
@@ -2292,25 +2430,31 @@ export struct EpisodeComponent1 {
           }
         })
 
-        Button({ type: ButtonType.Normal }) {
-          SymbolGlyph($r('sys.symbol.download'))
-            .fontSize(20)
-            .fontColor([$r('sys.color.font')])
-        }
-        .backgroundColor(Color.Transparent)
-        .width(38)
-        .height(38)
-        .borderRadius(8)
-        .onClick(async () => {
-          if (!this.user?.permissions.download) {
-            this.getUIContext().getPromptAction().showToast({
-              message: '当前用户没有下载权限！',
-              duration: 500
-            });
-          } else {
-            this.showConfirmDownload = true
+        Row() {
+          ImmersiveActionButton({
+            barWidth: 40,
+            barHeight: 40,
+            onButtonClick: (): void => {
+              this.requestEpisodeDownload()
+            }
+          }) {
+            Row() {
+              SymbolGlyph($r('sys.symbol.download'))
+                .fontSize(18)
+                .fontColor([$r('sys.color.font')])
+                .clip(false)
+                .hitTestBehavior(HitTestMode.None)
+            }
+            .width('100%')
+            .height('100%')
+            .justifyContent(FlexAlign.Center)
+            .alignItems(VerticalAlign.Center)
+            .clip(false)
           }
-        })
+        }
+        .width(40)
+        .height(40)
+        .clip(false)
         .bindSheet(this.showConfirmDownload, this.confirmDownloadBuilder(), {
           height: SheetSize.FIT_CONTENT,
           preferType: SheetType.CENTER,
@@ -2326,6 +2470,7 @@ export struct EpisodeComponent1 {
       .padding({
         top: 15, bottom: 20
       })
+      .clip(false)
       .bindSheet(this.showCreatePlaylist, this.createPlaylistBuilder(), {
         height: SheetSize.FIT_CONTENT,
         preferType: SheetType.CENTER,
