@@ -2079,7 +2079,7 @@ export struct LibraryItemDetail {
                   }
                   .width('100%')
                   .height(32)
-                  .alignItems(VerticalAlign.Top)
+                  .alignItems(VerticalAlign.Center)
                   .clip(false)
                   .justifyContent(FlexAlign.SpaceBetween)
 
