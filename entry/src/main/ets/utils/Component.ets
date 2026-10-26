@@ -2318,7 +2318,7 @@ export struct EpisodeComponent1 {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 38,
             onButtonClick: (): void => {
               this.playEpisodeItem()
             }
@@ -2358,13 +2358,13 @@ export struct EpisodeComponent1 {
         }
         .clip(false)
         .layoutWeight(1)
-        .height(40)
+        .height(38)
         .clip(false)
 
         Row() {
           ImmersiveActionButton({
-            barWidth: 40,
-            barHeight: 40,
+            barWidth: 38,
+            barHeight: 38,
             onButtonClick: (): void => {
               this.toggleEpisodeProgress()
             }
@@ -2384,14 +2384,14 @@ export struct EpisodeComponent1 {
             .clip(false)
           }
         }
-        .width(40)
-        .height(40)
+        .width(38)
+        .height(38)
         .clip(false)
 
         Row() {
           ImmersiveActionButton({
-            barWidth: 40,
-            barHeight: 40,
+            barWidth: 38,
+            barHeight: 38,
             onButtonClick: (): void => {
               this.showPlaylists = true
             }
@@ -2410,8 +2410,8 @@ export struct EpisodeComponent1 {
             .clip(false)
           }
         }
-        .width(40)
-        .height(40)
+        .width(38)
+        .height(38)
         .clip(false)
         .bindSheet(this.showPlaylists, this.playlistsBuilder(), {
           height: SheetSize.MEDIUM,
@@ -2432,8 +2432,8 @@ export struct EpisodeComponent1 {
 
         Row() {
           ImmersiveActionButton({
-            barWidth: 40,
-            barHeight: 40,
+            barWidth: 38,
+            barHeight: 38,
             onButtonClick: (): void => {
               this.requestEpisodeDownload()
             }
@@ -2452,8 +2452,8 @@ export struct EpisodeComponent1 {
             .clip(false)
           }
         }
-        .width(40)
-        .height(40)
+        .width(38)
+        .height(38)
         .clip(false)
         .bindSheet(this.showConfirmDownload, this.confirmDownloadBuilder(), {
           height: SheetSize.FIT_CONTENT,
