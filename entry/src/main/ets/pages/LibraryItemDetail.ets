@@ -2076,7 +2076,7 @@ export struct LibraryItemDetail {
                     }
                     .clip(false)
                     .height(32)
-                    .offset({ y: 2 })
+                    .offset({ y: -4 })
                   }
                   .width('100%')
                   .height(32)
