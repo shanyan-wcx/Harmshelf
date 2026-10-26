@@ -2076,10 +2076,11 @@ export struct LibraryItemDetail {
                     }
                     .clip(false)
                     .height(32)
+                    .offset({ y: 2 })
                   }
                   .width('100%')
                   .height(32)
-                  .alignItems(VerticalAlign.Center)
+                  .alignItems(VerticalAlign.Top)
                   .clip(false)
                   .justifyContent(FlexAlign.SpaceBetween)
 
