@@ -1675,7 +1675,7 @@ export struct EpisodeComponent {
         .maxLines(3)
         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-      Row() {
+      Row({ space: 16 }) {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
@@ -1787,7 +1787,6 @@ export struct EpisodeComponent {
         }
         .width(38)
         .height(38)
-        .margin({ left: 10 })
         .clip(false)
 
         Row() {

@@ -13,6 +13,10 @@ Apply the same helper to every podcast episode action row, including the
 event/clipping pattern instead of leaving ordinary `Button` instances in one
 episode list.
 
+Use `Row({ space: 16 })` as the single source of horizontal spacing for these
+four actions; do not add a per-button left margin, otherwise the first gap
+becomes larger than the other three.
+
 The official system `immersive-light` effect is reserved for title bars and
 Tab bars in this project. Do not use direct content-area `systemMaterial` for
 these actions; use the shared HDS helper instead.
