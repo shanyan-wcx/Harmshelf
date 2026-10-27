@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 17
+- **Total Sessions**: 18
 - **Last Active**: 2026-10-27
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~489 | Active |
+| `journal-1.md` | ~510 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 18 | 2026-10-27 | 统一最新页面剧集按钮样式 | `1f5b1ce` | `main` |
 | 17 | 2026-10-27 | Native immersive detail controls | `7061aba` | `main` |
 | 16 | 2026-10-25 | Complete immersive tab navigation | `a79ddcc` | `main` |
 | 15 | 2026-10-25 | Fix native home tab overflow layout | `08c00f5` | `main` |

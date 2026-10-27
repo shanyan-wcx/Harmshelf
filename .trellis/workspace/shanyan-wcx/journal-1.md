@@ -487,3 +487,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 18: 统一最新页面剧集按钮样式
+
+**Date**: 2026-10-27
+**Task**: 统一最新页面剧集按钮样式
+**Branch**: `main`
+
+### Summary
+
+将最新页面 EpisodeComponent 的四个剧集操作按钮统一为共享 ImmersiveActionButton，保留原有点击与弹层行为；通过 devecocli debug 构建验证并归档任务。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `1f5b1ce` | (see git log) |
+
+### Status
+
+[OK] **Completed**
