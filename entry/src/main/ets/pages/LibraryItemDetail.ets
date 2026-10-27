@@ -1828,12 +1828,15 @@ export struct LibraryItemDetail {
                     ListItem() {
                       Row() {
                         Text("标题")
-                          .fontSize(15)
+                          .fontSize(16)
                           .fontWeight(FontWeight.Medium)
+                          .fontColor($r('sys.color.font_secondary'))
+                          .layoutWeight(1)
 
                         Text("开始")
-                          .fontSize(15)
+                          .fontSize(16)
                           .fontWeight(FontWeight.Medium)
+                          .fontColor($r('sys.color.font_secondary'))
                           .margin({ left: 20 })
                       }
                       .width('100%')
@@ -1850,14 +1853,15 @@ export struct LibraryItemDetail {
                       ListItem() {
                         Row() {
                           Text(chapter.title)
-                            .fontSize(15)
+                            .fontSize(17)
                             .fontWeight(FontWeight.Medium)
                             .width('100%')
                             .layoutWeight(1)
 
                           Text(this.formatSeconds(chapter.start))
-                            .fontSize(15)
+                            .fontSize(16)
                             .fontWeight(FontWeight.Medium)
+                            .fontColor($r('sys.color.font_secondary'))
                             .margin({ left: 20 })
                             .decoration({
                               type: TextDecorationType.Underline
@@ -1874,8 +1878,8 @@ export struct LibraryItemDetail {
                         .padding({
                           left: 20,
                           right: 20,
-                          top: 9.5,
-                          bottom: 9.5
+                          top: 12,
+                          bottom: 12
                         })
                         .justifyContent(FlexAlign.SpaceBetween)
                         .backgroundColor(Color.Transparent)
@@ -1887,6 +1891,14 @@ export struct LibraryItemDetail {
                     .borderRadius(30)
                     .clip(true)
                     .scrollBar(BarState.Off)
+                    .divider({
+                      strokeWidth: 0.5,
+                      startMargin: 20,
+                      endMargin: 20,
+                      color: $r('app.color.divider')
+                    })
+                    .contentStartOffset(8)
+                    .contentEndOffset(8)
                     }
                     .width('100%')
                     .height('100%')
@@ -1940,12 +1952,15 @@ export struct LibraryItemDetail {
                     ListItem() {
                       Row() {
                         Text("文件名")
-                          .fontSize(15)
+                          .fontSize(16)
                           .fontWeight(FontWeight.Medium)
+                          .fontColor($r('sys.color.font_secondary'))
+                          .layoutWeight(1)
 
                         Text("时长")
-                          .fontSize(15)
+                          .fontSize(16)
                           .fontWeight(FontWeight.Medium)
+                          .fontColor($r('sys.color.font_secondary'))
                           .margin({ left: 20 })
                       }
                       .width('100%')
@@ -1962,22 +1977,23 @@ export struct LibraryItemDetail {
                       ListItem() {
                         Row() {
                           Text(audioFile.metadata.filename)
-                            .fontSize(15)
+                            .fontSize(17)
                             .fontWeight(FontWeight.Medium)
                             .width('100%')
                             .layoutWeight(1)
 
                           Text(this.formatSeconds(audioFile.duration))
-                            .fontSize(15)
+                            .fontSize(16)
                             .fontWeight(FontWeight.Medium)
+                            .fontColor($r('sys.color.font_secondary'))
                             .margin({ left: 20 })
                         }
                         .width('100%')
                         .padding({
                           left: 20,
                           right: 20,
-                          top: 9.5,
-                          bottom: 9.5
+                          top: 12,
+                          bottom: 12
                         })
                         .justifyContent(FlexAlign.SpaceBetween)
                         .backgroundColor(Color.Transparent)
@@ -1989,6 +2005,14 @@ export struct LibraryItemDetail {
                     .borderRadius(30)
                     .clip(true)
                     .scrollBar(BarState.Off)
+                    .divider({
+                      strokeWidth: 0.5,
+                      startMargin: 20,
+                      endMargin: 20,
+                      color: $r('app.color.divider')
+                    })
+                    .contentStartOffset(8)
+                    .contentEndOffset(8)
                     }
                     .width('100%')
                     .height('100%')

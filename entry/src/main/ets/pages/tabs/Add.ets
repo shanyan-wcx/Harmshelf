@@ -249,7 +249,7 @@ export struct Add {
                 color: $r('sys.color.ohos_id_color_focused_outline_transparent')
               })
               .shadow(ShadowStyle.OUTER_DEFAULT_XS)
-              .margin({ bottom: index === this.searchPodcasts.length - 1 ? getBottomContentInset(25, this.isStartPlaying, 109) : 8 })
+              .margin({ bottom: index === this.searchPodcasts.length - 1 ? getBottomContentInset(25, this.isStartPlaying, 109) : 16 })
               .onClick(async () => {
                 let podcast1 = await getFeed(searchPodcast.feedUrl)
                 if (podcast1) {
