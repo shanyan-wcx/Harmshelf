@@ -508,3 +508,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 19: 修复最新页面剧集按钮间距
+
+**Date**: 2026-10-27
+**Task**: 修复最新页面剧集按钮间距
+**Branch**: `main`
+
+### Summary
+
+将最新页面 EpisodeComponent 按钮行统一为 16vp 间距，移除旧的 10vp 左边距；通过 git 检查与 HarmonyOS 构建验证，归档任务。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `558d296` | (see git log) |
+
+### Status
+
+[OK] **Completed**
