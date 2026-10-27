@@ -801,19 +801,36 @@ export struct SeriesItemComponent {
         this.pageInfos.pushPathByName('filterItems', filter)
       })
 
-      Column() {
-        Text(this.series.name)
-          .fontSize(17)
-          .fontWeight(FontWeight.Medium)
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      Row() {
+        ImmersiveActionButton({
+          barWidth: '100%',
+          barHeight: 28,
+          onButtonClick: () => {
+            let filter: Filter1 = {
+              criteria: this.series.name,
+              type: "series"
+            }
+            this.series1 = this.series
+            this.pageInfos.pushPathByName('filterItems', filter)
+          }
+        }) {
+          Text(this.series.name)
+            .fontSize(17)
+            .fontWeight(FontWeight.Medium)
+            .width('100%')
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .textAlign(TextAlign.Center)
+            .padding({ left: 8, right: 8 })
+        }
       }
-      .width(this.seriesWidth)
-      .padding(4)
-      .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+      .width('100%')
+      .height(28)
+      .padding({ left: 8, right: 8 })
+      .margin({ bottom: 8 })
     }
     .borderRadius(10)
-    .clip(true)
+    .clip(false)
     .width('100%')
     .height('auto')
     .alignContent(Alignment.Bottom)
@@ -901,19 +918,32 @@ export struct CollectionItemComponent {
         this.pageInfos.pushPathByName('collectionDetail', null)
       })
 
-      Column() {
-        Text(this.collection.name)
-          .fontSize(17)
-          .fontWeight(FontWeight.Medium)
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      Row() {
+        ImmersiveActionButton({
+          barWidth: '100%',
+          barHeight: 28,
+          onButtonClick: () => {
+            this.collection1 = this.collection
+            this.pageInfos.pushPathByName('collectionDetail', null)
+          }
+        }) {
+          Text(this.collection.name)
+            .fontSize(17)
+            .fontWeight(FontWeight.Medium)
+            .width('100%')
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .textAlign(TextAlign.Center)
+            .padding({ left: 8, right: 8 })
+        }
       }
-      .width(this.collectionWidth)
-      .padding(4)
-      .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+      .width('100%')
+      .height(28)
+      .padding({ left: 8, right: 8 })
+      .margin({ bottom: 8 })
     }
     .borderRadius(10)
-    .clip(true)
+    .clip(false)
     .width('100%')
     .height('auto')
     .alignContent(Alignment.Bottom)

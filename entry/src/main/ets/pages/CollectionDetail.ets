@@ -499,11 +499,12 @@ export struct CollectionDetail {
             .margin({ top: 15 })
             .padding({ left: 20, right: 20, bottom: getBottomContentInset(deviceTypeInfo === '2in1' ? 20 : 25, this.isStartPlaying, 104, false) })
             .borderRadius({ topLeft: 32, topRight: 32 })
-            .clip(true)
+            .clip(false)
             .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
               env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
               this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
               $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
+            .shadow(ShadowStyle.OUTER_DEFAULT_XS)
             .constraintSize({
               minHeight: `calc(100% - ${Number(this.topHeight) + 20}vp)`
             })
