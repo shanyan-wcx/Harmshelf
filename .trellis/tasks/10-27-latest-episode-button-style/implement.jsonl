@@ -1,0 +1,2 @@
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Apply shared ImmersiveActionButton and clipping rules"}
+{"file": ".trellis/spec/frontend/directory-structure.md", "reason": "Keep the shared component change within the existing frontend structure"}

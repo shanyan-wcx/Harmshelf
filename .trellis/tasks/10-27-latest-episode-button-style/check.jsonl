@@ -1,0 +1,2 @@
+{"file": ".trellis/spec/frontend/component-guidelines.md", "reason": "Review immersive HdsTabs size, clipping, and event rules"}
+{"file": ".trellis/spec/frontend/type-safety.md", "reason": "Review ArkTS type-safety expectations for the component change"}

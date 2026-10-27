@@ -1676,107 +1676,145 @@ export struct EpisodeComponent {
         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
       Row() {
-        Button({ type: ButtonType.Normal }) {
-          Row() {
-            if (this.showPlayLoading) {
-              Column() {
-                LoadingProgress()
-                  .width(18)
-                  .height(18)
-                  .color($r('sys.color.ohos_id_color_titlebar_icon'))
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 38,
+            onButtonClick: async () => {
+              this.showPlayLoading = true
+              this.toCloseIndex = this.playingIndex
+              this.toCloseSession = this.playingItem
+              this.playingItem = await getPlayItem(this.item.libraryItemId!, this.item.id)
+              if (this.playingItem) {
+                await this.avPlayer!.reset();
+                this.isStartPlaying = true
+                this.isPlaying = true
+                this.playingIndex = 0
+                this.playingTitle = this.playingItem!.displayTitle.trim()
+                this.playStartTime = this.playingItem!.currentTime - this.playingItem!.audioTracks[0].startOffset
+                this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[0].contentUrl + "?token=" + this.apiToken
+                Logger.info(`共this.playingItem!.audioTracks.length条音轨`)
+                Logger.info(`播放序号为this.playingIndex`)
+                Logger.info(`起始位置为this.playStartTime`)
               }
-            } else {
-              SymbolGlyph($r('sys.symbol.play_fill'))
-                .fontWeight(FontWeight.Normal)
+              this.showPlayLoading = false
+            }
+          }) {
+            Row() {
+              if (this.showPlayLoading) {
+                Column() {
+                  LoadingProgress()
+                    .width(18)
+                    .height(18)
+                    .color($r('sys.color.ohos_id_color_titlebar_icon'))
+                }
+              } else {
+                SymbolGlyph($r('sys.symbol.play_fill'))
+                  .fontWeight(FontWeight.Normal)
+                  .fontSize(18)
+                  .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                  .clip(false)
+                  .hitTestBehavior(HitTestMode.None)
+                  .margin({ bottom: 1 })
+              }
+
+              Text(this.formatDuration(this.item.duration!))
                 .fontSize(18)
-                .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                .fontWeight(FontWeight.Medium)
+                .maxLines(1)
+                .textOverflow({ overflow: TextOverflow.Ellipsis })
+                .margin({ left: 5 })
+            }
+            .width('100%')
+            .height('100%')
+            .justifyContent(FlexAlign.Center)
+            .alignItems(VerticalAlign.Center)
+            .padding({ left: 10, right: 10 })
+            .clip(false)
+          }
+        }
+        .clip(false)
+        .layoutWeight(1)
+        .height(38)
+        .clip(false)
+
+        Row() {
+          ImmersiveActionButton({
+            barWidth: 38,
+            barHeight: 38,
+            onButtonClick: async () => {
+              if (this.itemProgress?.isFinished) {
+                let tmpProgress: UpdateProgress = {
+                  duration: this.item.duration!,
+                  currentTime: 0,
+                  progress: 0,
+                  isFinished: false
+                }
+                let status = await updateProgress(tmpProgress, this.item.libraryItemId!, this.item.id)
+                if (status) {
+                  this.progress = (await getUser())?.mediaProgress ?? this.progress
+                  this.itemProgress = this.progress.find(p => p.episodeId === this.item.id)
+                }
+              } else {
+                let tmpProgress: UpdateProgress = {
+                  duration: this.item.duration!,
+                  currentTime: this.item.duration!,
+                  progress: 1,
+                  isFinished: true
+                }
+                let status = await updateProgress(tmpProgress, this.item.libraryItemId!, this.item.id)
+                if (status) {
+                  this.progress = (await getUser())?.mediaProgress ?? this.progress
+                  this.itemProgress = this.progress.find(p => p.episodeId === this.item.id)
+                }
+              }
+            }
+          }) {
+            Row() {
+              SymbolGlyph(this.itemProgress?.isFinished ? $r('sys.symbol.checkmark_square_fill') :
+                $r('sys.symbol.checkmark_square'))
+                .fontSize(18)
+                .fontColor([$r('sys.color.font')])
+                .clip(false)
                 .hitTestBehavior(HitTestMode.None)
-                .margin({ bottom: 1 })
             }
-
-            Text(this.formatDuration(this.item.duration!))
-              .fontSize(18)
-              .fontWeight(FontWeight.Medium)
-              .maxLines(1)
-              .textOverflow({ overflow: TextOverflow.Ellipsis })
-              .margin({ left: 5 })
+            .width('100%')
+            .height('100%')
+            .justifyContent(FlexAlign.Center)
+            .alignItems(VerticalAlign.Center)
+            .clip(false)
           }
         }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
-        .height(38)
-        .padding({ left: 10, right: 10 })
-        .borderRadius(8)
-        .onClick(async () => {
-          this.showPlayLoading = true
-          this.toCloseIndex = this.playingIndex
-          this.toCloseSession = this.playingItem
-          this.playingItem = await getPlayItem(this.item.libraryItemId!, this.item.id)
-          if (this.playingItem) {
-            await this.avPlayer!.reset();
-            this.isStartPlaying = true
-            this.isPlaying = true
-            this.playingIndex = 0
-            this.playingTitle = this.playingItem!.displayTitle.trim()
-            this.playStartTime = this.playingItem!.currentTime - this.playingItem!.audioTracks[0].startOffset
-            this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[0].contentUrl + "?token=" + this.apiToken
-            Logger.info(`共this.playingItem!.audioTracks.length条音轨`)
-            Logger.info(`播放序号为this.playingIndex`)
-            Logger.info(`起始位置为this.playStartTime`)
-          }
-          this.showPlayLoading = false
-        })
-
-        Button({ type: ButtonType.Normal }) {
-          SymbolGlyph(this.itemProgress?.isFinished ? $r('sys.symbol.checkmark_square_fill') :
-            $r('sys.symbol.checkmark_square'))
-            .fontSize(20)
-            .fontColor([$r('sys.color.font')])
-        }
-        .backgroundColor(Color.Transparent)
         .width(38)
         .height(38)
-        .borderRadius(8)
         .margin({ left: 10 })
-        .onClick(async () => {
-          if (this.itemProgress?.isFinished) {
-            let tmpProgress: UpdateProgress = {
-              duration: this.item.duration!,
-              currentTime: 0,
-              progress: 0,
-              isFinished: false
-            }
-            let status = await updateProgress(tmpProgress, this.item.libraryItemId!, this.item.id)
-            if (status) {
-              this.progress = (await getUser())?.mediaProgress ?? this.progress
-              this.itemProgress = this.progress.find(p => p.episodeId === this.item.id)
-            }
-          } else {
-            let tmpProgress: UpdateProgress = {
-              duration: this.item.duration!,
-              currentTime: this.item.duration!,
-              progress: 1,
-              isFinished: true
-            }
-            let status = await updateProgress(tmpProgress, this.item.libraryItemId!, this.item.id)
-            if (status) {
-              this.progress = (await getUser())?.mediaProgress ?? this.progress
-              this.itemProgress = this.progress.find(p => p.episodeId === this.item.id)
-            }
-          }
-        })
+        .clip(false)
 
-        Button({ type: ButtonType.Normal }) {
-          SymbolGlyph($r('sys.symbol.music_note_list'))
-            .fontSize(20)
-            .fontColor([$r('sys.color.font')])
+        Row() {
+          ImmersiveActionButton({
+            barWidth: 38,
+            barHeight: 38,
+            onButtonClick: (): void => {
+              this.showPlaylists = true
+            }
+          }) {
+            Row() {
+              SymbolGlyph($r('sys.symbol.music_note_list'))
+                .fontSize(18)
+                .fontColor([$r('sys.color.font')])
+                .clip(false)
+                .hitTestBehavior(HitTestMode.None)
+            }
+            .width('100%')
+            .height('100%')
+            .justifyContent(FlexAlign.Center)
+            .alignItems(VerticalAlign.Center)
+            .clip(false)
+          }
         }
-        .backgroundColor(Color.Transparent)
         .width(38)
         .height(38)
-        .borderRadius(8)
-        .onClick(async () => {
-          this.showPlaylists = true
-        })
+        .clip(false)
         .bindSheet(this.showPlaylists, this.playlistsBuilder(), {
           height: SheetSize.MEDIUM,
           preferType: SheetType.CENTER,
@@ -1794,25 +1832,38 @@ export struct EpisodeComponent {
           }
         })
 
-        Button({ type: ButtonType.Normal }) {
-          SymbolGlyph($r('sys.symbol.download'))
-            .fontSize(20)
-            .fontColor([$r('sys.color.font')])
+        Row() {
+          ImmersiveActionButton({
+            barWidth: 38,
+            barHeight: 38,
+            onButtonClick: (): void => {
+              if (!this.user?.permissions.download) {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '当前用户没有下载权限！',
+                  duration: 500
+                });
+              } else {
+                this.showConfirmDownload = true
+              }
+            }
+          }) {
+            Row() {
+              SymbolGlyph($r('sys.symbol.download'))
+                .fontSize(18)
+                .fontColor([$r('sys.color.font')])
+                .clip(false)
+                .hitTestBehavior(HitTestMode.None)
+            }
+            .width('100%')
+            .height('100%')
+            .justifyContent(FlexAlign.Center)
+            .alignItems(VerticalAlign.Center)
+            .clip(false)
+          }
         }
-        .backgroundColor(Color.Transparent)
         .width(38)
         .height(38)
-        .borderRadius(8)
-        .onClick(async () => {
-          if (!this.user?.permissions.download) {
-            this.getUIContext().getPromptAction().showToast({
-              message: '当前用户没有下载权限！',
-              duration: 500
-            });
-          } else {
-            this.showConfirmDownload = true
-          }
-        })
+        .clip(false)
         .bindSheet(this.showConfirmDownload, this.confirmDownloadBuilder(), {
           height: SheetSize.FIT_CONTENT,
           preferType: SheetType.CENTER,
@@ -1828,6 +1879,7 @@ export struct EpisodeComponent {
       .padding({
         top: 15, bottom: 20
       })
+      .clip(false)
       .bindSheet(this.showCreatePlaylist, this.createPlaylistBuilder(), {
         height: SheetSize.FIT_CONTENT,
         preferType: SheetType.CENTER,

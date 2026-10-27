@@ -7,6 +7,12 @@ content-area actions that need the native HDS immersive material. It wraps one
 native `HdsTabs` instance from `@kit.UIDesignKit`; do not replace it with a
 painted blur, a second background button, or `hds_button`.
 
+Apply the same helper to every podcast episode action row, including the
+`EpisodeComponent` used by the RecentEpisodes tab. Keep the four actions
+(play, completion state, playlist, and download) on the shared 38vp sizing and
+event/clipping pattern instead of leaving ordinary `Button` instances in one
+episode list.
+
 The official system `immersive-light` effect is reserved for title bars and
 Tab bars in this project. Do not use direct content-area `systemMaterial` for
 these actions; use the shared HDS helper instead.
