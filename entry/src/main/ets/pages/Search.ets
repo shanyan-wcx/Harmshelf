@@ -3,7 +3,7 @@ import { LengthMetrics, uiMaterial } from '@kit.ArkUI';
 import { Author, Library, LibraryItem, LibraryItemSearchResult, SearchResult, Series } from '../utils/Interface';
 import { searchLibrary } from '../utils/Api';
 import { deviceInfo } from '@kit.BasicServicesKit';
-import { ImmersiveActionButton, transparentTitleBarStyle } from '../utils/Component';
+import { transparentTitleBarStyle } from '../utils/Component';
 import { getBottomContentInset } from '../utils/Layout';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
@@ -84,52 +84,54 @@ export struct SearchMedia {
               ForEach(this.searchResult.book, (libraryItemSearchResult: LibraryItemSearchResult, index) => {
                 ListItem() {
                   Row() {
-                    ImmersiveActionButton({
-                      barWidth: '100%',
-                      barHeight: 64,
-                      barRadius: 8,
-                      onButtonClick: () => {
-                        this.libraryItem = libraryItemSearchResult.libraryItem
-                        this.pageInfos.pushPathByName('libraryItemDetail', null)
-                      }
-                    }) {
-                      Row() {
-                        Image(this.baseUrl +
-                          `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
-                          .alt($rawfile('nocover.jpg'))
-                          .objectFit(ImageFit.Cover)
-                          .width(64)
-                          .aspectRatio(1)
-                          .borderRadius(8)
-                          .margin({ right: 10 })
-                          .draggable(false)
+                    Image(this.baseUrl +
+                      `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
+                      .alt($rawfile('nocover.jpg'))
+                      .objectFit(ImageFit.Cover)
+                      .width(64)
+                      .aspectRatio(1)
+                      .borderRadius(8)
+                      .margin({ right: 10 })
+                      .draggable(false)
 
-                        Column() {
-                          Text(libraryItemSearchResult.libraryItem.media.metadata.title)
-                            .fontSize(19)
-                            .maxLines(1)
-                            .textOverflow({ overflow: TextOverflow.Ellipsis })
-                            .margin({ bottom: 5 })
+                    Column() {
+                      Text(libraryItemSearchResult.libraryItem.media.metadata.title)
+                        .fontSize(19)
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        .margin({ bottom: 5 })
 
-                          Text((libraryItemSearchResult.libraryItem.media.metadata.authorName ?? "-"))
-                            .fontSize(16)
-                            .fontColor($r('sys.color.font_secondary'))
-                            .maxLines(1)
-                            .textOverflow({ overflow: TextOverflow.Ellipsis })
-                        }
-                        .alignItems(HorizontalAlign.Start)
-                      }
-                      .width('100%')
-                      .height('100%')
-                      .alignItems(VerticalAlign.Center)
-                      .clip(false)
+                      Text((libraryItemSearchResult.libraryItem.media.metadata.authorName ?? "-"))
+                        .fontSize(16)
+                        .fontColor($r('sys.color.font_secondary'))
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
                     }
+                    .alignItems(HorizontalAlign.Start)
                   }
                   .width('100%')
-                  .padding({ left: 20, right: 20 })
-                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 10, bottom: index === this.searchResult!.book!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 10 })
+                  .height(80)
+                  .padding({ left: 8, right: 8 })
+                  .alignItems(VerticalAlign.Center)
+                  .borderRadius(12)
+                  .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .border({
+                    width: 0.5,
+                    radius: 12,
+                    color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+                  })
+                  .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+                  .onClick(() => {
+                    this.libraryItem = libraryItemSearchResult.libraryItem
+                    this.pageInfos.pushPathByName('libraryItemDetail', null)
+                  })
                   .clip(false)
                 }
+                  .width('100%')
+                  .padding({ left: 20, right: 20 })
+                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 8, bottom: index === this.searchResult!.book!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 8 })
+                  .clip(false)
               })
             }
           } else if (this.library?.mediaType === 'podcast') {
@@ -137,52 +139,54 @@ export struct SearchMedia {
               ForEach(this.searchResult.podcast, (libraryItemSearchResult: LibraryItemSearchResult, index) => {
                 ListItem() {
                   Row() {
-                    ImmersiveActionButton({
-                      barWidth: '100%',
-                      barHeight: 64,
-                      barRadius: 8,
-                      onButtonClick: () => {
-                        this.libraryItem = libraryItemSearchResult.libraryItem
-                        this.pageInfos.pushPathByName('libraryItemDetail', null)
-                      }
-                    }) {
-                      Row() {
-                        Image(this.baseUrl +
-                          `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
-                          .alt($rawfile('nocover.jpg'))
-                          .objectFit(ImageFit.Cover)
-                          .width(64)
-                          .aspectRatio(1)
-                          .borderRadius(8)
-                          .margin({ right: 10 })
-                          .draggable(false)
+                    Image(this.baseUrl +
+                      `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
+                      .alt($rawfile('nocover.jpg'))
+                      .objectFit(ImageFit.Cover)
+                      .width(64)
+                      .aspectRatio(1)
+                      .borderRadius(8)
+                      .margin({ right: 10 })
+                      .draggable(false)
 
-                        Column() {
-                          Text(libraryItemSearchResult.libraryItem.media.metadata.title)
-                            .fontSize(19)
-                            .maxLines(1)
-                            .textOverflow({ overflow: TextOverflow.Ellipsis })
-                            .margin({ bottom: 5 })
+                    Column() {
+                      Text(libraryItemSearchResult.libraryItem.media.metadata.title)
+                        .fontSize(19)
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        .margin({ bottom: 5 })
 
-                          Text((libraryItemSearchResult.libraryItem.media.metadata.author ?? "-"))
-                            .fontSize(16)
-                            .fontColor($r('sys.color.font_secondary'))
-                            .maxLines(1)
-                            .textOverflow({ overflow: TextOverflow.Ellipsis })
-                        }
-                        .alignItems(HorizontalAlign.Start)
-                      }
-                      .width('100%')
-                      .height('100%')
-                      .alignItems(VerticalAlign.Center)
-                      .clip(false)
+                      Text((libraryItemSearchResult.libraryItem.media.metadata.author ?? "-"))
+                        .fontSize(16)
+                        .fontColor($r('sys.color.font_secondary'))
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
                     }
+                    .alignItems(HorizontalAlign.Start)
                   }
                   .width('100%')
-                  .padding({ left: 20, right: 20 })
-                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 10, bottom: index === this.searchResult!.podcast!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 10 })
+                  .height(80)
+                  .padding({ left: 8, right: 8 })
+                  .alignItems(VerticalAlign.Center)
+                  .borderRadius(12)
+                  .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .border({
+                    width: 0.5,
+                    radius: 12,
+                    color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+                  })
+                  .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+                  .onClick(() => {
+                    this.libraryItem = libraryItemSearchResult.libraryItem
+                    this.pageInfos.pushPathByName('libraryItemDetail', null)
+                  })
                   .clip(false)
                 }
+                  .width('100%')
+                  .padding({ left: 20, right: 20 })
+                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 8, bottom: index === this.searchResult!.podcast!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 8 })
+                  .clip(false)
               })
             }
           }

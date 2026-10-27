@@ -205,45 +205,51 @@ export struct Add {
         Column() {
           if (this.searchPodcasts.length > 0) {
             ForEach(this.searchPodcasts, (searchPodcast: SearchPodcast, index) => {
-              Column() {
-                Row() {
-                  Image(searchPodcast.cover)
-                    .alt($rawfile('nocover.jpg'))
-                    .objectFit(ImageFit.Cover)
-                    .width(70)
-                    .aspectRatio(1)
-                    .borderRadius(8)
-                    .margin({ right: 10 })
-                    .draggable(false)
+              Row() {
+                Image(searchPodcast.cover)
+                  .alt($rawfile('nocover.jpg'))
+                  .objectFit(ImageFit.Cover)
+                  .width(64)
+                  .aspectRatio(1)
+                  .borderRadius(8)
+                  .margin({ right: 10 })
+                  .draggable(false)
 
-                  Column() {
-                    Text(searchPodcast.title)
-                      .fontSize(17)
-                      .maxLines(1)
-                      .textOverflow({ overflow: TextOverflow.Ellipsis })
-                      .margin({ bottom: 3 })
+                Column() {
+                  Text(searchPodcast.title)
+                    .fontSize(17)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    .margin({ bottom: 3 })
 
-                    Text("by " + searchPodcast.artistName)
-                      .fontSize(15)
-                      .maxLines(1)
-                      .textOverflow({ overflow: TextOverflow.Ellipsis })
-                      .margin({ bottom: 5 })
+                  Text("by " + searchPodcast.artistName)
+                    .fontSize(15)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    .margin({ bottom: 5 })
 
-                    Text(searchPodcast.trackCount + " 剧集")
-                      .fontSize(13)
-                      .fontColor($r('sys.color.font_secondary'))
-                  }
-                  .alignItems(HorizontalAlign.Start)
+                  Text(searchPodcast.trackCount + " 剧集")
+                    .fontSize(13)
+                    .fontColor($r('sys.color.font_secondary'))
                 }
                 .width('100%')
-
-                Divider()
-                  .width('100%')
-                  .strokeWidth(1)
-                  .margin({ top: 15 })
+                .layoutWeight(1)
+                .alignItems(HorizontalAlign.Start)
               }
               .width('100%')
-              .margin({ bottom: index === this.searchPodcasts.length - 1 ? getBottomContentInset(25, this.isStartPlaying, 109) : 15 })
+              .height(80)
+              .padding({ left: 8, right: 8 })
+              .alignItems(VerticalAlign.Center)
+              .borderRadius(12)
+              .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+              .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+              .border({
+                width: 0.5,
+                radius: 12,
+                color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+              })
+              .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+              .margin({ bottom: index === this.searchPodcasts.length - 1 ? getBottomContentInset(25, this.isStartPlaying, 109) : 8 })
               .onClick(async () => {
                 let podcast1 = await getFeed(searchPodcast.feedUrl)
                 if (podcast1) {
@@ -257,6 +263,7 @@ export struct Add {
                   });
                 }
               })
+              .clip(false)
               .bindSheet(this.showConfirm[index], this.confirmBuilder(searchPodcast, this.podcast!, index), {
                 height: 429,
                 preferType: SheetType.CENTER,
@@ -283,20 +290,24 @@ export struct Add {
             .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
           }
         }
+        .width('100%')
+        .clip(false)
       }
       .width('100%')
       .height('100%')
       .layoutWeight(1)
-      .padding({ top: this.statusBarHeight + 56 + 36 + 75, bottom: 0 })
+      .padding({ left: 4, right: 4, top: this.statusBarHeight + 56 + 36 + 75, bottom: 0 })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
+      .clip(false)
 
     }
     .width('100%')
     .height('100%')
-    .padding({ left: 20, right: 20 })
+    .padding({ left: 16, right: 16 })
     .alignContent(Alignment.Top)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+    .clip(false)
   }
 }

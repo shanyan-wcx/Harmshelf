@@ -1,0 +1,6 @@
+{"_example": "Fill with {\"file\": \"<path>\", \"reason\": \"<why>\"}. Put spec/research files only — no code paths. Run `python .trellis/scripts/get_context.py --mode packages` to list available specs. Delete this line once real entries are added."}
+{"file":".trellis/spec/frontend/index.md","reason":"前端规范入口和预开发检查清单。"}
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"共享 ImmersiveActionButton、HdsTabs 材质和裁切约定。"}
+{"file":".trellis/spec/frontend/directory-structure.md","reason":"确认 Search 页面与 Component 工具的职责边界。"}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"两个搜索结果分支必须保持同一布局参数，避免遗漏。"}
+{"file":".trellis/tasks/10-27-fix-search-item-radius-spacing/research/hds-tabs-radius.md","reason":"记录 HdsTabs 官方圆角能力限制和根层 modifier 方案。"}

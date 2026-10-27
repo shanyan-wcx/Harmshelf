@@ -17,10 +17,35 @@ Use `Row({ space: 16 })` as the single source of horizontal spacing for these
 four actions; do not add a per-button left margin, otherwise the first gap
 becomes larger than the other three.
 
-When an immersive surface must remain a rounded rectangle on phone and tablet,
-pass `barRadius` explicitly (for example, `barHeight: 64, barRadius: 8`). If
-`barRadius` is omitted, keep the device-adaptive radius supplied by the shared
-helper for existing capsule and circle controls.
+`barRadius` only styles the custom tab-builder content inside
+`ImmersiveActionButton`; it does not change the native HdsTabs floating
+material shape. The official `HdsTabsFloatingStyle` has no radius field. Do
+not use `barRadius` when a user-visible card must have a guaranteed rounded
+rectangle. For geometry-controlled content cards, use a normal clickable
+container instead:
+
+```typescript
+Row() {
+  // card content
+}
+.height(80)
+.padding({ left: 8, right: 8 })
+.borderRadius(12)
+.backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+.backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+.border({
+  width: 0.5,
+  radius: 12,
+  color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+})
+.shadow(ShadowStyle.OUTER_DEFAULT_XS)
+.clip(false)
+```
+
+Keep the container unclipped when its shadow must extend beyond the card;
+round the media thumbnail independently. If `barRadius` is omitted, keep the
+device-adaptive radius supplied by the shared helper for existing capsule and
+circle controls.
 
 The official system `immersive-light` effect is reserved for title bars and
 Tab bars in this project. Do not use direct content-area `systemMaterial` for

@@ -1822,7 +1822,9 @@ export struct LibraryItemDetail {
                     }
                   })
 
-                  List() {
+                  Stack() {
+                    Stack() {
+                    List() {
                     ListItem() {
                       Row() {
                         Text("标题")
@@ -1841,7 +1843,7 @@ export struct LibraryItemDetail {
                         right: 20
                       })
                       .justifyContent(FlexAlign.SpaceBetween)
-                      .backgroundColor($r('sys.color.comp_background_tertiary'))
+                      .backgroundColor(Color.Transparent)
                     }
 
                     ForEach(this.libraryItem?.media.chapters, (chapter: Chapter, index) => {
@@ -1876,19 +1878,35 @@ export struct LibraryItemDetail {
                           bottom: 9.5
                         })
                         .justifyContent(FlexAlign.SpaceBetween)
-                        .backgroundColor(index % 2 === 0 ? Color.Transparent : $r('sys.color.comp_background_tertiary'))
+                        .backgroundColor(Color.Transparent)
                       }
                     })
+                    }
+                    .width('100%')
+                    .height('100%')
+                    .borderRadius(30)
+                    .clip(true)
+                    .scrollBar(BarState.Off)
+                    }
+                    .width('100%')
+                    .height('100%')
+                    .borderRadius(30)
+                    .clip(true)
                   }
-                  .scrollBar(BarState.Off)
-                  .margin({ bottom: 20 })
-                  .border({
-                    width: 1,
-                    radius: 8,
-                    color: $r('sys.color.comp_divider')
-                  })
-                  .visibility(this.showChapters ? Visibility.Visible : Visibility.None)
+                  .width('100%')
                   .height(this.contentHeight - 158)
+                  .borderRadius(30)
+                  .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .border({
+                    width: 0.5,
+                    radius: 30,
+                    color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+                  })
+                  .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+                  .clip(false)
+                  .margin({ bottom: 20 })
+                  .visibility(this.showChapters ? Visibility.Visible : Visibility.None)
 
                   Row() {
                     ImmersiveActionButton({
@@ -1916,7 +1934,9 @@ export struct LibraryItemDetail {
                   .margin({ bottom: 20 })
                   .clip(false)
 
-                  List() {
+                  Stack() {
+                    Stack() {
+                    List() {
                     ListItem() {
                       Row() {
                         Text("文件名")
@@ -1935,7 +1955,7 @@ export struct LibraryItemDetail {
                         right: 20
                       })
                       .justifyContent(FlexAlign.SpaceBetween)
-                      .backgroundColor($r('sys.color.comp_background_tertiary'))
+                      .backgroundColor(Color.Transparent)
                     }
 
                     ForEach(this.libraryItem?.media.audioFiles, (audioFile: AudioFile, index) => {
@@ -1960,19 +1980,35 @@ export struct LibraryItemDetail {
                           bottom: 9.5
                         })
                         .justifyContent(FlexAlign.SpaceBetween)
-                        .backgroundColor(index % 2 === 0 ? Color.Transparent : $r('sys.color.comp_background_tertiary'))
+                        .backgroundColor(Color.Transparent)
                       }
                     })
+                    }
+                    .width('100%')
+                    .height('100%')
+                    .borderRadius(30)
+                    .clip(true)
+                    .scrollBar(BarState.Off)
+                    }
+                    .width('100%')
+                    .height('100%')
+                    .borderRadius(30)
+                    .clip(true)
                   }
-                  .scrollBar(BarState.Off)
-                  .margin({ bottom: 20 })
-                  .border({
-                    width: 1,
-                    radius: 8,
-                    color: $r('sys.color.comp_divider')
-                  })
-                  .visibility(this.showAudioFiles ? Visibility.Visible : Visibility.None)
+                  .width('100%')
                   .height(this.contentHeight - 158)
+                  .borderRadius(30)
+                  .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+                  .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                  .border({
+                    width: 0.5,
+                    radius: 30,
+                    color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+                  })
+                  .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+                  .clip(false)
+                  .margin({ bottom: 20 })
+                  .visibility(this.showAudioFiles ? Visibility.Visible : Visibility.None)
                 }
               } else if (this.library?.mediaType === 'podcast') {
                 Column() {
