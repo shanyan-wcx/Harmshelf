@@ -3,7 +3,7 @@ import { LengthMetrics, uiMaterial } from '@kit.ArkUI';
 import { Author, Library, LibraryItem, LibraryItemSearchResult, SearchResult, Series } from '../utils/Interface';
 import { searchLibrary } from '../utils/Api';
 import { deviceInfo } from '@kit.BasicServicesKit';
-import { transparentTitleBarStyle } from '../utils/Component';
+import { ImmersiveActionButton, transparentTitleBarStyle } from '../utils/Component';
 import { getBottomContentInset } from '../utils/Layout';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
@@ -84,38 +84,51 @@ export struct SearchMedia {
               ForEach(this.searchResult.book, (libraryItemSearchResult: LibraryItemSearchResult, index) => {
                 ListItem() {
                   Row() {
-                    Image(this.baseUrl +
-                      `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
-                      .alt($rawfile('nocover.jpg'))
-                      .objectFit(ImageFit.Cover)
-                      .width(64)
-                      .aspectRatio(1)
-                      .borderRadius(8)
-                      .margin({ right: 10 })
-                      .draggable(false)
+                    ImmersiveActionButton({
+                      barWidth: '100%',
+                      barHeight: 64,
+                      barRadius: 8,
+                      onButtonClick: () => {
+                        this.libraryItem = libraryItemSearchResult.libraryItem
+                        this.pageInfos.pushPathByName('libraryItemDetail', null)
+                      }
+                    }) {
+                      Row() {
+                        Image(this.baseUrl +
+                          `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
+                          .alt($rawfile('nocover.jpg'))
+                          .objectFit(ImageFit.Cover)
+                          .width(64)
+                          .aspectRatio(1)
+                          .borderRadius(8)
+                          .margin({ right: 10 })
+                          .draggable(false)
 
-                    Column() {
-                      Text(libraryItemSearchResult.libraryItem.media.metadata.title)
-                        .fontSize(19)
-                        .maxLines(1)
-                        .textOverflow({ overflow: TextOverflow.Ellipsis })
-                        .margin({ bottom: 5 })
+                        Column() {
+                          Text(libraryItemSearchResult.libraryItem.media.metadata.title)
+                            .fontSize(19)
+                            .maxLines(1)
+                            .textOverflow({ overflow: TextOverflow.Ellipsis })
+                            .margin({ bottom: 5 })
 
-                      Text((libraryItemSearchResult.libraryItem.media.metadata.authorName ?? "-"))
-                        .fontSize(16)
-                        .fontColor($r('sys.color.font_secondary'))
-                        .maxLines(1)
-                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                          Text((libraryItemSearchResult.libraryItem.media.metadata.authorName ?? "-"))
+                            .fontSize(16)
+                            .fontColor($r('sys.color.font_secondary'))
+                            .maxLines(1)
+                            .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        }
+                        .alignItems(HorizontalAlign.Start)
+                      }
+                      .width('100%')
+                      .height('100%')
+                      .alignItems(VerticalAlign.Center)
+                      .clip(false)
                     }
-                    .alignItems(HorizontalAlign.Start)
                   }
                   .width('100%')
                   .padding({ left: 20, right: 20 })
                   .margin({ top: index === 0 ? 66 + this.statusBarHeight : 10, bottom: index === this.searchResult!.book!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 10 })
-                  .onClick(() => {
-                    this.libraryItem = libraryItemSearchResult.libraryItem
-                    this.pageInfos.pushPathByName('libraryItemDetail', null)
-                  })
+                  .clip(false)
                 }
               })
             }
@@ -124,38 +137,51 @@ export struct SearchMedia {
               ForEach(this.searchResult.podcast, (libraryItemSearchResult: LibraryItemSearchResult, index) => {
                 ListItem() {
                   Row() {
-                    Image(this.baseUrl +
-                      `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
-                      .alt($rawfile('nocover.jpg'))
-                      .objectFit(ImageFit.Cover)
-                      .width(64)
-                      .aspectRatio(1)
-                      .borderRadius(8)
-                      .margin({ right: 10 })
-                      .draggable(false)
+                    ImmersiveActionButton({
+                      barWidth: '100%',
+                      barHeight: 64,
+                      barRadius: 8,
+                      onButtonClick: () => {
+                        this.libraryItem = libraryItemSearchResult.libraryItem
+                        this.pageInfos.pushPathByName('libraryItemDetail', null)
+                      }
+                    }) {
+                      Row() {
+                        Image(this.baseUrl +
+                          `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
+                          .alt($rawfile('nocover.jpg'))
+                          .objectFit(ImageFit.Cover)
+                          .width(64)
+                          .aspectRatio(1)
+                          .borderRadius(8)
+                          .margin({ right: 10 })
+                          .draggable(false)
 
-                    Column() {
-                      Text(libraryItemSearchResult.libraryItem.media.metadata.title)
-                        .fontSize(19)
-                        .maxLines(1)
-                        .textOverflow({ overflow: TextOverflow.Ellipsis })
-                        .margin({ bottom: 5 })
+                        Column() {
+                          Text(libraryItemSearchResult.libraryItem.media.metadata.title)
+                            .fontSize(19)
+                            .maxLines(1)
+                            .textOverflow({ overflow: TextOverflow.Ellipsis })
+                            .margin({ bottom: 5 })
 
-                      Text((libraryItemSearchResult.libraryItem.media.metadata.author ?? "-"))
-                        .fontSize(16)
-                        .fontColor($r('sys.color.font_secondary'))
-                        .maxLines(1)
-                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                          Text((libraryItemSearchResult.libraryItem.media.metadata.author ?? "-"))
+                            .fontSize(16)
+                            .fontColor($r('sys.color.font_secondary'))
+                            .maxLines(1)
+                            .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        }
+                        .alignItems(HorizontalAlign.Start)
+                      }
+                      .width('100%')
+                      .height('100%')
+                      .alignItems(VerticalAlign.Center)
+                      .clip(false)
                     }
-                    .alignItems(HorizontalAlign.Start)
                   }
                   .width('100%')
                   .padding({ left: 20, right: 20 })
                   .margin({ top: index === 0 ? 66 + this.statusBarHeight : 10, bottom: index === this.searchResult!.podcast!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 10 })
-                  .onClick(() => {
-                    this.libraryItem = libraryItemSearchResult.libraryItem
-                    this.pageInfos.pushPathByName('libraryItemDetail', null)
-                  })
+                  .clip(false)
                 }
               })
             }
@@ -163,12 +189,6 @@ export struct SearchMedia {
         }
         .width('100%')
         .height('100%')
-        .divider({
-          strokeWidth: 1,
-          color: $r('app.color.divider'),
-          startMargin: 20,
-          endMargin: 20
-        })
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .scrollBar(BarState.Off)
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)

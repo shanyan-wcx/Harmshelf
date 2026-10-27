@@ -17,6 +17,11 @@ Use `Row({ space: 16 })` as the single source of horizontal spacing for these
 four actions; do not add a per-button left margin, otherwise the first gap
 becomes larger than the other three.
 
+When an immersive surface must remain a rounded rectangle on phone and tablet,
+pass `barRadius` explicitly (for example, `barHeight: 64, barRadius: 8`). If
+`barRadius` is omitted, keep the device-adaptive radius supplied by the shared
+helper for existing capsule and circle controls.
+
 The official system `immersive-light` effect is reserved for title bars and
 Tab bars in this project. Do not use direct content-area `systemMaterial` for
 these actions; use the shared HDS helper instead.

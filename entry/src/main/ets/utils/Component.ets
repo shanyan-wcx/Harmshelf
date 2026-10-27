@@ -107,6 +107,7 @@ function titleBarStyle(scrollEffectOpts: ScrollEffectOptions): TitleBarStyleOpti
 export struct ImmersiveActionButton {
   @Param barWidth: number | '100%' = '100%'
   @Param barHeight: number = 50
+  @Param barRadius: number | undefined = undefined
   @Param menuItems: Array<MenuElement> | undefined = undefined
   @Param onButtonClick: (() => void) | undefined = undefined
   @Param monopolizeActionEvents: boolean = true
@@ -133,7 +134,7 @@ export struct ImmersiveActionButton {
     }
     .width(this.barWidth)
     .height('100%')
-    .borderRadius(getImmersiveActionRadius(this.barHeight))
+    .borderRadius(this.barRadius ?? getImmersiveActionRadius(this.barHeight))
     .clip(false)
     .onClick(() => {
       if (this.onButtonClick) {
