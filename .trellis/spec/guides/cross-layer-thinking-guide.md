@@ -160,3 +160,19 @@ Create detailed flow docs when:
 - Multiple teams are involved
 - Data format is complex
 - Feature has caused bugs before
+
+## Native HDS immersive action boundary
+
+For a content action implemented with `ImmersiveActionButton`, separate the
+page-level caller from the native HdsTabs host before changing appearance:
+
+- The caller owns only content, layout, menu data, and semantic icon/text
+  colors. It must not pass a custom background color or light-effect color.
+- The shared helper owns the single HdsTabs instance and its native material;
+  the transparent floating mask, disabled default blur/divider, and
+  `clip(false)` chain belong there rather than in individual pages.
+- A rounded custom tab-builder child does not reshape the HdsTabs floating
+  host. If a pressed state shows a rectangular boundary, inspect the host's
+  floating mask and ancestor clipping before changing the child radius.
+- Deletion emphasis is content-only: keep the delete symbol or label red, not
+  a painted red surface behind the immersive material.

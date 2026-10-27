@@ -86,6 +86,12 @@ chain must use `.clip(false)` so the native material edge/shadow is not cut by
 an ancestor. Do not remove unrelated `.clip(true)` modifiers used to mask
 media thumbnails or content rows.
 
+Callers must not pass `barBackgroundColor`, `lightColor`, or another painted
+surface into `ImmersiveActionButton`. The helper may keep its explicit
+transparent HdsTabs host guard and native floating-mask settings; action
+specific color belongs only on the builder's symbol or text. Delete actions
+therefore use a red symbol/label without a red button background.
+
 Pass `menuItems` for menus that belong to an immersive action. The shared
 helper binds the array on the custom HdsTabs bar builder; do not put
 `bindMenu` on the outer `Row`, because `monopolizeEvents(true)` prevents that
