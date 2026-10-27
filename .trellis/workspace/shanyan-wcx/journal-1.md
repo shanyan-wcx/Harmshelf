@@ -529,3 +529,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 20: 搜索结果沉浸光感列表样式
+
+**Date**: 2026-10-27
+**Task**: 搜索结果沉浸光感列表样式
+**Branch**: `main`
+
+### Summary
+
+移除搜索结果分割线，书籍和播客结果项改用共享 ImmersiveActionButton，固定 8vp 圆角矩形并保留列表间距与导航行为；devecocli Debug 构建通过，任务已归档。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `10515d8` | (see git log) |
+
+### Status
+
+[OK] **Completed**
