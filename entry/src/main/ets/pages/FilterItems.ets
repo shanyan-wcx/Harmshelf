@@ -117,6 +117,7 @@ export struct FilterItems {
                 })
                   .margin({ bottom: index === this.filterItems.length - 1 ? 20 : 0 })
               }
+              .clip(false)
             })
           }
           .width('100%')
@@ -135,6 +136,7 @@ export struct FilterItems {
             top: 64 + this.statusBarHeight,
             bottom: getBottomContentInset(0, this.isStartPlaying, 84, false)
           })
+          .clip(false)
           .onReachEnd(async () => {
 
           })
@@ -152,6 +154,7 @@ export struct FilterItems {
         }
         .width('100%')
         .height('100%')
+        .clip(false)
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
 
         Column() {
@@ -167,6 +170,7 @@ export struct FilterItems {
       }
       .width('100%')
       .height('100%')
+      .clip(false)
     }
     .width('100%')
     .height('100%')

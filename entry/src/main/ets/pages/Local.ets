@@ -1,12 +1,11 @@
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
-import { env } from '../utils/Class';
-import { ConfigurationConstant } from '@kit.AbilityKit';
 import { PersistenceV2 } from '@kit.ArkUI';
 import { ColorMode } from "../pages/Index";
 import { LocalPlayItem, LocalTrack, PlayItem } from '../utils/Interface';
 import { media } from '@kit.MediaKit';
 import { Logger } from '../utils/Logger';
 import { getBottomContentInset } from '../utils/Layout';
+import { ImmersiveActionButton } from '../utils/Component';
 
 @ComponentV2
 export struct LocalMedia {
@@ -162,39 +161,52 @@ export struct LocalMedia {
 
   @Builder
   deleteSubFolderButton(folderName: string) {
-    Button({ type: ButtonType.Circle }) {
-      SymbolGlyph($r('sys.symbol.trash_fill'))
-        .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-        .fontColor([$r('sys.color.white')])
+    Row() {
+      ImmersiveActionButton({
+        barWidth: 40,
+        barHeight: 40,
+        onButtonClick: () => {
+          this.deleteSubFolder(folderName)
+        }
+      }) {
+        SymbolGlyph($r('sys.symbol.trash_fill'))
+          .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+          .fontColor([Color.Red])
+          .hitTestBehavior(HitTestMode.None)
+      }
     }
     .width(40)
     .height(40)
     .margin({ left: 10, right: 10 })
-    .backgroundColor($r('sys.color.warning'))
-    .onClick(() => {
-      this.deleteSubFolder(folderName)
-    })
+    .clip(false)
   }
 
   @Builder
   deleteButton(fileName: string) {
-    Button({ type: ButtonType.Circle }) {
-      SymbolGlyph($r('sys.symbol.trash_fill'))
-        .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-        .fontColor([$r('sys.color.white')])
+    Row() {
+      ImmersiveActionButton({
+        barWidth: 40,
+        barHeight: 40,
+        onButtonClick: () => {
+          this.deleteLocalFile(fileName)
+        }
+      }) {
+        SymbolGlyph($r('sys.symbol.trash_fill'))
+          .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+          .fontColor([Color.Red])
+          .hitTestBehavior(HitTestMode.None)
+      }
     }
     .width(40)
     .height(40)
     .margin({ left: 10, right: 10 })
-    .backgroundColor($r('sys.color.warning'))
-    .onClick(() => {
-      this.deleteLocalFile(fileName)
-    })
+    .clip(false)
   }
 
   build() {
     Stack() {
-      Column() {
+      Scroll(this.LocalMediaScroller) {
+        Column() {
         Column() {
           Text("本地媒体")
             .fontSize(18)
@@ -220,10 +232,17 @@ export struct LocalMedia {
               }
               .width('100%')
               .height(50)
-              .borderRadius(8)
-              .margin({ bottom: index !== this.folderList.length - 1 ? 10 : 0 })
+              .borderRadius(10)
+              .margin({ bottom: index !== this.folderList.length - 1 ? 12 : 0 })
               .padding({ left: 20, right: 20 })
-              .backgroundColor($r('sys.color.comp_background_tertiary'))
+              .backgroundColor($r('sys.color.background_secondary'))
+              .border({
+                width: 0.35,
+                radius: 10,
+                color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+              })
+              .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+              .clip(false)
               .onClick(async () => {
                 try {
                   this.subFolderList = []
@@ -267,16 +286,23 @@ export struct LocalMedia {
             }
             .width('100%')
             .height(50)
-            .borderRadius(8)
+            .borderRadius(10)
             .margin({ bottom: 10 })
             .padding({ left: 20, right: 20 })
-            .backgroundColor($r('sys.color.comp_background_tertiary'))
+            .backgroundColor($r('sys.color.background_secondary'))
+            .border({
+              width: 0.35,
+              radius: 10,
+              color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+            })
+            .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+            .clip(false)
             .onClick(async () => {
               this.folderDeep = 0
             })
 
             if (this.subFolderList.length > 0) {
-              List({ space: 6 }) {
+              List({ space: 12 }) {
                 ForEach(this.subFolderList.sort((a, b) => a.localeCompare(b)), (folder: string, index) => {
                   ListItem() {
                     Row() {
@@ -297,8 +323,15 @@ export struct LocalMedia {
                   }
                   .width('100%')
                   .height(50)
-                  .borderRadius(8)
-                  .backgroundColor($r('sys.color.comp_background_tertiary'))
+                  .borderRadius(10)
+                  .backgroundColor($r('sys.color.background_secondary'))
+                  .border({
+                    width: 0.35,
+                    radius: 10,
+                    color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+                  })
+                  .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+                  .clip(false)
                   .swipeAction({
                     end: {
                       builder: () => {
@@ -306,6 +339,7 @@ export struct LocalMedia {
                       }
                     }
                   })
+                  .clip(true)
                   .onClick(async () => {
                     try {
                       this.audioFolderList = []
@@ -326,6 +360,8 @@ export struct LocalMedia {
               .width('100%')
               .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
               .scrollBar(BarState.Off)
+              .enableScrollInteraction(false)
+              .clip(false)
             } else {
               Row() {
                 Text("没有项目")
@@ -333,7 +369,7 @@ export struct LocalMedia {
                   .fontWeight(FontWeight.Medium)
               }
               .height(50)
-              .borderRadius(8)
+              .borderRadius(10)
               .padding({ left: 20, right: 20 })
             }
           } else {
@@ -354,16 +390,23 @@ export struct LocalMedia {
             }
             .width('100%')
             .height(50)
-            .borderRadius(8)
+            .borderRadius(10)
             .margin({ bottom: 10 })
             .padding({ left: 20, right: 20 })
-            .backgroundColor($r('sys.color.comp_background_tertiary'))
+            .backgroundColor($r('sys.color.background_secondary'))
+            .border({
+              width: 0.35,
+              radius: 10,
+              color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+            })
+            .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+            .clip(false)
             .onClick(async () => {
               this.folderDeep = 1
             })
 
             if (this.audioFolderList.length > 0) {
-              List({ space: 6 }) {
+              List({ space: 12 }) {
                 ForEach(this.audioFolderList.sort((a, b) => a.localeCompare(b)), (file: string, index) => {
                   ListItem() {
                     Row() {
@@ -380,8 +423,15 @@ export struct LocalMedia {
                   }
                   .width('100%')
                   .height(50)
-                  .borderRadius(8)
-                  .backgroundColor($r('sys.color.comp_background_tertiary'))
+                  .borderRadius(10)
+                  .backgroundColor($r('sys.color.background_secondary'))
+                  .border({
+                    width: 0.35,
+                    radius: 10,
+                    color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+                  })
+                  .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+                  .clip(false)
                   .swipeAction({
                     end: {
                       builder: () => {
@@ -389,15 +439,17 @@ export struct LocalMedia {
                       }
                     }
                   })
+                  .clip(true)
                   .onClick(() => {
                     this.startLocalPlayback(index)
                   })
                 })
               }
               .width('100%')
-              .layoutWeight(1)
               .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
               .scrollBar(BarState.Off)
+              .enableScrollInteraction(false)
+              .clip(false)
             } else {
               Row() {
                 Text("没有文件")
@@ -405,23 +457,29 @@ export struct LocalMedia {
                   .fontWeight(FontWeight.Medium)
               }
               .height(50)
-              .borderRadius(8)
+              .borderRadius(10)
               .padding({ left: 20, right: 20 })
             }
           }
         }
         .width('100%')
-        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
-          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
-          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
-          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
-        .borderRadius(8)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+        .borderRadius(10)
         .padding({ left: 20, right: 20, bottom: 20 })
-        .clip(true)
+        .border({
+          width: 0.35,
+          radius: 10,
+          color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+        })
+        .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+        .clip(false)
+      }
+        .width('100%')
+        .padding({ left: 20, right: 20, top: this.statusBarHeight + 69, bottom: getBottomContentInset(25, this.isStartPlaying, 104) })
       }
       .width('100%')
       .height('100%')
-      .padding({ left: 20, right: 20, top: this.statusBarHeight + 69, bottom: getBottomContentInset(25, this.isStartPlaying, 104) })
       .align(Alignment.Top)
     }
     .width('100%')

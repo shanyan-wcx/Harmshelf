@@ -46,9 +46,11 @@ export struct RecentEpisodes {
       }
       .width('100%')
       .height('100%')
+      .clip(false)
       .padding({ top: this.statusBarHeight + 56 + 31, left: 20, right: 20, bottom: getBottomContentInset(20, this.isStartPlaying, 104) })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
+      .clip(false)
       .onReachEnd(async () => {
         let tmpEpisodes: Episode[] = await getRecentEpisodes(this.library!.id, this.recentEpisodesPage + 1)
         if (tmpEpisodes.length > 0) {
@@ -59,5 +61,6 @@ export struct RecentEpisodes {
     }
     .width('100%')
     .height('100%')
+    .clip(false)
   }
 }

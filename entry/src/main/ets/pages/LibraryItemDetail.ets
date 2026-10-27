@@ -222,7 +222,7 @@ export struct LibraryItemDetail {
       }
       if (this.itemProgress && this.itemProgress.currentTime > 0) {
         this.moreMenus.push({
-          symbolIcon: new SymbolGlyphModifier($r('sys.symbol.delete_left')),
+          symbolIcon: new SymbolGlyphModifier($r('sys.symbol.delete_left')).fontColor([Color.Red]),
           value: "放弃进度",
           action: async () => {
             let tmpProgress: UpdateProgress = {
@@ -363,7 +363,7 @@ export struct LibraryItemDetail {
       .backgroundColor($r('sys.color.comp_emphasize_secondary'))
       .height(40)
       .width('100%')
-      .borderRadius(8)
+      .borderRadius(10)
       .margin({ top: 20 })
       .onClick(async () => {
         if (this.addToServer.every(v => v === false)) {
@@ -418,7 +418,7 @@ export struct LibraryItemDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(() => {
           this.showConfirm = false
         })
@@ -431,7 +431,7 @@ export struct LibraryItemDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(async () => {
           if (this.tmpPlayingItem) {
             this.playingItem = this.tmpPlayingItem
@@ -481,7 +481,7 @@ export struct LibraryItemDetail {
         Row() {
           TextInput({ text: this.downloadStart, placeholder: '1' })
             .height(40)
-            .borderRadius(8)
+            .borderRadius(10)
             .inputFilter('[0-9]', (err) => {})
             .onChange((val) => { this.downloadStart = val })
             .textAlign(TextAlign.Center)
@@ -496,7 +496,7 @@ export struct LibraryItemDetail {
 
           TextInput({ text: this.downloadEnd, placeholder: String(this.libraryItem?.media.tracks?.length ?? '') })
             .height(40)
-            .borderRadius(8)
+            .borderRadius(10)
             .inputFilter('[0-9]', (err) => {})
             .onChange((val) => { this.downloadEnd = val })
             .textAlign(TextAlign.Center)
@@ -516,7 +516,7 @@ export struct LibraryItemDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(() => {
           this.showConfirmDownload = false
         })
@@ -529,7 +529,7 @@ export struct LibraryItemDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(async () => {
           const maxTracks = this.libraryItem?.media.tracks?.length ?? 0
           const start = this.downloadStart === '' ? 1 : Number(this.downloadStart)
@@ -631,7 +631,7 @@ export struct LibraryItemDetail {
                 }
                 .width(80)
                 .height(40)
-                .borderRadius(8)
+                .borderRadius(10)
                 .backgroundColor($r('sys.color.comp_background_tertiary'))
                 .onClick(async () => {
                   let tmpPlaylist: Playlist | undefined = undefined
@@ -655,7 +655,7 @@ export struct LibraryItemDetail {
         .height('100%')
         .padding({ left: 20, right: 20, bottom: 25 })
         .scrollBar(BarState.Off)
-        .borderRadius(8)
+        .borderRadius(10)
         .clip(true)
         .divider({
           strokeWidth: 1,
@@ -685,7 +685,7 @@ export struct LibraryItemDetail {
         }
         .height(45)
         .width('100%')
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .onClick(async () => {
           if (this.showProgress) {
@@ -715,7 +715,7 @@ export struct LibraryItemDetail {
       })
         .width("100%")
         .height(45)
-        .borderRadius(8)
+        .borderRadius(10)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -733,7 +733,7 @@ export struct LibraryItemDetail {
       })
         .width("100%")
         .height(120)
-        .borderRadius(8)
+        .borderRadius(10)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -756,7 +756,7 @@ export struct LibraryItemDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(() => {
           this.showCreatePlaylist = false
         })
@@ -769,7 +769,7 @@ export struct LibraryItemDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(async () => {
           if (this.tmpPlaylistName.length === 0) {
             this.getUIContext().getPromptAction().showToast({
@@ -828,7 +828,7 @@ export struct LibraryItemDetail {
                 }
                 .width(80)
                 .height(40)
-                .borderRadius(8)
+                .borderRadius(10)
                 .backgroundColor($r('sys.color.comp_background_tertiary'))
                 .onClick(async () => {
                   let tmpCollection: Collection | undefined = undefined
@@ -852,7 +852,7 @@ export struct LibraryItemDetail {
         .height('100%')
         .padding({ left: 20, right: 20, bottom: 25 })
         .scrollBar(BarState.Off)
-        .borderRadius(8)
+        .borderRadius(10)
         .clip(true)
         .divider({
           strokeWidth: 1,
@@ -882,7 +882,7 @@ export struct LibraryItemDetail {
         }
         .height(45)
         .width('100%')
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .onClick(async () => {
           if (this.showProgress) {
@@ -912,7 +912,7 @@ export struct LibraryItemDetail {
       })
         .width("100%")
         .height(45)
-        .borderRadius(8)
+        .borderRadius(10)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -930,7 +930,7 @@ export struct LibraryItemDetail {
       })
         .width("100%")
         .height(120)
-        .borderRadius(8)
+        .borderRadius(10)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -953,7 +953,7 @@ export struct LibraryItemDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(() => {
           this.showCreateCollection = false
         })
@@ -966,7 +966,7 @@ export struct LibraryItemDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(async () => {
           if (this.tmpCollectionName.length === 0) {
             this.getUIContext().getPromptAction().showToast({
@@ -1076,7 +1076,7 @@ export struct LibraryItemDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(() => {
           this.projectSkipSettings?.removeSkipSettings(this.libraryItem!.id)
           this.tmpSkipStart = 0
@@ -1096,7 +1096,7 @@ export struct LibraryItemDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(() => {
           this.projectSkipSettings?.setSkipSettings(this.libraryItem!.id, {
             skipStart: this.tmpSkipStart,
@@ -1189,14 +1189,27 @@ export struct LibraryItemDetail {
           }) {
             GridCol({ span: 1 }) {
               Column() {
-                Image(this.baseUrl + `/api/items/${this.libraryItem!.id}/cover?token=${this.apiToken}`)
-                  .alt($rawfile('nocover.jpg'))
-                  .objectFit(ImageFit.Cover)
+                Stack() {
+                  Image(this.baseUrl + `/api/items/${this.libraryItem!.id}/cover?token=${this.apiToken}`)
+                    .alt($rawfile('nocover.jpg'))
+                    .objectFit(ImageFit.Cover)
+                    .width('100%')
+                    .height('100%')
+                    .borderRadius(10)
+                    .clip(true)
+                    .draggable(false)
+                }
                   .width(this.sideBarContentWidth / this.displayHeight >= 3 / 5 ? this.displayHeight * 0.38 : '78%')
                   .aspectRatio(1)
                   .borderRadius(10)
+                  .border({
+                    width: 0.35,
+                    radius: 10,
+                    color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+                  })
+                  .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+                  .clip(false)
                   .margin({ bottom: 20 })
-                  .draggable(false)
 
                 Row() {
                   Row() {
@@ -1715,7 +1728,7 @@ export struct LibraryItemDetail {
                       }
                     }
                     .padding(5)
-                    .borderRadius(8)
+                    .borderRadius(10)
                     .backgroundColor(Color.Transparent)
                     .onClick(() => {
                       this.showMoreIntro = !this.showMoreIntro
@@ -1781,6 +1794,7 @@ export struct LibraryItemDetail {
                 }
               })
             }
+            .clip(false)
 
             GridCol({ span: 1 }) {
               if (this.library?.mediaType === 'book') {
@@ -1911,7 +1925,7 @@ export struct LibraryItemDetail {
                   .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                   .border({
-                    width: 0.5,
+                    width: 0.35,
                     radius: 30,
                     color: $r('sys.color.ohos_id_color_focused_outline_transparent')
                   })
@@ -2025,7 +2039,7 @@ export struct LibraryItemDetail {
                   .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                   .border({
-                    width: 0.5,
+                    width: 0.35,
                     radius: 30,
                     color: $r('sys.color.ohos_id_color_focused_outline_transparent')
                   })
@@ -2156,8 +2170,10 @@ export struct LibraryItemDetail {
                 }
               }
             }
+            .clip(false)
           }
           .width('100%')
+          .clip(false)
           .bindSheet(this.showSkipStartEnd, this.skipStartEndBuilder(), {
             height: SheetSize.FIT_CONTENT,
             preferType: SheetType.CENTER,
@@ -2190,6 +2206,7 @@ export struct LibraryItemDetail {
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .scrollBar(BarState.Off)
         .align(Alignment.Top)
+        .clip(false)
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
 
         Column() {
@@ -2205,6 +2222,7 @@ export struct LibraryItemDetail {
       }
       .width('100%')
       .height('100%')
+      .clip(false)
     }
     .width('100%')
     .height('100%')

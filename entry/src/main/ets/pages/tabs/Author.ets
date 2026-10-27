@@ -27,6 +27,7 @@ export struct AllAuthors {
               (this.displayWidth >= 1000 ? 5 :
                 (this.displayWidth >= 800 ? 4 :
                   (this.displayWidth >= 400 ? 3 : 2)))))
+          .clip(false)
 
           ForEach(this.authors, (author: Author, index) => {
             GridItem() {
@@ -35,6 +36,7 @@ export struct AllAuthors {
               })
                 .margin({ bottom: index === this.authors.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
             }
+            .clip(false)
           })
         }
         .width('100%')

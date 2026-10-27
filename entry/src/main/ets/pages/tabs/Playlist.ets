@@ -22,10 +22,11 @@ export struct AllPlaylists {
             }
           }
           .columnStart(0)
-          .columnEnd(this.displayWidth >= 1400 ? 5 :
-            (this.displayWidth >= 1000 ? 4 :
-              (this.displayWidth >= 800 ? 3 :
-                (this.displayWidth >= 400 ? 2 : 1))))
+          .columnEnd(this.displayWidth >= 1500 ? 5 :
+            (this.displayWidth >= 1200 ? 4 :
+              (this.displayWidth >= 900 ? 3 :
+                (this.displayWidth >= 600 ? 2 : 1))))
+          .clip(false)
 
           ForEach(this.playlists, (playlist: Playlist, index) => {
             GridItem() {
@@ -34,14 +35,15 @@ export struct AllPlaylists {
               })
                 .margin({ bottom: index === this.playlists.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
             }
+            .clip(false)
           })
         }
         .width('100%')
         .height('100%')
-        .columnsTemplate(this.displayWidth >= 1400 ? "1fr 1fr 1fr 1fr 1fr 1fr" :
-          (this.displayWidth >= 1000 ? "1fr 1fr 1fr 1fr 1fr" :
-            (this.displayWidth >= 800 ? "1fr 1fr 1fr 1fr" :
-              (this.displayWidth >= 400 ? "1fr 1fr 1fr" : "1fr 1fr"))))
+        .columnsTemplate(this.displayWidth >= 1500 ? "1fr 1fr 1fr 1fr 1fr 1fr" :
+          (this.displayWidth >= 1200 ? "1fr 1fr 1fr 1fr 1fr" :
+            (this.displayWidth >= 900 ? "1fr 1fr 1fr 1fr" :
+              (this.displayWidth >= 600 ? "1fr 1fr 1fr" : "1fr 1fr"))))
         .columnsGap(20)
         .rowsGap(15)
         .scrollBar(BarState.Off)

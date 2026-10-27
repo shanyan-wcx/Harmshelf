@@ -23,6 +23,7 @@ export struct AllCollections {
           }
           .columnStart(0)
           .columnEnd(this.displayWidth >= 1200 ? 2 : (this.displayWidth >= 800 ? 1 : 0))
+          .clip(false)
 
           ForEach(this.collections, (collection: Collection, index) => {
             GridItem() {
@@ -31,6 +32,7 @@ export struct AllCollections {
               })
                 .margin({ bottom: index === this.collections.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
             }
+            .clip(false)
           })
         }
         .width('100%')

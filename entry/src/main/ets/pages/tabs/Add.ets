@@ -42,7 +42,7 @@ export struct Add {
             .width("100%")
             .layoutWeight(1)
             .height(45)
-            .borderRadius(8)
+            .borderRadius(10)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({
@@ -71,7 +71,7 @@ export struct Add {
             .width("100%")
             .layoutWeight(1)
             .height(45)
-            .borderRadius(8)
+            .borderRadius(10)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({
@@ -100,7 +100,7 @@ export struct Add {
             .width("100%")
             .layoutWeight(1)
             .height(45)
-            .borderRadius(8)
+            .borderRadius(10)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({
@@ -129,7 +129,7 @@ export struct Add {
             .width("100%")
             .layoutWeight(1)
             .height(120)
-            .borderRadius(8)
+            .borderRadius(10)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({
@@ -172,7 +172,7 @@ export struct Add {
           .backgroundColor($r('sys.color.comp_emphasize_secondary'))
           .height(40)
           .width(100)
-          .borderRadius(8)
+          .borderRadius(10)
           .onClick(async () => {
             let podcast1 = await addPodcast(this.library!.id, this.library!.folders[0].id, this.library!.folders[0].fullPath + "/" + searchPodcast.title, searchPodcast, podcast, this.autoDownload[index])
             if (podcast1) {
@@ -211,7 +211,7 @@ export struct Add {
                   .objectFit(ImageFit.Cover)
                   .width(64)
                   .aspectRatio(1)
-                  .borderRadius(8)
+                  .borderRadius(10)
                   .margin({ right: 10 })
                   .draggable(false)
 
@@ -244,12 +244,12 @@ export struct Add {
               .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
               .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
               .border({
-                width: 0.5,
+                width: 0.35,
                 radius: 12,
                 color: $r('sys.color.ohos_id_color_focused_outline_transparent')
               })
               .shadow(ShadowStyle.OUTER_DEFAULT_XS)
-              .margin({ bottom: index === this.searchPodcasts.length - 1 ? getBottomContentInset(25, this.isStartPlaying, 109) : 16 })
+              .margin({ bottom: index === this.searchPodcasts.length - 1 ? getBottomContentInset(25, this.isStartPlaying, 109) : 12 })
               .onClick(async () => {
                 let podcast1 = await getFeed(searchPodcast.feedUrl)
                 if (podcast1) {

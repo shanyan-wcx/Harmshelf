@@ -24,6 +24,7 @@ export struct AllSeries {
           }
           .columnStart(0)
           .columnEnd(this.displayWidth >= 1200 ? 2 : (this.displayWidth >= 800 ? 1 : 0))
+          .clip(false)
 
           ForEach(this.series, (series: Series, index) => {
             GridItem() {
@@ -32,6 +33,7 @@ export struct AllSeries {
               })
                 .margin({ bottom: index === this.series.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
             }
+            .clip(false)
           })
         }
         .width('100%')

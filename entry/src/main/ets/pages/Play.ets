@@ -270,7 +270,7 @@ export struct Play {
       })
         .width("100%")
         .height(45)
-        .borderRadius(8)
+        .borderRadius(10)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -292,7 +292,7 @@ export struct Play {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(() => {
           this.showEditBookmark = false
         })
@@ -305,7 +305,7 @@ export struct Play {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(async () => {
           let bookmark: Bookmark = {
             libraryItemId: this.playingItem!.libraryItemId,
@@ -340,7 +340,7 @@ export struct Play {
           ForEach(this.bookmarks, (bookmark: Bookmark, index) => {
             HdsListItem({
               hdsListItemCard: {
-                cardBorderRadius: 8,
+                cardBorderRadius: 10,
                 cardBackgroundColor: Color.Transparent,
                 textItem: {
                   primaryText: {
@@ -386,6 +386,7 @@ export struct Play {
                 ],
                 deleteIconOptions: {
                   backgroundColor: $r('sys.color.warning'),
+                  iconColor: Color.Red,
                   onAction: async () => {
                     let status = await deleteBookmark(this.playingItem!.libraryItemId, bookmark.time)
                     if (status) {
@@ -420,7 +421,7 @@ export struct Play {
         .width('100%')
         .height('100%')
         .scrollBar(BarState.Off)
-        .borderRadius(8)
+        .borderRadius(10)
         .clip(true)
         .visibility(!this.showProgress ? Visibility.Visible : Visibility.None)
 
@@ -447,7 +448,7 @@ export struct Play {
           .width("100%")
           .height(45)
           .layoutWeight(1)
-          .borderRadius(8)
+          .borderRadius(10)
           .margin({ right: 15 })
           .caretColor($r('sys.color.font_secondary'))
           .fontSize(18)
@@ -465,7 +466,7 @@ export struct Play {
             .fontSize(18)
         }
         .height(45)
-        .borderRadius(8)
+        .borderRadius(10)
         .padding({ left: 15, right: 15 })
         .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .onClick(async () => {
@@ -493,7 +494,7 @@ export struct Play {
       }
       .padding({ top: 10, bottom: 5 })
       .margin({ left: 20, right: 20, bottom: 20 })
-      .borderRadius(8)
+      .borderRadius(10)
     }
   }
 
@@ -507,7 +508,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_50_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_50_X
@@ -521,7 +522,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_75_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_75_X
@@ -535,7 +536,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_00_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
@@ -549,7 +550,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_25_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_25_X
@@ -563,7 +564,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_50_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_50_X
@@ -577,7 +578,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_75_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_75_X
@@ -591,7 +592,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_2_00_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_2_00_X
@@ -614,7 +615,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
           this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 5 * 60
@@ -627,7 +628,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
           this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 10 * 60
@@ -640,7 +641,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
           this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 15 * 60
@@ -653,7 +654,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
           this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 30 * 60
@@ -666,7 +667,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
           this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 45 * 60
@@ -679,7 +680,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
           this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 60 * 60
@@ -692,7 +693,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
           this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 90 * 60
@@ -705,7 +706,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor(Color.Transparent)
         .onClick(() => {
           this.sleepTime = this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playingItem!.audioTracks[this.playingIndex].duration
@@ -718,7 +719,7 @@ export struct Play {
         }
         .width('100%')
         .height(50)
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .onClick(() => {
           this.sleepTime = 0
@@ -749,7 +750,7 @@ export struct Play {
               }
               .width('100%')
               .height(50)
-              .borderRadius(8)
+              .borderRadius(10)
               .padding({ left: 15, right: 15 })
               .backgroundColor(this.playingIndex === index ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
               .onClick(async () => {
@@ -775,7 +776,7 @@ export struct Play {
         .height('100%')
         .padding({ left: 20, right: 20, bottom: 25 })
         .scrollBar(BarState.Off)
-        .borderRadius(8)
+        .borderRadius(10)
         .clip(true)
       } else {
         List({ scroller: this.chapterScroller }) {
@@ -798,7 +799,7 @@ export struct Play {
               }
               .width('100%')
               .height(50)
-              .borderRadius(8)
+              .borderRadius(10)
               .padding({ left: 15, right: 15 })
               .backgroundColor(this.playingIndex === index ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
               .onClick(async () => {
@@ -816,7 +817,7 @@ export struct Play {
         .height('100%')
         .padding({ left: 20, right: 20, bottom: 25 })
         .scrollBar(BarState.Off)
-        .borderRadius(8)
+        .borderRadius(10)
         .clip(true)
       }
     }
@@ -858,7 +859,7 @@ export struct Play {
                   .fontSize(18)
               }
               .height(40)
-              .borderRadius(8)
+              .borderRadius(10)
               .padding({ left: 15, right: 15 })
               .backgroundColor($r('sys.color.comp_background_tertiary'))
               .visibility(this.sleepTime !== 0 ? Visibility.Visible : Visibility.None)
@@ -1353,7 +1354,7 @@ export struct Play {
     .backgroundColor(Color.Transparent)
     .backgroundBlurStyle(BlurStyle.Thin)
     .shadow({
-      radius: 8,
+      radius: 10,
       color: $r('sys.color.font')
     })
     .bindContentCover(this.showPlay, this.playBuilder(), {

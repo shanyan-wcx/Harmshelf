@@ -108,6 +108,7 @@ export struct ImmersiveActionButton {
   @Param barWidth: number | '100%' = '100%'
   @Param barHeight: number = 50
   @Param barRadius: number | undefined = undefined
+  @Param barBackgroundColor: ResourceColor | undefined = undefined
   @Param menuItems: Array<MenuElement> | undefined = undefined
   @Param onButtonClick: (() => void) | undefined = undefined
   @Param monopolizeActionEvents: boolean = true
@@ -161,8 +162,6 @@ export struct ImmersiveActionButton {
     .barWidth(this.resolvedBarWidth())
     .barHeight(this.barHeight)
     .barOverlap(true)
-    .barBackgroundColor(Color.Transparent)
-    .barBackgroundBlurStyle(BlurStyle.NONE)
     .divider({ mode: DividerMode.NONE })
     .barPosition(BarPosition.End)
     .vertical(false)
@@ -179,11 +178,14 @@ export struct ImmersiveActionButton {
       gradientMask: {
         maskColor: Color.Transparent
       },
+      lightColor: this.barBackgroundColor,
       systemMaterialEffect: {
         materialType: hdsMaterial.MaterialType.IMMERSIVE,
         materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
       }
     })
+    .barBackgroundColor(this.barBackgroundColor ?? Color.Transparent)
+    .barBackgroundBlurStyle(BlurStyle.NONE)
     .clip(false)
     .onAreaChange((oldArea, newArea) => {
       let measuredWidth: number = Number(newArea.width)
@@ -599,13 +601,21 @@ export struct LibraryItemComponent {
         .width('100%')
         .height('100%')
         .alignContent(Alignment.Bottom)
+        .borderRadius(10)
+        .clip(true)
       }
       .width('auto')
       .height('100%')
       .layoutWeight(1)
       .aspectRatio(1)
       .borderRadius(10)
-      .clip(true)
+      .border({
+        width: 0.35,
+        radius: 10,
+        color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+      })
+      .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+      .clip(false)
       .backgroundColor(Color.Transparent)
       .onClick(() => {
         this.libraryItem = this.item
@@ -632,6 +642,7 @@ export struct LibraryItemComponent {
     .width('auto')
     .height('100%')
     .alignItems(HorizontalAlign.Start)
+    .clip(false)
   }
 }
 
@@ -685,13 +696,21 @@ export struct LibraryItemComponent1 {
         .width('100%')
         .height('100%')
         .alignContent(Alignment.Bottom)
+        .borderRadius(10)
+        .clip(true)
       }
       .width('100%')
       .height('auto')
       .layoutWeight(1)
       .aspectRatio(1)
       .borderRadius(10)
-      .clip(true)
+      .border({
+        width: 0.35,
+        radius: 10,
+        color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+      })
+      .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+      .clip(false)
       .backgroundColor(Color.Transparent)
       .onClick(() => {
         this.libraryItem = this.item
@@ -718,6 +737,7 @@ export struct LibraryItemComponent1 {
     .width('100%')
     .height('auto')
     .alignItems(HorizontalAlign.Start)
+    .clip(false)
   }
 }
 
@@ -789,6 +809,8 @@ export struct SeriesItemComponent {
       .layoutWeight(1)
       .aspectRatio(2)
       .backgroundColor(Color.Transparent)
+      .borderRadius(10)
+      .clip(true)
       .onAreaChange((oldArea, newArea) => {
         this.imageWidth = newArea.width
       })
@@ -821,15 +843,21 @@ export struct SeriesItemComponent {
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .textAlign(TextAlign.Center)
-            .padding({ left: 8, right: 8 })
+            .padding({ left: 6, right: 6 })
         }
       }
       .width('100%')
       .height(28)
-      .padding({ left: 8, right: 8 })
-      .margin({ bottom: 8 })
+      .padding({ left: 6, right: 6 })
+      .margin({ bottom: 6 })
     }
     .borderRadius(10)
+    .border({
+      width: 0.35,
+      radius: 10,
+      color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+    })
+    .shadow(ShadowStyle.OUTER_DEFAULT_XS)
     .clip(false)
     .width('100%')
     .height('auto')
@@ -910,6 +938,8 @@ export struct CollectionItemComponent {
       .layoutWeight(1)
       .aspectRatio(2)
       .backgroundColor(Color.Transparent)
+      .borderRadius(10)
+      .clip(true)
       .onAreaChange((oldArea, newArea) => {
         this.imageWidth = newArea.width
       })
@@ -934,15 +964,21 @@ export struct CollectionItemComponent {
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .textAlign(TextAlign.Center)
-            .padding({ left: 8, right: 8 })
+            .padding({ left: 6, right: 6 })
         }
       }
       .width('100%')
       .height(28)
-      .padding({ left: 8, right: 8 })
-      .margin({ bottom: 8 })
+      .padding({ left: 6, right: 6 })
+      .margin({ bottom: 6 })
     }
     .borderRadius(10)
+    .border({
+      width: 0.35,
+      radius: 10,
+      color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+    })
+    .shadow(ShadowStyle.OUTER_DEFAULT_XS)
     .clip(false)
     .width('100%')
     .height('auto')
@@ -978,7 +1014,7 @@ export struct PlaylistItemComponent {
   }
 
   build() {
-    Stack() {
+    Stack({ alignContent: Alignment.Bottom }) {
       Button({ type: ButtonType.Normal }) {
         Column() {
           if (this.playlist.items.length === 1) {
@@ -1008,6 +1044,8 @@ export struct PlaylistItemComponent {
             })
           }
         }
+        .borderRadius(10)
+        .clip(true)
       }
       .width('100%')
       .height('auto')
@@ -1019,19 +1057,38 @@ export struct PlaylistItemComponent {
         this.pageInfos.pushPathByName('playlistDetail', null)
       })
 
-      Column() {
-        Text(this.playlist.name)
-          .fontSize(17)
-          .fontWeight(FontWeight.Medium)
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      Row() {
+        ImmersiveActionButton({
+          barWidth: '100%',
+          barHeight: 28,
+          onButtonClick: () => {
+            this.playlist1 = this.playlist
+            this.pageInfos.pushPathByName('playlistDetail', null)
+          }
+        }) {
+          Text(this.playlist.name)
+            .fontSize(17)
+            .fontWeight(FontWeight.Medium)
+            .width('100%')
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .textAlign(TextAlign.Center)
+            .padding({ left: 6, right: 6 })
+        }
       }
-      .width(this.playlistWidth)
-      .padding(4)
-      .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+      .width('100%')
+      .height(28)
+      .padding({ left: 6, right: 6 })
+      .margin({ bottom: 6 })
     }
     .borderRadius(10)
-    .clip(true)
+    .border({
+      width: 0.35,
+      radius: 10,
+      color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+    })
+    .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+    .clip(false)
     .width('100%')
     .height('auto')
     .alignContent(Alignment.Bottom)
@@ -1047,45 +1104,117 @@ export struct AuthorComponent {
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() baseUrl: string = ""
   @Consumer() apiToken: string = ""
-  @Local imageWidth: Length = 0
+  @Local imageHeight: number = 0
+
+  private getTitleHeight(): number {
+    return this.imageHeight > 0 ? this.imageHeight / 5 : 1
+  }
 
   build() {
     Stack() {
       Button({ type: ButtonType.Normal }) {
-        Image(this.baseUrl + `/api/authors/${this.author.id}/image?token=${this.apiToken}`)
-          .alt($rawfile('noprofile.jpg'))
-          .objectFit(ImageFit.Cover)
-          .width('100%')
-          .height('100%')
-          .draggable(false)
-          .onAreaChange((oldArea, newArea) => {
-            this.imageWidth = newArea.width
-          })
+        Stack() {
+          Image(this.baseUrl + `/api/authors/${this.author.id}/image?token=${this.apiToken}`)
+            .alt($rawfile('noprofile.jpg'))
+            .objectFit(ImageFit.Cover)
+            .width('100%')
+            .height('100%')
+            .borderRadius(10)
+            .draggable(false)
+
+          Stack() {
+            ImmersiveActionButton({
+              barWidth: 18,
+              barHeight: 18,
+              barRadius: 9,
+              onButtonClick: () => {
+                let filter: Filter1 = {
+                  criteria: this.author.name,
+                  type: "author"
+                }
+                this.pageInfos.pushPathByName('filterItems', filter)
+              }
+            }) {
+              Row() {
+                Text(Math.min(this.author.numBooks ?? 0, 99).toString())
+                  .fontSize(11)
+                  .fontWeight(FontWeight.Medium)
+                  .width('100%')
+                  .maxLines(1)
+                  .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  .textAlign(TextAlign.Center)
+                  .offset({ y: -1 })
+                  .hitTestBehavior(HitTestMode.None)
+              }
+              .width('100%')
+              .height('100%')
+              .justifyContent(FlexAlign.Center)
+              .alignItems(VerticalAlign.Center)
+              .clip(false)
+            }
+          }
+          .width(18)
+          .height(18)
+          .position({ top: 6, right: 6 })
+        }
+        .width('100%')
+        .height('100%')
+        .clip(false)
       }
       .width('auto')
       .height('100%')
       .layoutWeight(1)
       .aspectRatio(0.85)
+      .borderRadius(10)
       .backgroundColor(Color.Transparent)
+      .onAreaChange((oldArea, newArea) => {
+        this.imageHeight = Number(newArea.height)
+      })
 
-      Column() {
-        Text(this.author.name)
-          .fontSize(15)
-          .fontWeight(FontWeight.Medium)
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-        Text(this.author.numBooks?.toString() + " 图书")
-          .fontSize(12)
-          .fontColor($r('sys.color.font_secondary'))
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      Row() {
+        ImmersiveActionButton({
+          barWidth: '100%',
+          barHeight: this.getTitleHeight(),
+          onButtonClick: () => {
+            let filter: Filter1 = {
+              criteria: this.author.name,
+              type: "author"
+            }
+            this.pageInfos.pushPathByName('filterItems', filter)
+          }
+        }) {
+          Row() {
+            Text(this.author.name)
+              .fontSize(18)
+              .minFontSize(13)
+              .maxFontSize(18)
+              .fontWeight(FontWeight.Medium)
+              .width('calc(100% + 16vp)')
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .textAlign(TextAlign.Center)
+              .offset({ x: -8 })
+              .hitTestBehavior(HitTestMode.None)
+          }
+          .width('100%')
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
+          .alignItems(VerticalAlign.Center)
+          .clip(false)
+        }
       }
-      .width(this.imageWidth)
-      .padding(3)
-      .backgroundBlurStyle(BlurStyle.BACKGROUND_ULTRA_THICK)
+      .width('calc(100% - 12vp)')
+      .height(this.getTitleHeight())
+      .margin({ left: 6, right: 6, bottom: 6 })
     }
     .borderRadius(10)
-    .clip(true)
+    .border({
+      width: 0.35,
+      radius: 10,
+      color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+    })
+    .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+    .clip(false)
     .width('auto')
     .height('100%')
     .alignContent(Alignment.Bottom)
@@ -1105,45 +1234,117 @@ export struct AuthorComponent1 {
   @Consumer() pageInfos: NavPathStack = new NavPathStack();
   @Consumer() baseUrl: string = ""
   @Consumer() apiToken: string = ""
-  @Local imageWidth: Length = 0
+  @Local imageHeight: number = 0
+
+  private getTitleHeight(): number {
+    return this.imageHeight > 0 ? this.imageHeight / 5 : 1
+  }
 
   build() {
     Stack() {
       Button({ type: ButtonType.Normal }) {
-        Image(this.baseUrl + `/api/authors/${this.author.id}/image?token=${this.apiToken}`)
-          .alt($rawfile('noprofile.jpg'))
-          .objectFit(ImageFit.Cover)
-          .width('100%')
-          .height('100%')
-          .draggable(false)
-          .onAreaChange((oldArea, newArea) => {
-            this.imageWidth = newArea.width
-          })
+        Stack() {
+          Image(this.baseUrl + `/api/authors/${this.author.id}/image?token=${this.apiToken}`)
+            .alt($rawfile('noprofile.jpg'))
+            .objectFit(ImageFit.Cover)
+            .width('100%')
+            .height('100%')
+            .borderRadius(10)
+            .draggable(false)
+
+          Stack() {
+            ImmersiveActionButton({
+              barWidth: 18,
+              barHeight: 18,
+              barRadius: 9,
+              onButtonClick: () => {
+                let filter: Filter1 = {
+                  criteria: this.author.name,
+                  type: "author"
+                }
+                this.pageInfos.pushPathByName('filterItems', filter)
+              }
+            }) {
+              Row() {
+                Text(Math.min(this.author.numBooks ?? 0, 99).toString())
+                  .fontSize(11)
+                  .fontWeight(FontWeight.Medium)
+                  .width('100%')
+                  .maxLines(1)
+                  .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  .textAlign(TextAlign.Center)
+                  .offset({ y: -1 })
+                  .hitTestBehavior(HitTestMode.None)
+              }
+              .width('100%')
+              .height('100%')
+              .justifyContent(FlexAlign.Center)
+              .alignItems(VerticalAlign.Center)
+              .clip(false)
+            }
+          }
+          .width(18)
+          .height(18)
+          .position({ top: 6, right: 6 })
+        }
+        .width('100%')
+        .height('100%')
+        .clip(false)
       }
       .width('100%')
       .height('auto')
       .layoutWeight(1)
       .aspectRatio(0.85)
+      .borderRadius(10)
       .backgroundColor(Color.Transparent)
+      .onAreaChange((oldArea, newArea) => {
+        this.imageHeight = Number(newArea.height)
+      })
 
-      Column() {
-        Text(this.author.name)
-          .fontSize(15)
-          .fontWeight(FontWeight.Medium)
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-        Text(this.author.numBooks?.toString() + " 图书")
-          .fontSize(12)
-          .fontColor($r('sys.color.font_secondary'))
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
+      Row() {
+        ImmersiveActionButton({
+          barWidth: '100%',
+          barHeight: this.getTitleHeight(),
+          onButtonClick: () => {
+            let filter: Filter1 = {
+              criteria: this.author.name,
+              type: "author"
+            }
+            this.pageInfos.pushPathByName('filterItems', filter)
+          }
+        }) {
+          Row() {
+            Text(this.author.name)
+              .fontSize(18)
+              .minFontSize(13)
+              .maxFontSize(18)
+              .fontWeight(FontWeight.Medium)
+              .width('calc(100% + 16vp)')
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+              .textAlign(TextAlign.Center)
+              .offset({ x: -8 })
+              .hitTestBehavior(HitTestMode.None)
+          }
+          .width('100%')
+          .height('100%')
+          .justifyContent(FlexAlign.Center)
+          .alignItems(VerticalAlign.Center)
+          .clip(false)
+        }
       }
-      .width(this.imageWidth)
-      .padding(3)
-      .backgroundBlurStyle(BlurStyle.BACKGROUND_ULTRA_THICK)
+      .width('calc(100% - 12vp)')
+      .height(this.getTitleHeight())
+      .margin({ left: 6, right: 6, bottom: 6 })
     }
     .borderRadius(10)
-    .clip(true)
+    .border({
+      width: 0.35,
+      radius: 10,
+      color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+    })
+    .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+    .clip(false)
     .width('100%')
     .height('auto')
     .alignContent(Alignment.Bottom)
@@ -1200,31 +1401,46 @@ export struct RecentEpisodeComponent {
               y: 5
             }))
 
-          Text("剧集")
-            .fontSize(12)
-            .padding({
-              left: 5,
-              right: 5,
-              top: 3,
-              bottom: 2
-            })
-            .borderRadius(5)
-            .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-            .position({
-              top: 5,
-              right: 5
-            })
+          Stack() {
+            ImmersiveActionButton({
+              barWidth: 38,
+              barHeight: 20,
+              barRadius: 10,
+              onButtonClick: () => {
+                this.episode = this.item.recentEpisode
+                this.pageInfos.pushPathByName('episodeDetail', null)
+              },
+              monopolizeActionEvents: true
+            }) {
+              Text("剧集")
+                .fontSize(12)
+            }
+          }
+          .width(38)
+          .height(20)
+          .position({
+            top: 6,
+            right: 6
+          })
         }
         .width('100%')
         .height('100%')
         .alignContent(Alignment.Bottom)
+        .borderRadius(10)
+        .clip(true)
       }
       .width('auto')
       .height('100%')
       .layoutWeight(1)
       .aspectRatio(1)
       .borderRadius(10)
-      .clip(true)
+      .border({
+        width: 0.35,
+        radius: 10,
+        color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+      })
+      .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+      .clip(false)
       .backgroundColor(Color.Transparent)
       .onClick(() => {
         this.episode = this.item.recentEpisode
@@ -1250,6 +1466,7 @@ export struct RecentEpisodeComponent {
     .width('auto')
     .height('100%')
     .alignItems(HorizontalAlign.Start)
+    .clip(false)
   }
 }
 
@@ -1341,7 +1558,7 @@ export struct EpisodeComponent {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(() => {
           this.showConfirmDownload = false
         })
@@ -1354,7 +1571,7 @@ export struct EpisodeComponent {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(async () => {
           this.getUIContext().getPromptAction().showToast({
             message: '开始下载！',
@@ -1448,7 +1665,7 @@ export struct EpisodeComponent {
                 }
                 .width(80)
                 .height(40)
-                .borderRadius(8)
+                .borderRadius(10)
                 .backgroundColor($r('sys.color.comp_background_tertiary'))
                 .onClick(async () => {
                   let tmpPlaylist: Playlist | undefined = undefined
@@ -1472,7 +1689,7 @@ export struct EpisodeComponent {
         .height('100%')
         .padding({ left: 20, right: 20, bottom: 25 })
         .scrollBar(BarState.Off)
-        .borderRadius(8)
+        .borderRadius(10)
         .clip(true)
         .divider({
           strokeWidth: 1,
@@ -1502,7 +1719,7 @@ export struct EpisodeComponent {
         }
         .height(45)
         .width('100%')
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .onClick(async () => {
           if (this.showProgress) {
@@ -1532,7 +1749,7 @@ export struct EpisodeComponent {
       })
         .width("100%")
         .height(45)
-        .borderRadius(8)
+        .borderRadius(10)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -1550,7 +1767,7 @@ export struct EpisodeComponent {
       })
         .width("100%")
         .height(120)
-        .borderRadius(8)
+        .borderRadius(10)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -1573,7 +1790,7 @@ export struct EpisodeComponent {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(() => {
           this.showCreatePlaylist = false
         })
@@ -1586,7 +1803,7 @@ export struct EpisodeComponent {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(async () => {
           if (this.tmpPlaylistName.length === 0) {
             this.getUIContext().getPromptAction().showToast({
@@ -1628,14 +1845,27 @@ export struct EpisodeComponent {
   build() {
     Column() {
       Row() {
-        Image(this.baseUrl + `/api/items/${this.item.libraryItemId}/cover?token=${this.apiToken}`)
-          .alt($rawfile('nocover.jpg'))
-          .objectFit(ImageFit.Cover)
+        Stack() {
+          Image(this.baseUrl + `/api/items/${this.item.libraryItemId}/cover?token=${this.apiToken}`)
+            .alt($rawfile('nocover.jpg'))
+            .objectFit(ImageFit.Cover)
+            .width('100%')
+            .height('100%')
+            .borderRadius(10)
+            .clip(true)
+            .draggable(false)
+        }
+          .width(45)
           .height(45)
-          .aspectRatio(1)
-          .borderRadius(8)
+          .borderRadius(10)
+          .border({
+            width: 0.35,
+            radius: 10,
+            color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+          })
+          .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+          .clip(false)
           .margin({ right: 10 })
-          .draggable(false)
 
         Column() {
           Text(this.item.podcast?.metadata.title ?? "-")
@@ -1927,6 +2157,7 @@ export struct EpisodeComponent {
     }
     .margin({ top: 20 })
     .alignItems(HorizontalAlign.Start)
+    .clip(false)
     .onClick(() => {
       this.episode = this.item
       this.pageInfos.pushPathByName('episodeDetail', null)
@@ -2066,7 +2297,7 @@ export struct EpisodeComponent1 {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(() => {
           this.showConfirmDownload = false
         })
@@ -2079,7 +2310,7 @@ export struct EpisodeComponent1 {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(async () => {
           this.getUIContext().getPromptAction().showToast({
             message: '开始下载！',
@@ -2173,7 +2404,7 @@ export struct EpisodeComponent1 {
                 }
                 .width(80)
                 .height(40)
-                .borderRadius(8)
+                .borderRadius(10)
                 .backgroundColor($r('sys.color.comp_background_tertiary'))
                 .onClick(async () => {
                   let tmpPlaylist: Playlist | undefined = undefined
@@ -2197,7 +2428,7 @@ export struct EpisodeComponent1 {
         .height('100%')
         .padding({ left: 20, right: 20, bottom: 25 })
         .scrollBar(BarState.Off)
-        .borderRadius(8)
+        .borderRadius(10)
         .clip(true)
         .divider({
           strokeWidth: 1,
@@ -2227,7 +2458,7 @@ export struct EpisodeComponent1 {
         }
         .height(45)
         .width('100%')
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .onClick(async () => {
           if (this.showProgress) {
@@ -2257,7 +2488,7 @@ export struct EpisodeComponent1 {
       })
         .width("100%")
         .height(45)
-        .borderRadius(8)
+        .borderRadius(10)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -2275,7 +2506,7 @@ export struct EpisodeComponent1 {
       })
         .width("100%")
         .height(120)
-        .borderRadius(8)
+        .borderRadius(10)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -2298,7 +2529,7 @@ export struct EpisodeComponent1 {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(() => {
           this.showCreatePlaylist = false
         })
@@ -2311,7 +2542,7 @@ export struct EpisodeComponent1 {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(async () => {
           if (this.tmpPlaylistName.length === 0) {
             this.getUIContext().getPromptAction().showToast({
@@ -2570,6 +2801,7 @@ export struct EpisodeComponent1 {
     }
     .margin({ top: 20 })
     .alignItems(HorizontalAlign.Start)
+    .clip(false)
     .onClick(() => {
       this.episode = this.item
       this.pageInfos.pushPathByName('episodeDetail', null)

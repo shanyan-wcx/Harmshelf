@@ -28,6 +28,7 @@ export struct MediaLibrary {
             (this.displayWidth >= 1000 ? 4 :
               (this.displayWidth >= 800 ? 3 :
                 (this.displayWidth >= 400 ? 2 : 1))))
+          .clip(false)
 
           ForEach(this.libraryItems, (libraryItem: LibraryItem, index) => {
             GridItem() {
@@ -37,6 +38,7 @@ export struct MediaLibrary {
               })
                 .margin({ bottom: index === this.libraryItems.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
             }
+            .clip(false)
           })
         }
         .width('100%')

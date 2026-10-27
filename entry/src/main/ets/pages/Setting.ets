@@ -2,7 +2,6 @@ import { common, ConfigurationConstant, Want } from "@kit.AbilityKit"
 import { PersistenceV2 } from "@kit.ArkUI";
 import { ColorMode, DownloadSetting, OtherSetting, PlaySetting, ServerIndex, ServerSetting } from "../pages/Index";
 import { getLibraries, getLogin, getLogout, getUser } from "../utils/Api";
-import { env } from "../utils/Class";
 import { Library, LoginInfo, PlayItem, User } from "../utils/Interface";
 import { avSession } from "@kit.AVSessionKit";
 import { BusinessError } from '@kit.BasicServicesKit';
@@ -10,6 +9,7 @@ import { bundleManager } from '@kit.AbilityKit';
 import { media } from "@kit.MediaKit";
 import { Logger } from '../utils/Logger';
 import { getBottomContentInset } from '../utils/Layout';
+import { ImmersiveActionButton } from '../utils/Component';
 
 let bundleFlags = bundleManager.BundleFlag.GET_BUNDLE_INFO_DEFAULT;
 let bundleInfo = bundleManager.getBundleInfoForSelfSync(bundleFlags)
@@ -98,7 +98,7 @@ export struct Setting {
               .width("100%")
               .height(40)
               .layoutWeight(1)
-              .borderRadius(8)
+              .borderRadius(10)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
@@ -130,7 +130,7 @@ export struct Setting {
                 weight: FontWeight.Normal
               })
               .height(40)
-              .borderRadius(8)
+              .borderRadius(10)
               .margin({ left: 15 })
               .optionWidth(80)
             TextInput({
@@ -144,7 +144,7 @@ export struct Setting {
               .padding({ left: 22 })
               .margin({ right: -20 })
               .layoutWeight(1)
-              .borderRadius(8)
+              .borderRadius(10)
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
               .placeholderFont({
@@ -169,7 +169,7 @@ export struct Setting {
               .width("100%")
               .height(40)
               .layoutWeight(1)
-              .borderRadius(8)
+              .borderRadius(10)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
@@ -195,7 +195,7 @@ export struct Setting {
               .width("100%")
               .height(40)
               .layoutWeight(1)
-              .borderRadius(8)
+              .borderRadius(10)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
@@ -217,9 +217,9 @@ export struct Setting {
           }
           .width('100%')
           .height(50)
-          .borderRadius(8)
+          .borderRadius(10)
           .backgroundColor($r('sys.color.comp_emphasize_secondary'))
-          .borderRadius(8)
+          .borderRadius(10)
           .onClick(async () => {
             if (this.tmpUrl === "") {
               this.getUIContext().getPromptAction().showToast({
@@ -293,7 +293,7 @@ export struct Setting {
               .width("100%")
               .height(40)
               .layoutWeight(1)
-              .borderRadius(8)
+              .borderRadius(10)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
@@ -325,7 +325,7 @@ export struct Setting {
                 weight: FontWeight.Normal
               })
               .height(40)
-              .borderRadius(8)
+              .borderRadius(10)
               .margin({ left: 15 })
               .optionWidth(80)
             TextInput({
@@ -340,7 +340,7 @@ export struct Setting {
               .padding({ left: 22 })
               .margin({ right: -20 })
               .layoutWeight(1)
-              .borderRadius(8)
+              .borderRadius(10)
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
               .placeholderFont({
@@ -366,7 +366,7 @@ export struct Setting {
               .width("100%")
               .height(40)
               .layoutWeight(1)
-              .borderRadius(8)
+              .borderRadius(10)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
@@ -393,7 +393,7 @@ export struct Setting {
               .width("100%")
               .height(40)
               .layoutWeight(1)
-              .borderRadius(8)
+              .borderRadius(10)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
@@ -417,9 +417,9 @@ export struct Setting {
             .width('50%')
             .layoutWeight(1)
             .height(50)
-            .borderRadius(8)
+            .borderRadius(10)
             .backgroundColor($r('sys.color.comp_emphasize_secondary'))
-            .borderRadius(8)
+            .borderRadius(10)
             .onClick(async () => {
               if (this.tmpUrl === "") {
                 this.getUIContext().getPromptAction().showToast({
@@ -477,13 +477,14 @@ export struct Setting {
             Button({ type: ButtonType.Normal }) {
               Text("删除")
                 .fontSize(20)
+                .fontColor(Color.Red)
             }
             .width('50%')
             .layoutWeight(1)
             .height(50)
-            .borderRadius(8)
+            .borderRadius(10)
             .backgroundColor($r('sys.color.warning'))
-            .borderRadius(8)
+            .borderRadius(10)
             .onClick(async () => {
               if (this.editServerIndex !== this.serverIndex?.serverIndex) {
                 this.serverSetting!.loginInfos.splice(this.editServerIndex, 1)
@@ -687,7 +688,7 @@ export struct Setting {
               .height(40)
               .width('100%')
               .layoutWeight(1)
-              .borderRadius(8)
+              .borderRadius(10)
               .padding({ left: 10, right: 10 })
               .backgroundColor(Color.Transparent)
               .hitTestBehavior(HitTestMode.Block)
@@ -761,7 +762,7 @@ export struct Setting {
               }
               .height(40)
               .width(40)
-              .borderRadius(8)
+              .borderRadius(10)
               .backgroundColor(Color.Transparent)
               .onClick(() => {
                 this.editServerIndex = index
@@ -776,17 +777,22 @@ export struct Setting {
             .width('100%')
           })
 
-          Button({ type: ButtonType.Normal }) {
-            Text("添加")
-              .fontSize(20)
-              .fontColor($r('sys.color.font'))
+          Row() {
+            ImmersiveActionButton({
+              barWidth: '100%',
+              barHeight: 50,
+              onButtonClick: () => {
+                this.showAddServer = !this.showAddServer;
+              }
+            }) {
+              Text("添加")
+                .fontSize(20)
+                .fontColor($r('sys.color.font'))
+            }
           }
           .width('100%')
           .height(50)
-          .borderRadius(8)
-          .backgroundColor($r('sys.color.comp_background_tertiary'))
           .margin({ top: 10 })
-          .borderRadius(8)
           .bindSheet(this.showAddServer, this.AddServerBuilder(), {
             height: 380,
             preferType: SheetType.CENTER,
@@ -803,18 +809,20 @@ export struct Setting {
               this.tmpPassword = ""
             }
           })
-          .onClick(() => {
-            this.showAddServer = !this.showAddServer;
-          })
         }
         .width('100%')
-        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
-          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
-          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
-          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
-        .borderRadius(8)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+        .borderRadius(10)
         .padding({ left: 20, right: 20, bottom: 20 })
         .margin({ top: 13 })
+        .border({
+          width: 0.35,
+          radius: 10,
+          color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+        })
+        .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+        .clip(false)
         .bindSheet(this.showEditServer, this.EditServerBuilder(), {
           height: 380,
           preferType: SheetType.CENTER,
@@ -871,21 +879,23 @@ export struct Setting {
                   this.themeIcon = $r('sys.symbol.moon_fill')
                 }
               })
-              .border({
-                radius: 8
-              })
           }
           .width('100%')
           .justifyContent(FlexAlign.SpaceBetween)
         }
         .width('100%')
-        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
-          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
-          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
-          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
-        .borderRadius(8)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+        .borderRadius(10)
         .padding({ left: 20, right: 20, bottom: 20 })
         .margin({ top: 14 })
+        .border({
+          width: 0.35,
+          radius: 10,
+          color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+        })
+        .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+        .clip(false)
 
         Column() {
           Text("播放设置")
@@ -993,13 +1003,18 @@ export struct Setting {
           .justifyContent(FlexAlign.SpaceBetween)
         }
         .width('100%')
-        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
-          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
-          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
-          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
-        .borderRadius(8)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+        .borderRadius(10)
         .padding({ left: 20, right: 20, bottom: 10 })
         .margin({ top: 20 })
+        .border({
+          width: 0.35,
+          radius: 10,
+          color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+        })
+        .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+        .clip(false)
 
         Column() {
           Text("下载设置")
@@ -1028,13 +1043,18 @@ export struct Setting {
           .justifyContent(FlexAlign.SpaceBetween)
         }
         .width('100%')
-        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
-          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
-          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
-          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
-        .borderRadius(8)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+        .borderRadius(10)
         .padding({ left: 20, right: 20, bottom: 15 })
         .margin({ top: 20 })
+        .border({
+          width: 0.35,
+          radius: 10,
+          color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+        })
+        .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+        .clip(false)
 
         Column() {
           Text("其他设置")
@@ -1063,13 +1083,18 @@ export struct Setting {
           .justifyContent(FlexAlign.SpaceBetween)
         }
         .width('100%')
-        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
-          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
-          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
-          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
-        .borderRadius(8)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+        .borderRadius(10)
         .padding({ left: 20, right: 20, bottom: 15 })
         .margin({ top: 20 })
+        .border({
+          width: 0.35,
+          radius: 10,
+          color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+        })
+        .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+        .clip(false)
 
         Button({ type: ButtonType.Normal }) {
           Row() {
@@ -1088,12 +1113,17 @@ export struct Setting {
         }
         .width('100%')
         .height(60)
-        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
-          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
-          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
-          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
-        .borderRadius(8)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+        .borderRadius(10)
         .margin({ left: 20, right: 20 ,top: 20 })
+        .border({
+          width: 0.35,
+          radius: 10,
+          color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+        })
+        .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+        .clip(false)
         .onClick(() => {
           this.pageInfos.pushPathByName('log', null)
         })
@@ -1115,12 +1145,17 @@ export struct Setting {
         }
         .width('100%')
         .height(60)
-        .backgroundColor((this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET &&
-          env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT) ||
-          this.colorMode?.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_LIGHT ?
-          $r('sys.color.background_primary') : $r('sys.color.background_tertiary'))
-        .borderRadius(8)
+        .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+        .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+        .borderRadius(10)
         .margin({ left: 20, right: 20 ,top: 20 })
+        .border({
+          width: 0.35,
+          radius: 10,
+          color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+        })
+        .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+        .clip(false)
         .onClick(() => {
           this.showAbout = !this.showAbout;
         })
@@ -1143,5 +1178,6 @@ export struct Setting {
     .scrollBar(BarState.Off)
     .padding({ left: 20, right: 20, top: this.statusBarHeight + 56, bottom: getBottomContentInset(20, this.isStartPlaying, 104) })
     .align(Alignment.Top)
+    .clip(false)
   }
 }

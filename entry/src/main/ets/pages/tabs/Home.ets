@@ -60,6 +60,7 @@ export struct SubHome {
                             this.homeData.find(item => item.id === "continue-listening")!.entities.length - 1 ? 20 : 0
                         })
                     }
+                    .clip(false)
                   } else if (this.library?.mediaType === 'podcast') {
                     ListItem() {
                       RecentEpisodeComponent({
@@ -72,6 +73,7 @@ export struct SubHome {
                             this.homeData.find(item => item.id === "continue-listening")!.entities.length - 1 ? 20 : 0
                         })
                     }
+                    .clip(false)
                   }
                   })
               }
@@ -79,6 +81,7 @@ export struct SubHome {
               .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
               .listDirection(Axis.Horizontal)
               .scrollBar(BarState.Off)
+              .clip(false)
             }
           }
 
@@ -117,12 +120,14 @@ export struct SubHome {
                             this.homeData.find(item => item.id === "newest-episodes")!.entities.length - 1 ? 20 : 0
                         })
                     }
+                    .clip(false)
                   })
               }
               .width('100%')
               .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
               .listDirection(Axis.Horizontal)
               .scrollBar(BarState.Off)
+              .clip(false)
             }
           }
 
@@ -161,12 +166,14 @@ export struct SubHome {
                             this.homeData.find(item => item.id === "recently-added")!.entities.length - 1 ? 20 : 0
                         })
                     }
+                    .clip(false)
                   })
               }
               .width('100%')
               .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
               .listDirection(Axis.Horizontal)
               .scrollBar(BarState.Off)
+              .clip(false)
             }
           }
 
@@ -205,12 +212,14 @@ export struct SubHome {
                             20 : 0
                         })
                     }
+                    .clip(false)
                   })
               }
               .width('100%')
               .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
               .listDirection(Axis.Horizontal)
               .scrollBar(BarState.Off)
+              .clip(false)
             }
           }
 
@@ -251,6 +260,7 @@ export struct SubHome {
                               20 : 0
                           })
                       }
+                      .clip(false)
                     } else if (this.library?.mediaType === 'podcast') {
                       ListItem() {
                         RecentEpisodeComponent({
@@ -263,6 +273,7 @@ export struct SubHome {
                               20 : 0
                           })
                       }
+                      .clip(false)
                     }
                   })
               }
@@ -270,6 +281,7 @@ export struct SubHome {
               .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
               .listDirection(Axis.Horizontal)
               .scrollBar(BarState.Off)
+              .clip(false)
             }
           }
 
@@ -306,12 +318,14 @@ export struct SubHome {
                           20 : 0
                       })
                   }
+                  .clip(false)
                 })
               }
               .width('100%')
               .height(this.displayWidth >= 1400 ? 172 : (this.displayWidth >= 1200 ? 158 : 144))
               .listDirection(Axis.Horizontal)
               .scrollBar(BarState.Off)
+              .clip(false)
             }
           }
 
@@ -335,10 +349,12 @@ export struct SubHome {
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
+      .clip(false)
 
     }
     .width('100%')
     .height('100%')
+    .clip(false)
     .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
   }
 }

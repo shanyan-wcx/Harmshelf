@@ -129,7 +129,7 @@ export struct EpisodeDetail {
     }
     if (this.itemProgress && this.itemProgress.currentTime > 0) {
       this.moreMenus.push({
-        symbolIcon: new SymbolGlyphModifier($r('sys.symbol.delete_left')),
+        symbolIcon: new SymbolGlyphModifier($r('sys.symbol.delete_left')).fontColor([Color.Red]),
         value: "放弃进度",
         action: async () => {
           let tmpProgress: UpdateProgress = {
@@ -156,7 +156,7 @@ export struct EpisodeDetail {
     })
     if (this.user?.permissions.delete) {
       this.moreMenus.push({
-        symbolIcon: new SymbolGlyphModifier($r('sys.symbol.trash')),
+        symbolIcon: new SymbolGlyphModifier($r('sys.symbol.trash')).fontColor([Color.Red]),
         value: "从服务器中删除",
         action: async () => {
           this.showDeleteConfirm = true
@@ -209,7 +209,7 @@ export struct EpisodeDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(() => {
           this.showDeleteConfirm = false
         })
@@ -222,7 +222,7 @@ export struct EpisodeDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(async () => {
           let status = await deleteFromServer(this.episode!.libraryItemId!, this.episode!.id!)
           if (status) {
@@ -266,7 +266,7 @@ export struct EpisodeDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(() => {
           this.showConfirmDownload = false
         })
@@ -279,7 +279,7 @@ export struct EpisodeDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(async () => {
           this.showConfirmDownload = false
           this.getUIContext().getPromptAction().showToast({
@@ -363,7 +363,7 @@ export struct EpisodeDetail {
                 }
                 .width(80)
                 .height(40)
-                .borderRadius(8)
+                .borderRadius(10)
                 .backgroundColor($r('sys.color.comp_background_tertiary'))
                 .onClick(async () => {
                   let tmpPlaylist: Playlist | undefined = undefined
@@ -387,7 +387,7 @@ export struct EpisodeDetail {
         .height('100%')
         .padding({ left: 20, right: 20, bottom: 20 })
         .scrollBar(BarState.Off)
-        .borderRadius(8)
+        .borderRadius(10)
         .clip(true)
         .divider({
           strokeWidth: 1,
@@ -417,7 +417,7 @@ export struct EpisodeDetail {
         }
         .height(45)
         .width('100%')
-        .borderRadius(8)
+        .borderRadius(10)
         .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .onClick(async () => {
           if (this.showProgress) {
@@ -447,7 +447,7 @@ export struct EpisodeDetail {
       })
         .width("100%")
         .height(45)
-        .borderRadius(8)
+        .borderRadius(10)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -465,7 +465,7 @@ export struct EpisodeDetail {
       })
         .width("100%")
         .height(120)
-        .borderRadius(8)
+        .borderRadius(10)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -488,7 +488,7 @@ export struct EpisodeDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(() => {
           this.showCreatePlaylist = false
         })
@@ -501,7 +501,7 @@ export struct EpisodeDetail {
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(8)
+        .borderRadius(10)
         .onClick(async () => {
           if (this.tmpPlaylistName.length === 0) {
             this.getUIContext().getPromptAction().showToast({
@@ -546,14 +546,27 @@ export struct EpisodeDetail {
         Scroll(this.episodeDetailScroller) {
           Column() {
             Row() {
-              Image(this.baseUrl + `/api/items/${this.episode!.libraryItemId}/cover?token=${this.apiToken}`)
-                .alt($rawfile('nocover.jpg'))
-                .objectFit(ImageFit.Cover)
+              Stack() {
+                Image(this.baseUrl + `/api/items/${this.episode!.libraryItemId}/cover?token=${this.apiToken}`)
+                  .alt($rawfile('nocover.jpg'))
+                  .objectFit(ImageFit.Cover)
+                  .width('100%')
+                  .height('100%')
+                  .borderRadius(10)
+                  .clip(true)
+                  .draggable(false)
+              }
+                .width(80)
                 .height(80)
-                .aspectRatio(1)
-                .borderRadius(8)
+                .borderRadius(10)
+                .border({
+                  width: 0.35,
+                  radius: 10,
+                  color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+                })
+                .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+                .clip(false)
                 .margin({ right: 10 })
-                .draggable(false)
 
               Column() {
                 Text(this.podcast?.media.metadata.title ?? "-")
@@ -584,6 +597,7 @@ export struct EpisodeDetail {
             .width('100%')
             .margin({ top: 10, bottom: 16 })
             .justifyContent(FlexAlign.Start)
+            .clip(false)
 
             Row() {
               ImmersiveActionButton({
@@ -799,6 +813,7 @@ export struct EpisodeDetail {
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .scrollBar(BarState.Off)
         .align(Alignment.Top)
+        .clip(false)
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
 
         Column() {
@@ -815,6 +830,7 @@ export struct EpisodeDetail {
       .width('100%')
       .height('100%')
       .alignContent(Alignment.End)
+      .clip(false)
       .bindSheet(this.showDeleteConfirm, this.deleteConfirmBuilder(), {
         height: SheetSize.FIT_CONTENT,
         preferType: SheetType.CENTER,
