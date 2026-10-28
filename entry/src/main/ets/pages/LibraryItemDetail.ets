@@ -1957,7 +1957,8 @@ export struct LibraryItemDetail {
                             .fontColor($r('sys.color.font_secondary'))
                             .margin({ left: 20 })
                             .decoration({
-                              type: TextDecorationType.Underline
+                              type: TextDecorationType.Underline,
+                              color: $r('sys.color.font_secondary')
                             })
                             .onClick(async () => {
                               this.tmpPlayingItem = await getPlayItem(this.libraryItem!.id)
