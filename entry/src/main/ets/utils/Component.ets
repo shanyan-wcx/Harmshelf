@@ -142,7 +142,7 @@ export struct ImmersiveActionButton {
         this.onButtonClick()
       }
     })
-    .hitTestBehavior(this.onButtonClick || (this.menuItems && this.menuItems.length > 0) ? HitTestMode.Block : HitTestMode.None)
+    .hitTestBehavior(HitTestMode.Transparent)
     .bindMenu(this.menuItems ?? [])
   }
 

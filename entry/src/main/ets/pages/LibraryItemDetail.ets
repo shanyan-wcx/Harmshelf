@@ -432,9 +432,6 @@ export struct LibraryItemDetail {
         .height(40)
         .layoutWeight(1)
         .clip(false)
-        .onClick(() => {
-          this.showConfirm = false
-        })
 
         Row() {
           ImmersiveActionButton({
@@ -1144,7 +1141,17 @@ export struct LibraryItemDetail {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 40,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.projectSkipSettings?.removeSkipSettings(this.libraryItem!.id)
+              this.tmpSkipStart = 0
+              this.tmpSkipEnd = 0
+              this.showSkipStartEnd = false
+              this.getUIContext().getPromptAction().showToast({
+                message: '已清除跳过设置',
+                duration: 500
+              });
+            }
           }) {
             Text("清除")
               .fontSize(18)
@@ -1154,22 +1161,23 @@ export struct LibraryItemDetail {
         .height(40)
         .layoutWeight(1)
         .clip(false)
-        .onClick(() => {
-          this.projectSkipSettings?.removeSkipSettings(this.libraryItem!.id)
-          this.tmpSkipStart = 0
-          this.tmpSkipEnd = 0
-          this.showSkipStartEnd = false
-          this.getUIContext().getPromptAction().showToast({
-            message: '已清除跳过设置',
-            duration: 500
-          });
-        })
 
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 40,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.projectSkipSettings?.setSkipSettings(this.libraryItem!.id, {
+                skipStart: this.tmpSkipStart,
+                skipEnd: this.tmpSkipEnd
+              })
+              this.showSkipStartEnd = false
+              this.getUIContext().getPromptAction().showToast({
+                message: '跳过设置保存成功',
+                duration: 500
+              });
+            }
           }) {
             Text("设置")
               .fontSize(18)
@@ -1179,17 +1187,6 @@ export struct LibraryItemDetail {
         .height(40)
         .layoutWeight(1)
         .clip(false)
-        .onClick(() => {
-          this.projectSkipSettings?.setSkipSettings(this.libraryItem!.id, {
-            skipStart: this.tmpSkipStart,
-            skipEnd: this.tmpSkipEnd
-          })
-          this.showSkipStartEnd = false
-          this.getUIContext().getPromptAction().showToast({
-            message: '跳过设置保存成功',
-            duration: 500
-          });
-        })
       }
       .margin({ top: 15 })
     }
