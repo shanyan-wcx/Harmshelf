@@ -142,7 +142,7 @@ export struct LibraryItemDetail {
   report: CustomDialogController = new CustomDialogController({
     builder: reportBuilder(),
     width: 350,
-    height: 325,
+    height: 335,
     backgroundColor: $r('sys.color.background_tertiary')
   })
 
@@ -359,7 +359,7 @@ export struct LibraryItemDetail {
       Row() {
         ImmersiveActionButton({
           barWidth: '100%',
-          barHeight: 40,
+          barHeight: 50,
           monopolizeActionEvents: false
         }) {
           Text("添加到服务器")
@@ -367,7 +367,7 @@ export struct LibraryItemDetail {
             .hitTestBehavior(HitTestMode.None)
         }
       }
-      .height(40)
+      .height(50)
       .width('100%')
       .margin({ top: 20 })
       .onClick(async () => {
@@ -418,7 +418,7 @@ export struct LibraryItemDetail {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: () => {
               this.showConfirm = false
@@ -429,14 +429,14 @@ export struct LibraryItemDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
 
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false
           }) {
             Text("确认")
@@ -444,7 +444,7 @@ export struct LibraryItemDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
         .onClick(async () => {
@@ -526,7 +526,7 @@ export struct LibraryItemDetail {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: () => {
               this.showConfirmDownload = false
@@ -537,14 +537,14 @@ export struct LibraryItemDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
 
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false
           }) {
             Text("确认")
@@ -552,7 +552,7 @@ export struct LibraryItemDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
         .onClick(async () => {
@@ -713,7 +713,7 @@ export struct LibraryItemDetail {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: async () => {
               if (this.showProgress) {
@@ -734,7 +734,7 @@ export struct LibraryItemDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .width('100%')
         .clip(false)
       }
@@ -788,7 +788,7 @@ export struct LibraryItemDetail {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: () => {
               this.showCreatePlaylist = false
@@ -799,14 +799,14 @@ export struct LibraryItemDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
 
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false
           }) {
             Text("确认")
@@ -814,7 +814,7 @@ export struct LibraryItemDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
         .onClick(async () => {
@@ -932,7 +932,7 @@ export struct LibraryItemDetail {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: async () => {
               if (this.showProgress) {
@@ -953,7 +953,7 @@ export struct LibraryItemDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .width('100%')
         .clip(false)
       }
@@ -1007,7 +1007,7 @@ export struct LibraryItemDetail {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: () => {
               this.showCreateCollection = false
@@ -1018,14 +1018,14 @@ export struct LibraryItemDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
 
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false
           }) {
             Text("确认")
@@ -1033,7 +1033,7 @@ export struct LibraryItemDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
         .onClick(async () => {
@@ -1140,7 +1140,7 @@ export struct LibraryItemDetail {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: () => {
               this.projectSkipSettings?.removeSkipSettings(this.libraryItem!.id)
@@ -1158,14 +1158,14 @@ export struct LibraryItemDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
 
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: () => {
               this.projectSkipSettings?.setSkipSettings(this.libraryItem!.id, {
@@ -1184,7 +1184,7 @@ export struct LibraryItemDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
       }

@@ -80,7 +80,7 @@ export struct EpisodeDetail {
   report: CustomDialogController = new CustomDialogController({
     builder: reportBuilder(),
     width: 350,
-    height: 325,
+    height: 335,
     backgroundColor: $r('sys.color.background_tertiary')
   })
 
@@ -204,7 +204,7 @@ export struct EpisodeDetail {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             onButtonClick: () => {
               this.showDeleteConfirm = false
             }
@@ -214,14 +214,14 @@ export struct EpisodeDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
 
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             onButtonClick: async () => {
               let status = await deleteFromServer(this.episode!.libraryItemId!, this.episode!.id!)
               if (status) {
@@ -245,7 +245,7 @@ export struct EpisodeDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
       }
@@ -269,7 +269,7 @@ export struct EpisodeDetail {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             onButtonClick: () => {
               this.showConfirmDownload = false
             }
@@ -279,14 +279,14 @@ export struct EpisodeDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
 
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             onButtonClick: async () => {
               this.showConfirmDownload = false
               this.getUIContext().getPromptAction().showToast({
@@ -349,7 +349,7 @@ export struct EpisodeDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
       }
@@ -433,7 +433,7 @@ export struct EpisodeDetail {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             onButtonClick: async () => {
               if (this.showProgress) {
                 this.getUIContext().getPromptAction().showToast({
@@ -453,7 +453,7 @@ export struct EpisodeDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .width('100%')
         .clip(false)
       }
@@ -507,7 +507,7 @@ export struct EpisodeDetail {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             onButtonClick: () => {
               this.showCreatePlaylist = false
             }
@@ -517,14 +517,14 @@ export struct EpisodeDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
 
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             onButtonClick: async () => {
               if (this.tmpPlaylistName.length === 0) {
                 this.getUIContext().getPromptAction().showToast({
@@ -564,7 +564,7 @@ export struct EpisodeDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
       }

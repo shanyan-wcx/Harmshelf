@@ -288,7 +288,7 @@ export struct Play {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false
           }) {
             Text("取消")
@@ -296,7 +296,7 @@ export struct Play {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
         .onClick(() => {
@@ -306,7 +306,7 @@ export struct Play {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false
           }) {
             Text("确认")
@@ -314,7 +314,7 @@ export struct Play {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
         .onClick(async () => {
@@ -475,7 +475,7 @@ export struct Play {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false
           }) {
             Text("创建书签")
@@ -483,7 +483,7 @@ export struct Play {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .padding({ left: 15, right: 15 })
         .clip(false)
         .onClick(async () => {

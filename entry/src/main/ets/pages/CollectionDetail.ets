@@ -191,7 +191,7 @@ export struct CollectionDetail {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             onButtonClick: async () => {
               let status = await deleteCollection(this.collection1!.id!)
               if (status) {
@@ -216,14 +216,14 @@ export struct CollectionDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
 
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             onButtonClick: async () => {
               if (this.tmpCollectionName.length === 0) {
                 this.getUIContext().getPromptAction().showToast({
@@ -254,7 +254,7 @@ export struct CollectionDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
       }

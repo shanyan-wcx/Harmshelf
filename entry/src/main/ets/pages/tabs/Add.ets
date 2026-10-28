@@ -169,7 +169,7 @@ export struct Add {
           Row() {
             ImmersiveActionButton({
               barWidth: 100,
-              barHeight: 40,
+              barHeight: 50,
               monopolizeActionEvents: false
             }) {
               Text("提交")
@@ -177,7 +177,7 @@ export struct Add {
                 .hitTestBehavior(HitTestMode.None)
             }
           }
-          .height(40)
+          .height(50)
           .width(100)
           .clip(false)
           .onClick(async () => {
@@ -272,7 +272,7 @@ export struct Add {
               })
               .clip(false)
               .bindSheet(this.showConfirm[index], this.confirmBuilder(searchPodcast, this.podcast!, index), {
-                height: 449,
+                height: 459,
                 preferType: SheetType.CENTER,
                 title: {
                   title: "确认添加"

@@ -205,7 +205,7 @@ export struct PlaylistDetail {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             onButtonClick: async () => {
               let status = await deletePlaylist(this.playlist1!.id!)
               if (status) {
@@ -230,14 +230,14 @@ export struct PlaylistDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
 
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             onButtonClick: async () => {
               if (this.tmpPlaylistName.length === 0) {
                 this.getUIContext().getPromptAction().showToast({
@@ -268,7 +268,7 @@ export struct PlaylistDetail {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .layoutWeight(1)
         .clip(false)
       }

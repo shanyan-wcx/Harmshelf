@@ -1554,7 +1554,7 @@ export struct EpisodeComponent {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: () => {
               this.showConfirmDownload = false
@@ -1565,7 +1565,7 @@ export struct EpisodeComponent {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .width('50%')
         .layoutWeight(1)
         .clip(false)
@@ -1573,7 +1573,7 @@ export struct EpisodeComponent {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false
           }) {
             Text("确认")
@@ -1581,7 +1581,7 @@ export struct EpisodeComponent {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .width('50%')
         .layoutWeight(1)
         .clip(false)
@@ -1735,7 +1735,7 @@ export struct EpisodeComponent {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: async () => {
               if (this.showProgress) {
@@ -1756,7 +1756,7 @@ export struct EpisodeComponent {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .width('100%')
         .clip(false)
       }
@@ -1810,7 +1810,7 @@ export struct EpisodeComponent {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: () => {
               this.showCreatePlaylist = false
@@ -1821,7 +1821,7 @@ export struct EpisodeComponent {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .width('50%')
         .layoutWeight(1)
         .clip(false)
@@ -1829,7 +1829,7 @@ export struct EpisodeComponent {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false
           }) {
             Text("确认")
@@ -1837,7 +1837,7 @@ export struct EpisodeComponent {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .width('50%')
         .layoutWeight(1)
         .clip(false)
@@ -2329,7 +2329,7 @@ export struct EpisodeComponent1 {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: () => {
               this.showConfirmDownload = false
@@ -2340,7 +2340,7 @@ export struct EpisodeComponent1 {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .width('50%')
         .layoutWeight(1)
         .clip(false)
@@ -2348,7 +2348,7 @@ export struct EpisodeComponent1 {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false
           }) {
             Text("确认")
@@ -2356,7 +2356,7 @@ export struct EpisodeComponent1 {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .width('50%')
         .layoutWeight(1)
         .clip(false)
@@ -2510,7 +2510,7 @@ export struct EpisodeComponent1 {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: async () => {
               if (this.showProgress) {
@@ -2531,7 +2531,7 @@ export struct EpisodeComponent1 {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .width('100%')
         .clip(false)
       }
@@ -2585,7 +2585,7 @@ export struct EpisodeComponent1 {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: () => {
               this.showCreatePlaylist = false
@@ -2596,7 +2596,7 @@ export struct EpisodeComponent1 {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .width('50%')
         .layoutWeight(1)
         .clip(false)
@@ -2604,7 +2604,7 @@ export struct EpisodeComponent1 {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false
           }) {
             Text("确认")
@@ -2612,7 +2612,7 @@ export struct EpisodeComponent1 {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .width('50%')
         .layoutWeight(1)
         .clip(false)
@@ -2986,7 +2986,7 @@ export struct reportBuilder {
           Row() {
             ImmersiveActionButton({
               barWidth: '100%',
-              barHeight: 40,
+              barHeight: 50,
               monopolizeActionEvents: false,
               onButtonClick: () => {
                 this.reportDialog.close()
@@ -2999,13 +2999,13 @@ export struct reportBuilder {
           }
           .width('50%')
           .layoutWeight(1)
-          .height(40)
+          .height(50)
           .clip(false)
 
           Row() {
             ImmersiveActionButton({
               barWidth: '100%',
-              barHeight: 40,
+              barHeight: 50,
               monopolizeActionEvents: false
             }) {
               Text("提交")
@@ -3015,7 +3015,7 @@ export struct reportBuilder {
           }
           .width('50%')
           .layoutWeight(1)
-          .height(40)
+          .height(50)
           .clip(false)
           .onClick(async () => {
             if (!this.reason.trim()) {

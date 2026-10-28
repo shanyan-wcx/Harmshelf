@@ -214,7 +214,7 @@ export struct Setting {
           Row() {
             ImmersiveActionButton({
               barWidth: '100%',
-              barHeight: 40,
+              barHeight: 50,
               monopolizeActionEvents: false
             }) {
               Text("保存")
@@ -223,7 +223,7 @@ export struct Setting {
             }
           }
           .width('100%')
-          .height(40)
+          .height(50)
           .clip(false)
           .onClick(async () => {
             if (this.tmpUrl === "") {
@@ -418,7 +418,7 @@ export struct Setting {
             Row() {
               ImmersiveActionButton({
                 barWidth: '100%',
-                barHeight: 40,
+                barHeight: 50,
                 monopolizeActionEvents: false
               }) {
                 Text("保存")
@@ -427,7 +427,7 @@ export struct Setting {
               }
             }
             .layoutWeight(1)
-            .height(40)
+            .height(50)
             .clip(false)
             .onClick(async () => {
               if (this.tmpUrl === "") {
@@ -486,7 +486,7 @@ export struct Setting {
             Row() {
               ImmersiveActionButton({
                 barWidth: '100%',
-                barHeight: 40,
+                barHeight: 50,
                 monopolizeActionEvents: false
               }) {
                 Text("删除")
@@ -496,7 +496,7 @@ export struct Setting {
               }
             }
             .layoutWeight(1)
-            .height(40)
+            .height(50)
             .clip(false)
             .onClick(async () => {
               if (this.editServerIndex !== this.serverIndex?.serverIndex) {
@@ -807,7 +807,7 @@ export struct Setting {
           .height(50)
           .margin({ top: 10 })
           .bindSheet(this.showAddServer, this.AddServerBuilder(), {
-            height: 370,
+            height: 380,
             preferType: SheetType.CENTER,
             title: {
               title: "添加服务器"
@@ -837,7 +837,7 @@ export struct Setting {
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)
         .clip(false)
         .bindSheet(this.showEditServer, this.EditServerBuilder(), {
-          height: 370,
+          height: 380,
           preferType: SheetType.CENTER,
           title: {
             title: "编辑服务器"
