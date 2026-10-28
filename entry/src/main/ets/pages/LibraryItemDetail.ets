@@ -419,7 +419,10 @@ export struct LibraryItemDetail {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 40,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.showConfirm = false
+            }
           }) {
             Text("取消")
               .fontSize(18)
@@ -527,7 +530,10 @@ export struct LibraryItemDetail {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 40,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.showConfirmDownload = false
+            }
           }) {
             Text("取消")
               .fontSize(18)
@@ -537,9 +543,6 @@ export struct LibraryItemDetail {
         .height(40)
         .layoutWeight(1)
         .clip(false)
-        .onClick(() => {
-          this.showConfirmDownload = false
-        })
 
         Row() {
           ImmersiveActionButton({
@@ -655,7 +658,20 @@ export struct LibraryItemDetail {
                   ImmersiveActionButton({
                     barWidth: '100%',
                     barHeight: 40,
-                    monopolizeActionEvents: false
+                    monopolizeActionEvents: false,
+                    onButtonClick: async () => {
+                      let tmpPlaylist: Playlist | undefined = undefined
+                      let item = playlist.items.find(p => p.libraryItemId === this.libraryItem!.id)
+                      if (!item) {
+                        tmpPlaylist = await addToPlaylist(playlist.id!, this.libraryItem!.id)
+                      } else {
+                        tmpPlaylist = await removeFromPlaylist(playlist.id!, this.libraryItem!.id)
+                      }
+                      if (tmpPlaylist) {
+                        this.showPlaylists = false
+                        playlist = tmpPlaylist
+                      }
+                    }
                   }) {
                     Text(playlist.items.find(p => p.libraryItemId === this.libraryItem!.id) ? "移除" : "添加")
                       .hitTestBehavior(HitTestMode.None)
@@ -664,19 +680,6 @@ export struct LibraryItemDetail {
                 .width(80)
                 .height(40)
                 .clip(false)
-                .onClick(async () => {
-                  let tmpPlaylist: Playlist | undefined = undefined
-                  let item = playlist.items.find(p => p.libraryItemId === this.libraryItem!.id)
-                  if (!item) {
-                    tmpPlaylist = await addToPlaylist(playlist.id!, this.libraryItem!.id)
-                  } else {
-                    tmpPlaylist = await removeFromPlaylist(playlist.id!, this.libraryItem!.id)
-                  }
-                  if (tmpPlaylist) {
-                    this.showPlaylists = false
-                    playlist = tmpPlaylist
-                  }
-                })
               }
               .height(60)
             }
@@ -687,7 +690,7 @@ export struct LibraryItemDetail {
         .padding({ left: 20, right: 20, bottom: 25 })
         .scrollBar(BarState.Off)
         .borderRadius(10)
-        .clip(true)
+        .clip(false)
         .divider({
           strokeWidth: 1,
           color: $r('app.color.divider')
@@ -714,7 +717,20 @@ export struct LibraryItemDetail {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 40,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: async () => {
+              if (this.showProgress) {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '正在加载播放列表！',
+                  duration: 500
+                });
+              } else {
+                this.tmpPlaylistName = ""
+                this.tmpPlaylistDescription = ""
+                this.showPlaylists = false
+                this.showCreatePlaylist = true
+              }
+            }
           }) {
             Text("新建播放列表")
               .fontSize(18)
@@ -724,19 +740,6 @@ export struct LibraryItemDetail {
         .height(40)
         .width('100%')
         .clip(false)
-        .onClick(async () => {
-          if (this.showProgress) {
-            this.getUIContext().getPromptAction().showToast({
-              message: '正在加载播放列表！',
-              duration: 500
-            });
-          } else {
-            this.tmpPlaylistName = ""
-            this.tmpPlaylistDescription = ""
-            this.showPlaylists = false
-            this.showCreatePlaylist = true
-          }
-        })
       }
       .width('100%')
       .padding({ left: 20, right: 20 })
@@ -789,7 +792,10 @@ export struct LibraryItemDetail {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 40,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.showCreatePlaylist = false
+            }
           }) {
             Text("取消")
               .fontSize(18)
@@ -799,9 +805,6 @@ export struct LibraryItemDetail {
         .height(40)
         .layoutWeight(1)
         .clip(false)
-        .onClick(() => {
-          this.showCreatePlaylist = false
-        })
 
         Row() {
           ImmersiveActionButton({
@@ -874,7 +877,20 @@ export struct LibraryItemDetail {
                   ImmersiveActionButton({
                     barWidth: '100%',
                     barHeight: 40,
-                    monopolizeActionEvents: false
+                    monopolizeActionEvents: false,
+                    onButtonClick: async () => {
+                      let tmpCollection: Collection | undefined = undefined
+                      let book = collection.books!.find(b => b.id === this.libraryItem!.id)
+                      if (!book) {
+                        tmpCollection = await addToCollection(collection.id!, this.libraryItem!.id)
+                      } else {
+                        tmpCollection = await removeFromCollection(collection.id!, this.libraryItem!.id)
+                      }
+                      if (tmpCollection) {
+                        this.showCollections = false
+                        collection = tmpCollection
+                      }
+                    }
                   }) {
                     Text(collection.books!.find(b => b.id === this.libraryItem!.id) ? "移除" : "添加")
                       .hitTestBehavior(HitTestMode.None)
@@ -883,19 +899,6 @@ export struct LibraryItemDetail {
                 .width(80)
                 .height(40)
                 .clip(false)
-                .onClick(async () => {
-                  let tmpCollection: Collection | undefined = undefined
-                  let book = collection.books!.find(b => b.id === this.libraryItem!.id)
-                  if (!book) {
-                    tmpCollection = await addToCollection(collection.id!, this.libraryItem!.id)
-                  } else {
-                    tmpCollection = await removeFromCollection(collection.id!, this.libraryItem!.id)
-                  }
-                  if (tmpCollection) {
-                    this.showCollections = false
-                    collection = tmpCollection
-                  }
-                })
               }
               .height(60)
             }
@@ -906,7 +909,7 @@ export struct LibraryItemDetail {
         .padding({ left: 20, right: 20, bottom: 25 })
         .scrollBar(BarState.Off)
         .borderRadius(10)
-        .clip(true)
+        .clip(false)
         .divider({
           strokeWidth: 1,
           color: $r('app.color.divider')
@@ -933,7 +936,20 @@ export struct LibraryItemDetail {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 40,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: async () => {
+              if (this.showProgress) {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '正在加载收藏！',
+                  duration: 500
+                });
+              } else {
+                this.tmpCollectionName = ""
+                this.tmpCollectionDescription = ""
+                this.showCollections = false
+                this.showCreateCollection = true
+              }
+            }
           }) {
             Text("新建收藏")
               .fontSize(18)
@@ -943,19 +959,6 @@ export struct LibraryItemDetail {
         .height(40)
         .width('100%')
         .clip(false)
-        .onClick(async () => {
-          if (this.showProgress) {
-            this.getUIContext().getPromptAction().showToast({
-              message: '正在加载收藏！',
-              duration: 500
-            });
-          } else {
-            this.tmpCollectionName = ""
-            this.tmpCollectionDescription = ""
-            this.showCollections = false
-            this.showCreateCollection = true
-          }
-        })
       }
       .width('100%')
       .padding({ left: 20, right: 20 })
@@ -1008,7 +1011,10 @@ export struct LibraryItemDetail {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 40,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.showCreateCollection = false
+            }
           }) {
             Text("取消")
               .fontSize(18)
@@ -1018,9 +1024,6 @@ export struct LibraryItemDetail {
         .height(40)
         .layoutWeight(1)
         .clip(false)
-        .onClick(() => {
-          this.showCreateCollection = false
-        })
 
         Row() {
           ImmersiveActionButton({

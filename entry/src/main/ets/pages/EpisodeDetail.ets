@@ -407,7 +407,7 @@ export struct EpisodeDetail {
         .padding({ left: 20, right: 20, bottom: 20 })
         .scrollBar(BarState.Off)
         .borderRadius(10)
-        .clip(true)
+        .clip(false)
         .divider({
           strokeWidth: 1,
           color: $r('app.color.divider')

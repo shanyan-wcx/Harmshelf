@@ -142,6 +142,7 @@ export struct ImmersiveActionButton {
         this.onButtonClick()
       }
     })
+    .hitTestBehavior(this.onButtonClick || (this.menuItems && this.menuItems.length > 0) ? HitTestMode.Block : HitTestMode.None)
     .bindMenu(this.menuItems ?? [])
   }
 
@@ -1554,7 +1555,10 @@ export struct EpisodeComponent {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 40,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.showConfirmDownload = false
+            }
           }) {
             Text("取消")
               .fontSize(18)
@@ -1565,9 +1569,6 @@ export struct EpisodeComponent {
         .width('50%')
         .layoutWeight(1)
         .clip(false)
-        .onClick(() => {
-          this.showConfirmDownload = false
-        })
 
         Row() {
           ImmersiveActionButton({
@@ -1676,7 +1677,20 @@ export struct EpisodeComponent {
                   ImmersiveActionButton({
                     barWidth: '100%',
                     barHeight: 40,
-                    monopolizeActionEvents: false
+                    monopolizeActionEvents: false,
+                    onButtonClick: async () => {
+                      let tmpPlaylist: Playlist | undefined = undefined
+                      let item = playlist.items.find(p => p.episodeId === this.item.id)
+                      if (!item) {
+                        tmpPlaylist = await addToPlaylist(playlist.id!, this.item.libraryItemId!, this.item.id)
+                      } else {
+                        tmpPlaylist = await removeFromPlaylist(playlist.id!, this.item.libraryItemId!, this.item.id)
+                      }
+                      if (tmpPlaylist) {
+                        this.showPlaylists = false
+                        playlist = tmpPlaylist
+                      }
+                    }
                   }) {
                     Text(playlist.items.find(p => p.episodeId === this.item.id) ? "移除" : "添加")
                       .hitTestBehavior(HitTestMode.None)
@@ -1685,19 +1699,6 @@ export struct EpisodeComponent {
                 .width(80)
                 .height(40)
                 .clip(false)
-                .onClick(async () => {
-                  let tmpPlaylist: Playlist | undefined = undefined
-                  let item = playlist.items.find(p => p.episodeId === this.item.id)
-                  if (!item) {
-                    tmpPlaylist = await addToPlaylist(playlist.id!, this.item.libraryItemId!, this.item.id)
-                  } else {
-                    tmpPlaylist = await removeFromPlaylist(playlist.id!, this.item.libraryItemId!, this.item.id)
-                  }
-                  if (tmpPlaylist) {
-                    this.showPlaylists = false
-                    playlist = tmpPlaylist
-                  }
-                })
               }
               .height(60)
             }
@@ -1708,7 +1709,7 @@ export struct EpisodeComponent {
         .padding({ left: 20, right: 20, bottom: 25 })
         .scrollBar(BarState.Off)
         .borderRadius(10)
-        .clip(true)
+        .clip(false)
         .divider({
           strokeWidth: 1,
           color: $r('app.color.divider')
@@ -1735,7 +1736,20 @@ export struct EpisodeComponent {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 40,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: async () => {
+              if (this.showProgress) {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '正在加载播放列表！',
+                  duration: 500
+                });
+              } else {
+                this.tmpPlaylistName = ""
+                this.tmpPlaylistDescription = ""
+                this.showPlaylists = false
+                this.showCreatePlaylist = true
+              }
+            }
           }) {
             Text("新建播放列表")
               .fontSize(18)
@@ -1745,19 +1759,6 @@ export struct EpisodeComponent {
         .height(40)
         .width('100%')
         .clip(false)
-        .onClick(async () => {
-          if (this.showProgress) {
-            this.getUIContext().getPromptAction().showToast({
-              message: '正在加载播放列表！',
-              duration: 500
-            });
-          } else {
-            this.tmpPlaylistName = ""
-            this.tmpPlaylistDescription = ""
-            this.showPlaylists = false
-            this.showCreatePlaylist = true
-          }
-        })
       }
       .width('100%')
       .padding({ left: 20, right: 20 })
@@ -1810,7 +1811,10 @@ export struct EpisodeComponent {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 40,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.showCreatePlaylist = false
+            }
           }) {
             Text("取消")
               .fontSize(18)
@@ -1821,9 +1825,6 @@ export struct EpisodeComponent {
         .width('50%')
         .layoutWeight(1)
         .clip(false)
-        .onClick(() => {
-          this.showCreatePlaylist = false
-        })
 
         Row() {
           ImmersiveActionButton({
@@ -2329,7 +2330,10 @@ export struct EpisodeComponent1 {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 40,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.showConfirmDownload = false
+            }
           }) {
             Text("取消")
               .fontSize(18)
@@ -2340,9 +2344,6 @@ export struct EpisodeComponent1 {
         .width('50%')
         .layoutWeight(1)
         .clip(false)
-        .onClick(() => {
-          this.showConfirmDownload = false
-        })
 
         Row() {
           ImmersiveActionButton({
@@ -2451,7 +2452,20 @@ export struct EpisodeComponent1 {
                   ImmersiveActionButton({
                     barWidth: '100%',
                     barHeight: 40,
-                    monopolizeActionEvents: false
+                    monopolizeActionEvents: false,
+                    onButtonClick: async () => {
+                      let tmpPlaylist: Playlist | undefined = undefined
+                      let item = playlist.items.find(p => p.episodeId === this.item.id)
+                      if (!item) {
+                        tmpPlaylist = await addToPlaylist(playlist.id!, this.item.libraryItemId!, this.item.id)
+                      } else {
+                        tmpPlaylist = await removeFromPlaylist(playlist.id!, this.item.libraryItemId!, this.item.id)
+                      }
+                      if (tmpPlaylist) {
+                        this.showPlaylists = false
+                        playlist = tmpPlaylist
+                      }
+                    }
                   }) {
                     Text(playlist.items.find(p => p.episodeId === this.item.id) ? "移除" : "添加")
                       .hitTestBehavior(HitTestMode.None)
@@ -2460,19 +2474,6 @@ export struct EpisodeComponent1 {
                 .width(80)
                 .height(40)
                 .clip(false)
-                .onClick(async () => {
-                  let tmpPlaylist: Playlist | undefined = undefined
-                  let item = playlist.items.find(p => p.episodeId === this.item.id)
-                  if (!item) {
-                    tmpPlaylist = await addToPlaylist(playlist.id!, this.item.libraryItemId!, this.item.id)
-                  } else {
-                    tmpPlaylist = await removeFromPlaylist(playlist.id!, this.item.libraryItemId!, this.item.id)
-                  }
-                  if (tmpPlaylist) {
-                    this.showPlaylists = false
-                    playlist = tmpPlaylist
-                  }
-                })
               }
               .height(60)
             }
@@ -2483,7 +2484,7 @@ export struct EpisodeComponent1 {
         .padding({ left: 20, right: 20, bottom: 25 })
         .scrollBar(BarState.Off)
         .borderRadius(10)
-        .clip(true)
+        .clip(false)
         .divider({
           strokeWidth: 1,
           color: $r('app.color.divider')
@@ -2510,7 +2511,20 @@ export struct EpisodeComponent1 {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 40,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: async () => {
+              if (this.showProgress) {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '正在加载播放列表！',
+                  duration: 500
+                });
+              } else {
+                this.tmpPlaylistName = ""
+                this.tmpPlaylistDescription = ""
+                this.showPlaylists = false
+                this.showCreatePlaylist = true
+              }
+            }
           }) {
             Text("新建播放列表")
               .fontSize(18)
@@ -2520,19 +2534,6 @@ export struct EpisodeComponent1 {
         .height(40)
         .width('100%')
         .clip(false)
-        .onClick(async () => {
-          if (this.showProgress) {
-            this.getUIContext().getPromptAction().showToast({
-              message: '正在加载播放列表！',
-              duration: 500
-            });
-          } else {
-            this.tmpPlaylistName = ""
-            this.tmpPlaylistDescription = ""
-            this.showPlaylists = false
-            this.showCreatePlaylist = true
-          }
-        })
       }
       .width('100%')
       .padding({ left: 20, right: 20 })
@@ -2585,7 +2586,10 @@ export struct EpisodeComponent1 {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 40,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.showCreatePlaylist = false
+            }
           }) {
             Text("取消")
               .fontSize(18)
@@ -2596,9 +2600,6 @@ export struct EpisodeComponent1 {
         .width('50%')
         .layoutWeight(1)
         .clip(false)
-        .onClick(() => {
-          this.showCreatePlaylist = false
-        })
 
         Row() {
           ImmersiveActionButton({
@@ -2986,7 +2987,10 @@ export struct reportBuilder {
             ImmersiveActionButton({
               barWidth: '100%',
               barHeight: 40,
-              monopolizeActionEvents: false
+              monopolizeActionEvents: false,
+              onButtonClick: () => {
+                this.reportDialog.close()
+              }
             }) {
               Text("取消")
                 .fontSize(18)
@@ -2997,9 +3001,6 @@ export struct reportBuilder {
           .layoutWeight(1)
           .height(40)
           .clip(false)
-          .onClick(() => {
-            this.reportDialog.close()
-          })
 
           Row() {
             ImmersiveActionButton({
