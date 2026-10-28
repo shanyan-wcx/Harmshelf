@@ -493,7 +493,7 @@ export struct LocalMedia {
           color: $r('sys.color.ohos_id_color_focused_outline_transparent')
         })
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)
-        .clip(false)
+        .clip(true)
       }
         .width('100%')
         .padding({ left: 20, right: 20, top: this.statusBarHeight + 69, bottom: getBottomContentInset(25, this.isStartPlaying, 104) })
