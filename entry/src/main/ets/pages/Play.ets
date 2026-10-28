@@ -9,7 +9,6 @@ import { createBookmark, deleteBookmark, getBookmarks } from '../utils/Api';
 import { PlaySetting } from './Index';
 import { media } from '@kit.MediaKit';
 import { Logger } from '../utils/Logger';
-import { ImmersiveActionButton } from '../utils/Component';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -285,38 +284,28 @@ export struct Play {
         })
 
       Row({ space: 20 }) {
-        Row() {
-          ImmersiveActionButton({
-            barWidth: '100%',
-            barHeight: 50,
-            monopolizeActionEvents: false
-          }) {
-            Text("取消")
-              .fontSize(18)
-              .hitTestBehavior(HitTestMode.None)
-          }
+        Button({ type: ButtonType.Normal }) {
+          Text("取消")
+            .fontSize(18)
         }
-        .height(50)
+        .backgroundColor($r('sys.color.comp_background_tertiary'))
+        .height(40)
+        .width('50%')
         .layoutWeight(1)
-        .clip(false)
+        .borderRadius(10)
         .onClick(() => {
           this.showEditBookmark = false
         })
 
-        Row() {
-          ImmersiveActionButton({
-            barWidth: '100%',
-            barHeight: 50,
-            monopolizeActionEvents: false
-          }) {
-            Text("确认")
-              .fontSize(18)
-              .hitTestBehavior(HitTestMode.None)
-          }
+        Button({ type: ButtonType.Normal }) {
+          Text("确认")
+            .fontSize(18)
         }
-        .height(50)
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .height(40)
+        .width('50%')
         .layoutWeight(1)
-        .clip(false)
+        .borderRadius(10)
         .onClick(async () => {
           let bookmark: Bookmark = {
             libraryItemId: this.playingItem!.libraryItemId,
@@ -472,20 +461,14 @@ export struct Play {
             this.tmpBookmarkTitle = value
           })
 
-        Row() {
-          ImmersiveActionButton({
-            barWidth: '100%',
-            barHeight: 50,
-            monopolizeActionEvents: false
-          }) {
-            Text("创建书签")
-              .fontSize(18)
-              .hitTestBehavior(HitTestMode.None)
-          }
+        Button({ type: ButtonType.Normal }) {
+          Text("创建书签")
+            .fontSize(18)
         }
-        .height(50)
+        .height(45)
+        .borderRadius(10)
         .padding({ left: 15, right: 15 })
-        .clip(false)
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .onClick(async () => {
           let time = Date.now()
           let bookmark: Bookmark = {
@@ -516,64 +499,102 @@ export struct Play {
   }
 
   @Builder
-  popupActionButton(label: string, action: () => void) {
-    Row() {
-      ImmersiveActionButton({
-        barWidth: '100%',
-        barHeight: 40,
-        onButtonClick: action
-      }) {
-        Text(label)
-          .fontSize(18)
-          .hitTestBehavior(HitTestMode.None)
-      }
-    }
-    .width('100%')
-    .height(40)
-    .clip(false)
-  }
-
-  @Builder
   speedBuilder() {
     Scroll() {
       Column() {
-        this.popupActionButton("0.5x", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("0.5x")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_50_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
+        .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_50_X
           this.avPlayer!.setSpeed(this.speed)
           this.showSpeed = false
         })
 
-        this.popupActionButton("0.75x", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("0.75x")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_75_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
+        .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_75_X
           this.avPlayer!.setSpeed(this.speed)
           this.showSpeed = false
         })
 
-        this.popupActionButton("1x", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("1x")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_00_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
+        .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
           this.avPlayer!.setSpeed(this.speed)
           this.showSpeed = false
         })
 
-        this.popupActionButton("1.25x", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("1.25x")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_25_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
+        .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_25_X
           this.avPlayer!.setSpeed(this.speed)
           this.showSpeed = false
         })
 
-        this.popupActionButton("1.5x", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("1.5x")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_50_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
+        .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_50_X
           this.avPlayer!.setSpeed(this.speed)
           this.showSpeed = false
         })
 
-        this.popupActionButton("1.75x", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("1.75x")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_75_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
+        .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_75_X
           this.avPlayer!.setSpeed(this.speed)
           this.showSpeed = false
         })
 
-        this.popupActionButton("2x", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("2x")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_2_00_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
+        .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_2_00_X
           this.avPlayer!.setSpeed(this.speed)
           this.showSpeed = false
@@ -588,47 +609,119 @@ export struct Play {
   sleepBuilder() {
     Scroll() {
       Column() {
-        this.popupActionButton("5 min", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("5 min")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
           this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 5 * 60
           this.showSleep = false
         })
 
-        this.popupActionButton("10 min", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("10 min")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
           this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 10 * 60
           this.showSleep = false
         })
 
-        this.popupActionButton("15 min", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("15 min")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
           this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 15 * 60
           this.showSleep = false
         })
 
-        this.popupActionButton("30 min", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("30 min")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
           this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 30 * 60
           this.showSleep = false
         })
 
-        this.popupActionButton("45 min", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("45 min")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
           this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 45 * 60
           this.showSleep = false
         })
 
-        this.popupActionButton("60 min", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("60 min")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
           this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 60 * 60
           this.showSleep = false
         })
 
-        this.popupActionButton("90 min", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("90 min")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
           this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 90 * 60
           this.showSleep = false
         })
 
-        this.popupActionButton("章节结束", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("章节结束")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
           this.sleepTime = this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playingItem!.audioTracks[this.playingIndex].duration
           this.showSleep = false
         })
 
-        this.popupActionButton("清除定时", () => {
+        Button({ type: ButtonType.Normal }) {
+          Text("清除定时")
+            .fontSize(18)
+        }
+        .width('100%')
+        .height(50)
+        .borderRadius(10)
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .onClick(() => {
           this.sleepTime = 0
           this.showSleep = false
         })
@@ -645,27 +738,21 @@ export struct Play {
         List({ scroller: this.chapterScroller }) {
           ForEach(this.localPlayItem!.tracks, (track: LocalTrack, index: number) => {
             ListItem() {
-              Row() {
-                ImmersiveActionButton({
-                  barWidth: '100%',
-                  barHeight: 40,
-                  monopolizeActionEvents: false
-                }) {
-                  Row() {
-                    Text(track.title)
-                      .fontSize(16)
-                      .width('100%')
-                      .layoutWeight(1)
-                      .maxLines(1)
-                      .textOverflow({ overflow: TextOverflow.Ellipsis })
-                      .hitTestBehavior(HitTestMode.None)
-                  }
+              Button({ type: ButtonType.Normal }) {
+                Row() {
+                  Text(track.title)
+                    .fontSize(16)
+                    .width('100%')
+                    .layoutWeight(1)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
                 }
               }
               .width('100%')
-              .height(40)
+              .height(50)
+              .borderRadius(10)
               .padding({ left: 15, right: 15 })
-              .clip(false)
+              .backgroundColor(this.playingIndex === index ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
               .onClick(async () => {
                 this.showChapter = false
                 await this.avPlayer!.reset();
@@ -695,33 +782,26 @@ export struct Play {
         List({ scroller: this.chapterScroller }) {
           ForEach(this.playingItem!.chapters, (chapter: Chapter, index) => {
             ListItem() {
-              Row() {
-                ImmersiveActionButton({
-                  barWidth: '100%',
-                  barHeight: 40,
-                  monopolizeActionEvents: false
-                }) {
-                  Row() {
-                    Text(chapter.title)
-                      .fontSize(16)
-                      .width('100%')
-                      .layoutWeight(1)
-                      .maxLines(1)
-                      .textOverflow({ overflow: TextOverflow.Ellipsis })
-                      .hitTestBehavior(HitTestMode.None)
+              Button({ type: ButtonType.Normal }) {
+                Row() {
+                  Text(chapter.title)
+                    .fontSize(16)
+                    .width('100%')
+                    .layoutWeight(1)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                    Text(this.formatSeconds(chapter.start))
-                      .fontSize(16)
-                      .fontColor($r('sys.color.font_secondary'))
-                      .margin({ left: 10 })
-                      .hitTestBehavior(HitTestMode.None)
-                  }
+                  Text(this.formatSeconds(chapter.start))
+                    .fontSize(16)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .margin({ left: 10 })
                 }
               }
               .width('100%')
-              .height(40)
+              .height(50)
+              .borderRadius(10)
               .padding({ left: 15, right: 15 })
-              .clip(false)
+              .backgroundColor(this.playingIndex === index ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
               .onClick(async () => {
                 this.showChapter = false
                 await this.avPlayer!.reset();

@@ -142,7 +142,7 @@ export struct LibraryItemDetail {
   report: CustomDialogController = new CustomDialogController({
     builder: reportBuilder(),
     width: 350,
-    height: 335,
+    height: 325,
     backgroundColor: $r('sys.color.background_tertiary')
   })
 
