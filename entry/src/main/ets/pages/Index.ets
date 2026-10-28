@@ -1206,7 +1206,7 @@ struct Index {
       .height('100%')
       .width('100%')
       .justifyContent(FlexAlign.Center)
-      .visibility(this.showLoadingProgress === true ? Visibility.Visible : Visibility.None)
+      .visibility(this.showLoadingProgress === true && this.pageIndex !== 2 ? Visibility.Visible : Visibility.None)
     }
     .width('100%')
     .height('100%')
