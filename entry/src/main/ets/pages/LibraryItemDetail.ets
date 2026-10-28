@@ -222,7 +222,7 @@ export struct LibraryItemDetail {
       }
       if (this.itemProgress && this.itemProgress.currentTime > 0) {
         this.moreMenus.push({
-          symbolIcon: new SymbolGlyphModifier($r('sys.symbol.delete_left')).fontColor([Color.Red]),
+          symbolIcon: new SymbolGlyphModifier($r('sys.symbol.delete_left')),
           value: "放弃进度",
           action: async () => {
             let tmpProgress: UpdateProgress = {
