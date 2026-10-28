@@ -876,7 +876,7 @@ export struct EpisodeDetail {
         }
       })
       .bindSheet(this.showReport, this.reportBuilder(), {
-        height: 365,
+        height: 345,
         preferType: SheetType.CENTER,
         title: {
           title: "举报内容"

@@ -2306,7 +2306,7 @@ export struct LibraryItemDetail {
       .height('100%')
       .clip(false)
       .bindSheet(this.showReport, this.reportBuilder(), {
-        height: 365,
+        height: 345,
         preferType: SheetType.CENTER,
         title: {
           title: "举报内容"

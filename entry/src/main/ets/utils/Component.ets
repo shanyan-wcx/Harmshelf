@@ -3040,8 +3040,6 @@ export struct ReportPanel {
       }
       .width('100%')
       .height('100%')
-      .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-      .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
       .padding({ left: 20, right: 20, bottom: 25 })
 
       Column() {
