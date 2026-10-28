@@ -285,7 +285,7 @@ export struct LocalMedia {
               .justifyContent(FlexAlign.SpaceBetween)
             }
             .width('100%')
-            .height(50)
+            .height(60)
             .borderRadius(10)
             .margin({ bottom: 10 })
             .padding({ left: 20, right: 20 })
@@ -394,7 +394,7 @@ export struct LocalMedia {
               .justifyContent(FlexAlign.SpaceBetween)
             }
             .width('100%')
-            .height(50)
+            .height(60)
             .borderRadius(10)
             .margin({ bottom: 10 })
             .padding({ left: 20, right: 20 })
@@ -415,33 +415,38 @@ export struct LocalMedia {
                 ForEach(this.audioFolderList.sort((a, b) => a.localeCompare(b)), (file: string, index) => {
                   ListItem() {
                     Stack() {
-                      Row() {
-                        Text(file)
-                          .fontSize(18)
-                          .fontWeight(FontWeight.Medium)
-                          .maxLines(1)
-                          .textOverflow({ overflow: TextOverflow.Ellipsis })
-                          .layoutWeight(1)
+                      Stack() {
+                        Row() {
+                          Text(file)
+                            .fontSize(18)
+                            .fontWeight(FontWeight.Medium)
+                            .maxLines(1)
+                            .textOverflow({ overflow: TextOverflow.Ellipsis })
+                            .layoutWeight(1)
+                        }
+                        .width('100%')
+                        .height(60)
+                        .padding({ left: 20, right: 20 })
                       }
                       .width('100%')
                       .height(60)
-                      .padding({ left: 20, right: 20 })
+                      .borderRadius(10)
+                      .clip(true)
                     }
                     .width('100%')
                     .height(60)
                     .borderRadius(10)
-                    .clip(true)
+                    .backgroundColor($r('sys.color.background_secondary'))
+                    .border({
+                      width: 0.35,
+                      radius: 10,
+                      color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+                    })
+                    .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+                    .clip(false)
                   }
                   .width('100%')
                   .height(60)
-                  .borderRadius(10)
-                  .backgroundColor($r('sys.color.background_secondary'))
-                  .border({
-                    width: 0.35,
-                    radius: 10,
-                    color: $r('sys.color.ohos_id_color_focused_outline_transparent')
-                  })
-                  .shadow(ShadowStyle.OUTER_DEFAULT_XS)
                   .swipeAction({
                     end: {
                       builder: () => {
