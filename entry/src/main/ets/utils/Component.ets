@@ -1830,7 +1830,40 @@ export struct EpisodeComponent {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 50,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: async () => {
+              if (this.tmpPlaylistName.length === 0) {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '播放列表名称不能为空！',
+                  duration: 500
+                });
+              } else {
+                let playlist: Playlist = {
+                  libraryId: this.library!.id,
+                  name: this.tmpPlaylistName,
+                  description: this.tmpPlaylistDescription.length > 0 ? this.tmpPlaylistDescription : null,
+                  items: [{
+                    libraryItemId: this.episode!.libraryItemId!,
+                    episodeId: this.episode!.id!,
+                    episode: this.episode
+                  }]
+                }
+                let newPlaylist = await createPlaylist(playlist)
+                if (newPlaylist) {
+                  this.playlists.push(newPlaylist)
+                  this.showCreatePlaylist = false
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '创建播放列表成功！',
+                    duration: 500
+                  });
+                } else {
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '创建播放列表失败，请检查网络！',
+                    duration: 500
+                  });
+                }
+              }
+            }
           }) {
             Text("确认")
               .fontSize(18)
@@ -1841,39 +1874,6 @@ export struct EpisodeComponent {
         .width('50%')
         .layoutWeight(1)
         .clip(false)
-        .onClick(async () => {
-          if (this.tmpPlaylistName.length === 0) {
-            this.getUIContext().getPromptAction().showToast({
-              message: '播放列表名称不能为空！',
-              duration: 500
-            });
-          } else {
-            let playlist: Playlist = {
-              libraryId: this.library!.id,
-              name: this.tmpPlaylistName,
-              description: this.tmpPlaylistDescription.length > 0 ? this.tmpPlaylistDescription : null,
-              items: [{
-                libraryItemId: this.episode!.libraryItemId!,
-                episodeId: this.episode!.id!,
-                episode: this.episode
-              }]
-            }
-            let newPlaylist = await createPlaylist(playlist)
-            if (newPlaylist) {
-              this.playlists.push(newPlaylist)
-              this.showCreatePlaylist = false
-              this.getUIContext().getPromptAction().showToast({
-                message: '创建播放列表成功！',
-                duration: 500
-              });
-            } else {
-              this.getUIContext().getPromptAction().showToast({
-                message: '创建播放列表失败，请检查网络！',
-                duration: 500
-              });
-            }
-          }
-        })
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
@@ -2605,7 +2605,40 @@ export struct EpisodeComponent1 {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 50,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: async () => {
+              if (this.tmpPlaylistName.length === 0) {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '播放列表名称不能为空！',
+                  duration: 500
+                });
+              } else {
+                let playlist: Playlist = {
+                  libraryId: this.library!.id,
+                  name: this.tmpPlaylistName,
+                  description: this.tmpPlaylistDescription.length > 0 ? this.tmpPlaylistDescription : null,
+                  items: [{
+                    libraryItemId: this.episode!.libraryItemId!,
+                    episodeId: this.episode!.id!,
+                    episode: this.episode
+                  }]
+                }
+                let newPlaylist = await createPlaylist(playlist)
+                if (newPlaylist) {
+                  this.playlists.push(newPlaylist)
+                  this.showCreatePlaylist = false
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '创建播放列表成功！',
+                    duration: 500
+                  });
+                } else {
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '创建播放列表失败，请检查网络！',
+                    duration: 500
+                  });
+                }
+              }
+            }
           }) {
             Text("确认")
               .fontSize(18)
@@ -2616,39 +2649,6 @@ export struct EpisodeComponent1 {
         .width('50%')
         .layoutWeight(1)
         .clip(false)
-        .onClick(async () => {
-          if (this.tmpPlaylistName.length === 0) {
-            this.getUIContext().getPromptAction().showToast({
-              message: '播放列表名称不能为空！',
-              duration: 500
-            });
-          } else {
-            let playlist: Playlist = {
-              libraryId: this.library!.id,
-              name: this.tmpPlaylistName,
-              description: this.tmpPlaylistDescription.length > 0 ? this.tmpPlaylistDescription : null,
-              items: [{
-                libraryItemId: this.episode!.libraryItemId!,
-                episodeId: this.episode!.id!,
-                episode: this.episode
-              }]
-            }
-            let newPlaylist = await createPlaylist(playlist)
-            if (newPlaylist) {
-              this.playlists.push(newPlaylist)
-              this.showCreatePlaylist = false
-              this.getUIContext().getPromptAction().showToast({
-                message: '创建播放列表成功！',
-                duration: 500
-              });
-            } else {
-              this.getUIContext().getPromptAction().showToast({
-                message: '创建播放列表失败，请检查网络！',
-                duration: 500
-              });
-            }
-          }
-        })
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })

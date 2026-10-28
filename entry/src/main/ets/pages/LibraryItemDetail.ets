@@ -809,7 +809,40 @@ export struct LibraryItemDetail {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 50,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: async () => {
+              if (this.tmpPlaylistName.length === 0) {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '播放列表名称不能为空！',
+                  duration: 500
+                });
+              } else {
+                let playlist: Playlist = {
+                  libraryId: this.library!.id,
+                  name: this.tmpPlaylistName,
+                  description: this.tmpPlaylistDescription.length > 0 ? this.tmpPlaylistDescription : null,
+                  items: [{
+                    libraryItemId: this.libraryItem!.id,
+                    episodeId: null,
+                    libraryItem: this.libraryItem
+                  }]
+                }
+                let newPlaylist = await createPlaylist(playlist)
+                if (newPlaylist) {
+                  this.showCreatePlaylist = false
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '创建播放列表成功！',
+                    duration: 500
+                  });
+                  this.playlists.push(newPlaylist)
+                } else {
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '创建播放列表失败，请检查网络！',
+                    duration: 500
+                  });
+                }
+              }
+            }
           }) {
             Text("确认")
               .fontSize(18)
@@ -819,39 +852,6 @@ export struct LibraryItemDetail {
         .height(50)
         .layoutWeight(1)
         .clip(false)
-        .onClick(async () => {
-          if (this.tmpPlaylistName.length === 0) {
-            this.getUIContext().getPromptAction().showToast({
-              message: '播放列表名称不能为空！',
-              duration: 500
-            });
-          } else {
-            let playlist: Playlist = {
-              libraryId: this.library!.id,
-              name: this.tmpPlaylistName,
-              description: this.tmpPlaylistDescription.length > 0 ? this.tmpPlaylistDescription : null,
-              items: [{
-                libraryItemId: this.libraryItem!.id,
-                episodeId: null,
-                libraryItem: this.libraryItem
-              }]
-            }
-            let newPlaylist = await createPlaylist(playlist)
-            if (newPlaylist) {
-              this.showCreatePlaylist = false
-              this.getUIContext().getPromptAction().showToast({
-                message: '创建播放列表成功！',
-                duration: 500
-              });
-              this.playlists.push(newPlaylist)
-            } else {
-              this.getUIContext().getPromptAction().showToast({
-                message: '创建播放列表失败，请检查网络！',
-                duration: 500
-              });
-            }
-          }
-        })
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
@@ -1028,7 +1028,36 @@ export struct LibraryItemDetail {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 50,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: async () => {
+              if (this.tmpCollectionName.length === 0) {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '收藏名称不能为空！',
+                  duration: 500
+                });
+              } else {
+                let collection: Collection1 = {
+                  libraryId: this.library!.id,
+                  name: this.tmpCollectionName,
+                  description: this.tmpCollectionDescription.length > 0 ? this.tmpCollectionDescription : null,
+                  books: [this.libraryItem!.id]
+                }
+                let newCollection = await createCollection(collection)
+                if (newCollection) {
+                  this.showCreateCollection = false
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '创建收藏成功！',
+                    duration: 500
+                  });
+                  this.collections.push(newCollection)
+                } else {
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '创建收藏失败，请检查网络！',
+                    duration: 500
+                  });
+                }
+              }
+            }
           }) {
             Text("确认")
               .fontSize(18)
@@ -1038,35 +1067,6 @@ export struct LibraryItemDetail {
         .height(50)
         .layoutWeight(1)
         .clip(false)
-        .onClick(async () => {
-          if (this.tmpCollectionName.length === 0) {
-            this.getUIContext().getPromptAction().showToast({
-              message: '收藏名称不能为空！',
-              duration: 500
-            });
-          } else {
-            let collection: Collection1 = {
-              libraryId: this.library!.id,
-              name: this.tmpCollectionName,
-              description: this.tmpCollectionDescription.length > 0 ? this.tmpCollectionDescription : null,
-              books: [this.libraryItem!.id]
-            }
-            let newCollection = await createCollection(collection)
-            if (newCollection) {
-              this.showCreateCollection = false
-              this.getUIContext().getPromptAction().showToast({
-                message: '创建收藏成功！',
-                duration: 500
-              });
-              this.collections.push(newCollection)
-            } else {
-              this.getUIContext().getPromptAction().showToast({
-                message: '创建收藏失败，请检查网络！',
-                duration: 500
-              });
-            }
-          }
-        })
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
