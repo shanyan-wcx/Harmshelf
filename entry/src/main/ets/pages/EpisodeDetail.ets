@@ -19,7 +19,7 @@ import { env } from '../utils/Class'
 import { media } from '@kit.MediaKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
-import { reportBuilder, gradientBlurTitleBarStyle, ImmersiveActionButton } from '../utils/Component'
+import { ReportPanel, gradientBlurTitleBarStyle, ImmersiveActionButton } from '../utils/Component'
 import { getBottomContentInset } from '../utils/Layout'
 import { DownloadSetting, OtherSetting } from './Index'
 import { Logger } from '../utils/Logger'
@@ -68,6 +68,7 @@ export struct EpisodeDetail {
   @Local showProgress: boolean = false
   @Local showCreatePlaylist: boolean = false
   @Local showDeleteConfirm: boolean = false
+  @Local showReport: boolean = false
   @Local showConfirmDownload: boolean = false
   @Local tmpPlaylistName: string = ""
   @Local tmpPlaylistDescription: string = ""
@@ -77,13 +78,6 @@ export struct EpisodeDetail {
     this.itemProgress = this.progress.find(p => p.episodeId === this.episode!.id)
     this.updateMoreMenus()
   }
-  report: CustomDialogController = new CustomDialogController({
-    builder: reportBuilder(),
-    width: 350,
-    height: 325,
-    backgroundColor: $r('sys.color.background_tertiary')
-  })
-
   formatDuration(seconds: number): string {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -168,7 +162,7 @@ export struct EpisodeDetail {
         symbolIcon: new SymbolGlyphModifier($r('sys.symbol.exclamationmark_triangle')),
         value: "举报内容",
         action: async () => {
-          this.report.open()
+          this.showReport = true
         }
       })
     }
@@ -186,6 +180,13 @@ export struct EpisodeDetail {
     }
     this.updateMoreMenus()
     this.showLoadingProgress = false
+  }
+
+  @Builder
+  reportBuilder() {
+    ReportPanel({ onClose: () => {
+      this.showReport = false
+    } })
   }
 
   @Builder
@@ -872,6 +873,17 @@ export struct EpisodeDetail {
         showClose: false,
         onDisappear: () => {
           this.showDeleteConfirm = false
+        }
+      })
+      .bindSheet(this.showReport, this.reportBuilder(), {
+        height: 325,
+        preferType: SheetType.CENTER,
+        title: {
+          title: "举报内容"
+        },
+        showClose: false,
+        onDisappear: () => {
+          this.showReport = false
         }
       })
     }

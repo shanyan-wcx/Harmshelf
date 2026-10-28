@@ -2921,25 +2921,16 @@ export struct pageUpDown {
   }
 }
 
-@CustomDialog
-export struct reportBuilder {
-  @State reason: string = ''
-  @State description: string = ''
-  @State showProgress: boolean = false
-  reportDialog: CustomDialogController = new CustomDialogController({
-    builder: reportBuilder({})
-  })
+@ComponentV2
+export struct ReportPanel {
+  @Local reason: string = ''
+  @Local description: string = ''
+  @Local showProgress: boolean = false
+  @Param onClose: () => void = () => {}
 
   build() {
     Stack() {
       Column() {
-        Text("举报内容")
-          .width('100%')
-          .textAlign(TextAlign.Center)
-          .fontSize(20)
-          .fontWeight(FontWeight.Bold)
-          .margin({ top: 16, bottom: 15 })
-
         Row() {
           Text("举报原因")
             .fontSize(18)
@@ -2989,7 +2980,7 @@ export struct reportBuilder {
               barHeight: 50,
               monopolizeActionEvents: false,
               onButtonClick: () => {
-                this.reportDialog.close()
+                this.onClose()
               }
             }) {
               Text("取消")
@@ -3031,7 +3022,7 @@ export struct reportBuilder {
             this.showProgress = false
 
             if (success === true) {
-              this.reportDialog.close()
+              this.onClose()
               this.getUIContext().getPromptAction().showToast({
                 message: '举报已提交，感谢反馈！',
                 duration: 1000
@@ -3050,7 +3041,7 @@ export struct reportBuilder {
       .width('100%')
       .height('100%')
       .backgroundColor($r('sys.color.background_secondary'))
-      .padding({ left: 20, right: 20 })
+      .padding({ left: 20, right: 20, bottom: 25 })
 
       Column() {
         LoadingProgress()

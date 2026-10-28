@@ -21,7 +21,7 @@ import { HdsNavDestination, HdsNavDestinationAttribute } from "@kit.UIDesignKit"
 import { LengthMetrics, PersistenceV2, SymbolGlyphModifier } from "@kit.ArkUI";
 import {
   gradientBlurTitleBarStyle,
-  reportBuilder,
+  ReportPanel,
   EpisodeComponent1,
   ImmersiveActionButton
 } from "../utils/Component";
@@ -123,6 +123,7 @@ export struct LibraryItemDetail {
   @Local showCreateCollection: boolean = false
   @Local loadingFeed: boolean = false
   @Local showFeedEpisodes: boolean = false
+  @Local showReport: boolean = false
   @Local feedEpisodes: Episode[] = []
   @Local addToServer: boolean[] = []
   @Local tmpCollectionName: string = ""
@@ -139,12 +140,13 @@ export struct LibraryItemDetail {
   async refreshLibraryItem(monitor: IMonitor) {
     this.episodes = this.libraryItem?.media.episodes!
   }
-  report: CustomDialogController = new CustomDialogController({
-    builder: reportBuilder(),
-    width: 350,
-    height: 325,
-    backgroundColor: $r('sys.color.background_tertiary')
-  })
+
+  @Builder
+  reportBuilder() {
+    ReportPanel({ onClose: () => {
+      this.showReport = false
+    } })
+  }
 
   formatDuration(seconds: number): string {
     const hours = Math.floor(seconds / 3600);
@@ -270,7 +272,7 @@ export struct LibraryItemDetail {
         symbolIcon: new SymbolGlyphModifier($r('sys.symbol.exclamationmark_triangle')),
         value: "举报内容",
         action: async () => {
-          this.report.open()
+          this.showReport = true
         }
       })
     }
@@ -2303,6 +2305,17 @@ export struct LibraryItemDetail {
       .width('100%')
       .height('100%')
       .clip(false)
+      .bindSheet(this.showReport, this.reportBuilder(), {
+        height: 325,
+        preferType: SheetType.CENTER,
+        title: {
+          title: "举报内容"
+        },
+        showClose: false,
+        onDisappear: () => {
+          this.showReport = false
+        }
+      })
     }
     .width('100%')
     .height('100%')
