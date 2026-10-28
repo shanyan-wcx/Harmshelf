@@ -807,7 +807,7 @@ export struct Setting {
           .height(50)
           .margin({ top: 10 })
           .bindSheet(this.showAddServer, this.AddServerBuilder(), {
-            height: 400,
+            height: SheetSize.FIT_CONTENT,
             preferType: SheetType.CENTER,
             title: {
               title: "添加服务器"
@@ -837,7 +837,7 @@ export struct Setting {
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)
         .clip(false)
         .bindSheet(this.showEditServer, this.EditServerBuilder(), {
-          height: 400,
+          height: SheetSize.FIT_CONTENT,
           preferType: SheetType.CENTER,
           title: {
             title: "编辑服务器"
