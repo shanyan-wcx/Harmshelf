@@ -1,6 +1,7 @@
 import { addPodcast, getFeed } from "../../utils/Api"
 import { Library, Podcast, SearchPodcast } from "../../utils/Interface"
 import { getBottomContentInset } from '../../utils/Layout';
+import { ImmersiveActionButton } from '../../utils/Component';
 
 @ComponentV2
 export struct Add {
@@ -165,14 +166,20 @@ export struct Add {
               .margin({ left: 5 })
           }
 
-          Button({ type: ButtonType.Normal }) {
-            Text("提交")
-              .fontSize(18)
+          Row() {
+            ImmersiveActionButton({
+              barWidth: 100,
+              barHeight: 40,
+              monopolizeActionEvents: false
+            }) {
+              Text("提交")
+                .fontSize(18)
+                .hitTestBehavior(HitTestMode.None)
+            }
           }
-          .backgroundColor($r('sys.color.comp_emphasize_secondary'))
           .height(40)
           .width(100)
-          .borderRadius(10)
+          .clip(false)
           .onClick(async () => {
             let podcast1 = await addPodcast(this.library!.id, this.library!.folders[0].id, this.library!.folders[0].fullPath + "/" + searchPodcast.title, searchPodcast, podcast, this.autoDownload[index])
             if (podcast1) {
@@ -265,7 +272,7 @@ export struct Add {
               })
               .clip(false)
               .bindSheet(this.showConfirm[index], this.confirmBuilder(searchPodcast, this.podcast!, index), {
-                height: 429,
+                height: 449,
                 preferType: SheetType.CENTER,
                 title: {
                   title: "确认添加"

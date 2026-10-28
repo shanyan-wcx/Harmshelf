@@ -188,67 +188,75 @@ export struct CollectionDetail {
         })
 
       Row({ space: 20 }) {
-        Button({ type: ButtonType.Normal }) {
-          Text("删除")
-            .fontSize(18)
-            .fontColor(Color.Red)
-        }
-        .backgroundColor($r('sys.color.warning'))
-        .height(40)
-        .width('50%')
-        .layoutWeight(1)
-        .borderRadius(10)
-        .onClick(async () => {
-          let status = await deleteCollection(this.collection1!.id!)
-          if (status) {
-            this.showEditCollection = false
-            this.getUIContext().getPromptAction().showToast({
-              message: '删除成功！',
-              duration: 500
-            });
-            this.pageInfos.pop()
-            this.collections = await getCollections(this.library!.id)
-          } else {
-            this.getUIContext().getPromptAction().showToast({
-              message: '删除失败，请检查网络！',
-              duration: 500
-            });
-          }
-        })
-
-        Button({ type: ButtonType.Normal }) {
-          Text("确认")
-            .fontSize(18)
-        }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
-        .height(40)
-        .width('50%')
-        .layoutWeight(1)
-        .borderRadius(10)
-        .onClick(async () => {
-          if (this.tmpCollectionName.length === 0) {
-            this.getUIContext().getPromptAction().showToast({
-              message: '收藏名称不能为空！',
-              duration: 500
-            });
-          } else {
-            let newCollection = await updateCollection(this.collection1!.id!, this.tmpCollectionName, this.tmpCollectionDescription)
-            if (newCollection) {
-              this.showEditCollection = false
-              this.getUIContext().getPromptAction().showToast({
-                message: '编辑收藏成功！',
-                duration: 500
-              });
-              this.collection1 = newCollection
-              this.collections = await getCollections(this.library!.id)
-            } else {
-              this.getUIContext().getPromptAction().showToast({
-                message: '编辑收藏失败，请检查网络！',
-                duration: 500
-              });
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            onButtonClick: async () => {
+              let status = await deleteCollection(this.collection1!.id!)
+              if (status) {
+                this.showEditCollection = false
+                this.getUIContext().getPromptAction().showToast({
+                  message: '删除成功！',
+                  duration: 500
+                });
+                this.pageInfos.pop()
+                this.collections = await getCollections(this.library!.id)
+              } else {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '删除失败，请检查网络！',
+                  duration: 500
+                });
+              }
             }
+          }) {
+            Text("删除")
+              .fontSize(18)
+              .fontColor(Color.Red)
+              .hitTestBehavior(HitTestMode.None)
           }
-        })
+        }
+        .height(40)
+        .layoutWeight(1)
+        .clip(false)
+
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            onButtonClick: async () => {
+              if (this.tmpCollectionName.length === 0) {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '收藏名称不能为空！',
+                  duration: 500
+                });
+              } else {
+                let newCollection = await updateCollection(this.collection1!.id!, this.tmpCollectionName, this.tmpCollectionDescription)
+                if (newCollection) {
+                  this.showEditCollection = false
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '编辑收藏成功！',
+                    duration: 500
+                  });
+                  this.collection1 = newCollection
+                  this.collections = await getCollections(this.library!.id)
+                } else {
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '编辑收藏失败，请检查网络！',
+                    duration: 500
+                  });
+                }
+              }
+            }
+          }) {
+            Text("确认")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
+        }
+        .height(40)
+        .layoutWeight(1)
+        .clip(false)
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })

@@ -211,15 +211,20 @@ export struct Setting {
           .width('100%')
           .margin({ top: 20, bottom: 20 })
 
-          Button({ type: ButtonType.Normal }) {
-            Text("保存")
-              .fontSize(20)
+          Row() {
+            ImmersiveActionButton({
+              barWidth: '100%',
+              barHeight: 40,
+              monopolizeActionEvents: false
+            }) {
+              Text("保存")
+                .fontSize(20)
+                .hitTestBehavior(HitTestMode.None)
+            }
           }
           .width('100%')
-          .height(50)
-          .borderRadius(10)
-          .backgroundColor($r('sys.color.comp_emphasize_secondary'))
-          .borderRadius(10)
+          .height(40)
+          .clip(false)
           .onClick(async () => {
             if (this.tmpUrl === "") {
               this.getUIContext().getPromptAction().showToast({
@@ -410,16 +415,20 @@ export struct Setting {
           .margin({ top: 20, bottom: 20 })
 
           Row({ space: 20 }) {
-            Button({ type: ButtonType.Normal }) {
-              Text("保存")
-                .fontSize(20)
+            Row() {
+              ImmersiveActionButton({
+                barWidth: '100%',
+                barHeight: 40,
+                monopolizeActionEvents: false
+              }) {
+                Text("保存")
+                  .fontSize(20)
+                  .hitTestBehavior(HitTestMode.None)
+              }
             }
-            .width('50%')
             .layoutWeight(1)
-            .height(50)
-            .borderRadius(10)
-            .backgroundColor($r('sys.color.comp_emphasize_secondary'))
-            .borderRadius(10)
+            .height(40)
+            .clip(false)
             .onClick(async () => {
               if (this.tmpUrl === "") {
                 this.getUIContext().getPromptAction().showToast({
@@ -474,17 +483,21 @@ export struct Setting {
               }
             })
 
-            Button({ type: ButtonType.Normal }) {
-              Text("删除")
-                .fontSize(20)
-                .fontColor(Color.Red)
+            Row() {
+              ImmersiveActionButton({
+                barWidth: '100%',
+                barHeight: 40,
+                monopolizeActionEvents: false
+              }) {
+                Text("删除")
+                  .fontSize(20)
+                  .fontColor(Color.Red)
+                  .hitTestBehavior(HitTestMode.None)
+              }
             }
-            .width('50%')
             .layoutWeight(1)
-            .height(50)
-            .borderRadius(10)
-            .backgroundColor($r('sys.color.warning'))
-            .borderRadius(10)
+            .height(40)
+            .clip(false)
             .onClick(async () => {
               if (this.editServerIndex !== this.serverIndex?.serverIndex) {
                 this.serverSetting!.loginInfos.splice(this.editServerIndex, 1)
@@ -794,7 +807,7 @@ export struct Setting {
           .height(50)
           .margin({ top: 10 })
           .bindSheet(this.showAddServer, this.AddServerBuilder(), {
-            height: 380,
+            height: 400,
             preferType: SheetType.CENTER,
             title: {
               title: "添加服务器"
@@ -824,7 +837,7 @@ export struct Setting {
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)
         .clip(false)
         .bindSheet(this.showEditServer, this.EditServerBuilder(), {
-          height: 380,
+          height: 400,
           preferType: SheetType.CENTER,
           title: {
             title: "编辑服务器"

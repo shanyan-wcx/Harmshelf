@@ -202,67 +202,75 @@ export struct PlaylistDetail {
         })
 
       Row({ space: 20 }) {
-        Button({ type: ButtonType.Normal }) {
-          Text("删除")
-            .fontSize(18)
-            .fontColor(Color.Red)
-        }
-        .backgroundColor($r('sys.color.warning'))
-        .height(40)
-        .width('50%')
-        .layoutWeight(1)
-        .borderRadius(10)
-        .onClick(async () => {
-          let status = await deletePlaylist(this.playlist1!.id!)
-          if (status) {
-            this.showEditPlaylist = false
-            this.getUIContext().getPromptAction().showToast({
-              message: '删除成功！',
-              duration: 500
-            });
-            this.pageInfos.pop()
-            this.playlists = await getPlaylists(this.library!.id)
-          } else {
-            this.getUIContext().getPromptAction().showToast({
-              message: '删除失败，请检查网络！',
-              duration: 500
-            });
-          }
-        })
-
-        Button({ type: ButtonType.Normal }) {
-          Text("确认")
-            .fontSize(18)
-        }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
-        .height(40)
-        .width('50%')
-        .layoutWeight(1)
-        .borderRadius(10)
-        .onClick(async () => {
-          if (this.tmpPlaylistName.length === 0) {
-            this.getUIContext().getPromptAction().showToast({
-              message: '播放列表名称不能为空！',
-              duration: 500
-            });
-          } else {
-            let newPlaylist = await updatePlaylist(this.playlist1!.id!, this.tmpPlaylistName, this.tmpPlaylistDescription)
-            if (newPlaylist) {
-              this.showEditPlaylist = false
-              this.getUIContext().getPromptAction().showToast({
-                message: '编辑播放列表成功！',
-                duration: 500
-              });
-              this.playlist1 = newPlaylist
-              this.playlists = await getPlaylists(this.library!.id)
-            } else {
-              this.getUIContext().getPromptAction().showToast({
-                message: '编辑播放列表失败，请检查网络！',
-                duration: 500
-              });
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            onButtonClick: async () => {
+              let status = await deletePlaylist(this.playlist1!.id!)
+              if (status) {
+                this.showEditPlaylist = false
+                this.getUIContext().getPromptAction().showToast({
+                  message: '删除成功！',
+                  duration: 500
+                });
+                this.pageInfos.pop()
+                this.playlists = await getPlaylists(this.library!.id)
+              } else {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '删除失败，请检查网络！',
+                  duration: 500
+                });
+              }
             }
+          }) {
+            Text("删除")
+              .fontSize(18)
+              .fontColor(Color.Red)
+              .hitTestBehavior(HitTestMode.None)
           }
-        })
+        }
+        .height(40)
+        .layoutWeight(1)
+        .clip(false)
+
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            onButtonClick: async () => {
+              if (this.tmpPlaylistName.length === 0) {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '播放列表名称不能为空！',
+                  duration: 500
+                });
+              } else {
+                let newPlaylist = await updatePlaylist(this.playlist1!.id!, this.tmpPlaylistName, this.tmpPlaylistDescription)
+                if (newPlaylist) {
+                  this.showEditPlaylist = false
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '编辑播放列表成功！',
+                    duration: 500
+                  });
+                  this.playlist1 = newPlaylist
+                  this.playlists = await getPlaylists(this.library!.id)
+                } else {
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '编辑播放列表失败，请检查网络！',
+                    duration: 500
+                  });
+                }
+              }
+            }
+          }) {
+            Text("确认")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
+        }
+        .height(40)
+        .layoutWeight(1)
+        .clip(false)
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })

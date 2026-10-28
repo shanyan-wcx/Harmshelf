@@ -356,14 +356,19 @@ export struct LibraryItemDetail {
       .layoutWeight(1)
       .scrollBar(BarState.Off)
 
-      Button({ type: ButtonType.Normal }) {
-        Text("添加到服务器")
-          .fontSize(18)
+      Row() {
+        ImmersiveActionButton({
+          barWidth: '100%',
+          barHeight: 40,
+          monopolizeActionEvents: false
+        }) {
+          Text("添加到服务器")
+            .fontSize(18)
+            .hitTestBehavior(HitTestMode.None)
+        }
       }
-      .backgroundColor($r('sys.color.comp_emphasize_secondary'))
       .height(40)
       .width('100%')
-      .borderRadius(10)
       .margin({ top: 20 })
       .onClick(async () => {
         if (this.addToServer.every(v => v === false)) {
@@ -410,28 +415,38 @@ export struct LibraryItemDetail {
       }
 
       Row({ space: 20 }) {
-        Button({ type: ButtonType.Normal }) {
-          Text("取消")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("取消")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .height(40)
-        .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(() => {
           this.showConfirm = false
         })
 
-        Button({ type: ButtonType.Normal }) {
-          Text("确认")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("确认")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .height(40)
-        .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(async () => {
           if (this.tmpPlayingItem) {
             this.playingItem = this.tmpPlayingItem
@@ -508,28 +523,38 @@ export struct LibraryItemDetail {
       .margin({ top: 0, bottom: 20 })
 
       Row({ space: 20 }) {
-        Button({ type: ButtonType.Normal }) {
-          Text("取消")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("取消")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .height(40)
-        .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(() => {
           this.showConfirmDownload = false
         })
 
-        Button({ type: ButtonType.Normal }) {
-          Text("确认")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("确认")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .height(40)
-        .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(async () => {
           const maxTracks = this.libraryItem?.media.tracks?.length ?? 0
           const start = this.downloadStart === '' ? 1 : Number(this.downloadStart)
@@ -626,13 +651,19 @@ export struct LibraryItemDetail {
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                Button({ type: ButtonType.Normal }) {
-                  Text(playlist.items.find(p => p.libraryItemId === this.libraryItem!.id) ? "移除" : "添加")
+                Row() {
+                  ImmersiveActionButton({
+                    barWidth: '100%',
+                    barHeight: 40,
+                    monopolizeActionEvents: false
+                  }) {
+                    Text(playlist.items.find(p => p.libraryItemId === this.libraryItem!.id) ? "移除" : "添加")
+                      .hitTestBehavior(HitTestMode.None)
+                  }
                 }
                 .width(80)
                 .height(40)
-                .borderRadius(10)
-                .backgroundColor($r('sys.color.comp_background_tertiary'))
+                .clip(false)
                 .onClick(async () => {
                   let tmpPlaylist: Playlist | undefined = undefined
                   let item = playlist.items.find(p => p.libraryItemId === this.libraryItem!.id)
@@ -679,14 +710,20 @@ export struct LibraryItemDetail {
       .layoutWeight(1)
 
       Column() {
-        Button({ type: ButtonType.Normal }) {
-          Text("新建播放列表")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("新建播放列表")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .height(45)
+        .height(40)
         .width('100%')
-        .borderRadius(10)
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .clip(false)
         .onClick(async () => {
           if (this.showProgress) {
             this.getUIContext().getPromptAction().showToast({
@@ -748,28 +785,38 @@ export struct LibraryItemDetail {
         })
 
       Row({ space: 20 }) {
-        Button({ type: ButtonType.Normal }) {
-          Text("取消")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("取消")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .height(40)
-        .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(() => {
           this.showCreatePlaylist = false
         })
 
-        Button({ type: ButtonType.Normal }) {
-          Text("确认")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("确认")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .height(40)
-        .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(async () => {
           if (this.tmpPlaylistName.length === 0) {
             this.getUIContext().getPromptAction().showToast({
@@ -823,13 +870,19 @@ export struct LibraryItemDetail {
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                Button({ type: ButtonType.Normal }) {
-                  Text(collection.books!.find(b => b.id === this.libraryItem!.id) ? "移除" : "添加")
+                Row() {
+                  ImmersiveActionButton({
+                    barWidth: '100%',
+                    barHeight: 40,
+                    monopolizeActionEvents: false
+                  }) {
+                    Text(collection.books!.find(b => b.id === this.libraryItem!.id) ? "移除" : "添加")
+                      .hitTestBehavior(HitTestMode.None)
+                  }
                 }
                 .width(80)
                 .height(40)
-                .borderRadius(10)
-                .backgroundColor($r('sys.color.comp_background_tertiary'))
+                .clip(false)
                 .onClick(async () => {
                   let tmpCollection: Collection | undefined = undefined
                   let book = collection.books!.find(b => b.id === this.libraryItem!.id)
@@ -876,14 +929,20 @@ export struct LibraryItemDetail {
       .layoutWeight(1)
 
       Column() {
-        Button({ type: ButtonType.Normal }) {
-          Text("新建收藏")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("新建收藏")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .height(45)
+        .height(40)
         .width('100%')
-        .borderRadius(10)
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .clip(false)
         .onClick(async () => {
           if (this.showProgress) {
             this.getUIContext().getPromptAction().showToast({
@@ -945,28 +1004,38 @@ export struct LibraryItemDetail {
         })
 
       Row({ space: 20 }) {
-        Button({ type: ButtonType.Normal }) {
-          Text("取消")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("取消")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .height(40)
-        .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(() => {
           this.showCreateCollection = false
         })
 
-        Button({ type: ButtonType.Normal }) {
-          Text("确认")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("确认")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .height(40)
-        .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(async () => {
           if (this.tmpCollectionName.length === 0) {
             this.getUIContext().getPromptAction().showToast({
@@ -1068,15 +1137,20 @@ export struct LibraryItemDetail {
         .selectedColor($r('sys.color.comp_emphasize_secondary'))
 
       Row({ space: 20 }) {
-        Button({ type: ButtonType.Normal }) {
-          Text("清除")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("清除")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .height(40)
-        .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(() => {
           this.projectSkipSettings?.removeSkipSettings(this.libraryItem!.id)
           this.tmpSkipStart = 0
@@ -1088,15 +1162,20 @@ export struct LibraryItemDetail {
           });
         })
 
-        Button({ type: ButtonType.Normal }) {
-          Text("设置")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("设置")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .height(40)
-        .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(() => {
           this.projectSkipSettings?.setSkipSettings(this.libraryItem!.id, {
             skipStart: this.tmpSkipStart,

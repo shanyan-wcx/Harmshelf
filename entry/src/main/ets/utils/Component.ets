@@ -1550,28 +1550,40 @@ export struct EpisodeComponent {
       }
 
       Row({ space: 20 }) {
-        Button({ type: ButtonType.Normal }) {
-          Text("取消")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("取消")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(() => {
           this.showConfirmDownload = false
         })
 
-        Button({ type: ButtonType.Normal }) {
-          Text("确认")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("确认")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(async () => {
           this.getUIContext().getPromptAction().showToast({
             message: '开始下载！',
@@ -1660,13 +1672,19 @@ export struct EpisodeComponent {
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                Button({ type: ButtonType.Normal }) {
-                  Text(playlist.items.find(p => p.episodeId === this.item.id) ? "移除" : "添加")
+                Row() {
+                  ImmersiveActionButton({
+                    barWidth: '100%',
+                    barHeight: 40,
+                    monopolizeActionEvents: false
+                  }) {
+                    Text(playlist.items.find(p => p.episodeId === this.item.id) ? "移除" : "添加")
+                      .hitTestBehavior(HitTestMode.None)
+                  }
                 }
                 .width(80)
                 .height(40)
-                .borderRadius(10)
-                .backgroundColor($r('sys.color.comp_background_tertiary'))
+                .clip(false)
                 .onClick(async () => {
                   let tmpPlaylist: Playlist | undefined = undefined
                   let item = playlist.items.find(p => p.episodeId === this.item.id)
@@ -1713,14 +1731,20 @@ export struct EpisodeComponent {
       .layoutWeight(1)
 
       Column() {
-        Button({ type: ButtonType.Normal }) {
-          Text("新建播放列表")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("新建播放列表")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .height(45)
+        .height(40)
         .width('100%')
-        .borderRadius(10)
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .clip(false)
         .onClick(async () => {
           if (this.showProgress) {
             this.getUIContext().getPromptAction().showToast({
@@ -1782,28 +1806,40 @@ export struct EpisodeComponent {
         })
 
       Row({ space: 20 }) {
-        Button({ type: ButtonType.Normal }) {
-          Text("取消")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("取消")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(() => {
           this.showCreatePlaylist = false
         })
 
-        Button({ type: ButtonType.Normal }) {
-          Text("确认")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("确认")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(async () => {
           if (this.tmpPlaylistName.length === 0) {
             this.getUIContext().getPromptAction().showToast({
@@ -2289,28 +2325,40 @@ export struct EpisodeComponent1 {
       }
 
       Row({ space: 20 }) {
-        Button({ type: ButtonType.Normal }) {
-          Text("取消")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("取消")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(() => {
           this.showConfirmDownload = false
         })
 
-        Button({ type: ButtonType.Normal }) {
-          Text("确认")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("确认")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(async () => {
           this.getUIContext().getPromptAction().showToast({
             message: '开始下载！',
@@ -2399,13 +2447,19 @@ export struct EpisodeComponent1 {
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                Button({ type: ButtonType.Normal }) {
-                  Text(playlist.items.find(p => p.episodeId === this.item.id) ? "移除" : "添加")
+                Row() {
+                  ImmersiveActionButton({
+                    barWidth: '100%',
+                    barHeight: 40,
+                    monopolizeActionEvents: false
+                  }) {
+                    Text(playlist.items.find(p => p.episodeId === this.item.id) ? "移除" : "添加")
+                      .hitTestBehavior(HitTestMode.None)
+                  }
                 }
                 .width(80)
                 .height(40)
-                .borderRadius(10)
-                .backgroundColor($r('sys.color.comp_background_tertiary'))
+                .clip(false)
                 .onClick(async () => {
                   let tmpPlaylist: Playlist | undefined = undefined
                   let item = playlist.items.find(p => p.episodeId === this.item.id)
@@ -2452,14 +2506,20 @@ export struct EpisodeComponent1 {
       .layoutWeight(1)
 
       Column() {
-        Button({ type: ButtonType.Normal }) {
-          Text("新建播放列表")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("新建播放列表")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .height(45)
+        .height(40)
         .width('100%')
-        .borderRadius(10)
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .clip(false)
         .onClick(async () => {
           if (this.showProgress) {
             this.getUIContext().getPromptAction().showToast({
@@ -2521,28 +2581,40 @@ export struct EpisodeComponent1 {
         })
 
       Row({ space: 20 }) {
-        Button({ type: ButtonType.Normal }) {
-          Text("取消")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("取消")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(() => {
           this.showCreatePlaylist = false
         })
 
-        Button({ type: ButtonType.Normal }) {
-          Text("确认")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false
+          }) {
+            Text("确认")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
+        .clip(false)
         .onClick(async () => {
           if (this.tmpPlaylistName.length === 0) {
             this.getUIContext().getPromptAction().showToast({
@@ -2910,28 +2982,40 @@ export struct reportBuilder {
         .alignItems(VerticalAlign.Top)
 
         Row({ space: 20 }) {
-          Button({ type: ButtonType.Normal }) {
-            Text("取消")
-              .fontSize(18)
+          Row() {
+            ImmersiveActionButton({
+              barWidth: '100%',
+              barHeight: 40,
+              monopolizeActionEvents: false
+            }) {
+              Text("取消")
+                .fontSize(18)
+                .hitTestBehavior(HitTestMode.None)
+            }
           }
           .width('50%')
           .layoutWeight(1)
-          .height(50)
-          .borderRadius(10)
-          .backgroundColor($r('sys.color.comp_background_tertiary'))
+          .height(40)
+          .clip(false)
           .onClick(() => {
             this.reportDialog.close()
           })
 
-          Button({ type: ButtonType.Normal }) {
-            Text("提交")
-              .fontSize(18)
+          Row() {
+            ImmersiveActionButton({
+              barWidth: '100%',
+              barHeight: 40,
+              monopolizeActionEvents: false
+            }) {
+              Text("提交")
+                .fontSize(18)
+                .hitTestBehavior(HitTestMode.None)
+            }
           }
           .width('50%')
           .layoutWeight(1)
-          .height(50)
-          .borderRadius(10)
-          .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+          .height(40)
+          .clip(false)
           .onClick(async () => {
             if (!this.reason.trim()) {
               this.getUIContext().getPromptAction().showToast({

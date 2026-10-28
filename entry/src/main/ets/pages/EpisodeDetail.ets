@@ -201,45 +201,53 @@ export struct EpisodeDetail {
       }
 
       Row({ space: 20 }) {
-        Button({ type: ButtonType.Normal }) {
-          Text("取消")
-            .fontSize(18)
-        }
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
-        .height(40)
-        .width('50%')
-        .layoutWeight(1)
-        .borderRadius(10)
-        .onClick(() => {
-          this.showDeleteConfirm = false
-        })
-
-        Button({ type: ButtonType.Normal }) {
-          Text("确认")
-            .fontSize(18)
-        }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
-        .height(40)
-        .width('50%')
-        .layoutWeight(1)
-        .borderRadius(10)
-        .onClick(async () => {
-          let status = await deleteFromServer(this.episode!.libraryItemId!, this.episode!.id!)
-          if (status) {
-            this.showDeleteConfirm = false
-            this.getUIContext().getPromptAction().showToast({
-              message: '删除成功！',
-              duration: 500
-            });
-            this.pageInfos.pop()
-            this.libraryItem = await getItem(this.libraryItem!.id)
-          } else {
-            this.getUIContext().getPromptAction().showToast({
-              message: '删除失败，请检查网络！',
-              duration: 500
-            });
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            onButtonClick: () => {
+              this.showDeleteConfirm = false
+            }
+          }) {
+            Text("取消")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
           }
-        })
+        }
+        .height(40)
+        .layoutWeight(1)
+        .clip(false)
+
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            onButtonClick: async () => {
+              let status = await deleteFromServer(this.episode!.libraryItemId!, this.episode!.id!)
+              if (status) {
+                this.showDeleteConfirm = false
+                this.getUIContext().getPromptAction().showToast({
+                  message: '删除成功！',
+                  duration: 500
+                });
+                this.pageInfos.pop()
+                this.libraryItem = await getItem(this.libraryItem!.id)
+              } else {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '删除失败，请检查网络！',
+                  duration: 500
+                });
+              }
+            }
+          }) {
+            Text("确认")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
+        }
+        .height(40)
+        .layoutWeight(1)
+        .clip(false)
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
@@ -258,86 +266,92 @@ export struct EpisodeDetail {
       }
 
       Row({ space: 20 }) {
-        Button({ type: ButtonType.Normal }) {
-          Text("取消")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            onButtonClick: () => {
+              this.showConfirmDownload = false
+            }
+          }) {
+            Text("取消")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .height(40)
-        .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
-        .onClick(() => {
-          this.showConfirmDownload = false
-        })
+        .clip(false)
 
-        Button({ type: ButtonType.Normal }) {
-          Text("确认")
-            .fontSize(18)
-        }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
-        .height(40)
-        .width('50%')
-        .layoutWeight(1)
-        .borderRadius(10)
-        .onClick(async () => {
-          this.showConfirmDownload = false
-          this.getUIContext().getPromptAction().showToast({
-            message: '开始下载！',
-            duration: 500
-          });
-          const downloadPath = new fileUri.FileUri(this.downloadUri).path
-          const dir = downloadPath + "/播客/" + this.podcast!.media.metadata.title
-          const existsDir = fs.accessSync(dir)
-          if (!existsDir) {
-            fs.mkdirSync(dir);
-          }
-          const filePath = dir + "/" + this.episode!.audioFile!.metadata.filename
-          if (this.downloadSetting?.skipExistingFiles && fs.accessSync(filePath)) {
-            Logger.info(`文件已存在，跳过: ${filePath}`)
-          } else {
-            const task = new DownloadTaskInfo()
-            task.mediaType = this.library!.mediaType
-            task.folder = this.podcast!.media.metadata.title
-            task.id = this.episode!.id!
-            task.title = this.episode!.audioFile!.metadata.filename
-            task.url = this.baseUrl + this.episode!.audioTrack?.contentUrl + "?token=" + this.apiToken
-            task.filePath = filePath
-            this.downloadTasks.push(task)
-            this.downloadCount = this.downloadTasks.length
-            this.downloadManager!.add(
-              this.library!.mediaType,
-              this.podcast!.media.metadata.title,
-              this.episode!.id!,
-              this.episode!.audioFile!.metadata.filename,
-              this.baseUrl + this.episode!.audioTrack?.contentUrl + "?token=" + this.apiToken,
-              filePath,
-              (info) => {
-                // 下载进度回调
-                Logger.info(`Progress: ${info.title} ${Math.floor(info.progress)}%`);
-                let index = this.downloadTasks.findIndex(t => t.id === info.id)
-                if (index >= 0) {
-                  this.downloadTasks[index].progress = info.progress;
-                }
-              },
-              (info) => {
-                // 状态变化回调
-                Logger.info(`Status changed: ${info.title} ${info.status}`);
-                let index = this.downloadTasks.findIndex(t => t.id === info.id)
-                if (index >= 0) {
-                  if (info.status === DownloadStatus.Removed) {
-                    this.downloadTasks.splice(index, 1);
-                    this.downloadCount = this.downloadTasks.length
-                  } else {
-                    this.downloadTasks[index].status = info.status;
-                  }
-                }
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            onButtonClick: async () => {
+              this.showConfirmDownload = false
+              this.getUIContext().getPromptAction().showToast({
+                message: '开始下载！',
+                duration: 500
+              });
+              const downloadPath = new fileUri.FileUri(this.downloadUri).path
+              const dir = downloadPath + "/播客/" + this.podcast!.media.metadata.title
+              const existsDir = fs.accessSync(dir)
+              if (!existsDir) {
+                fs.mkdirSync(dir);
               }
-            )
+              const filePath = dir + "/" + this.episode!.audioFile!.metadata.filename
+              if (this.downloadSetting?.skipExistingFiles && fs.accessSync(filePath)) {
+                Logger.info(`文件已存在，跳过: ${filePath}`)
+              } else {
+                const task = new DownloadTaskInfo()
+                task.mediaType = this.library!.mediaType
+                task.folder = this.podcast!.media.metadata.title
+                task.id = this.episode!.id!
+                task.title = this.episode!.audioFile!.metadata.filename
+                task.url = this.baseUrl + this.episode!.audioTrack?.contentUrl + "?token=" + this.apiToken
+                task.filePath = filePath
+                this.downloadTasks.push(task)
+                this.downloadCount = this.downloadTasks.length
+                this.downloadManager!.add(
+                  this.library!.mediaType,
+                  this.podcast!.media.metadata.title,
+                  this.episode!.id!,
+                  this.episode!.audioFile!.metadata.filename,
+                  this.baseUrl + this.episode!.audioTrack?.contentUrl + "?token=" + this.apiToken,
+                  filePath,
+                  (info) => {
+                    Logger.info(`Progress: ${info.title} ${Math.floor(info.progress)}%`);
+                    let index = this.downloadTasks.findIndex(t => t.id === info.id)
+                    if (index >= 0) {
+                      this.downloadTasks[index].progress = info.progress;
+                    }
+                  },
+                  (info) => {
+                    Logger.info(`Status changed: ${info.title} ${info.status}`);
+                    let index = this.downloadTasks.findIndex(t => t.id === info.id)
+                    if (index >= 0) {
+                      if (info.status === DownloadStatus.Removed) {
+                        this.downloadTasks.splice(index, 1);
+                        this.downloadCount = this.downloadTasks.length
+                      } else {
+                        this.downloadTasks[index].status = info.status;
+                      }
+                    }
+                  }
+                )
+              }
+              const coverUrl = this.baseUrl + `/api/items/${this.episode!.libraryItemId}/cover?token=${this.apiToken}`
+              this.downloadManager!.downloadCover(coverUrl, dir + "/cover.jpg")
+            }
+          }) {
+            Text("确认")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
           }
-          const coverUrl = this.baseUrl + `/api/items/${this.episode!.libraryItemId}/cover?token=${this.apiToken}`
-          this.downloadManager!.downloadCover(coverUrl, dir + "/cover.jpg")
-        })
+        }
+        .height(40)
+        .layoutWeight(1)
+        .clip(false)
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
@@ -358,26 +372,31 @@ export struct EpisodeDetail {
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                Button({ type: ButtonType.Normal }) {
-                  Text(playlist.items.find(p => p.episodeId === this.episode!.id) ? "移除" : "添加")
+                Row() {
+                  ImmersiveActionButton({
+                    barWidth: 80,
+                    barHeight: 40,
+                    onButtonClick: async () => {
+                      let tmpPlaylist: Playlist | undefined = undefined
+                      let item = playlist.items.find(p => p.episodeId === this.episode!.id)
+                      if (!item) {
+                        tmpPlaylist = await addToPlaylist(playlist.id!, this.episode!.libraryItemId!, this.episode!.id)
+                      } else {
+                        tmpPlaylist = await removeFromPlaylist(playlist.id!, this.episode!.libraryItemId!, this.episode!.id)
+                      }
+                      if (tmpPlaylist) {
+                        this.showPlaylists = false
+                        playlist = tmpPlaylist
+                      }
+                    }
+                  }) {
+                    Text(playlist.items.find(p => p.episodeId === this.episode!.id) ? "移除" : "添加")
+                      .hitTestBehavior(HitTestMode.None)
+                  }
                 }
                 .width(80)
                 .height(40)
-                .borderRadius(10)
-                .backgroundColor($r('sys.color.comp_background_tertiary'))
-                .onClick(async () => {
-                  let tmpPlaylist: Playlist | undefined = undefined
-                  let item = playlist.items.find(p => p.episodeId === this.episode!.id)
-                  if (!item) {
-                    tmpPlaylist = await addToPlaylist(playlist.id!, this.episode!.libraryItemId!, this.episode!.id)
-                  } else {
-                    tmpPlaylist = await removeFromPlaylist(playlist.id!, this.episode!.libraryItemId!, this.episode!.id)
-                  }
-                  if (tmpPlaylist) {
-                    this.showPlaylists = false
-                    playlist = tmpPlaylist
-                  }
-                })
+                .clip(false)
               }
               .height(60)
             }
@@ -411,27 +430,32 @@ export struct EpisodeDetail {
       .layoutWeight(1)
 
       Column() {
-        Button({ type: ButtonType.Normal }) {
-          Text("新建播放列表")
-            .fontSize(18)
-        }
-        .height(45)
-        .width('100%')
-        .borderRadius(10)
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
-        .onClick(async () => {
-          if (this.showProgress) {
-            this.getUIContext().getPromptAction().showToast({
-              message: '正在加载播放列表！',
-              duration: 500
-            });
-          } else {
-            this.tmpPlaylistName = ""
-            this.tmpPlaylistDescription = ""
-            this.showPlaylists = false
-            this.showCreatePlaylist = true
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            onButtonClick: async () => {
+              if (this.showProgress) {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '正在加载播放列表！',
+                  duration: 500
+                });
+              } else {
+                this.tmpPlaylistName = ""
+                this.tmpPlaylistDescription = ""
+                this.showPlaylists = false
+                this.showCreatePlaylist = true
+              }
+            }
+          }) {
+            Text("新建播放列表")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
           }
-        })
+        }
+        .height(40)
+        .width('100%')
+        .clip(false)
       }
       .width('100%')
       .padding({ left: 20, right: 20 })
@@ -480,61 +504,69 @@ export struct EpisodeDetail {
         })
 
       Row({ space: 20 }) {
-        Button({ type: ButtonType.Normal }) {
-          Text("取消")
-            .fontSize(18)
-        }
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
-        .height(40)
-        .width('50%')
-        .layoutWeight(1)
-        .borderRadius(10)
-        .onClick(() => {
-          this.showCreatePlaylist = false
-        })
-
-        Button({ type: ButtonType.Normal }) {
-          Text("确认")
-            .fontSize(18)
-        }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
-        .height(40)
-        .width('50%')
-        .layoutWeight(1)
-        .borderRadius(10)
-        .onClick(async () => {
-          if (this.tmpPlaylistName.length === 0) {
-            this.getUIContext().getPromptAction().showToast({
-              message: '播放列表名称不能为空！',
-              duration: 500
-            });
-          } else {
-            let playlist: Playlist = {
-              libraryId: this.library!.id,
-              name: this.tmpPlaylistName,
-              description: this.tmpPlaylistDescription.length > 0 ? this.tmpPlaylistDescription : null,
-              items: [{
-                libraryItemId: this.episode!.libraryItemId!,
-                episodeId: this.episode!.id!,
-                episode: this.episode
-              }]
-            }
-            let newPlaylist = await createPlaylist(playlist)
-            if (newPlaylist) {
-              this.playlists.push(newPlaylist)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            onButtonClick: () => {
               this.showCreatePlaylist = false
-              this.getUIContext().getPromptAction().showToast({
-                message: '创建播放列表成功！',
-                duration: 500
-              });
-            } else {
-              this.getUIContext().getPromptAction().showToast({
-                message: '创建播放列表失败，请检查网络！',
-                duration: 500
-              });
             }
+          }) {
+            Text("取消")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
           }
-        })
+        }
+        .height(40)
+        .layoutWeight(1)
+        .clip(false)
+
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            onButtonClick: async () => {
+              if (this.tmpPlaylistName.length === 0) {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '播放列表名称不能为空！',
+                  duration: 500
+                });
+              } else {
+                let playlist: Playlist = {
+                  libraryId: this.library!.id,
+                  name: this.tmpPlaylistName,
+                  description: this.tmpPlaylistDescription.length > 0 ? this.tmpPlaylistDescription : null,
+                  items: [{
+                    libraryItemId: this.episode!.libraryItemId!,
+                    episodeId: this.episode!.id!,
+                    episode: this.episode
+                  }]
+                }
+                let newPlaylist = await createPlaylist(playlist)
+                if (newPlaylist) {
+                  this.playlists.push(newPlaylist)
+                  this.showCreatePlaylist = false
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '创建播放列表成功！',
+                    duration: 500
+                  });
+                } else {
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '创建播放列表失败，请检查网络！',
+                    duration: 500
+                  });
+                }
+              }
+            }
+          }) {
+            Text("确认")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
+        }
+        .height(40)
+        .layoutWeight(1)
+        .clip(false)
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
