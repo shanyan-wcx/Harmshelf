@@ -1,6 +1,6 @@
 import { Book, Collection, Collection1, Library, LibraryItem, PlayItem, Progress, User } from '../utils/Interface';
 import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit';
-import { LengthMetrics, PersistenceV2, RectShape } from '@kit.ArkUI';
+import { LengthMetrics, PersistenceV2, RectShape, uiMaterial } from '@kit.ArkUI';
 import { gradientBlurTitleBarStyle, ImmersiveActionButton } from '../utils/Component';
 import { ColorMode } from "../pages/Index";
 import { deleteCollection, getCollections, getPlayItem, removeFromCollection, updateCollection } from '../utils/Api';
@@ -629,6 +629,7 @@ export struct CollectionDetail {
     .backgroundColor($r('sys.color.background_secondary'))
     .bindToScrollable([this.CollectionDetailScroller])
     .bindSheet(this.showEditCollection, this.editCollectionBuilder(), {
+      systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
       height: SheetSize.FIT_CONTENT,
       preferType: SheetType.CENTER,
       title: {

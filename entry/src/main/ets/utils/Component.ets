@@ -2134,6 +2134,7 @@ export struct EpisodeComponent {
         .height(38)
         .clip(false)
         .bindSheet(this.showPlaylists, this.playlistsBuilder(), {
+          systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
           height: SheetSize.MEDIUM,
           preferType: SheetType.CENTER,
           title: {
@@ -2183,6 +2184,7 @@ export struct EpisodeComponent {
         .height(38)
         .clip(false)
         .bindSheet(this.showConfirmDownload, this.confirmDownloadBuilder(), {
+          systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
           height: SheetSize.FIT_CONTENT,
           preferType: SheetType.CENTER,
           title: {
@@ -2199,6 +2201,7 @@ export struct EpisodeComponent {
       })
       .clip(false)
       .bindSheet(this.showCreatePlaylist, this.createPlaylistBuilder(), {
+        systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
         height: SheetSize.FIT_CONTENT,
         preferType: SheetType.CENTER,
         title: {
@@ -2821,6 +2824,7 @@ export struct EpisodeComponent1 {
         .height(38)
         .clip(false)
         .bindSheet(this.showPlaylists, this.playlistsBuilder(), {
+          systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
           height: SheetSize.MEDIUM,
           preferType: SheetType.CENTER,
           title: {
@@ -2863,6 +2867,7 @@ export struct EpisodeComponent1 {
         .height(38)
         .clip(false)
         .bindSheet(this.showConfirmDownload, this.confirmDownloadBuilder(), {
+          systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
           height: SheetSize.FIT_CONTENT,
           preferType: SheetType.CENTER,
           title: {
@@ -2879,6 +2884,7 @@ export struct EpisodeComponent1 {
       })
       .clip(false)
       .bindSheet(this.showCreatePlaylist, this.createPlaylistBuilder(), {
+        systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
         height: SheetSize.FIT_CONTENT,
         preferType: SheetType.CENTER,
         title: {

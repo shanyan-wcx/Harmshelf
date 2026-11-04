@@ -1,5 +1,5 @@
 import { common, ConfigurationConstant, Want } from "@kit.AbilityKit"
-import { PersistenceV2 } from "@kit.ArkUI";
+import { PersistenceV2, uiMaterial } from "@kit.ArkUI";
 import { ColorMode, DownloadSetting, OtherSetting, PlaySetting, ServerIndex, ServerSetting } from "../pages/Index";
 import { getLibraries, getLogin, getLogout, getUser } from "../utils/Api";
 import { Library, LoginInfo, PlayItem, User } from "../utils/Interface";
@@ -807,6 +807,7 @@ export struct Setting {
           .height(50)
           .margin({ top: 10 })
           .bindSheet(this.showAddServer, this.AddServerBuilder(), {
+            systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
             height: 380,
             preferType: SheetType.CENTER,
             title: {
@@ -837,6 +838,7 @@ export struct Setting {
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)
         .clip(false)
         .bindSheet(this.showEditServer, this.EditServerBuilder(), {
+          systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
           height: 380,
           preferType: SheetType.CENTER,
           title: {
@@ -1173,6 +1175,7 @@ export struct Setting {
           this.showAbout = !this.showAbout;
         })
         .bindSheet(this.showAbout, this.AboutBuilder(), {
+          systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
           height: SheetSize.FIT_CONTENT,
           preferType: SheetType.CENTER,
           title: {

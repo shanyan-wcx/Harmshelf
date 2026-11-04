@@ -2,6 +2,7 @@ import { addPodcast, getFeed } from "../../utils/Api"
 import { Library, Podcast, SearchPodcast } from "../../utils/Interface"
 import { getBottomContentInset } from '../../utils/Layout';
 import { ImmersiveActionButton } from '../../utils/Component';
+import { uiMaterial } from '@kit.ArkUI';
 
 @ComponentV2
 export struct Add {
@@ -272,6 +273,7 @@ export struct Add {
               })
               .clip(false)
               .bindSheet(this.showConfirm[index], this.confirmBuilder(searchPodcast, this.podcast!, index), {
+                systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
                 height: 459,
                 preferType: SheetType.CENTER,
                 title: {

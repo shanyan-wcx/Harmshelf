@@ -11,7 +11,7 @@ import {
   updateProgress
 } from '../utils/Api'
 import { Episode, Library, LibraryItem, PlayItem, Playlist, Progress, UpdateProgress, User } from '../utils/Interface'
-import { LengthMetrics, PersistenceV2, SymbolGlyphModifier } from '@kit.ArkUI'
+import { LengthMetrics, PersistenceV2, SymbolGlyphModifier, uiMaterial } from '@kit.ArkUI'
 import { HdsNavDestination, HdsNavDestinationAttribute } from '@kit.UIDesignKit'
 import { HmParseHTML, Node } from '@wuyan/html_parse'
 import { common, ConfigurationConstant, Want } from '@kit.AbilityKit'
@@ -754,6 +754,7 @@ export struct EpisodeDetail {
               .height(45)
               .clip(false)
               .bindSheet(this.showConfirmDownload, this.confirmDownloadBuilder(), {
+                systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
                 height: SheetSize.FIT_CONTENT,
                 preferType: SheetType.CENTER,
                 title: {
@@ -786,6 +787,7 @@ export struct EpisodeDetail {
             .width('100%')
             .clip(false)
             .bindSheet(this.showPlaylists, this.playlistsBuilder(), {
+              systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
               height: SheetSize.MEDIUM,
               preferType: SheetType.CENTER,
               title: {
@@ -824,6 +826,7 @@ export struct EpisodeDetail {
           }
           .width('100%')
           .bindSheet(this.showCreatePlaylist, this.createPlaylistBuilder(), {
+            systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
             height: SheetSize.FIT_CONTENT,
             preferType: SheetType.CENTER,
             title: {
@@ -865,6 +868,7 @@ export struct EpisodeDetail {
       .alignContent(Alignment.End)
       .clip(false)
       .bindSheet(this.showDeleteConfirm, this.deleteConfirmBuilder(), {
+        systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
         height: SheetSize.FIT_CONTENT,
         preferType: SheetType.CENTER,
         title: {
@@ -876,6 +880,7 @@ export struct EpisodeDetail {
         }
       })
       .bindSheet(this.showReport, this.reportBuilder(), {
+        systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
         height: 340,
         preferType: SheetType.CENTER,
         title: {

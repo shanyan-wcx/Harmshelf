@@ -18,7 +18,7 @@ import {
   SkipSettings
 } from "../utils/Interface";
 import { HdsNavDestination, HdsNavDestinationAttribute } from "@kit.UIDesignKit";
-import { LengthMetrics, PersistenceV2, SymbolGlyphModifier } from "@kit.ArkUI";
+import { LengthMetrics, PersistenceV2, SymbolGlyphModifier, uiMaterial } from "@kit.ArkUI";
 import {
   gradientBlurTitleBarStyle,
   ReportPanel,
@@ -1391,6 +1391,7 @@ export struct LibraryItemDetail {
                     .height(45)
                     .clip(false)
                     .bindSheet(this.showConfirmDownload, this.confirmDownloadBuilder(), {
+                      systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
                       height: SheetSize.FIT_CONTENT,
                       preferType: SheetType.CENTER,
                       title: {
@@ -1421,6 +1422,7 @@ export struct LibraryItemDetail {
                   .height(45)
                   .clip(false)
                   .bindSheet(this.showPlaylists, this.playlistsBuilder(), {
+                    systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
                     height: SheetSize.MEDIUM,
                     preferType: SheetType.CENTER,
                     title: {
@@ -1441,6 +1443,7 @@ export struct LibraryItemDetail {
                 .margin({ top: 0 })
                 .clip(false)
                 .bindSheet(this.showCreatePlaylist, this.createPlaylistBuilder(), {
+                  systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
                   height: SheetSize.FIT_CONTENT,
                   preferType: SheetType.CENTER,
                   title: {
@@ -1830,6 +1833,7 @@ export struct LibraryItemDetail {
                 .width('100%')
                 .margin({ top: 15 })
                 .bindSheet(this.showCollections, this.collectionsBuilder(), {
+                  systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
                   height: SheetSize.MEDIUM,
                   preferType: SheetType.CENTER,
                   title: {
@@ -1864,6 +1868,7 @@ export struct LibraryItemDetail {
                 }
               })
               .bindSheet(this.showCreateCollection, this.createCollectionBuilder(), {
+                systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
                 height: SheetSize.FIT_CONTENT,
                 preferType: SheetType.CENTER,
                 title: {
@@ -1906,6 +1911,7 @@ export struct LibraryItemDetail {
                   .margin({ bottom: 20 })
                   .clip(false)
                   .bindSheet(this.showConfirm, this.confirmBuilder(), {
+                    systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
                     height: SheetSize.FIT_CONTENT,
                     preferType: SheetType.CENTER,
                     title: {
@@ -2190,6 +2196,7 @@ export struct LibraryItemDetail {
                       .height(32)
                       .clip(false)
                       .bindSheet(this.showFeedEpisodes, this.feedEpisodesBuilder(), {
+                        systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
                         height: SheetSize.MEDIUM,
                         preferType: SheetType.CENTER,
                         title: {
@@ -2257,6 +2264,7 @@ export struct LibraryItemDetail {
           .width('100%')
           .clip(false)
           .bindSheet(this.showSkipStartEnd, this.skipStartEndBuilder(), {
+            systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
             height: SheetSize.FIT_CONTENT,
             preferType: SheetType.CENTER,
             title: {
@@ -2306,6 +2314,7 @@ export struct LibraryItemDetail {
       .height('100%')
       .clip(false)
       .bindSheet(this.showReport, this.reportBuilder(), {
+        systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
         height: 340,
         preferType: SheetType.CENTER,
         title: {
