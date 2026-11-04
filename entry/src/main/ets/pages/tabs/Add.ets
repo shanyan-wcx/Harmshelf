@@ -169,7 +169,7 @@ export struct Add {
 
           Row() {
             ImmersiveActionButton({
-              barWidth: 100,
+              barWidth: 120,
               barHeight: 50,
               monopolizeActionEvents: false
             }) {
@@ -179,7 +179,7 @@ export struct Add {
             }
           }
           .height(50)
-          .width(100)
+          .width(120)
           .clip(false)
           .onClick(async () => {
             let podcast1 = await addPodcast(this.library!.id, this.library!.folders[0].id, this.library!.folders[0].fullPath + "/" + searchPodcast.title, searchPodcast, podcast, this.autoDownload[index])
