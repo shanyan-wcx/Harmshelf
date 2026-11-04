@@ -2786,6 +2786,7 @@ export struct EpisodeComponent1 {
               SymbolGlyph(this.itemProgress?.isFinished ? $r('sys.symbol.checkmark_square_fill') :
                 $r('sys.symbol.checkmark_square'))
                 .fontSize(18)
+                .fontWeight(FontWeight.Medium)
                 .fontColor([$r('sys.color.font')])
                 .clip(false)
                 .hitTestBehavior(HitTestMode.None)
@@ -2812,6 +2813,7 @@ export struct EpisodeComponent1 {
             Row() {
               SymbolGlyph($r('sys.symbol.music_note_list'))
                 .fontSize(18)
+                .fontWeight(FontWeight.Medium)
                 .fontColor([$r('sys.color.font')])
                 .clip(false)
                 .hitTestBehavior(HitTestMode.None)
@@ -2855,6 +2857,7 @@ export struct EpisodeComponent1 {
             Row() {
               SymbolGlyph($r('sys.symbol.download'))
                 .fontSize(18)
+                .fontWeight(FontWeight.Medium)
                 .fontColor([$r('sys.color.font')])
                 .clip(false)
                 .hitTestBehavior(HitTestMode.None)
