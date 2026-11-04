@@ -313,13 +313,13 @@ export struct LibraryItemDetail {
                     SymbolGlyph($r('sys.symbol.checkmark'))
                       .fontWeight(FontWeight.Bold)
                       .fontSize(20)
-                      .fontColor([$r('sys.color.comp_emphasize_secondary')])
+                      .fontColor([$r('sys.color.icon_sub_emphasize')])
                       .margin({ left: 4, right: 4 })
                   } else {
                     Checkbox()
                       .width(20)
                       .select(this.addToServer[index])
-                      .selectedColor($r('sys.color.comp_emphasize_secondary'))
+                      .selectedColor($r('sys.color.icon_sub_emphasize'))
                       .onClick(() => {
                         this.addToServer[index] = !this.addToServer[index]
                       })
@@ -1105,7 +1105,7 @@ export struct LibraryItemDetail {
         })
         .margin({ bottom: 15 })
         .blockColor($r('sys.color.white'))
-        .selectedColor($r('sys.color.comp_emphasize_secondary'))
+        .selectedColor($r('sys.color.icon_sub_emphasize'))
 
       Text("结尾")
         .fontSize(18)
@@ -1136,7 +1136,7 @@ export struct LibraryItemDetail {
           this.tmpSkipEnd = value
         })
         .blockColor($r('sys.color.white'))
-        .selectedColor($r('sys.color.comp_emphasize_secondary'))
+        .selectedColor($r('sys.color.icon_sub_emphasize'))
 
       Row({ space: 20 }) {
         Row() {
