@@ -1599,6 +1599,7 @@ export struct EpisodeComponent {
           }) {
             Text("确认")
               .fontSize(18)
+              .fontColor($r('sys.color.comp_emphasize_secondary'))
               .hitTestBehavior(HitTestMode.None)
           }
         }
@@ -1714,6 +1715,7 @@ export struct EpisodeComponent {
                     }
                   }) {
                     Text(playlist.items.find(p => p.episodeId === this.item.id) ? "移除" : "添加")
+                      .fontColor(playlist.items.find(p => p.episodeId === this.item.id) ? $r('sys.color.font') : $r('sys.color.comp_background_tertiary'))
                       .hitTestBehavior(HitTestMode.None)
                   }
                 }
@@ -1888,6 +1890,7 @@ export struct EpisodeComponent {
           }) {
             Text("确认")
               .fontSize(18)
+              .fontColor($r('sys.color.comp_emphasize_secondary'))
               .hitTestBehavior(HitTestMode.None)
           }
         }
@@ -2031,7 +2034,7 @@ export struct EpisodeComponent {
                 SymbolGlyph($r('sys.symbol.play_fill'))
                   .fontWeight(FontWeight.Normal)
                   .fontSize(18)
-                  .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                  .fontColor([$r('sys.color.comp_emphasize_secondary')])
                   .clip(false)
                   .hitTestBehavior(HitTestMode.None)
                   .margin({ bottom: 1 })
@@ -2377,6 +2380,7 @@ export struct EpisodeComponent1 {
           }) {
             Text("确认")
               .fontSize(18)
+              .fontColor($r('sys.color.comp_emphasize_secondary'))
               .hitTestBehavior(HitTestMode.None)
           }
         }
@@ -2492,6 +2496,7 @@ export struct EpisodeComponent1 {
                     }
                   }) {
                     Text(playlist.items.find(p => p.episodeId === this.item.id) ? "移除" : "添加")
+                      .fontColor(playlist.items.find(p => p.episodeId === this.item.id) ? $r('sys.color.font') : $r('sys.color.comp_background_tertiary'))
                       .hitTestBehavior(HitTestMode.None)
                   }
                 }
@@ -2666,6 +2671,7 @@ export struct EpisodeComponent1 {
           }) {
             Text("确认")
               .fontSize(18)
+              .fontColor($r('sys.color.comp_emphasize_secondary'))
               .hitTestBehavior(HitTestMode.None)
           }
         }
@@ -2745,7 +2751,7 @@ export struct EpisodeComponent1 {
               SymbolGlyph($r('sys.symbol.play_fill'))
                 .fontWeight(FontWeight.Normal)
                 .fontSize(18)
-                .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                .fontColor([$r('sys.color.comp_emphasize_secondary')])
                 .clip(false)
                 .hitTestBehavior(HitTestMode.None)
                 .margin({ bottom: 1 })
@@ -3028,6 +3034,7 @@ export struct ReportPanel {
             }) {
               Text("提交")
                 .fontSize(18)
+                .fontColor($r('sys.color.comp_emphasize_secondary'))
                 .hitTestBehavior(HitTestMode.None)
             }
           }

@@ -175,6 +175,7 @@ export struct Add {
             }) {
               Text("提交")
                 .fontSize(18)
+                .fontColor($r('sys.color.comp_emphasize_secondary'))
                 .hitTestBehavior(HitTestMode.None)
             }
           }

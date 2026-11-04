@@ -366,6 +366,7 @@ export struct LibraryItemDetail {
         }) {
           Text("添加到服务器")
             .fontSize(18)
+            .fontColor($r('sys.color.comp_emphasize_secondary'))
             .hitTestBehavior(HitTestMode.None)
         }
       }
@@ -443,6 +444,7 @@ export struct LibraryItemDetail {
           }) {
             Text("确认")
               .fontSize(18)
+              .fontColor($r('sys.color.comp_emphasize_secondary'))
               .hitTestBehavior(HitTestMode.None)
           }
         }
@@ -551,6 +553,7 @@ export struct LibraryItemDetail {
           }) {
             Text("确认")
               .fontSize(18)
+              .fontColor($r('sys.color.comp_emphasize_secondary'))
               .hitTestBehavior(HitTestMode.None)
           }
         }
@@ -673,6 +676,7 @@ export struct LibraryItemDetail {
                     }
                   }) {
                     Text(playlist.items.find(p => p.libraryItemId === this.libraryItem!.id) ? "移除" : "添加")
+                      .fontColor(playlist.items.find(p => p.libraryItemId === this.libraryItem!.id) ? $r('sys.color.font') : $r('sys.color.comp_background_tertiary'))
                       .hitTestBehavior(HitTestMode.None)
                   }
                 }
@@ -846,6 +850,7 @@ export struct LibraryItemDetail {
           }) {
             Text("确认")
               .fontSize(18)
+              .fontColor($r('sys.color.comp_emphasize_secondary'))
               .hitTestBehavior(HitTestMode.None)
           }
         }
@@ -892,6 +897,7 @@ export struct LibraryItemDetail {
                     }
                   }) {
                     Text(collection.books!.find(b => b.id === this.libraryItem!.id) ? "移除" : "添加")
+                      .fontColor(collection.books!.find(b => b.id === this.libraryItem!.id) ? $r('sys.color.font') : $r('sys.color.comp_background_tertiary'))
                       .hitTestBehavior(HitTestMode.None)
                   }
                 }
@@ -1061,6 +1067,7 @@ export struct LibraryItemDetail {
           }) {
             Text("确认")
               .fontSize(18)
+              .fontColor($r('sys.color.comp_emphasize_secondary'))
               .hitTestBehavior(HitTestMode.None)
           }
         }
@@ -1338,14 +1345,14 @@ export struct LibraryItemDetail {
                             SymbolGlyph($r('sys.symbol.play_fill'))
                               .fontWeight(FontWeight.Normal)
                               .fontSize(18)
-                              .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                              .fontColor([$r('sys.color.comp_emphasize_secondary')])
                               .hitTestBehavior(HitTestMode.None)
                               .margin({ bottom: 1 })
 
                             Text(this.library?.mediaType === 'book' ? " 播放" : " 下一首")
                               .fontSize(18)
                               .fontWeight(FontWeight.Medium)
-                              .fontColor($r('sys.color.ohos_id_color_titlebar_icon'))
+                              .fontColor($r('sys.color.comp_emphasize_secondary'))
                               .maxLines(1)
                               .textOverflow({ overflow: TextOverflow.Ellipsis })
                           }

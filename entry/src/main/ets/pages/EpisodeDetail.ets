@@ -243,6 +243,7 @@ export struct EpisodeDetail {
           }) {
             Text("确认")
               .fontSize(18)
+              .fontColor($r('sys.color.comp_emphasize_secondary'))
               .hitTestBehavior(HitTestMode.None)
           }
         }
@@ -347,6 +348,7 @@ export struct EpisodeDetail {
           }) {
             Text("确认")
               .fontSize(18)
+              .fontColor($r('sys.color.comp_emphasize_secondary'))
               .hitTestBehavior(HitTestMode.None)
           }
         }
@@ -392,6 +394,7 @@ export struct EpisodeDetail {
                     }
                   }) {
                     Text(playlist.items.find(p => p.episodeId === this.episode!.id) ? "移除" : "添加")
+                      .fontColor(playlist.items.find(p => p.episodeId === this.episode!.id) ? $r('sys.color.font') : $r('sys.color.comp_background_tertiary'))
                       .hitTestBehavior(HitTestMode.None)
                   }
                 }
@@ -562,6 +565,7 @@ export struct EpisodeDetail {
           }) {
             Text("确认")
               .fontSize(18)
+              .fontColor($r('sys.color.comp_emphasize_secondary'))
               .hitTestBehavior(HitTestMode.None)
           }
         }
@@ -702,14 +706,14 @@ export struct EpisodeDetail {
                       SymbolGlyph($r('sys.symbol.play_fill'))
                         .fontWeight(FontWeight.Normal)
                         .fontSize(18)
-                        .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
+                        .fontColor([$r('sys.color.comp_emphasize_secondary')])
                         .hitTestBehavior(HitTestMode.None)
                         .margin({ bottom: 1 })
 
                       Text(" 播放")
                         .fontSize(18)
                         .fontWeight(FontWeight.Medium)
-                        .fontColor($r('sys.color.ohos_id_color_titlebar_icon'))
+                        .fontColor($r('sys.color.comp_emphasize_secondary'))
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
                     }

@@ -800,7 +800,7 @@ export struct Setting {
             }) {
               Text("添加")
                 .fontSize(20)
-                .fontColor($r('sys.color.font'))
+                .fontColor($r('sys.color.comp_background_tertiary'))
             }
           }
           .width('100%')
