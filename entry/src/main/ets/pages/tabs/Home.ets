@@ -6,7 +6,7 @@ import { getBottomContentInset } from '../../utils/Layout';
 
 @ComponentV2
 export struct SubHome {
-  private homeScroller: Scroller = new Scroller();
+  @Consumer() homeScroller: Scroller = new Scroller();
   private continueListeningScroller: Scroller = new Scroller();
   private newestEpisodesScroller: Scroller = new Scroller();
   private recentlyAddedScroller: Scroller = new Scroller();

@@ -4,7 +4,7 @@ import { getBottomContentInset } from '../../utils/Layout';
 
 @ComponentV2
 export struct MediaLibrary {
-  private mediaLibraryScroller: Scroller = new Scroller();
+  @Consumer() mediaLibraryScroller: Scroller = new Scroller();
   @Consumer() displayWidth: number = 0
   @Consumer() showLoadingProgress: boolean = false
   @Consumer() library: Library | undefined = undefined

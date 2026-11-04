@@ -4,7 +4,7 @@ import { getBottomContentInset } from '../../utils/Layout';
 
 @ComponentV2
 export struct AllSeries {
-  private seriesScroller: Scroller = new Scroller();
+  @Consumer() seriesScroller: Scroller = new Scroller();
   @Consumer() displayWidth: number = 0
   @Consumer() showLoadingProgress: boolean = false
   @Consumer() series: Series[] = []

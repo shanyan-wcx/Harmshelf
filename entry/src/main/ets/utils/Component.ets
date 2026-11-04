@@ -200,6 +200,14 @@ export struct ImmersiveActionButton {
 
 @ComponentV2
 export struct MyNavigation {
+  @Consumer() homeScroller: Scroller = new Scroller()
+  @Consumer() recentEpisodesScroller: Scroller = new Scroller()
+  @Consumer() mediaLibraryScroller: Scroller = new Scroller()
+  @Consumer() seriesScroller: Scroller = new Scroller()
+  @Consumer() collectionScroller: Scroller = new Scroller()
+  @Consumer() authorScroller: Scroller = new Scroller()
+  @Consumer() playlistScroller: Scroller = new Scroller()
+  @Consumer() addScroller: Scroller = new Scroller()
   @Consumer() statsScroller: Scroller = new Scroller()
   @Consumer() LocalMediaScroller: Scroller = new Scroller()
   @Consumer() logScroller: Scroller = new Scroller()
@@ -543,7 +551,20 @@ export struct MyNavigation {
     })
     .titleMode(HdsNavigationTitleMode.MINI)
     .hideBackButton(true)
-    .bindToScrollable([this.statsScroller, this.LocalMediaScroller, this.logScroller, this.settingScroller])
+    .bindToScrollable([
+      this.homeScroller,
+      this.recentEpisodesScroller,
+      this.mediaLibraryScroller,
+      this.seriesScroller,
+      this.collectionScroller,
+      this.authorScroller,
+      this.playlistScroller,
+      this.addScroller,
+      this.statsScroller,
+      this.LocalMediaScroller,
+      this.logScroller,
+      this.settingScroller
+    ])
     .onSizeChange((oldValue, newValue) => {
       if (newValue.width) {
         this.sideBarContentWidth = Number(newValue.width)

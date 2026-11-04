@@ -4,7 +4,7 @@ import { getBottomContentInset } from '../../utils/Layout';
 
 @ComponentV2
 export struct AllPlaylists {
-  private playlistScroller: Scroller = new Scroller();
+  @Consumer() playlistScroller: Scroller = new Scroller();
   @Consumer() displayWidth: number = 0
   @Consumer() showLoadingProgress: boolean = false
   @Consumer() isStartPlaying: boolean = false

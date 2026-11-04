@@ -5,7 +5,7 @@ import { ImmersiveActionButton } from '../../utils/Component';
 
 @ComponentV2
 export struct Add {
-  private addScroller: Scroller = new Scroller()
+  @Consumer() addScroller: Scroller = new Scroller()
   @Consumer() displayWidth: number = 0
   @Consumer() library: Library | undefined = undefined
   @Consumer() showLoadingProgress: boolean = false

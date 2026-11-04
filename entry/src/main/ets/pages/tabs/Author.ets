@@ -4,7 +4,7 @@ import { getBottomContentInset } from '../../utils/Layout';
 
 @ComponentV2
 export struct AllAuthors {
-  private authorScroller: Scroller = new Scroller();
+  @Consumer() authorScroller: Scroller = new Scroller();
   @Consumer() displayWidth: number = 0
   @Consumer() showLoadingProgress: boolean = false
   @Consumer() authors: Author[] = []

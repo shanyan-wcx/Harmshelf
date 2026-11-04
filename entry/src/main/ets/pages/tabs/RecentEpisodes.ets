@@ -5,7 +5,7 @@ import { getBottomContentInset } from '../../utils/Layout';
 
 @ComponentV2
 export struct RecentEpisodes {
-  private recentEpisodesScroller: Scroller = new Scroller();
+  @Consumer() recentEpisodesScroller: Scroller = new Scroller();
   @Consumer() recentEpisodes: Episode[] = []
   @Consumer() library: Library | undefined = undefined
   @Consumer() recentEpisodesPage: number = 0
