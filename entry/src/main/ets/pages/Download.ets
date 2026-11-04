@@ -62,7 +62,7 @@ export struct DownloadTask {
                     .style({ strokeWidth: 6, enableSmoothEffect: false })
                     .color(task.item.status === DownloadStatus.Failed ? $r('sys.color.warning') :
                       (task.item.status === DownloadStatus.Paused ? $r('sys.color.comp_background_tertiary') :
-                        $r('sys.color.icon_sub_emphasize')))
+                        $r('sys.color.comp_emphasize_secondary')))
                 }
                 .width('100%')
                 .padding({

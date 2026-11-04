@@ -301,7 +301,7 @@ export struct Play {
           Text("确认")
             .fontSize(18)
         }
-        .backgroundColor($r('sys.color.icon_sub_emphasize'))
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .height(40)
         .width('50%')
         .layoutWeight(1)
@@ -468,7 +468,7 @@ export struct Play {
         .height(45)
         .borderRadius(10)
         .padding({ left: 15, right: 15 })
-        .backgroundColor($r('sys.color.icon_sub_emphasize'))
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .onClick(async () => {
           let time = Date.now()
           let bookmark: Bookmark = {
@@ -509,7 +509,7 @@ export struct Play {
         .width('100%')
         .height(50)
         .borderRadius(10)
-        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_50_X ? $r('sys.color.icon_sub_emphasize') : Color.Transparent)
+        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_50_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_50_X
           this.avPlayer!.setSpeed(this.speed)
@@ -523,7 +523,7 @@ export struct Play {
         .width('100%')
         .height(50)
         .borderRadius(10)
-        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_75_X ? $r('sys.color.icon_sub_emphasize') : Color.Transparent)
+        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_75_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_75_X
           this.avPlayer!.setSpeed(this.speed)
@@ -537,7 +537,7 @@ export struct Play {
         .width('100%')
         .height(50)
         .borderRadius(10)
-        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_00_X ? $r('sys.color.icon_sub_emphasize') : Color.Transparent)
+        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_00_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
           this.avPlayer!.setSpeed(this.speed)
@@ -551,7 +551,7 @@ export struct Play {
         .width('100%')
         .height(50)
         .borderRadius(10)
-        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_25_X ? $r('sys.color.icon_sub_emphasize') : Color.Transparent)
+        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_25_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_25_X
           this.avPlayer!.setSpeed(this.speed)
@@ -565,7 +565,7 @@ export struct Play {
         .width('100%')
         .height(50)
         .borderRadius(10)
-        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_50_X ? $r('sys.color.icon_sub_emphasize') : Color.Transparent)
+        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_50_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_50_X
           this.avPlayer!.setSpeed(this.speed)
@@ -579,7 +579,7 @@ export struct Play {
         .width('100%')
         .height(50)
         .borderRadius(10)
-        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_75_X ? $r('sys.color.icon_sub_emphasize') : Color.Transparent)
+        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_75_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_75_X
           this.avPlayer!.setSpeed(this.speed)
@@ -593,7 +593,7 @@ export struct Play {
         .width('100%')
         .height(50)
         .borderRadius(10)
-        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_2_00_X ? $r('sys.color.icon_sub_emphasize') : Color.Transparent)
+        .backgroundColor(this.speed === media.PlaybackSpeed.SPEED_FORWARD_2_00_X ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
         .onClick(() => {
           this.speed = media.PlaybackSpeed.SPEED_FORWARD_2_00_X
           this.avPlayer!.setSpeed(this.speed)
@@ -720,7 +720,7 @@ export struct Play {
         .width('100%')
         .height(50)
         .borderRadius(10)
-        .backgroundColor($r('sys.color.icon_sub_emphasize'))
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .onClick(() => {
           this.sleepTime = 0
           this.showSleep = false
@@ -752,7 +752,7 @@ export struct Play {
               .height(50)
               .borderRadius(10)
               .padding({ left: 15, right: 15 })
-              .backgroundColor(this.playingIndex === index ? $r('sys.color.icon_sub_emphasize') : Color.Transparent)
+              .backgroundColor(this.playingIndex === index ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
               .onClick(async () => {
                 this.showChapter = false
                 await this.avPlayer!.reset();
@@ -801,7 +801,7 @@ export struct Play {
               .height(50)
               .borderRadius(10)
               .padding({ left: 15, right: 15 })
-              .backgroundColor(this.playingIndex === index ? $r('sys.color.icon_sub_emphasize') : Color.Transparent)
+              .backgroundColor(this.playingIndex === index ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
               .onClick(async () => {
                 this.showChapter = false
                 await this.avPlayer!.reset();

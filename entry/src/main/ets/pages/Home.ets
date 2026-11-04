@@ -88,7 +88,7 @@ export struct HomeTopTabs {
         .width(20)
         .height(3)
         .borderRadius(1.5)
-        .backgroundColor($r('sys.color.icon_sub_emphasize'))
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .opacity(this.topTabIndex === index ? 1 : 0)
         .translate({ x: 0, y: 11 })
         .animation({ duration: 280, curve: Curve.Friction })

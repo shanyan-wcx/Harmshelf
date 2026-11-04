@@ -683,7 +683,7 @@ export struct Setting {
                     .width(20)
                     .checked(this.serverIndex?.serverIndex === index)
                     .radioStyle({
-                      checkedBackgroundColor: $r('sys.color.icon_sub_emphasize'),
+                      checkedBackgroundColor: $r('sys.color.comp_emphasize_secondary'),
                       indicatorColor: $r('app.color.start_window_background')
                     })
                   Text(loginInfo.name !== "" ? loginInfo.name : loginInfo.server)
@@ -928,7 +928,7 @@ export struct Setting {
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
             Toggle({ type: ToggleType.Switch, isOn: this.playSetting?.fadeInOut })
-              .selectedColor($r('sys.color.icon_sub_emphasize'))
+              .selectedColor($r('sys.color.comp_emphasize_secondary'))
               .onClick(() => {
                 if (this.playSetting) {
                   this.playSetting.fadeInOut = !this.playSetting.fadeInOut
@@ -945,7 +945,7 @@ export struct Setting {
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
             Toggle({ type: ToggleType.Switch, isOn: this.playSetting?.shareAudio })
-              .selectedColor($r('sys.color.icon_sub_emphasize'))
+              .selectedColor($r('sys.color.comp_emphasize_secondary'))
               .onClick(() => {
                 if (this.playSetting) {
                   this.playSetting.shareAudio = !this.playSetting.shareAudio
@@ -963,7 +963,7 @@ export struct Setting {
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
             Toggle({ type: ToggleType.Switch, isOn: this.playSetting?.rememberSpeed })
-              .selectedColor($r('sys.color.icon_sub_emphasize'))
+              .selectedColor($r('sys.color.comp_emphasize_secondary'))
               .onClick(() => {
                 if (this.playSetting) {
                   this.playSetting.rememberSpeed = !this.playSetting.rememberSpeed
@@ -1047,7 +1047,7 @@ export struct Setting {
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
             Toggle({ type: ToggleType.Switch, isOn: this.downloadSetting?.skipExistingFiles })
-              .selectedColor($r('sys.color.icon_sub_emphasize'))
+              .selectedColor($r('sys.color.comp_emphasize_secondary'))
               .onClick(() => {
                 if (this.downloadSetting) {
                   this.downloadSetting.skipExistingFiles = !this.downloadSetting.skipExistingFiles
@@ -1087,7 +1087,7 @@ export struct Setting {
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
             Toggle({ type: ToggleType.Switch, isOn: this.otherSetting!.hideReport })
-              .selectedColor($r('sys.color.icon_sub_emphasize'))
+              .selectedColor($r('sys.color.comp_emphasize_secondary'))
               .onClick(() => {
                 if (this.otherSetting) {
                   this.otherSetting.hideReport = !this.otherSetting.hideReport

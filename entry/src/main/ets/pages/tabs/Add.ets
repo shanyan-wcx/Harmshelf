@@ -154,7 +154,7 @@ export struct Add {
               .width(20)
               .checked(this.autoDownload[index])
               .radioStyle({
-                checkedBackgroundColor: $r('sys.color.icon_sub_emphasize'),
+                checkedBackgroundColor: $r('sys.color.comp_emphasize_secondary'),
                 indicatorColor: $r('app.color.start_window_background')
               })
               .onClick(() => {
