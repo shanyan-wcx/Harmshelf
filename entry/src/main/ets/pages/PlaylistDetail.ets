@@ -265,7 +265,7 @@ export struct PlaylistDetail {
           }) {
             Text("确认")
               .fontSize(18)
-              .fontColor($r('sys.color.ohos_id_color_emphasize'))
+              .fontColor($r('sys.color.comp_emphasize_secondary'))
               .hitTestBehavior(HitTestMode.None)
           }
         }
@@ -435,14 +435,14 @@ export struct PlaylistDetail {
                       SymbolGlyph($r('sys.symbol.play_fill'))
                         .fontWeight(FontWeight.Normal)
                         .fontSize(18)
-                        .fontColor([$r('sys.color.ohos_id_color_emphasize')])
+                        .fontColor([$r('sys.color.comp_emphasize_secondary')])
                         .hitTestBehavior(HitTestMode.None)
                         .margin({ bottom: 1 })
 
                       Text(" 播放")
                         .fontSize(18)
                         .fontWeight(FontWeight.Medium)
-                        .fontColor($r('sys.color.ohos_id_color_emphasize'))
+                        .fontColor($r('sys.color.comp_emphasize_secondary'))
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
                     }
@@ -537,7 +537,7 @@ export struct PlaylistDetail {
                           SymbolGlyph($r('sys.symbol.play_fill'))
                             .fontWeight(FontWeight.Normal)
                             .fontSize(18)
-                            .fontColor([$r('sys.color.ohos_id_color_emphasize')])
+                            .fontColor([$r('sys.color.comp_emphasize_secondary')])
                             .hitTestBehavior(HitTestMode.None)
                             .margin({ bottom: 1 })
                         }

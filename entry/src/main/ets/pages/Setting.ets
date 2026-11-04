@@ -219,7 +219,6 @@ export struct Setting {
             }) {
               Text("保存")
                 .fontSize(20)
-                .fontColor($r('sys.color.ohos_id_color_emphasize'))
                 .hitTestBehavior(HitTestMode.None)
             }
           }
@@ -424,7 +423,6 @@ export struct Setting {
               }) {
                 Text("保存")
                   .fontSize(20)
-                  .fontColor($r('sys.color.ohos_id_color_emphasize'))
                   .hitTestBehavior(HitTestMode.None)
               }
             }
@@ -802,7 +800,7 @@ export struct Setting {
             }) {
               Text("添加")
                 .fontSize(20)
-                .fontColor($r('sys.color.ohos_id_color_emphasize'))
+                .fontColor($r('sys.color.comp_background_tertiary'))
             }
           }
           .width('100%')

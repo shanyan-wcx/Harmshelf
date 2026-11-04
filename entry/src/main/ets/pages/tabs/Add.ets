@@ -175,7 +175,7 @@ export struct Add {
             }) {
               Text("提交")
                 .fontSize(18)
-                .fontColor($r('sys.color.ohos_id_color_emphasize'))
+                .fontColor($r('sys.color.comp_emphasize_secondary'))
                 .hitTestBehavior(HitTestMode.None)
             }
           }
