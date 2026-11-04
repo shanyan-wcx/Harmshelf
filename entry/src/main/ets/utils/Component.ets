@@ -453,7 +453,7 @@ export struct MyNavigation {
       padding: {
         end: deviceTypeInfo === '2in1' ? LengthMetrics.vp(168) : LengthMetrics.vp(16)
       },
-      style: transparentTitleBarStyle(),
+      style: gradientBlurTitleBarStyle(),
       content: {
         stackBuilder: (): void => this.titleBarBuilder(),
         bottomBuilder: this.isHomeTabsVisible() ? {

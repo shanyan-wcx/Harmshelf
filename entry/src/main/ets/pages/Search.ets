@@ -3,7 +3,7 @@ import { LengthMetrics, uiMaterial } from '@kit.ArkUI';
 import { Author, Library, LibraryItem, LibraryItemSearchResult, SearchResult, Series } from '../utils/Interface';
 import { searchLibrary } from '../utils/Api';
 import { deviceInfo } from '@kit.BasicServicesKit';
-import { transparentTitleBarStyle } from '../utils/Component';
+import { gradientBlurTitleBarStyle } from '../utils/Component';
 import { getBottomContentInset } from '../utils/Layout';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
@@ -235,7 +235,7 @@ export struct SearchMedia {
         start: LengthMetrics.vp(16),
         end: LengthMetrics.vp(16)
       },
-      style: transparentTitleBarStyle(),
+      style: gradientBlurTitleBarStyle(),
       content: {
         stackBuilder: (): void => this.titleBarBuilder()
       }
