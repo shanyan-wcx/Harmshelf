@@ -861,7 +861,7 @@ export struct Play {
                   .height(96)
                   .rotate({ angle: 180 })
                   .linearGradientBlur(80, {
-                    fractionStops: [[0, 0], [0, 0.2], [1, 0.75], [1, 1]],
+                    fractionStops: [[0.55, 0], [0.9, 0.12], [1, 0.28], [1, 1]],
                     direction: GradientDirection.Top
                   })
 
@@ -911,6 +911,7 @@ export struct Play {
                   rate: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.2 : 0.5,
                   lightUpDegree: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.1 : 0.5
                 })
+                .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.BOTTOM])
                 .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
 
               Column() {
@@ -1284,7 +1285,7 @@ export struct Play {
         .padding({ left: 20, right: 20 })
       }
       .width('100%')
-      .height('100%')
+      .height(LayoutPolicy.matchParent)
       .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP, LayoutSafeAreaEdge.BOTTOM])
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
       .clip(false)
