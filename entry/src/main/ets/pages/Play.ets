@@ -561,7 +561,7 @@ export struct Play {
                    }
                  ],
                  deleteIconOptions: {
-                   backgroundColor: $r('sys.color.warning'),
+                   backgroundColor: $r('sys.color.comp_background_tertiary'),
                    iconColor: Color.Red,
                    onAction: async () => {
                      let status = await deleteBookmark(this.playingItem!.libraryItemId, bookmark.time)
@@ -950,7 +950,7 @@ export struct Play {
 
   @Builder
   sleepOptionBuilder(label: string, option: number) {
-    if (this.selectedSleepOption === option) {
+    if (option === 0 || this.selectedSleepOption === option) {
       Row() {
         ImmersiveActionButton({
           barWidth: '100%',
@@ -976,7 +976,7 @@ export struct Play {
       .width('100%')
       .height(50)
       .borderRadius(25)
-      .backgroundColor(option === 0 ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
+      .backgroundColor(Color.Transparent)
       .onClick(() => this.selectSleepOption(option))
     }
   }
@@ -1279,6 +1279,7 @@ export struct Play {
                     style: this.lockPlayer ? SliderStyle.NONE : SliderStyle.OutSet
                   })
                     .width('100%')
+                    .margin({ top: -4 })
                     .trackThickness(5)
                     .selectedBorderRadius(5)
                     .blockSize({
