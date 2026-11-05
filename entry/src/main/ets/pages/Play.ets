@@ -1,6 +1,7 @@
 import { BlurStrategy, HdsActionBar, ActionBarButton, HdsListItem, ActionBarStyle } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
 import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier, window } from '@kit.ArkUI'
+import { common } from '@kit.AbilityKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { createBookmark, deleteBookmark, getBookmarks } from '../utils/Api';
 import { PlaySetting } from './Index';
@@ -47,12 +48,38 @@ export struct Play {
   @Local coverColor: number = 0xff181818
   private coverColorKey: string = ''
   private coverColorRequest: number = 0
+  private previousStatusBarContentColor: string = ''
 
   private get playControlColor(): Color {
     const red = (this.coverColor >>> 16) & 0xff
     const green = (this.coverColor >>> 8) & 0xff
     const blue = this.coverColor & 0xff
     return red * 0.299 + green * 0.587 + blue * 0.114 > 160 ? Color.Black : Color.White
+  }
+
+  private async updateStatusBarContentColor() {
+    try {
+      const context = this.getUIContext().getHostContext() as common.UIAbilityContext
+      const mainWindow = await window.getLastWindow(context)
+      await mainWindow.setWindowSystemBarProperties({
+        statusBarContentColor: this.playControlColor === Color.Black ? '#000000' : '#FFFFFF'
+      })
+    } catch (_) {
+    }
+  }
+
+  private async restoreStatusBarContentColor() {
+    if (!this.previousStatusBarContentColor) {
+      return
+    }
+    try {
+      const context = this.getUIContext().getHostContext() as common.UIAbilityContext
+      const mainWindow = await window.getLastWindow(context)
+      await mainWindow.setWindowSystemBarProperties({
+        statusBarContentColor: this.previousStatusBarContentColor
+      })
+    } catch (_) {
+    }
   }
   @Consumer() isOnFocus: boolean = true
   @Monitor('isOnFocus')
@@ -64,12 +91,25 @@ export struct Play {
     }
   }
 
+  async aboutToAppear() {
+    try {
+      const context = this.getUIContext().getHostContext() as common.UIAbilityContext
+      const mainWindow = await window.getLastWindow(context)
+      this.previousStatusBarContentColor = mainWindow.getWindowSystemBarProperties().statusBarContentColor ?? ''
+      if (this.showPlay) {
+        await this.updateStatusBarContentColor()
+      }
+    } catch (_) {
+    }
+  }
+
   aboutToDisappear() {
     this.stopRotate()
     if (this.fadeInterval !== -1) {
       clearInterval(this.fadeInterval)
     }
     this.coverColorRequest++
+    this.restoreStatusBarContentColor()
   }
   @Local shouldClosePlayer: boolean = false
   @Local lockPlayer: boolean = false
@@ -109,7 +149,10 @@ export struct Play {
   @Monitor('showPlay')
   async refreshShownCoverColor(_: IMonitor) {
     if (this.showPlay) {
+      await this.updateStatusBarContentColor()
       await this.refreshCoverColor()
+    } else {
+      await this.restoreStatusBarContentColor()
     }
   }
 
@@ -162,6 +205,7 @@ export struct Play {
       if (color && requestId === this.coverColorRequest && coverSource === this.getCoverSource()) {
         this.coverColor = 0xff000000 +
           Math.round(color.red) * 0x10000 + Math.round(color.green) * 0x100 + Math.round(color.blue)
+        await this.updateStatusBarContentColor()
       }
     } catch (_) {
       Logger.error('提取封面主色失败')
