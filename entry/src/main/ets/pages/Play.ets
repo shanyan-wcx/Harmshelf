@@ -1,16 +1,11 @@
 import { BlurStrategy, HdsActionBar, ActionBarButton, HdsListItem, ActionBarStyle } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
 import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier } from '@kit.ArkUI'
-import { ConfigurationConstant } from '@kit.AbilityKit';
-import { env } from '../utils/Class';
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
-import { deviceInfo } from "@kit.BasicServicesKit";
 import { createBookmark, deleteBookmark, getBookmarks } from '../utils/Api';
 import { PlaySetting } from './Index';
 import { media } from '@kit.MediaKit';
 import { Logger } from '../utils/Logger';
-
-let deviceTypeInfo: string = deviceInfo.deviceType;
 
 @ComponentV2
 export struct Play {
@@ -826,29 +821,15 @@ export struct Play {
   @Builder
   playBuilder() {
     Column() {
-      GridRow({
-        columns: {
-          xs: 1,
-          sm: 2,
-        },
-        breakpoints: {
-          value: ['1000vp'],
-          reference: BreakpointsReference.WindowSize
-        },
-        gutter: {
-          x: 20
-        }
-      }) {
-        GridCol({ span: 1 }) {
-          Column() {
+      Column() {
             Row() {
               Button({ type: ButtonType.Circle }) {
                 SymbolGlyph($r('sys.symbol.chevron_down'))
                   .fontSize(32)
                   .fontColor([$r('sys.color.font_secondary')])
               }
-              .height(40)
-              .width(40)
+              .height(48)
+              .width(48)
               .backgroundColor(Color.Transparent)
               .onClick(() => {
                 this.showPlay = false
@@ -869,8 +850,8 @@ export struct Play {
                   .fontSize($r('sys.float.ohos_id_text_size_headline7'))
                   .fontColor([$r('sys.color.font_secondary')])
               }
-              .height(40)
-              .width(40)
+              .height(48)
+              .width(48)
               .backgroundColor(Color.Transparent)
               .bindMenu([{
                 symbolIcon: new SymbolGlyphModifier(this.lockPlayer ? $r('sys.symbol.lock') :
@@ -891,55 +872,54 @@ export struct Play {
             }
             .width('100%')
             .justifyContent(FlexAlign.SpaceBetween)
-            .margin({ bottom: 25 })
             .padding({ left: 20, right: 20 })
 
-            Column() {
-              if (this.displayHeight >= 700) {
-                if (!this.isLocalPlaying) {
-                  Image(this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`)
-                    .alt($rawfile('nocover.jpg'))
-                    .objectFit(ImageFit.Cover)
-                    .width(deviceTypeInfo === '2in1' ?
-                      (((this.displayWidth / 2) - 60) > (this.displayHeight / 2) ? this.displayHeight / 2 : '100%') :
-                      ((this.displayWidth > (this.displayHeight * 3 / 5)) ? this.displayHeight / 3 : '100%'))
-                    .aspectRatio(1)
-                    .borderRadius(10)
-                    .draggable(false)
-                    .geometryTransition("cover")
-                    .margin({ bottom: 40 })
-                } else if (this.localPlayItem?.coverPath) {
-                  Image(fileUri.getUriFromPath(this.localPlayItem.coverPath))
-                    .alt($rawfile('nocover.jpg'))
-                    .objectFit(ImageFit.Cover)
-                    .width(deviceTypeInfo === '2in1' ?
-                      (((this.displayWidth / 2) - 60) > (this.displayHeight / 2) ? this.displayHeight / 2 : '100%') :
-                      ((this.displayWidth > (this.displayHeight * 3 / 5)) ? this.displayHeight / 3 : '100%'))
-                    .aspectRatio(1)
-                    .borderRadius(10)
-                    .draggable(false)
-                    .geometryTransition("cover")
-                    .margin({ bottom: 40 })
-                } else {
-                  Image($rawfile('nocover.jpg'))
-                    .objectFit(ImageFit.Cover)
-                    .width(deviceTypeInfo === '2in1' ?
-                      (((this.displayWidth / 2) - 60) > (this.displayHeight / 2) ? this.displayHeight / 2 : '100%') :
-                      ((this.displayWidth > (this.displayHeight * 3 / 5)) ? this.displayHeight / 3 : '100%'))
-                    .aspectRatio(1)
-                    .borderRadius(10)
-                    .draggable(false)
-                    .geometryTransition("cover")
-                    .margin({ bottom: 40 })
-                }
-              }
+            if (!this.isLocalPlaying) {
+              Image(this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`)
+                .alt($rawfile('nocover.jpg'))
+                .objectFit(ImageFit.Cover)
+                .width('100%')
+                .aspectRatio(1)
+                .draggable(false)
+                .geometryTransition("cover")
+            } else if (this.localPlayItem?.coverPath) {
+              Image(fileUri.getUriFromPath(this.localPlayItem.coverPath))
+                .alt($rawfile('nocover.jpg'))
+                .objectFit(ImageFit.Cover)
+                .width('100%')
+                .aspectRatio(1)
+                .draggable(false)
+                .geometryTransition("cover")
+            } else {
+              Image($rawfile('nocover.jpg'))
+                .objectFit(ImageFit.Cover)
+                .width('100%')
+                .aspectRatio(1)
+                .draggable(false)
+                .geometryTransition("cover")
+            }
+
+            Stack() {
+              Image(this.isLocalPlaying ?
+                (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
+                (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
+                .alt($rawfile('nocover.jpg'))
+                .objectFit(ImageFit.Cover)
+                .width('100%')
+                .height('100%')
+                .rotate({ angle: 180 })
+                .blur(0)
+                .linearGradientBlur(80, {
+                  fractionStops: [[0, 0], [0, 0.33], [1, 0.66], [1, 1]],
+                  direction: GradientDirection.Top
+                })
 
               Column() {
+                Column() {
                 Text(this.playingTitle)
                   .width('100%')
                   .fontSize(20)
                   .fontWeight(FontWeight.Medium)
-                  .margin({ bottom: 5 })
                   .textAlign(TextAlign.Center)
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -957,7 +937,6 @@ export struct Play {
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
               }
               .width('100%')
-              .margin({ bottom: 30 })
               .padding({ left: 20, right: 20 })
               .alignItems(HorizontalAlign.Center)
 
@@ -974,7 +953,6 @@ export struct Play {
                   }
                   .width('100%')
                   .justifyContent(FlexAlign.SpaceBetween)
-                  .margin({ bottom: -10 })
                   .padding({ left: 20, right: 20 })
 
                   Slider({
@@ -1274,45 +1252,19 @@ export struct Play {
             .width('100%')
             .height('100%')
             .layoutWeight(1)
-            .padding({
-              bottom: deviceTypeInfo === '2in1' ? 0 : 10,
-              left: 20,
-              right: 20,
-            })
+            .justifyContent(FlexAlign.SpaceBetween)
           }
+          .width('100%')
+          .layoutWeight(1)
+          .clip(false)
         }
-
-        if (this.displayWidth >= 1000) {
-          GridCol({ span: 1 }) {
-            Column() {
-              Text("没想好放什么")
-                .fontSize(32)
-            }
-            .width('100%')
-            .height('100%')
-            .margin({ bottom: 20 })
-            .justifyContent(FlexAlign.Center)
-          }
-          .padding({
-            bottom: deviceTypeInfo === '2in1' ? 0 : 10,
-            left: 20,
-            right: 20,
-          })
-        }
+        .width('100%')
+        .height('100%')
+        .layoutWeight(1)
       }
-    }
-    .width('100%')
-    .height('100%')
-    .backgroundImage(this.isLocalPlaying ?
-      (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
-      (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
-    .backgroundImageSize(ImageSize.FILL)
-    .backgroundBlurStyle(BlurStyle.BACKGROUND_ULTRA_THICK)
-    .backgroundBrightness({
-      rate: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.2 : 0.5,
-      lightUpDegree: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.1 : 0.5
-    })
-    .padding({ top: this.statusBarHeight + 20, bottom: 20 })
+      .width('100%')
+      .height('100%')
+      .padding({ top: this.statusBarHeight + 20, bottom: 20 })
   }
 
   @Builder
