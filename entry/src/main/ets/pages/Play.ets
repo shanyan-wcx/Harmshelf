@@ -561,8 +561,8 @@ export struct Play {
                    }
                  ],
                  deleteIconOptions: {
-                   backgroundColor: Color.Red,
-                   iconColor: $r('sys.color.font'),
+                   backgroundColor: $r('sys.color.comp_background_tertiary'),
+                   iconColor: Color.Red,
                    onAction: async () => {
                      let status = await deleteBookmark(this.playingItem!.libraryItemId, bookmark.time)
                      if (status) {
@@ -1055,11 +1055,11 @@ export struct Play {
                       .maxLines(1)
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
                   }
+                  .padding({ left: 15, right: 15 })
                 }
                 .width('100%')
                 .height(50)
                 .borderRadius(25)
-                .padding({ left: 15, right: 15 })
                 .backgroundColor(Color.Transparent)
                 .onClick(async () => {
                   this.showChapter = false
@@ -1142,11 +1142,11 @@ export struct Play {
                       .fontColor($r('sys.color.font_secondary'))
                       .margin({ left: 10 })
                   }
+                  .padding({ left: 15, right: 15 })
                 }
                 .width('100%')
                 .height(50)
                 .borderRadius(25)
-                .padding({ left: 15, right: 15 })
                 .backgroundColor(Color.Transparent)
                 .onClick(async () => {
                   this.showChapter = false
@@ -1608,7 +1608,7 @@ export struct Play {
 
           Row() {
             ImmersiveActionButton({
-              barWidth: 140,
+              barWidth: 165,
               barHeight: 40,
               barRadius: 20,
               monopolizeActionEvents: false
@@ -1618,7 +1618,7 @@ export struct Play {
                 .fontColor(this.playColorPalette.secondary)
             }
           }
-          .width(140)
+          .width(165)
           .height(40)
           .clip(false)
           .visibility(this.sleepTime !== 0 ? Visibility.Visible : Visibility.None)
@@ -1668,7 +1668,12 @@ export struct Play {
         .height(this.windowAvoidArea.statusBar.visible ? this.windowAvoidArea.statusBar.topRect.height : 0)
         .linearGradient({
           direction: GradientDirection.Bottom,
-          colors: [[this.coverColor, 0], [ColorMetrics.rgba(
+          colors: [[ColorMetrics.rgba(
+            (this.coverColor >>> 16) & 0xff,
+            (this.coverColor >>> 8) & 0xff,
+            this.coverColor & 0xff,
+            0.5
+          ).color, 0], [ColorMetrics.rgba(
             (this.coverColor >>> 16) & 0xff,
             (this.coverColor >>> 8) & 0xff,
             this.coverColor & 0xff,
