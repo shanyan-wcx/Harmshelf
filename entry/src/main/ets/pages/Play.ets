@@ -57,6 +57,11 @@ export struct Play {
     return red * 0.299 + green * 0.587 + blue * 0.114 > 160 ? Color.Black : Color.White
   }
 
+  private get playSecondaryColor(): string {
+    const channel = this.playControlColor === Color.Black ? 0 : 255
+    return ColorMetrics.rgba(channel, channel, channel, 0.55).color
+  }
+
   private async updateStatusBarContentColor() {
     try {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
@@ -1034,6 +1039,7 @@ export struct Play {
                     .width('100%')
                     .fontSize(20)
                     .fontWeight(FontWeight.Medium)
+                    .fontColor(this.playControlColor)
                     .textAlign(TextAlign.Center)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -1045,7 +1051,7 @@ export struct Play {
                     .width('100%')
                     .fontSize(18)
                     .fontWeight(FontWeight.Medium)
-                    .fontColor($r('sys.color.font_secondary'))
+                    .fontColor(this.playSecondaryColor)
                     .textAlign(TextAlign.Center)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -1056,10 +1062,12 @@ export struct Play {
                     Text(this.formatSeconds(this.playedPercent * this.getCurrentDuration() / 100))
                       .fontSize(16)
                       .fontWeight(FontWeight.Medium)
+                      .fontColor(this.playControlColor)
 
                     Text(this.formatSeconds(this.getCurrentDuration()))
                       .fontSize(16)
                       .fontWeight(FontWeight.Medium)
+                      .fontColor(this.playControlColor)
                   }
                   .width('100%')
                   .justifyContent(FlexAlign.SpaceBetween)
@@ -1080,8 +1088,9 @@ export struct Play {
                       height: 14
                     })
                     .padding({ left: this.lockPlayer ? 20 : 10, right: this.lockPlayer ? 20 : 10 })
-                    .blockColor($r('app.color.sliderBlock'))
-                    .selectedColor($r('sys.color.font_secondary'))
+                    .blockColor(this.playControlColor)
+                    .trackColor(this.playSecondaryColor)
+                    .selectedColor(this.playControlColor)
                     .sliderInteractionMode(SliderInteraction.SLIDE_AND_CLICK_UP)
                     .onChange((value: number, mode: SliderChangeMode) => {
                       if (mode === SliderChangeMode.Begin) {
