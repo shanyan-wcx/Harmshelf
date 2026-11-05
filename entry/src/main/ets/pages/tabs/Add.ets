@@ -44,7 +44,7 @@ export struct Add {
             .width("100%")
             .layoutWeight(1)
             .height(45)
-            .borderRadius(18)
+            .borderRadius(10)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({
@@ -73,7 +73,7 @@ export struct Add {
             .width("100%")
             .layoutWeight(1)
             .height(45)
-            .borderRadius(18)
+            .borderRadius(10)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({
@@ -102,7 +102,7 @@ export struct Add {
             .width("100%")
             .layoutWeight(1)
             .height(45)
-            .borderRadius(18)
+            .borderRadius(10)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({
@@ -131,7 +131,7 @@ export struct Add {
             .width("100%")
             .layoutWeight(1)
             .height(120)
-            .borderRadius(18)
+            .borderRadius(10)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({
