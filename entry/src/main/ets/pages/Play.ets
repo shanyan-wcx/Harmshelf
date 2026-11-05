@@ -1,7 +1,9 @@
 import { BlurStrategy, HdsActionBar, ActionBarButton, HdsListItem, ActionBarStyle } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
 import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier } from '@kit.ArkUI'
+import { ConfigurationConstant } from '@kit.AbilityKit';
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
+import { env } from '../utils/Class';
 import { createBookmark, deleteBookmark, getBookmarks } from '../utils/Api';
 import { PlaySetting } from './Index';
 import { media } from '@kit.MediaKit';
@@ -13,7 +15,6 @@ export struct Play {
   @Consumer() playSetting: PlaySetting | undefined = PersistenceV2.connect(PlaySetting, () => new PlaySetting());
   @Consumer() displayWidth: number = 0
   @Consumer() displayHeight: number = 0
-  @Consumer() statusBarHeight: number = 0;
   @Consumer() isPlaying: boolean = false
   @Consumer() isStartPlaying: boolean = false
   @Consumer() showPlay: boolean = false
@@ -820,60 +821,8 @@ export struct Play {
 
   @Builder
   playBuilder() {
-    Column() {
+    Stack({ alignContent: Alignment.TopStart }) {
       Column() {
-            Row() {
-              Button({ type: ButtonType.Circle }) {
-                SymbolGlyph($r('sys.symbol.chevron_down'))
-                  .fontSize(32)
-                  .fontColor([$r('sys.color.font_secondary')])
-              }
-              .height(48)
-              .width(48)
-              .backgroundColor(Color.Transparent)
-              .onClick(() => {
-                this.showPlay = false
-              })
-
-              Row() {
-                Text("睡眠定时 " + ((this.sleepTime !== 0 && !this.isLocalPlaying && this.playingItem!.audioTracks !== undefined) ? this.formatSleepTime(this.sleepTime - this.playedTime - this.playingItem!.audioTracks[this.playingIndex].startOffset) : 0))
-                  .fontSize(18)
-              }
-              .height(40)
-              .borderRadius(10)
-              .padding({ left: 15, right: 15 })
-              .backgroundColor($r('sys.color.comp_background_tertiary'))
-              .visibility(this.sleepTime !== 0 ? Visibility.Visible : Visibility.None)
-
-              Button({ type: ButtonType.Circle }) {
-                SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
-                  .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-                  .fontColor([$r('sys.color.font_secondary')])
-              }
-              .height(48)
-              .width(48)
-              .backgroundColor(Color.Transparent)
-              .bindMenu([{
-                symbolIcon: new SymbolGlyphModifier(this.lockPlayer ? $r('sys.symbol.lock') :
-                  $r('sys.symbol.lock_open')),
-                value: this.lockPlayer ? "解锁播放器" : "锁定播放器",
-                action: async () => {
-                  this.lockPlayer = !this.lockPlayer
-                }
-              }, {
-                symbolIcon: new SymbolGlyphModifier($r('sys.symbol.xmark')),
-                value: "关闭播放器",
-                action: () => {
-                  this.avPlayer!.stop()
-                  this.shouldClosePlayer = true
-                  this.showPlay = false
-                }
-              }])
-            }
-            .width('100%')
-            .justifyContent(FlexAlign.SpaceBetween)
-            .padding({ left: 20, right: 20 })
-
             if (!this.isLocalPlaying) {
               Image(this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`)
                 .alt($rawfile('nocover.jpg'))
@@ -908,7 +857,7 @@ export struct Play {
                 .width('100%')
                 .height('100%')
                 .rotate({ angle: 180 })
-                .blur(0)
+                .blur(35)
                 .linearGradientBlur(80, {
                   fractionStops: [[0, 0], [0, 0.33], [1, 0.66], [1, 1]],
                   direction: GradientDirection.Top
@@ -1261,10 +1210,71 @@ export struct Play {
         .width('100%')
         .height('100%')
         .layoutWeight(1)
+        Row() {
+          Button({ type: ButtonType.Circle }) {
+            SymbolGlyph($r('sys.symbol.chevron_down'))
+              .fontSize(32)
+              .fontColor([$r('sys.color.font_secondary')])
+          }
+          .height(48)
+          .width(48)
+          .backgroundColor(Color.Transparent)
+          .onClick(() => {
+            this.showPlay = false
+          })
+
+          Row() {
+            Text("睡眠定时 " + ((this.sleepTime !== 0 && !this.isLocalPlaying && this.playingItem!.audioTracks !== undefined) ? this.formatSleepTime(this.sleepTime - this.playedTime - this.playingItem!.audioTracks[this.playingIndex].startOffset) : 0))
+              .fontSize(18)
+          }
+          .height(40)
+          .borderRadius(10)
+          .padding({ left: 15, right: 15 })
+          .backgroundColor($r('sys.color.comp_background_tertiary'))
+          .visibility(this.sleepTime !== 0 ? Visibility.Visible : Visibility.None)
+
+          Button({ type: ButtonType.Circle }) {
+            SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
+              .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+              .fontColor([$r('sys.color.font_secondary')])
+          }
+          .height(48)
+          .width(48)
+          .backgroundColor(Color.Transparent)
+          .bindMenu([{
+            symbolIcon: new SymbolGlyphModifier(this.lockPlayer ? $r('sys.symbol.lock') :
+              $r('sys.symbol.lock_open')),
+            value: this.lockPlayer ? "解锁播放器" : "锁定播放器",
+            action: async () => {
+              this.lockPlayer = !this.lockPlayer
+            }
+          }, {
+            symbolIcon: new SymbolGlyphModifier($r('sys.symbol.xmark')),
+            value: "关闭播放器",
+            action: () => {
+              this.avPlayer!.stop()
+              this.shouldClosePlayer = true
+              this.showPlay = false
+            }
+          }])
+        }
+        .width('100%')
+        .justifyContent(FlexAlign.SpaceBetween)
+        .padding({ left: 20, right: 20 })
       }
       .width('100%')
       .height('100%')
-      .padding({ top: this.statusBarHeight + 20, bottom: 20 })
+      .backgroundImage(this.isLocalPlaying ?
+        (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
+        (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
+      .backgroundImageSize(ImageSize.FILL)
+      .backgroundBlurStyle(BlurStyle.BACKGROUND_ULTRA_THICK)
+      .backgroundBrightness({
+        rate: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.2 : 0.5,
+        lightUpDegree: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.1 : 0.5
+      })
+      .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP, LayoutSafeAreaEdge.BOTTOM])
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
   }
 
   @Builder
