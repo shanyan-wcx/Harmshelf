@@ -1,13 +1,14 @@
 import { BlurStrategy, HdsActionBar, ActionBarButton, HdsListItem, ActionBarStyle } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
 import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier, window } from '@kit.ArkUI'
-import { ConfigurationConstant } from '@kit.AbilityKit';
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
-import { env } from '../utils/Class';
 import { createBookmark, deleteBookmark, getBookmarks } from '../utils/Api';
 import { PlaySetting } from './Index';
 import { media } from '@kit.MediaKit';
 import { Logger } from '../utils/Logger';
+import { image } from '@kit.ImageKit';
+import { effectKit } from '@kit.ArkGraphics2D';
+import { rcp } from '@kit.RemoteCommunicationKit';
 
 @ComponentV2
 export struct Play {
@@ -43,6 +44,9 @@ export struct Play {
   @Local rotateTimer: number = -1
   @Local sliderValue: number = 0
   @Local fadeInterval: number = -1
+  @Local coverColor: number = 0xff181818
+  private coverColorKey: string = ''
+  private coverColorRequest: number = 0
   @Consumer() isOnFocus: boolean = true
   @Monitor('isOnFocus')
   onFocusChange() {
@@ -58,6 +62,7 @@ export struct Play {
     if (this.fadeInterval !== -1) {
       clearInterval(this.fadeInterval)
     }
+    this.coverColorRequest++
   }
   @Local shouldClosePlayer: boolean = false
   @Local lockPlayer: boolean = false
@@ -80,6 +85,98 @@ export struct Play {
       this.speed = this.playSetting.globalSpeed
     } else {
       this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
+    }
+  }
+  @Monitor('playingItem')
+  async refreshPlayingCoverColor(_: IMonitor) {
+    await this.refreshCoverColor()
+  }
+  @Monitor('localPlayItem')
+  async refreshLocalCoverColor(_: IMonitor) {
+    await this.refreshCoverColor()
+  }
+  @Monitor('isLocalPlaying')
+  async refreshLocalModeCoverColor(_: IMonitor) {
+    await this.refreshCoverColor()
+  }
+  @Monitor('showPlay')
+  async refreshShownCoverColor(_: IMonitor) {
+    if (this.showPlay) {
+      await this.refreshCoverColor()
+    }
+  }
+
+  private getCoverSource(): string {
+    if (this.isLocalPlaying) {
+      const coverPath = this.localPlayItem?.coverPath ?? ''
+      return coverPath ? fileUri.getUriFromPath(coverPath) : ''
+    }
+    if (!this.baseUrl || !this.playingItem?.libraryItemId) {
+      return ''
+    }
+    return this.baseUrl + `/api/items/${this.playingItem.libraryItemId}/cover?token=${this.apiToken}`
+  }
+
+  private async refreshCoverColor(): Promise<void> {
+    const coverSource = this.getCoverSource()
+    if (!coverSource || coverSource === this.coverColorKey) {
+      return
+    }
+    this.coverColorKey = coverSource
+    const requestId = ++this.coverColorRequest
+    let session: rcp.Session | undefined = undefined
+    let imageSource: image.ImageSource | undefined = undefined
+    let pixelMap: image.PixelMap | undefined = undefined
+    try {
+      if (coverSource.startsWith('http://') || coverSource.startsWith('https://')) {
+        session = rcp.createSession()
+        const response = await session.fetch(new rcp.Request(coverSource, 'GET'))
+        if (!response.body) {
+          return
+        }
+        imageSource = image.createImageSource(response.body)
+      } else {
+        imageSource = image.createImageSource(coverSource)
+      }
+      if (!imageSource) {
+        return
+      }
+      pixelMap = await imageSource.createPixelMap({
+        desiredSize: { width: 32, height: 32 },
+        desiredPixelFormat: image.PixelMapFormat.RGBA_8888
+      })
+      const picker = await effectKit.createColorPicker(pixelMap)
+      let color: effectKit.Color | undefined = undefined
+      try {
+        color = await picker.getMainColor()
+      } catch (_) {
+        color = picker.getAverageColor()
+      }
+      if (color && requestId === this.coverColorRequest && coverSource === this.getCoverSource()) {
+        this.coverColor = 0xff000000 +
+          Math.round(color.red) * 0x10000 + Math.round(color.green) * 0x100 + Math.round(color.blue)
+      }
+    } catch (_) {
+      Logger.error('提取封面主色失败')
+    } finally {
+      if (pixelMap) {
+        try {
+          await pixelMap.release()
+        } catch (_) {
+        }
+      }
+      if (imageSource) {
+        try {
+          await imageSource.release()
+        } catch (_) {
+        }
+      }
+      if (session) {
+        try {
+          session.close()
+        } catch (_) {
+        }
+      }
     }
   }
   @Monitor('speed')
@@ -852,25 +949,12 @@ export struct Play {
               }
 
               Stack({ alignContent: Alignment.Bottom }) {
-                Stack() {
-                  Image(this.isLocalPlaying ?
-                    (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
-                    (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
-                    .alt($rawfile('nocover.jpg'))
-                    .objectFit(ImageFit.Fill)
-                    .width('100%')
-                    .height('100%')
-                    .rotate({ angle: 180 })
-                }
+                Column()
                 .width('100%')
                 .height(96)
-                .linearGradientBlur(160, {
-                  fractionStops: [[0, 0], [0, 0.3], [1, 0.85], [1, 1]],
-                  direction: GradientDirection.Bottom
-                })
-                .backgroundBrightness({
-                  rate: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.2 : 0.5,
-                  lightUpDegree: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.1 : 0.5
+                .linearGradient({
+                  direction: GradientDirection.Bottom,
+                  colors: [[Color.Transparent, 0], [this.coverColor, 1]]
                 })
 
                 Column() {
@@ -909,19 +993,7 @@ export struct Play {
               Column()
                 .width('100%')
                 .height('100%')
-                .rotate({ angle: 180 })
-                .backgroundImage(this.isLocalPlaying ?
-                  (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
-                  (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
-                .backgroundImageSize(ImageSize.FILL)
-                .linearGradientBlur(160, {
-                  fractionStops: [[1, 0], [1, 1]],
-                  direction: GradientDirection.Bottom
-                })
-                .backgroundBrightness({
-                  rate: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.2 : 0.5,
-                  lightUpDegree: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.1 : 0.5
-                })
+                .backgroundColor(this.coverColor)
                 .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
 
               Column() {
