@@ -130,7 +130,7 @@ export struct SearchMedia {
                 }
                   .width('100%')
                   .padding({ left: 20, right: 20 })
-                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 6, bottom: index === this.searchResult!.book!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 6 })
+                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 8, bottom: index === this.searchResult!.book!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 8 })
                   .clip(false)
               })
             }
@@ -185,7 +185,7 @@ export struct SearchMedia {
                 }
                   .width('100%')
                   .padding({ left: 20, right: 20 })
-                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 6, bottom: index === this.searchResult!.podcast!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 6 })
+                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 8, bottom: index === this.searchResult!.podcast!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 8 })
                   .clip(false)
               })
             }
