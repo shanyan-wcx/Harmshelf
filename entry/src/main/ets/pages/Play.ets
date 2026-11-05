@@ -951,7 +951,7 @@ export struct Play {
               Stack({ alignContent: Alignment.Bottom }) {
                 Column()
                 .width('100%')
-                .height(60)
+                .height(120)
                 .linearGradient({
                   direction: GradientDirection.Bottom,
                   colors: [[ColorMetrics.rgba(
@@ -962,21 +962,9 @@ export struct Play {
                   ).color, 0], [this.coverColor, 1]]
                 })
 
-                Column() {
-                  Text(this.playingTitle)
-                    .width('100%')
-                    .fontSize(20)
-                    .fontWeight(FontWeight.Medium)
-                    .textAlign(TextAlign.Center)
-                    .maxLines(1)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
-                }
-                .width('100%')
-                .padding({ left: 20, right: 20 })
-                .alignItems(HorizontalAlign.Center)
               }
               .width('100%')
-              .height(60)
+              .height(120)
             }
             .width('100%')
             .aspectRatio(1)
@@ -991,6 +979,14 @@ export struct Play {
 
               Column() {
                 Column() {
+                  Text(this.playingTitle)
+                    .width('100%')
+                    .fontSize(20)
+                    .fontWeight(FontWeight.Medium)
+                    .textAlign(TextAlign.Center)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+
                   Text(this.isLocalPlaying ? "本地文件" :
                     (this.playingItem?.mediaType === 'book' ?
                     this.playingItem?.mediaMetadata.authors?.map(item => item.name).join(", ") :
