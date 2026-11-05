@@ -1,6 +1,6 @@
 import { BlurStrategy, HdsActionBar, ActionBarButton, HdsListItem, ActionBarStyle } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
-import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, uiMaterial, window } from '@kit.ArkUI'
+import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier, uiMaterial, window } from '@kit.ArkUI'
 import { common } from '@kit.AbilityKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { createBookmark, deleteBookmark, getBookmarks } from '../utils/Api';
@@ -145,6 +145,7 @@ export struct Play {
   @Local tmpBookmarkTime: number = 0
   @Local showEditBookmark: boolean = false
   @Local editBookmarkIndex: number = 0
+  @Local selectedSleepOption: number = 0
   @Local maxIntroLine: number = 5
   @Local showMoreIntro: boolean = false
   @Monitor('playingItem')
@@ -154,6 +155,13 @@ export struct Play {
       this.speed = this.playSetting.globalSpeed
     } else {
       this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
+    }
+  }
+
+  @Monitor('sleepTime')
+  syncSelectedSleepOption(_: IMonitor) {
+    if (this.sleepTime === 0) {
+      this.selectedSleepOption = 0
     }
   }
   @Monitor('playingItem')
@@ -501,89 +509,78 @@ export struct Play {
   }
 
   @Builder
-  bookmarkItemBuilder(bookmark: Bookmark, index: number) {
-    Row() {
-      Row() {
-        SymbolGlyph($r('sys.symbol.bookmark'))
-          .fontSize(20)
-        Column() {
-          Text(bookmark.title.length === 0 ? this.formatTime(bookmark.createdAt) : bookmark.title)
-            .fontSize(16)
-          Text(this.formatSeconds(bookmark.time))
-            .fontSize(16)
-            .fontColor($r('sys.color.font_secondary'))
-            .margin({ top: 4 })
-        }
-        .margin({ left: 12 })
-      }
-      .layoutWeight(1)
-      .onClick(async () => {
-        this.showBookmark = false
-        await this.avPlayer!.reset();
-        this.isPlaying = true
-        await this.getPlayContent(this.playingItem!, bookmark.time)
-        this.getUIContext().getPromptAction().showToast({
-          message: '跳转书签成功！',
-          duration: 500
-        });
-      })
-
-      ImmersiveActionButton({
-        barWidth: 40,
-        barHeight: 40,
-        barRadius: 20,
-        onButtonClick: async () => {
-          let status = await deleteBookmark(this.playingItem!.libraryItemId, bookmark.time)
-          if (status) {
-            this.showBookmark = false
-            this.getUIContext().getPromptAction().showToast({
-              message: '删除书签成功！',
-              duration: 500
-            });
-          } else {
-            this.getUIContext().getPromptAction().showToast({
-              message: '删除书签失败，请检查网络！',
-              duration: 500
-            });
-          }
-        }
-      }) {
-        SymbolGlyph($r('sys.symbol.trash'))
-          .fontSize(18)
-          .fontColor([Color.Red])
-      }
-    }
-    .width('100%')
-    .height(60)
-    .padding({ left: 15, right: 15 })
-    .borderRadius(10)
-  }
-
-  @Builder
   bookmarkBuilder() {
     Column() {
       Stack() {
         List() {
-          ForEach(this.bookmarks, (bookmark: Bookmark, index) => {
-            HdsListItem({
-              swipeActionOptions: {
-                icons: [
-                  {
-                    icon: new SymbolGlyphModifier($r('sys.symbol.square_and_pencil')).fontSize(18)
-                      .fontColor([$r('sys.color.font')]),
-                    backgroundColor: $r('sys.color.comp_background_tertiary'),
-                    onAction: () => {
-                      this.showBookmark = false
-                      this.editBookmarkIndex = index
-                      this.tmpBookmarkTitle = bookmark.title
-                      this.tmpBookmarkTime = bookmark.time
-                      this.showEditBookmark = true
-                    }
-                  }
-                ]
-              },
-              customItemBuilder: () => this.bookmarkItemBuilder(bookmark, index)
-          })
+           ForEach(this.bookmarks, (bookmark: Bookmark, index) => {
+             HdsListItem({
+               hdsListItemCard: {
+                 cardBorderRadius: 10,
+                 cardBackgroundColor: Color.Transparent,
+                 textItem: {
+                   primaryText: {
+                     text: bookmark.title.length === 0 ? this.formatTime(bookmark.createdAt) : bookmark.title,
+                     modifier: new TextModifier().fontSize(16)
+                   },
+                   primaryPrefixSymbol: {
+                     symbol: $r('sys.symbol.bookmark')
+                   },
+                   secondaryText: {
+                     text: this.formatSeconds(bookmark.time),
+                     modifier: new TextModifier().fontSize(16).fontColor($r('sys.color.font_secondary'))
+                   },
+                   secondaryPrefixSymbol: {
+                     symbol: $r('sys.symbol.clock')
+                   }
+                 },
+                 onClick: async () => {
+                   this.showBookmark = false
+                   await this.avPlayer!.reset();
+                   this.isPlaying = true
+                   await this.getPlayContent(this.playingItem!, bookmark.time)
+                   this.getUIContext().getPromptAction().showToast({
+                     message: '跳转书签成功！',
+                     duration: 500
+                   });
+                 }
+               },
+               swipeActionOptions: {
+                 icons: [
+                   {
+                     icon: new SymbolGlyphModifier($r('sys.symbol.square_and_pencil')).fontSize(18)
+                       .fontColor([$r('sys.color.font')]),
+                     backgroundColor: $r('sys.color.comp_background_tertiary'),
+                     onAction: () => {
+                       this.showBookmark = false
+                       this.editBookmarkIndex = index
+                       this.tmpBookmarkTitle = bookmark.title
+                       this.tmpBookmarkTime = bookmark.time
+                       this.showEditBookmark = true
+                     }
+                   }
+                 ],
+                 deleteIconOptions: {
+                   backgroundColor: $r('sys.color.warning'),
+                   iconColor: Color.Red,
+                   onAction: async () => {
+                     let status = await deleteBookmark(this.playingItem!.libraryItemId, bookmark.time)
+                     if (status) {
+                       this.showBookmark = false
+                       this.getUIContext().getPromptAction().showToast({
+                         message: '删除书签成功！',
+                         duration: 500
+                       });
+                     } else {
+                       this.getUIContext().getPromptAction().showToast({
+                         message: '删除书签失败，请检查网络！',
+                         duration: 500
+                       });
+                     }
+                   }
+                 }
+               }
+             })
           })
 
           if (this.bookmarks.length === 0) {
@@ -682,20 +679,25 @@ export struct Play {
     Scroll() {
       Column() {
         if (this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_50_X) {
-          ImmersiveActionButton({
-            barWidth: '100%',
-            barHeight: 50,
-            barRadius: 25,
-            monopolizeActionEvents: false,
-            onButtonClick: () => {
-              this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_50_X
-              this.avPlayer!.setSpeed(this.speed)
-              this.showSpeed = false
+          Row() {
+            ImmersiveActionButton({
+              barWidth: '100%',
+              barHeight: 50,
+              barRadius: 25,
+              monopolizeActionEvents: false,
+              onButtonClick: () => {
+                this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_50_X
+                this.avPlayer!.setSpeed(this.speed)
+                this.showSpeed = false
+              }
+            }) {
+              Text("0.5x")
+                .fontSize(18)
             }
-          }) {
-            Text("0.5x")
-              .fontSize(18)
           }
+          .width('100%')
+          .height(50)
+          .clip(false)
         } else {
           Button({ type: ButtonType.Normal }) {
             Text("0.5x")
@@ -713,20 +715,25 @@ export struct Play {
         }
 
         if (this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_75_X) {
-          ImmersiveActionButton({
-            barWidth: '100%',
-            barHeight: 50,
-            barRadius: 25,
-            monopolizeActionEvents: false,
-            onButtonClick: () => {
-              this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_75_X
-              this.avPlayer!.setSpeed(this.speed)
-              this.showSpeed = false
+          Row() {
+            ImmersiveActionButton({
+              barWidth: '100%',
+              barHeight: 50,
+              barRadius: 25,
+              monopolizeActionEvents: false,
+              onButtonClick: () => {
+                this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_75_X
+                this.avPlayer!.setSpeed(this.speed)
+                this.showSpeed = false
+              }
+            }) {
+              Text("0.75x")
+                .fontSize(18)
             }
-          }) {
-            Text("0.75x")
-              .fontSize(18)
           }
+          .width('100%')
+          .height(50)
+          .clip(false)
         } else {
           Button({ type: ButtonType.Normal }) {
             Text("0.75x")
@@ -744,20 +751,25 @@ export struct Play {
         }
 
         if (this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_00_X) {
-          ImmersiveActionButton({
-            barWidth: '100%',
-            barHeight: 50,
-            barRadius: 25,
-            monopolizeActionEvents: false,
-            onButtonClick: () => {
-              this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
-              this.avPlayer!.setSpeed(this.speed)
-              this.showSpeed = false
+          Row() {
+            ImmersiveActionButton({
+              barWidth: '100%',
+              barHeight: 50,
+              barRadius: 25,
+              monopolizeActionEvents: false,
+              onButtonClick: () => {
+                this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
+                this.avPlayer!.setSpeed(this.speed)
+                this.showSpeed = false
+              }
+            }) {
+              Text("1x")
+                .fontSize(18)
             }
-          }) {
-            Text("1x")
-              .fontSize(18)
           }
+          .width('100%')
+          .height(50)
+          .clip(false)
         } else {
           Button({ type: ButtonType.Normal }) {
             Text("1x")
@@ -775,20 +787,25 @@ export struct Play {
         }
 
         if (this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_25_X) {
-          ImmersiveActionButton({
-            barWidth: '100%',
-            barHeight: 50,
-            barRadius: 25,
-            monopolizeActionEvents: false,
-            onButtonClick: () => {
-              this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_25_X
-              this.avPlayer!.setSpeed(this.speed)
-              this.showSpeed = false
+          Row() {
+            ImmersiveActionButton({
+              barWidth: '100%',
+              barHeight: 50,
+              barRadius: 25,
+              monopolizeActionEvents: false,
+              onButtonClick: () => {
+                this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_25_X
+                this.avPlayer!.setSpeed(this.speed)
+                this.showSpeed = false
+              }
+            }) {
+              Text("1.25x")
+                .fontSize(18)
             }
-          }) {
-            Text("1.25x")
-              .fontSize(18)
           }
+          .width('100%')
+          .height(50)
+          .clip(false)
         } else {
           Button({ type: ButtonType.Normal }) {
             Text("1.25x")
@@ -806,20 +823,25 @@ export struct Play {
         }
 
         if (this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_50_X) {
-          ImmersiveActionButton({
-            barWidth: '100%',
-            barHeight: 50,
-            barRadius: 25,
-            monopolizeActionEvents: false,
-            onButtonClick: () => {
-              this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_50_X
-              this.avPlayer!.setSpeed(this.speed)
-              this.showSpeed = false
+          Row() {
+            ImmersiveActionButton({
+              barWidth: '100%',
+              barHeight: 50,
+              barRadius: 25,
+              monopolizeActionEvents: false,
+              onButtonClick: () => {
+                this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_50_X
+                this.avPlayer!.setSpeed(this.speed)
+                this.showSpeed = false
+              }
+            }) {
+              Text("1.5x")
+                .fontSize(18)
             }
-          }) {
-            Text("1.5x")
-              .fontSize(18)
           }
+          .width('100%')
+          .height(50)
+          .clip(false)
         } else {
           Button({ type: ButtonType.Normal }) {
             Text("1.5x")
@@ -837,20 +859,25 @@ export struct Play {
         }
 
         if (this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_75_X) {
-          ImmersiveActionButton({
-            barWidth: '100%',
-            barHeight: 50,
-            barRadius: 25,
-            monopolizeActionEvents: false,
-            onButtonClick: () => {
-              this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_75_X
-              this.avPlayer!.setSpeed(this.speed)
-              this.showSpeed = false
+          Row() {
+            ImmersiveActionButton({
+              barWidth: '100%',
+              barHeight: 50,
+              barRadius: 25,
+              monopolizeActionEvents: false,
+              onButtonClick: () => {
+                this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_75_X
+                this.avPlayer!.setSpeed(this.speed)
+                this.showSpeed = false
+              }
+            }) {
+              Text("1.75x")
+                .fontSize(18)
             }
-          }) {
-            Text("1.75x")
-              .fontSize(18)
           }
+          .width('100%')
+          .height(50)
+          .clip(false)
         } else {
           Button({ type: ButtonType.Normal }) {
             Text("1.75x")
@@ -868,20 +895,25 @@ export struct Play {
         }
 
         if (this.speed === media.PlaybackSpeed.SPEED_FORWARD_2_00_X) {
-          ImmersiveActionButton({
-            barWidth: '100%',
-            barHeight: 50,
-            barRadius: 25,
-            monopolizeActionEvents: false,
-            onButtonClick: () => {
-              this.speed = media.PlaybackSpeed.SPEED_FORWARD_2_00_X
-              this.avPlayer!.setSpeed(this.speed)
-              this.showSpeed = false
+          Row() {
+            ImmersiveActionButton({
+              barWidth: '100%',
+              barHeight: 50,
+              barRadius: 25,
+              monopolizeActionEvents: false,
+              onButtonClick: () => {
+                this.speed = media.PlaybackSpeed.SPEED_FORWARD_2_00_X
+                this.avPlayer!.setSpeed(this.speed)
+                this.showSpeed = false
+              }
+            }) {
+              Text("2x")
+                .fontSize(18)
             }
-          }) {
-            Text("2x")
-              .fontSize(18)
           }
+          .width('100%')
+          .height(50)
+          .clip(false)
         } else {
           Button({ type: ButtonType.Normal }) {
             Text("2x")
@@ -903,126 +935,65 @@ export struct Play {
     .scrollBar(BarState.Off)
   }
 
+  private selectSleepOption(option: number) {
+    if (option === 0) {
+      this.sleepTime = 0
+    } else if (option === -1) {
+      this.sleepTime = this.playingItem!.audioTracks[this.playingIndex].startOffset +
+        this.playingItem!.audioTracks[this.playingIndex].duration
+    } else {
+      this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + option * 60
+    }
+    this.selectedSleepOption = option
+    this.showSleep = false
+  }
+
+  @Builder
+  sleepOptionBuilder(label: string, option: number) {
+    if (this.selectedSleepOption === option) {
+      Row() {
+        ImmersiveActionButton({
+          barWidth: '100%',
+          barHeight: 50,
+          barRadius: 25,
+          monopolizeActionEvents: false,
+          onButtonClick: () => {
+            this.selectSleepOption(option)
+          }
+        }) {
+          Text(label)
+            .fontSize(18)
+        }
+      }
+      .width('100%')
+      .height(50)
+      .clip(false)
+    } else {
+      Button({ type: ButtonType.Normal }) {
+        Text(label)
+          .fontSize(18)
+      }
+      .width('100%')
+      .height(50)
+      .borderRadius(25)
+      .backgroundColor(option === 0 ? $r('sys.color.comp_emphasize_secondary') : Color.Transparent)
+      .onClick(() => this.selectSleepOption(option))
+    }
+  }
+
   @Builder
   sleepBuilder() {
     Scroll() {
       Column() {
-        Button({ type: ButtonType.Normal }) {
-          Text("5 min")
-            .fontSize(18)
-        }
-        .width('100%')
-        .height(50)
-        .borderRadius(25)
-        .backgroundColor(Color.Transparent)
-        .onClick(() => {
-            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 5 * 60
-            this.showSleep = false
-        })
-
-        Button({ type: ButtonType.Normal }) {
-          Text("10 min")
-            .fontSize(18)
-        }
-        .width('100%')
-        .height(50)
-        .borderRadius(25)
-        .backgroundColor(Color.Transparent)
-        .onClick(() => {
-            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 10 * 60
-            this.showSleep = false
-        })
-
-        Button({ type: ButtonType.Normal }) {
-          Text("15 min")
-            .fontSize(18)
-        }
-        .width('100%')
-        .height(50)
-        .borderRadius(25)
-        .backgroundColor(Color.Transparent)
-        .onClick(() => {
-            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 15 * 60
-            this.showSleep = false
-        })
-
-        Button({ type: ButtonType.Normal }) {
-          Text("30 min")
-            .fontSize(18)
-        }
-        .width('100%')
-        .height(50)
-        .borderRadius(25)
-        .backgroundColor(Color.Transparent)
-        .onClick(() => {
-            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 30 * 60
-            this.showSleep = false
-        })
-
-        Button({ type: ButtonType.Normal }) {
-          Text("45 min")
-            .fontSize(18)
-        }
-        .width('100%')
-        .height(50)
-        .borderRadius(25)
-        .backgroundColor(Color.Transparent)
-        .onClick(() => {
-            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 45 * 60
-            this.showSleep = false
-        })
-
-        Button({ type: ButtonType.Normal }) {
-          Text("60 min")
-            .fontSize(18)
-        }
-        .width('100%')
-        .height(50)
-        .borderRadius(25)
-        .backgroundColor(Color.Transparent)
-        .onClick(() => {
-            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 60 * 60
-            this.showSleep = false
-        })
-
-        Button({ type: ButtonType.Normal }) {
-          Text("90 min")
-            .fontSize(18)
-        }
-        .width('100%')
-        .height(50)
-        .borderRadius(25)
-        .backgroundColor(Color.Transparent)
-        .onClick(() => {
-            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 90 * 60
-            this.showSleep = false
-        })
-
-        Button({ type: ButtonType.Normal }) {
-          Text("章节结束")
-            .fontSize(18)
-        }
-        .width('100%')
-        .height(50)
-        .borderRadius(25)
-        .backgroundColor(Color.Transparent)
-        .onClick(() => {
-            this.sleepTime = this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playingItem!.audioTracks[this.playingIndex].duration
-            this.showSleep = false
-        })
-
-        Button({ type: ButtonType.Normal }) {
-          Text("清除定时")
-            .fontSize(18)
-        }
-        .width('100%')
-        .height(50)
-        .borderRadius(25)
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
-        .onClick(() => {
-          this.sleepTime = 0
-          this.showSleep = false
-        })
+        this.sleepOptionBuilder("5 min", 5)
+        this.sleepOptionBuilder("10 min", 10)
+        this.sleepOptionBuilder("15 min", 15)
+        this.sleepOptionBuilder("30 min", 30)
+        this.sleepOptionBuilder("45 min", 45)
+        this.sleepOptionBuilder("60 min", 60)
+        this.sleepOptionBuilder("90 min", 90)
+        this.sleepOptionBuilder("章节结束", -1)
+        this.sleepOptionBuilder("清除定时", 0)
       }
       .padding({ left: 20, right: 20, bottom: 25 })
     }
@@ -1037,38 +1008,43 @@ export struct Play {
           ForEach(this.localPlayItem!.tracks, (track: LocalTrack, index: number) => {
             ListItem() {
               if (this.playingIndex === index) {
-                ImmersiveActionButton({
-                  barWidth: '100%',
-                  barHeight: 50,
-                  barRadius: 25,
-                  monopolizeActionEvents: false,
-                  onButtonClick: async () => {
-                    this.showChapter = false
-                    await this.avPlayer!.reset();
-                    this.playingIndex = index
-                    this.playingTitle = track.title
-                    try {
-                      const file = fs.openSync(track.filePath, fs.OpenMode.READ_ONLY)
+                Row() {
+                  ImmersiveActionButton({
+                    barWidth: '100%',
+                    barHeight: 50,
+                    barRadius: 25,
+                    monopolizeActionEvents: false,
+                    onButtonClick: async () => {
+                      this.showChapter = false
+                      await this.avPlayer!.reset();
+                      this.playingIndex = index
+                      this.playingTitle = track.title
                       try {
-                        this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+                        const file = fs.openSync(track.filePath, fs.OpenMode.READ_ONLY)
+                        try {
+                          this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+                        } catch (_) {
+                          fs.closeSync(file)
+                        }
                       } catch (_) {
-                        fs.closeSync(file)
+                        this.getUIContext().getPromptAction().showToast({ message: '播放失败，格式不支持或文件不存在！', duration: 500 })
                       }
-                    } catch (_) {
-                      this.getUIContext().getPromptAction().showToast({ message: '播放失败，格式不支持或文件不存在！', duration: 500 })
                     }
+                  }) {
+                    Row() {
+                      Text(track.title)
+                        .fontSize(16)
+                        .width('100%')
+                        .layoutWeight(1)
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    }
+                    .padding({ left: 15, right: 15 })
                   }
-                }) {
-                  Row() {
-                    Text(track.title)
-                      .fontSize(16)
-                      .width('100%')
-                      .layoutWeight(1)
-                      .maxLines(1)
-                      .textOverflow({ overflow: TextOverflow.Ellipsis })
-                  }
-                  .padding({ left: 15, right: 15 })
                 }
+                .width('100%')
+                .height(50)
+                .clip(false)
               } else {
                 Button({ type: ButtonType.Normal }) {
                   Row() {
@@ -1103,6 +1079,7 @@ export struct Play {
                 })
               }
             }
+            .clip(false)
           })
         }
         .width('100%')
@@ -1110,41 +1087,46 @@ export struct Play {
         .padding({ left: 20, right: 20, bottom: 25 })
         .scrollBar(BarState.Off)
         .borderRadius(10)
-        .clip(true)
+        .clip(false)
       } else {
         List({ scroller: this.chapterScroller }) {
           ForEach(this.playingItem!.chapters, (chapter: Chapter, index) => {
             ListItem() {
               if (this.playingIndex === index) {
-                ImmersiveActionButton({
-                  barWidth: '100%',
-                  barHeight: 50,
-                  barRadius: 25,
-                  monopolizeActionEvents: false,
-                  onButtonClick: async () => {
-                    this.showChapter = false
-                    await this.avPlayer!.reset();
-                    this.isPlaying = true
-                    this.playingIndex = index
-                    this.playingTitle = chapter.title
-                    this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
-                  }
-                }) {
-                  Row() {
-                    Text(chapter.title)
-                      .fontSize(16)
-                      .width('100%')
-                      .layoutWeight(1)
-                      .maxLines(1)
-                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+                Row() {
+                  ImmersiveActionButton({
+                    barWidth: '100%',
+                    barHeight: 50,
+                    barRadius: 25,
+                    monopolizeActionEvents: false,
+                    onButtonClick: async () => {
+                      this.showChapter = false
+                      await this.avPlayer!.reset();
+                      this.isPlaying = true
+                      this.playingIndex = index
+                      this.playingTitle = chapter.title
+                      this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+                    }
+                  }) {
+                    Row() {
+                      Text(chapter.title)
+                        .fontSize(16)
+                        .width('100%')
+                        .layoutWeight(1)
+                        .maxLines(1)
+                        .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                    Text(this.formatSeconds(chapter.start))
-                      .fontSize(16)
-                      .fontColor($r('sys.color.font_secondary'))
-                      .margin({ left: 10 })
+                      Text(this.formatSeconds(chapter.start))
+                        .fontSize(16)
+                        .fontColor($r('sys.color.font_secondary'))
+                        .margin({ left: 10 })
+                    }
+                    .padding({ left: 15, right: 15 })
                   }
-                  .padding({ left: 15, right: 15 })
                 }
+                .width('100%')
+                .height(50)
+                .clip(false)
               } else {
                 Button({ type: ButtonType.Normal }) {
                   Row() {
@@ -1176,6 +1158,7 @@ export struct Play {
                 })
               }
             }
+            .clip(false)
           })
         }
         .width('100%')
@@ -1183,9 +1166,10 @@ export struct Play {
         .padding({ left: 20, right: 20, bottom: 25 })
         .scrollBar(BarState.Off)
         .borderRadius(10)
-        .clip(true)
+        .clip(false)
       }
     }
+    .clip(false)
   }
 
   @Builder
@@ -1372,46 +1356,52 @@ export struct Play {
                   })
                   .visibility(this.lockPlayer ? Visibility.Hidden : Visibility.Visible)
 
-                  Button({ type: ButtonType.Circle }) {
-                    SymbolGlyph(this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
-                      .fontSize(34)
-                      .fontColor([this.playColorPalette.secondary])
+                  Row() {
+                    ImmersiveActionButton({
+                      barWidth: 78,
+                      barHeight: 78,
+                      barRadius: 39,
+                      onButtonClick: async () => {
+                        if (this.isPlaying) {
+                          if (this.avPlayer!.state === 'playing') {
+                            if (this.playSetting?.fadeInOut) {
+                              this.fadeOut()
+                            } else {
+                              this.avPlayer!.pause()
+                            }
+                          }
+                        } else {
+                          if (this.avPlayer!.state === 'error') {
+                            this.isPlaying = true
+                            const savedPosition = this.playedTime
+                            await this.avPlayer!.reset()
+                            this.playStartTime = savedPosition
+                            if (this.isLocalPlaying) {
+                              const file = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
+                              this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+                            } else {
+                              this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+                            }
+                            this.avPlayer!.prepare()
+                          } else if (['prepared', 'paused', 'completed'].includes(this.avPlayer!.state)) {
+                            if (this.playSetting?.fadeInOut) {
+                              this.fadeIn()
+                            } else {
+                              this.avPlayer!.play()
+                            }
+                          }
+                        }
+                      }
+                    }) {
+                      SymbolGlyph(this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
+                        .fontSize(34)
+                        .fontColor([this.playColorPalette.secondary])
+                    }
                   }
                   .height(78)
                   .width(78)
                   .margin({ left: 6, right: 6 })
-                  .backgroundColor($r('sys.color.comp_background_tertiary'))
-                  .onClick(async () => {
-                    if (this.isPlaying) {
-                      if (this.avPlayer!.state === 'playing') {
-                        if (this.playSetting?.fadeInOut) {
-                          this.fadeOut()
-                        } else {
-                          this.avPlayer!.pause()
-                        }
-                      }
-                    } else {
-                      if (this.avPlayer!.state === 'error') {
-                        this.isPlaying = true
-                        const savedPosition = this.playedTime
-                        await this.avPlayer!.reset()
-                        this.playStartTime = savedPosition
-                        if (this.isLocalPlaying) {
-                          const file = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
-                          this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
-                        } else {
-                          this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
-                        }
-                        this.avPlayer!.prepare()
-                      } else if (['prepared', 'paused', 'completed'].includes(this.avPlayer!.state)) {
-                        if (this.playSetting?.fadeInOut) {
-                          this.fadeIn()
-                        } else {
-                          this.avPlayer!.play()
-                        }
-                      }
-                    }
-                  })
+                  .clip(false)
 
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph(this.goforwardIcon)
@@ -1663,6 +1653,16 @@ export struct Play {
       .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP, LayoutSafeAreaEdge.BOTTOM])
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
       .clip(false)
+
+      Column()
+        .width('100%')
+        .height(this.windowAvoidArea.statusBar.visible ? this.windowAvoidArea.statusBar.topRect.height : 0)
+        .linearGradient({
+          direction: GradientDirection.Bottom,
+          colors: [[this.coverColor, 0], [Color.Transparent, 1]]
+        })
+        .position({ top: 0, left: 0 })
+        .hitTestBehavior(HitTestMode.None)
   }
 
   @Builder
