@@ -63,6 +63,11 @@ content contrast), not the secondary font color. Keep the time-label row's
 20vp left and right padding, while leaving the slider's own thumb interaction
 padding unchanged.
 
+Playback sheets use `SheetOptions.systemMaterial` with the native regular
+`uiMaterial.ImmersiveMaterial`. Sheet options use `ImmersiveActionButton` with
+`barRadius: barHeight / 2`; preserve existing callbacks and use the helper's
+`monopolizeActionEvents: false` for scrollable option lists.
+
 ```typescript
 Row() {
   ImmersiveActionButton({
