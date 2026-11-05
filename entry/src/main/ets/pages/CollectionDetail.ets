@@ -388,8 +388,8 @@ export struct CollectionDetail {
                     if (this.showPlayLoading) {
                       Column() {
                         LoadingProgress()
-                          .width(30)
-                          .height(30)
+                          .width(18)
+                          .height(18)
                           .color($r('sys.color.ohos_id_color_titlebar_icon'))
                       }
                     } else {
@@ -574,7 +574,7 @@ export struct CollectionDetail {
         Column() {
           LoadingProgress()
             .width("100%")
-            .height(72)
+            .height(43.2)
             .color($r('sys.color.loading_progress_focused_color'))
         }
         .height('100%')

@@ -270,7 +270,7 @@ export struct Setting {
       Column(){
         LoadingProgress()
           .width("100%")
-          .height(72)
+          .height(43.2)
       }
       .width('100%')
       .height('100%')
@@ -525,7 +525,7 @@ export struct Setting {
       Column(){
         LoadingProgress()
           .width("100%")
-          .height(72)
+          .height(43.2)
       }
       .width('100%')
       .height('100%')

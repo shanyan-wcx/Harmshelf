@@ -1738,7 +1738,7 @@ export struct EpisodeComponent {
         Column() {
           LoadingProgress()
             .width("100%")
-            .height(72)
+            .height(43.2)
         }
         .width('100%')
         .height('100%')
@@ -2021,8 +2021,8 @@ export struct EpisodeComponent {
               if (this.showPlayLoading) {
                 Column() {
                   LoadingProgress()
-                    .width(18)
-                    .height(18)
+                    .width(10.8)
+                    .height(10.8)
                     .color($r('sys.color.ohos_id_color_titlebar_icon'))
                 }
               } else {
@@ -2519,7 +2519,7 @@ export struct EpisodeComponent1 {
         Column() {
           LoadingProgress()
             .width("100%")
-            .height(72)
+            .height(43.2)
         }
         .width('100%')
         .height('100%')
@@ -2738,8 +2738,8 @@ export struct EpisodeComponent1 {
             if (this.showPlayLoading) {
               Column() {
                 LoadingProgress()
-                  .width(18)
-                  .height(18)
+                  .width(10.8)
+                  .height(10.8)
                   .color($r('sys.color.ohos_id_color_titlebar_icon'))
               }
             } else {
@@ -3076,7 +3076,7 @@ export struct ReportPanel {
       Column() {
         LoadingProgress()
           .width("100%")
-          .height(72)
+          .height(43.2)
       }
       .width('100%')
       .height('100%')

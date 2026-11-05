@@ -418,7 +418,7 @@ export struct EpisodeDetail {
         Column() {
           LoadingProgress()
             .width("100%")
-            .height(72)
+            .height(43.2)
         }
         .width('100%')
         .height('100%')
@@ -694,8 +694,8 @@ export struct EpisodeDetail {
                 Row() {
                   if (this.showPlayLoading) {
                     LoadingProgress()
-                      .width(30)
-                      .height(30)
+                      .width(18)
+                      .height(18)
                       .color($r('sys.color.ohos_id_color_titlebar_icon'))
                   } else {
                     Row() {
@@ -855,7 +855,7 @@ export struct EpisodeDetail {
         Column() {
           LoadingProgress()
             .width("100%")
-            .height(72)
+            .height(43.2)
             .color($r('sys.color.loading_progress_focused_color'))
         }
         .height('100%')
