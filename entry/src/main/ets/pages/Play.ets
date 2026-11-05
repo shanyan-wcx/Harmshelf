@@ -1055,7 +1055,7 @@ export struct Play {
                       .maxLines(1)
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
                   }
-                  .padding({ left: 35, right: 35 })
+                  .padding({ left: 25, right: 25 })
                 }
                 .width('100%')
                 .height(50)
@@ -1143,7 +1143,7 @@ export struct Play {
                       .fontColor($r('sys.color.font_secondary'))
                       .margin({ left: 10 })
                   }
-                  .padding({ left: 35, right: 35 })
+                  .padding({ left: 25, right: 25 })
                 }
                 .width('100%')
                 .height(50)
