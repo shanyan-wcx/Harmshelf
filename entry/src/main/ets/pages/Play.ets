@@ -1674,7 +1674,7 @@ export struct Play {
             (this.coverColor >>> 16) & 0xff,
             (this.coverColor >>> 8) & 0xff,
             this.coverColor & 0xff,
-            0.3
+            (this.windowAvoidArea.statusBar.visible ? this.windowAvoidArea.statusBar.topRect.height : 0) / 200
           ).color, 0], [ColorMetrics.rgba(
             (this.coverColor >>> 16) & 0xff,
             (this.coverColor >>> 8) & 0xff,
