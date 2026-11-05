@@ -959,7 +959,7 @@ export struct Play {
                     (this.coverColor >>> 8) & 0xff,
                     this.coverColor & 0xff,
                     0
-                  ).color, 0], [this.coverColor, 0.35], [this.coverColor, 1]]
+                  ).color, 0], [this.coverColor, 1]]
                 })
 
                 Column() {
@@ -1001,7 +1001,7 @@ export struct Play {
                   .textAlign(TextAlign.Center)
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
-                  .margin({ top: 16 })
+                  .margin({ top: 8 })
 
                 Column() {
                   Row() {
