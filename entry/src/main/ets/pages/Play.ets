@@ -848,11 +848,10 @@ export struct Play {
                 .geometryTransition("cover")
             }
 
-            Stack() {
+            Stack({ alignContent: Alignment.TopStart }) {
               Column()
                 .width('100%')
-                .height('calc(100% + 120vp)')
-                .offset({ y: -120 })
+                .height('100%')
                 .rotate({ angle: 180 })
                 .backgroundImage(this.isLocalPlaying ?
                   (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
@@ -863,6 +862,15 @@ export struct Play {
                   rate: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.2 : 0.5,
                   lightUpDegree: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.1 : 0.5
                 })
+
+              Image(this.isLocalPlaying ?
+                (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
+                (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
+                .alt($rawfile('nocover.jpg'))
+                .objectFit(ImageFit.Cover)
+                .width('100%')
+                .height(160)
+                .rotate({ angle: 180 })
                 .linearGradientBlur(80, {
                   fractionStops: [[1, 0], [1, 0.72], [1, 0.88], [0.15, 0.96], [0, 1]],
                   direction: GradientDirection.Top
