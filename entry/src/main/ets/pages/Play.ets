@@ -57,11 +57,6 @@ export struct Play {
     return red * 0.299 + green * 0.587 + blue * 0.114 > 160 ? Color.Black : Color.White
   }
 
-  private get playSecondaryColor(): string {
-    const channel = this.playControlColor === Color.Black ? 0 : 255
-    return ColorMetrics.rgba(channel, channel, channel, 0.55).color
-  }
-
   private async updateStatusBarContentColor() {
     try {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
@@ -1039,7 +1034,7 @@ export struct Play {
                     .width('100%')
                     .fontSize(20)
                     .fontWeight(FontWeight.Medium)
-                    .fontColor(this.playControlColor)
+                    .fontColor($r('sys.color.font'))
                     .textAlign(TextAlign.Center)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -1051,7 +1046,7 @@ export struct Play {
                     .width('100%')
                     .fontSize(18)
                     .fontWeight(FontWeight.Medium)
-                    .fontColor(this.playSecondaryColor)
+                    .fontColor($r('sys.color.font_secondary'))
                     .textAlign(TextAlign.Center)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -1062,12 +1057,12 @@ export struct Play {
                     Text(this.formatSeconds(this.playedPercent * this.getCurrentDuration() / 100))
                       .fontSize(16)
                       .fontWeight(FontWeight.Medium)
-                      .fontColor(this.playControlColor)
+                      .fontColor($r('sys.color.font'))
 
                     Text(this.formatSeconds(this.getCurrentDuration()))
                       .fontSize(16)
                       .fontWeight(FontWeight.Medium)
-                      .fontColor(this.playControlColor)
+                      .fontColor($r('sys.color.font'))
                   }
                   .width('100%')
                   .justifyContent(FlexAlign.SpaceBetween)
@@ -1088,9 +1083,9 @@ export struct Play {
                       height: 14
                     })
                     .padding({ left: this.lockPlayer ? 20 : 10, right: this.lockPlayer ? 20 : 10 })
-                    .blockColor(this.playControlColor)
-                    .trackColor(this.playSecondaryColor)
-                    .selectedColor(this.playControlColor)
+                    .blockColor($r('app.color.sliderBlock'))
+                    .trackColor($r('sys.color.font_secondary'))
+                    .selectedColor($r('sys.color.font_secondary'))
                     .sliderInteractionMode(SliderInteraction.SLIDE_AND_CLICK_UP)
                     .onChange((value: number, mode: SliderChangeMode) => {
                       if (mode === SliderChangeMode.Begin) {
@@ -1120,7 +1115,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph($r('sys.symbol.backward_end_fill'))
                       .fontSize(30)
-                      .fontColor([this.playControlColor])
+                      .fontColor([$r('sys.color.font_secondary')])
                   }
                   .height(40)
                   .width(40)
@@ -1147,7 +1142,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph(this.gobackwardIcon)
                       .fontSize(34)
-                      .fontColor([this.playControlColor])
+                      .fontColor([$r('sys.color.font_secondary')])
                   }
                   .height(50)
                   .width(50)
@@ -1161,7 +1156,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph(this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
                       .fontSize(34)
-                      .fontColor([this.playControlColor])
+                      .fontColor([$r('sys.color.font_secondary')])
                   }
                   .height(78)
                   .width(78)
@@ -1202,7 +1197,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph(this.goforwardIcon)
                       .fontSize(34)
-                      .fontColor([this.playControlColor])
+                      .fontColor([$r('sys.color.font_secondary')])
                   }
                   .height(50)
                   .width(50)
@@ -1217,7 +1212,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph($r('sys.symbol.forward_end_fill'))
                       .fontSize(30)
-                      .fontColor([this.playControlColor])
+                      .fontColor([$r('sys.color.font_secondary')])
                   }
                   .height(40)
                   .width(40)
@@ -1249,7 +1244,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph($r('sys.symbol.bookmark'))
                       .fontSize(30)
-                      .fontColor([this.playControlColor])
+                      .fontColor([$r('sys.color.font_secondary')])
                   }
                   .height(45)
                   .width(45)
@@ -1280,7 +1275,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph(this.speedIcon)
                       .fontSize(30)
-                      .fontColor([this.playControlColor])
+                      .fontColor([$r('sys.color.font_secondary')])
                   }
                   .height(45)
                   .width(45)
@@ -1303,7 +1298,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph($r('sys.symbol.moon_z'))
                       .fontSize(30)
-                      .fontColor([this.playControlColor])
+                      .fontColor([$r('sys.color.font_secondary')])
                   }
                   .height(45)
                   .width(45)
@@ -1326,7 +1321,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph($r('sys.symbol.list_bullet'))
                       .fontSize(30)
-                      .fontColor([this.playControlColor])
+                      .fontColor([$r('sys.color.font_secondary')])
                   }
                   .height(45)
                   .width(45)
@@ -1369,6 +1364,8 @@ export struct Play {
               .height('100%')
               .justifyContent(FlexAlign.SpaceBetween)
               .padding({
+                left: 20,
+                right: 20,
                 bottom: this.windowAvoidArea.navigationIndicator.visible ?
                   this.windowAvoidArea.navigationIndicator.bottomRect.height : 0
               })
@@ -1383,7 +1380,7 @@ export struct Play {
           Button({ type: ButtonType.Circle }) {
             SymbolGlyph($r('sys.symbol.chevron_down'))
               .fontSize(32)
-              .fontColor([this.playControlColor])
+              .fontColor([$r('sys.color.font_secondary')])
           }
           .height(48)
           .width(48)
@@ -1405,7 +1402,7 @@ export struct Play {
           Button({ type: ButtonType.Circle }) {
             SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
               .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-              .fontColor([this.playControlColor])
+              .fontColor([$r('sys.color.font_secondary')])
           }
           .height(48)
           .width(48)
