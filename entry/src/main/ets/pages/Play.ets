@@ -951,7 +951,7 @@ export struct Play {
               Stack({ alignContent: Alignment.Bottom }) {
                 Column()
                 .width('100%')
-                .height(96)
+                .height(60)
                 .linearGradient({
                   direction: GradientDirection.Bottom,
                   colors: [[ColorMetrics.rgba(
@@ -959,7 +959,7 @@ export struct Play {
                     (this.coverColor >>> 8) & 0xff,
                     this.coverColor & 0xff,
                     0
-                  ).color, 0], [this.coverColor, 1]]
+                  ).color, 0], [this.coverColor, 0.35], [this.coverColor, 1]]
                 })
 
                 Column() {
@@ -970,25 +970,13 @@ export struct Play {
                     .textAlign(TextAlign.Center)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
-
-                  Text(this.isLocalPlaying ? "本地文件" :
-                    (this.playingItem?.mediaType === 'book' ?
-                    this.playingItem?.mediaMetadata.authors?.map(item => item.name).join(", ") :
-                    this.playingItem?.displayAuthor))
-                    .width('100%')
-                    .fontSize(18)
-                    .fontWeight(FontWeight.Medium)
-                    .fontColor($r('sys.color.font_secondary'))
-                    .textAlign(TextAlign.Center)
-                    .maxLines(1)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
                 }
                 .width('100%')
-                .padding({ left: 20, right: 20, top: 8 })
+                .padding({ left: 20, right: 20 })
                 .alignItems(HorizontalAlign.Center)
               }
               .width('100%')
-              .height(96)
+              .height(60)
             }
             .width('100%')
             .aspectRatio(1)
@@ -1002,6 +990,19 @@ export struct Play {
                 .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
 
               Column() {
+                Text(this.isLocalPlaying ? "本地文件" :
+                  (this.playingItem?.mediaType === 'book' ?
+                  this.playingItem?.mediaMetadata.authors?.map(item => item.name).join(", ") :
+                  this.playingItem?.displayAuthor))
+                  .width('100%')
+                  .fontSize(18)
+                  .fontWeight(FontWeight.Medium)
+                  .fontColor($r('sys.color.font_secondary'))
+                  .textAlign(TextAlign.Center)
+                  .maxLines(1)
+                  .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  .margin({ top: 16 })
+
                 Column() {
                   Row() {
                     Text(this.formatSeconds(this.playedPercent * this.getCurrentDuration() / 100))
