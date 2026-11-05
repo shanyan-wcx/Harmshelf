@@ -212,7 +212,7 @@ export struct SearchMedia {
         Column() {
           LoadingProgress()
             .width("100%")
-            .height(43)
+            .height(45)
             .color($r('sys.color.loading_progress_focused_color'))
         }
         .height('100%')

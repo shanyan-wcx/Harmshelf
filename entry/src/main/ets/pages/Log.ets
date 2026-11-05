@@ -143,8 +143,8 @@ export struct Log {
         if (this.showLoadingProgress) {
           Column() {
             LoadingProgress()
-              .width(34)
-              .height(34)
+              .width(45)
+              .height(45)
               .color($r('sys.color.loading_progress_focused_color'))
           }
           .height('100%')
