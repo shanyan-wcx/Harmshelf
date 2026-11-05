@@ -954,7 +954,12 @@ export struct Play {
                 .height(96)
                 .linearGradient({
                   direction: GradientDirection.Bottom,
-                  colors: [[Color.Transparent, 0], [this.coverColor, 1]]
+                  colors: [[ColorMetrics.rgba(
+                    (this.coverColor >>> 16) & 0xff,
+                    (this.coverColor >>> 8) & 0xff,
+                    this.coverColor & 0xff,
+                    0
+                  ).color, 0], [this.coverColor, 1]]
                 })
 
                 Column() {
@@ -979,7 +984,7 @@ export struct Play {
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
                 }
                 .width('100%')
-                .padding({ left: 20, right: 20, top: 8, bottom: 16 })
+                .padding({ left: 20, right: 20, top: 8 })
                 .alignItems(HorizontalAlign.Center)
               }
               .width('100%')
