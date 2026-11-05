@@ -868,6 +868,10 @@ export struct Play {
                   fractionStops: [[0, 0], [0, 0.3], [1, 0.85], [1, 1]],
                   direction: GradientDirection.Bottom
                 })
+                .backgroundBrightness({
+                  rate: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.2 : 0.5,
+                  lightUpDegree: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.1 : 0.5
+                })
 
                 Column() {
                   Text(this.playingTitle)
@@ -910,7 +914,10 @@ export struct Play {
                   (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
                   (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
                 .backgroundImageSize(ImageSize.FILL)
-                .backgroundBlurStyle(BlurStyle.BACKGROUND_ULTRA_THICK)
+                .linearGradientBlur(160, {
+                  fractionStops: [[1, 0], [1, 1]],
+                  direction: GradientDirection.Bottom
+                })
                 .backgroundBrightness({
                   rate: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.2 : 0.5,
                   lightUpDegree: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.1 : 0.5
@@ -971,6 +978,7 @@ export struct Play {
                     .hitTestBehavior(this.lockPlayer ? HitTestMode.None : HitTestMode.Default)
                 }
                 .width('100%')
+                .margin({ top: 20 })
 
                 Row() {
                   Button({ type: ButtonType.Circle }) {
