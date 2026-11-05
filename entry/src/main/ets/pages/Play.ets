@@ -951,7 +951,7 @@ export struct Play {
               Stack({ alignContent: Alignment.Bottom }) {
                 Column()
                 .width('100%')
-                .height(60)
+                .height(68)
                 .linearGradient({
                   direction: GradientDirection.Bottom,
                   colors: [[ColorMetrics.rgba(
@@ -981,6 +981,7 @@ export struct Play {
             .width('100%')
             .aspectRatio(1)
             .clip(false)
+            .zIndex(1)
 
             Stack({ alignContent: Alignment.TopStart }) {
               Column()
@@ -990,20 +991,21 @@ export struct Play {
                 .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
 
               Column() {
-                Text(this.isLocalPlaying ? "本地文件" :
-                  (this.playingItem?.mediaType === 'book' ?
-                  this.playingItem?.mediaMetadata.authors?.map(item => item.name).join(", ") :
-                  this.playingItem?.displayAuthor))
-                  .width('100%')
-                  .fontSize(18)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor($r('sys.color.font_secondary'))
-                  .textAlign(TextAlign.Center)
-                  .maxLines(1)
-                  .textOverflow({ overflow: TextOverflow.Ellipsis })
-                  .margin({ top: 8 })
-
                 Column() {
+                  Text(this.isLocalPlaying ? "本地文件" :
+                    (this.playingItem?.mediaType === 'book' ?
+                    this.playingItem?.mediaMetadata.authors?.map(item => item.name).join(", ") :
+                    this.playingItem?.displayAuthor))
+                    .width('100%')
+                    .fontSize(18)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .textAlign(TextAlign.Center)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    .margin({ top: 8 })
+
+                  Column() {
                   Row() {
                     Text(this.formatSeconds(this.playedPercent * this.getCurrentDuration() / 100))
                       .fontSize(16)
@@ -1056,7 +1058,8 @@ export struct Play {
                     .hitTestBehavior(this.lockPlayer ? HitTestMode.None : HitTestMode.Default)
                 }
                 .width('100%')
-                .margin({ top: 20 })
+                }
+                .width('100%')
 
                 Row() {
                   Button({ type: ButtonType.Circle }) {
