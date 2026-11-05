@@ -849,17 +849,22 @@ export struct Play {
             }
 
             Stack() {
-              Image(this.isLocalPlaying ?
-                (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
-                (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
-                .alt($rawfile('nocover.jpg'))
-                .objectFit(ImageFit.Cover)
+              Column()
                 .width('100%')
-                .height('100%')
+                .height('calc(100% + 120vp)')
+                .offset({ y: -120 })
                 .rotate({ angle: 180 })
-                .blur(35)
+                .backgroundImage(this.isLocalPlaying ?
+                  (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
+                  (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
+                .backgroundImageSize(ImageSize.FILL)
+                .backgroundBlurStyle(BlurStyle.BACKGROUND_ULTRA_THICK)
+                .backgroundBrightness({
+                  rate: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.2 : 0.5,
+                  lightUpDegree: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.1 : 0.5
+                })
                 .linearGradientBlur(80, {
-                  fractionStops: [[0, 0], [0, 0.33], [1, 0.66], [1, 1]],
+                  fractionStops: [[1, 0], [1, 0.72], [1, 0.88], [0.15, 0.96], [0, 1]],
                   direction: GradientDirection.Top
                 })
 
@@ -1194,7 +1199,6 @@ export struct Play {
                 })
               }
               .width('100%')
-              .height('100%')
               .layoutWeight(1)
               .justifyContent(FlexAlign.SpaceBetween)
             }
@@ -1264,17 +1268,9 @@ export struct Play {
       }
       .width('100%')
       .height('100%')
-      .backgroundImage(this.isLocalPlaying ?
-        (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
-        (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
-      .backgroundImageSize(ImageSize.FILL)
-      .backgroundBlurStyle(BlurStyle.BACKGROUND_ULTRA_THICK)
-      .backgroundBrightness({
-        rate: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.2 : 0.5,
-        lightUpDegree: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.1 : 0.5
-      })
       .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP, LayoutSafeAreaEdge.BOTTOM])
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+      .clip(false)
   }
 
   @Builder
