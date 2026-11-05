@@ -852,18 +852,22 @@ export struct Play {
               }
 
               Stack({ alignContent: Alignment.Bottom }) {
-                Image(this.isLocalPlaying ?
-                  (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
-                  (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
-                  .alt($rawfile('nocover.jpg'))
-                  .objectFit(ImageFit.Cover)
-                  .width('100%')
-                  .height(96)
-                  .rotate({ angle: 180 })
-                  .linearGradientBlur(80, {
-                    fractionStops: [[0.55, 0], [0.9, 0.12], [1, 0.28], [1, 1]],
-                    direction: GradientDirection.Top
-                  })
+                Stack() {
+                  Image(this.isLocalPlaying ?
+                    (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
+                    (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
+                    .alt($rawfile('nocover.jpg'))
+                    .objectFit(ImageFit.Fill)
+                    .width('100%')
+                    .height('100%')
+                    .rotate({ angle: 180 })
+                }
+                .width('100%')
+                .height(96)
+                .linearGradientBlur(160, {
+                  fractionStops: [[0, 0], [0, 0.3], [1, 0.85], [1, 1]],
+                  direction: GradientDirection.Bottom
+                })
 
                 Column() {
                   Text(this.playingTitle)
@@ -911,7 +915,6 @@ export struct Play {
                   rate: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.2 : 0.5,
                   lightUpDegree: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.1 : 0.5
                 })
-                .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.BOTTOM])
                 .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
 
               Column() {
@@ -1219,15 +1222,15 @@ export struct Play {
                 })
               }
               .width('100%')
-              .layoutWeight(1)
+              .height('100%')
               .justifyContent(FlexAlign.SpaceBetween)
+              .padding({
+                bottom: this.windowAvoidArea.navigationIndicator.visible ?
+                  this.windowAvoidArea.navigationIndicator.bottomRect.height : 0
+              })
             }
             .width('100%')
             .layoutWeight(1)
-            .padding({
-              bottom: this.windowAvoidArea.navigationIndicator.visible ?
-                this.windowAvoidArea.navigationIndicator.bottomRect.height : 0
-            })
           }
           .width('100%')
           .layoutWeight(1)
