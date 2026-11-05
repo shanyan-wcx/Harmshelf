@@ -57,6 +57,12 @@ from the cover luminance; the ambient page color mode does not follow the
 cover. Only the playback page status-bar content color uses the luminance
 result directly as pure black or white.
 
+The playback slider's unselected track is the original default component
+track color (`#19182431` in light content contrast and `#19FFFFFF` in dark
+content contrast), not the secondary font color. Keep the time-label row's
+20vp left and right padding, while leaving the slider's own thumb interaction
+padding unchanged.
+
 ```typescript
 Row() {
   ImmersiveActionButton({

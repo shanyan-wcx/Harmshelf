@@ -15,6 +15,7 @@ interface PlayColorPalette {
   primary: string
   secondary: string
   sliderBlock: string
+  sliderTrack: string
 }
 
 @ComponentV2
@@ -67,11 +68,13 @@ export struct Play {
     return this.playControlColor === Color.Black ? {
       primary: '#182431',
       secondary: '#99182431',
-      sliderBlock: '#3A3A3B'
+      sliderBlock: '#3A3A3B',
+      sliderTrack: '#19182431'
     } : {
       primary: '#FFFFFF',
       secondary: '#99FFFFFF',
-      sliderBlock: '#BCBCBC'
+      sliderBlock: '#BCBCBC',
+      sliderTrack: '#19FFFFFF'
     }
   }
 
@@ -1084,6 +1087,7 @@ export struct Play {
                   }
                   .width('100%')
                   .justifyContent(FlexAlign.SpaceBetween)
+                  .padding({ left: 20, right: 20 })
 
                   Slider({
                     value: this.playedPercent,
@@ -1101,7 +1105,7 @@ export struct Play {
                     })
                     .padding({ left: this.lockPlayer ? 20 : 10, right: this.lockPlayer ? 20 : 10 })
                     .blockColor(this.playColorPalette.sliderBlock)
-                    .trackColor(this.playColorPalette.secondary)
+                    .trackColor(this.playColorPalette.sliderTrack)
                     .selectedColor(this.playColorPalette.secondary)
                     .sliderInteractionMode(SliderInteraction.SLIDE_AND_CLICK_UP)
                     .onChange((value: number, mode: SliderChangeMode) => {
