@@ -561,8 +561,8 @@ export struct Play {
                    }
                  ],
                  deleteIconOptions: {
-                   backgroundColor: $r('sys.color.comp_background_tertiary'),
-                   iconColor: Color.Red,
+                   backgroundColor: Color.Red,
+                   iconColor: $r('sys.color.font'),
                    onAction: async () => {
                      let status = await deleteBookmark(this.playingItem!.libraryItemId, bookmark.time)
                      if (status) {
@@ -677,7 +677,7 @@ export struct Play {
   @Builder
   speedBuilder() {
     Scroll() {
-      Column() {
+      Column({ space: 5 }) {
         if (this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_50_X) {
           Row() {
             ImmersiveActionButton({
@@ -984,7 +984,7 @@ export struct Play {
   @Builder
   sleepBuilder() {
     Scroll() {
-      Column() {
+      Column({ space: 5 }) {
         this.sleepOptionBuilder("5 min", 5)
         this.sleepOptionBuilder("10 min", 10)
         this.sleepOptionBuilder("15 min", 15)
@@ -1241,6 +1241,7 @@ export struct Play {
                     .textAlign(TextAlign.Center)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
+                    .margin({ top: 8 })
 
                   Text(this.isLocalPlaying ? "本地文件" :
                     (this.playingItem?.mediaType === 'book' ?
@@ -1606,13 +1607,20 @@ export struct Play {
           }
 
           Row() {
-            Text("睡眠定时 " + ((this.sleepTime !== 0 && !this.isLocalPlaying && this.playingItem!.audioTracks !== undefined) ? this.formatSleepTime(this.sleepTime - this.playedTime - this.playingItem!.audioTracks[this.playingIndex].startOffset) : 0))
-              .fontSize(18)
+            ImmersiveActionButton({
+              barWidth: 140,
+              barHeight: 40,
+              barRadius: 20,
+              monopolizeActionEvents: false
+            }) {
+              Text("睡眠定时 " + ((this.sleepTime !== 0 && !this.isLocalPlaying && this.playingItem!.audioTracks !== undefined) ? this.formatSleepTime(this.sleepTime - this.playedTime - this.playingItem!.audioTracks[this.playingIndex].startOffset) : 0))
+                .fontSize(18)
+                .fontColor(this.playColorPalette.secondary)
+            }
           }
+          .width(140)
           .height(40)
-          .borderRadius(10)
-          .padding({ left: 15, right: 15 })
-          .backgroundColor($r('sys.color.comp_background_tertiary'))
+          .clip(false)
           .visibility(this.sleepTime !== 0 ? Visibility.Visible : Visibility.None)
 
           ImmersiveActionButton({
@@ -1660,7 +1668,12 @@ export struct Play {
         .height(this.windowAvoidArea.statusBar.visible ? this.windowAvoidArea.statusBar.topRect.height : 0)
         .linearGradient({
           direction: GradientDirection.Bottom,
-          colors: [[this.coverColor, 0], [Color.Transparent, 1]]
+          colors: [[this.coverColor, 0], [ColorMetrics.rgba(
+            (this.coverColor >>> 16) & 0xff,
+            (this.coverColor >>> 8) & 0xff,
+            this.coverColor & 0xff,
+            0
+          ).color, 1]]
         })
         .position({ top: 0, left: 0 })
         .hitTestBehavior(HitTestMode.None)
