@@ -699,7 +699,7 @@ export struct LibraryItemDetail {
         Column() {
           LoadingProgress()
             .width("100%")
-            .height(43.2)
+            .height(43)
         }
         .width('100%')
         .height('100%')
@@ -918,7 +918,7 @@ export struct LibraryItemDetail {
         Column() {
           LoadingProgress()
             .width("100%")
-            .height(43.2)
+            .height(43)
         }
         .width('100%')
         .height('100%')
@@ -2302,7 +2302,7 @@ export struct LibraryItemDetail {
         Column() {
           LoadingProgress()
             .width("100%")
-            .height(43.2)
+            .height(43)
             .color($r('sys.color.loading_progress_focused_color'))
         }
         .height('100%')

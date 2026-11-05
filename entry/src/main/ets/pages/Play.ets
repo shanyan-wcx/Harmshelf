@@ -428,7 +428,7 @@ export struct Play {
         Column() {
           LoadingProgress()
             .width("100%")
-            .height(43.2)
+            .height(43)
         }
         .width('100%')
         .height('100%')
