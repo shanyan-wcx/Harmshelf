@@ -823,30 +823,77 @@ export struct Play {
   playBuilder() {
     Stack({ alignContent: Alignment.TopStart }) {
       Column() {
-            if (!this.isLocalPlaying) {
-              Image(this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`)
-                .alt($rawfile('nocover.jpg'))
-                .objectFit(ImageFit.Cover)
+            Stack({ alignContent: Alignment.Bottom }) {
+              if (!this.isLocalPlaying) {
+                Image(this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`)
+                  .alt($rawfile('nocover.jpg'))
+                  .objectFit(ImageFit.Cover)
+                  .width('100%')
+                  .aspectRatio(1)
+                  .draggable(false)
+                  .geometryTransition("cover")
+              } else if (this.localPlayItem?.coverPath) {
+                Image(fileUri.getUriFromPath(this.localPlayItem.coverPath))
+                  .alt($rawfile('nocover.jpg'))
+                  .objectFit(ImageFit.Cover)
+                  .width('100%')
+                  .aspectRatio(1)
+                  .draggable(false)
+                  .geometryTransition("cover")
+              } else {
+                Image($rawfile('nocover.jpg'))
+                  .objectFit(ImageFit.Cover)
+                  .width('100%')
+                  .aspectRatio(1)
+                  .draggable(false)
+                  .geometryTransition("cover")
+              }
+
+              Stack({ alignContent: Alignment.Bottom }) {
+                Image(this.isLocalPlaying ?
+                  (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
+                  (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
+                  .alt($rawfile('nocover.jpg'))
+                  .objectFit(ImageFit.Cover)
+                  .width('100%')
+                  .height(160)
+                  .rotate({ angle: 180 })
+                  .linearGradientBlur(80, {
+                    fractionStops: [[1, 0], [1, 0.72], [1, 0.88], [0.15, 0.96], [0, 1]],
+                    direction: GradientDirection.Top
+                  })
+
+                Column() {
+                  Text(this.playingTitle)
+                    .width('100%')
+                    .fontSize(20)
+                    .fontWeight(FontWeight.Medium)
+                    .textAlign(TextAlign.Center)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+                  Text(this.isLocalPlaying ? "本地文件" :
+                    (this.playingItem?.mediaType === 'book' ?
+                    this.playingItem?.mediaMetadata.authors?.map(item => item.name).join(", ") :
+                    this.playingItem?.displayAuthor))
+                    .width('100%')
+                    .fontSize(18)
+                    .fontWeight(FontWeight.Medium)
+                    .fontColor($r('sys.color.font_secondary'))
+                    .textAlign(TextAlign.Center)
+                    .maxLines(1)
+                    .textOverflow({ overflow: TextOverflow.Ellipsis })
+                }
                 .width('100%')
-                .aspectRatio(1)
-                .draggable(false)
-                .geometryTransition("cover")
-            } else if (this.localPlayItem?.coverPath) {
-              Image(fileUri.getUriFromPath(this.localPlayItem.coverPath))
-                .alt($rawfile('nocover.jpg'))
-                .objectFit(ImageFit.Cover)
-                .width('100%')
-                .aspectRatio(1)
-                .draggable(false)
-                .geometryTransition("cover")
-            } else {
-              Image($rawfile('nocover.jpg'))
-                .objectFit(ImageFit.Cover)
-                .width('100%')
-                .aspectRatio(1)
-                .draggable(false)
-                .geometryTransition("cover")
+                .padding({ left: 20, right: 20, bottom: 16 })
+                .alignItems(HorizontalAlign.Center)
+              }
+              .width('100%')
+              .height(160)
             }
+            .width('100%')
+            .aspectRatio(1)
+            .clip(false)
 
             Stack({ alignContent: Alignment.TopStart }) {
               Column()
@@ -862,45 +909,7 @@ export struct Play {
                   rate: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.2 : 0.5,
                   lightUpDegree: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? 0.1 : 0.5
                 })
-
-              Image(this.isLocalPlaying ?
-                (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
-                (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
-                .alt($rawfile('nocover.jpg'))
-                .objectFit(ImageFit.Cover)
-                .width('100%')
-                .height(160)
-                .rotate({ angle: 180 })
-                .linearGradientBlur(80, {
-                  fractionStops: [[1, 0], [1, 0.72], [1, 0.88], [0.15, 0.96], [0, 1]],
-                  direction: GradientDirection.Top
-                })
-
-              Column() {
-                Column() {
-                Text(this.playingTitle)
-                  .width('100%')
-                  .fontSize(20)
-                  .fontWeight(FontWeight.Medium)
-                  .textAlign(TextAlign.Center)
-                  .maxLines(1)
-                  .textOverflow({ overflow: TextOverflow.Ellipsis })
-
-                Text(this.isLocalPlaying ? "本地文件" :
-                  (this.playingItem?.mediaType === 'book' ?
-                  this.playingItem?.mediaMetadata.authors?.map(item => item.name).join(", ") :
-                  this.playingItem?.displayAuthor))
-                  .width('100%')
-                  .fontSize(18)
-                  .fontWeight(FontWeight.Medium)
-                  .fontColor($r('sys.color.font_secondary'))
-                  .textAlign(TextAlign.Center)
-                  .maxLines(1)
-                  .textOverflow({ overflow: TextOverflow.Ellipsis })
-              }
-              .width('100%')
-              .padding({ left: 20, right: 20 })
-              .alignItems(HorizontalAlign.Center)
+                .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
 
               Column() {
                 Column() {
@@ -1213,15 +1222,10 @@ export struct Play {
             .width('100%')
             .height('100%')
             .layoutWeight(1)
-            .justifyContent(FlexAlign.SpaceBetween)
           }
           .width('100%')
           .layoutWeight(1)
           .clip(false)
-        }
-        .width('100%')
-        .height('100%')
-        .layoutWeight(1)
         Row() {
           Button({ type: ButtonType.Circle }) {
             SymbolGlyph($r('sys.symbol.chevron_down'))
@@ -1276,8 +1280,8 @@ export struct Play {
       }
       .width('100%')
       .height('100%')
-      .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP, LayoutSafeAreaEdge.BOTTOM])
-      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+      .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP])
+      .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
       .clip(false)
   }
 
