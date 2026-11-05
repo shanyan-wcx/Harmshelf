@@ -951,15 +951,36 @@ export struct Play {
               Stack({ alignContent: Alignment.Bottom }) {
                 Column()
                 .width('100%')
-                .height(68)
+                .height(60)
                 .linearGradient({
                   direction: GradientDirection.Bottom,
-                  colors: [[ColorMetrics.rgba(
-                    (this.coverColor >>> 16) & 0xff,
-                    (this.coverColor >>> 8) & 0xff,
-                    this.coverColor & 0xff,
-                    0
-                  ).color, 0], [this.coverColor, 1]]
+                  colors: [
+                    [ColorMetrics.rgba(
+                      (this.coverColor >>> 16) & 0xff,
+                      (this.coverColor >>> 8) & 0xff,
+                      this.coverColor & 0xff,
+                      0
+                    ).color, 0],
+                    [ColorMetrics.rgba(
+                      (this.coverColor >>> 16) & 0xff,
+                      (this.coverColor >>> 8) & 0xff,
+                      this.coverColor & 0xff,
+                      0.03
+                    ).color, 0.25],
+                    [ColorMetrics.rgba(
+                      (this.coverColor >>> 16) & 0xff,
+                      (this.coverColor >>> 8) & 0xff,
+                      this.coverColor & 0xff,
+                      0.18
+                    ).color, 0.55],
+                    [ColorMetrics.rgba(
+                      (this.coverColor >>> 16) & 0xff,
+                      (this.coverColor >>> 8) & 0xff,
+                      this.coverColor & 0xff,
+                      0.55
+                    ).color, 0.8],
+                    [this.coverColor, 1]
+                  ]
                 })
 
                 Column() {
@@ -981,7 +1002,6 @@ export struct Play {
             .width('100%')
             .aspectRatio(1)
             .clip(false)
-            .zIndex(1)
 
             Stack({ alignContent: Alignment.TopStart }) {
               Column()
@@ -1003,7 +1023,7 @@ export struct Play {
                     .textAlign(TextAlign.Center)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
-                    .margin({ top: 8 })
+                    .margin({ top: 6 })
 
                   Column() {
                   Row() {
