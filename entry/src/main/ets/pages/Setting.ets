@@ -98,7 +98,7 @@ export struct Setting {
               .width("100%")
               .height(40)
               .layoutWeight(1)
-              .borderRadius(10)
+              .borderRadius(18)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
@@ -130,7 +130,7 @@ export struct Setting {
                 weight: FontWeight.Normal
               })
               .height(40)
-              .borderRadius(10)
+              .borderRadius(18)
               .margin({ left: 15 })
               .optionWidth(80)
             TextInput({
@@ -144,7 +144,7 @@ export struct Setting {
               .padding({ left: 22 })
               .margin({ right: -20 })
               .layoutWeight(1)
-              .borderRadius(10)
+              .borderRadius(18)
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
               .placeholderFont({
@@ -169,7 +169,7 @@ export struct Setting {
               .width("100%")
               .height(40)
               .layoutWeight(1)
-              .borderRadius(10)
+              .borderRadius(18)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
@@ -195,7 +195,7 @@ export struct Setting {
               .width("100%")
               .height(40)
               .layoutWeight(1)
-              .borderRadius(10)
+              .borderRadius(18)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
@@ -298,7 +298,7 @@ export struct Setting {
               .width("100%")
               .height(40)
               .layoutWeight(1)
-              .borderRadius(10)
+              .borderRadius(18)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
@@ -330,7 +330,7 @@ export struct Setting {
                 weight: FontWeight.Normal
               })
               .height(40)
-              .borderRadius(10)
+              .borderRadius(18)
               .margin({ left: 15 })
               .optionWidth(80)
             TextInput({
@@ -345,7 +345,7 @@ export struct Setting {
               .padding({ left: 22 })
               .margin({ right: -20 })
               .layoutWeight(1)
-              .borderRadius(10)
+              .borderRadius(18)
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
               .placeholderFont({
@@ -371,7 +371,7 @@ export struct Setting {
               .width("100%")
               .height(40)
               .layoutWeight(1)
-              .borderRadius(10)
+              .borderRadius(18)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
@@ -398,7 +398,7 @@ export struct Setting {
               .width("100%")
               .height(40)
               .layoutWeight(1)
-              .borderRadius(10)
+              .borderRadius(18)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(20)
@@ -827,12 +827,12 @@ export struct Setting {
         .width('100%')
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
         .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-        .borderRadius(10)
+        .borderRadius(18)
         .padding({ left: 20, right: 20, bottom: 20 })
         .margin({ top: 13 })
         .border({
           width: 0.35,
-          radius: 10,
+          radius: 18,
           color: $r('sys.color.ohos_id_color_focused_outline_transparent')
         })
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)
@@ -901,12 +901,12 @@ export struct Setting {
         .width('100%')
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
         .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-        .borderRadius(10)
+        .borderRadius(18)
         .padding({ left: 20, right: 20, bottom: 20 })
         .margin({ top: 14 })
         .border({
           width: 0.35,
-          radius: 10,
+          radius: 18,
           color: $r('sys.color.ohos_id_color_focused_outline_transparent')
         })
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)
@@ -1020,12 +1020,12 @@ export struct Setting {
         .width('100%')
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
         .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-        .borderRadius(10)
+        .borderRadius(18)
         .padding({ left: 20, right: 20, bottom: 10 })
         .margin({ top: 20 })
         .border({
           width: 0.35,
-          radius: 10,
+          radius: 18,
           color: $r('sys.color.ohos_id_color_focused_outline_transparent')
         })
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)
@@ -1060,12 +1060,12 @@ export struct Setting {
         .width('100%')
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
         .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-        .borderRadius(10)
+        .borderRadius(18)
         .padding({ left: 20, right: 20, bottom: 15 })
         .margin({ top: 20 })
         .border({
           width: 0.35,
-          radius: 10,
+          radius: 18,
           color: $r('sys.color.ohos_id_color_focused_outline_transparent')
         })
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)
@@ -1100,12 +1100,12 @@ export struct Setting {
         .width('100%')
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
         .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-        .borderRadius(10)
+        .borderRadius(18)
         .padding({ left: 20, right: 20, bottom: 15 })
         .margin({ top: 20 })
         .border({
           width: 0.35,
-          radius: 10,
+          radius: 18,
           color: $r('sys.color.ohos_id_color_focused_outline_transparent')
         })
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)
@@ -1130,11 +1130,11 @@ export struct Setting {
         .height(60)
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
         .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-        .borderRadius(10)
+        .borderRadius(18)
         .margin({ left: 20, right: 20 ,top: 20 })
         .border({
           width: 0.35,
-          radius: 10,
+          radius: 18,
           color: $r('sys.color.ohos_id_color_focused_outline_transparent')
         })
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)
@@ -1162,11 +1162,11 @@ export struct Setting {
         .height(60)
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
         .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-        .borderRadius(10)
+        .borderRadius(18)
         .margin({ left: 20, right: 20 ,top: 20 })
         .border({
           width: 0.35,
-          radius: 10,
+          radius: 18,
           color: $r('sys.color.ohos_id_color_focused_outline_transparent')
         })
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)

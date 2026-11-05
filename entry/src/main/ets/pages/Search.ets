@@ -113,12 +113,12 @@ export struct SearchMedia {
                   .height(80)
                   .padding({ left: 8, right: 8 })
                   .alignItems(VerticalAlign.Center)
-                  .borderRadius(12)
+                  .borderRadius(18)
                   .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                   .border({
                     width: 0.35,
-                    radius: 12,
+                    radius: 18,
                     color: $r('sys.color.ohos_id_color_focused_outline_transparent')
                   })
                   .shadow(ShadowStyle.OUTER_DEFAULT_XS)
@@ -168,12 +168,12 @@ export struct SearchMedia {
                   .height(80)
                   .padding({ left: 8, right: 8 })
                   .alignItems(VerticalAlign.Center)
-                  .borderRadius(12)
+                  .borderRadius(18)
                   .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
                   .border({
                     width: 0.35,
-                    radius: 12,
+                    radius: 18,
                     color: $r('sys.color.ohos_id_color_focused_outline_transparent')
                   })
                   .shadow(ShadowStyle.OUTER_DEFAULT_XS)

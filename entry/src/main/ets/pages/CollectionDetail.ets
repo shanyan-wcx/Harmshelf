@@ -154,7 +154,7 @@ export struct CollectionDetail {
       })
         .width("100%")
         .height(45)
-        .borderRadius(10)
+        .borderRadius(18)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -173,7 +173,7 @@ export struct CollectionDetail {
       })
         .width("100%")
         .height(120)
-        .borderRadius(10)
+        .borderRadius(18)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -430,7 +430,7 @@ export struct CollectionDetail {
                             .objectFit(ImageFit.Cover)
                             .width(55)
                             .aspectRatio(1)
-                            .borderRadius(10)
+                            .borderRadius(18)
                             .margin({ right: 10 })
                             .draggable(false)
 
@@ -519,16 +519,16 @@ export struct CollectionDetail {
                       }
                       .width('100%')
                       .alignContent(Alignment.Bottom)
-                      .borderRadius(10)
+                      .borderRadius(18)
                       .clip(true)
                     }
                     .clip(false)
                     .width('100%')
                     .backgroundColor($r('sys.color.background_secondary'))
-                    .borderRadius(10)
+                    .borderRadius(18)
                     .border({
                       width: 0.35,
-                      radius: 10,
+                      radius: 18,
                       color: $r('sys.color.ohos_id_color_focused_outline_transparent')
                     })
                     .shadow(ShadowStyle.OUTER_DEFAULT_XS)

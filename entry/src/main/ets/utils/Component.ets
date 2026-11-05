@@ -1148,7 +1148,6 @@ export struct AuthorComponent {
             ImmersiveActionButton({
               barWidth: 18,
               barHeight: 18,
-              barRadius: 9,
               onButtonClick: () => {
                 let filter: Filter1 = {
                   criteria: this.author.name,
@@ -1278,7 +1277,6 @@ export struct AuthorComponent1 {
             ImmersiveActionButton({
               barWidth: 18,
               barHeight: 18,
-              barRadius: 9,
               onButtonClick: () => {
                 let filter: Filter1 = {
                   criteria: this.author.name,
@@ -1795,7 +1793,7 @@ export struct EpisodeComponent {
       })
         .width("100%")
         .height(45)
-        .borderRadius(10)
+        .borderRadius(18)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -1813,7 +1811,7 @@ export struct EpisodeComponent {
       })
         .width("100%")
         .height(120)
-        .borderRadius(10)
+        .borderRadius(18)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -2576,7 +2574,7 @@ export struct EpisodeComponent1 {
       })
         .width("100%")
         .height(45)
-        .borderRadius(10)
+        .borderRadius(18)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -2594,7 +2592,7 @@ export struct EpisodeComponent1 {
       })
         .width("100%")
         .height(120)
-        .borderRadius(10)
+        .borderRadius(18)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -2974,7 +2972,7 @@ export struct ReportPanel {
             .width("100%")
             .height(40)
             .layoutWeight(1)
-            .borderRadius(10)
+            .borderRadius(18)
             .margin({ left: 15 })
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
@@ -2995,7 +2993,7 @@ export struct ReportPanel {
             .width("100%")
             .height(120)
             .layoutWeight(1)
-            .borderRadius(10)
+            .borderRadius(18)
             .margin({ left: 15 })
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)

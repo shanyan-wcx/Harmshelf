@@ -44,7 +44,7 @@ export struct Add {
             .width("100%")
             .layoutWeight(1)
             .height(45)
-            .borderRadius(10)
+            .borderRadius(18)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({
@@ -73,7 +73,7 @@ export struct Add {
             .width("100%")
             .layoutWeight(1)
             .height(45)
-            .borderRadius(10)
+            .borderRadius(18)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({
@@ -102,7 +102,7 @@ export struct Add {
             .width("100%")
             .layoutWeight(1)
             .height(45)
-            .borderRadius(10)
+            .borderRadius(18)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({
@@ -131,7 +131,7 @@ export struct Add {
             .width("100%")
             .layoutWeight(1)
             .height(120)
-            .borderRadius(10)
+            .borderRadius(18)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({
@@ -248,12 +248,12 @@ export struct Add {
               .height(80)
               .padding({ left: 8, right: 8 })
               .alignItems(VerticalAlign.Center)
-              .borderRadius(12)
+              .borderRadius(18)
               .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
               .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
               .border({
                 width: 0.35,
-                radius: 12,
+                radius: 18,
                 color: $r('sys.color.ohos_id_color_focused_outline_transparent')
               })
               .shadow(ShadowStyle.OUTER_DEFAULT_XS)

@@ -498,7 +498,7 @@ export struct LibraryItemDetail {
         Row() {
           TextInput({ text: this.downloadStart, placeholder: '1' })
             .height(40)
-            .borderRadius(10)
+            .borderRadius(18)
             .inputFilter('[0-9]', (err) => {})
             .onChange((val) => { this.downloadStart = val })
             .textAlign(TextAlign.Center)
@@ -513,7 +513,7 @@ export struct LibraryItemDetail {
 
           TextInput({ text: this.downloadEnd, placeholder: String(this.libraryItem?.media.tracks?.length ?? '') })
             .height(40)
-            .borderRadius(10)
+            .borderRadius(18)
             .inputFilter('[0-9]', (err) => {})
             .onChange((val) => { this.downloadEnd = val })
             .textAlign(TextAlign.Center)
@@ -754,7 +754,7 @@ export struct LibraryItemDetail {
       })
         .width("100%")
         .height(45)
-        .borderRadius(10)
+        .borderRadius(18)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -772,7 +772,7 @@ export struct LibraryItemDetail {
       })
         .width("100%")
         .height(120)
-        .borderRadius(10)
+        .borderRadius(18)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -973,7 +973,7 @@ export struct LibraryItemDetail {
       })
         .width("100%")
         .height(45)
-        .borderRadius(10)
+        .borderRadius(18)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -991,7 +991,7 @@ export struct LibraryItemDetail {
       })
         .width("100%")
         .height(120)
-        .borderRadius(10)
+        .borderRadius(18)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -1812,7 +1812,7 @@ export struct LibraryItemDetail {
                       }
                     }
                     .padding(5)
-                    .borderRadius(10)
+                    .borderRadius(18)
                     .backgroundColor(Color.Transparent)
                     .onClick(() => {
                       this.showMoreIntro = !this.showMoreIntro

@@ -232,13 +232,13 @@ export struct LocalMedia {
               }
               .width('100%')
               .height(60)
-              .borderRadius(10)
+              .borderRadius(18)
               .margin({ bottom: index !== this.folderList.length - 1 ? 12 : 0 })
               .padding({ left: 20, right: 20 })
               .backgroundColor($r('sys.color.background_secondary'))
               .border({
                 width: 0.35,
-                radius: 10,
+                radius: 18,
                 color: $r('sys.color.ohos_id_color_focused_outline_transparent')
               })
               .shadow(ShadowStyle.OUTER_DEFAULT_XS)
@@ -286,13 +286,13 @@ export struct LocalMedia {
             }
             .width('100%')
             .height(60)
-            .borderRadius(10)
+            .borderRadius(18)
             .margin({ bottom: 10 })
             .padding({ left: 20, right: 20 })
             .backgroundColor($r('sys.color.background_secondary'))
             .border({
               width: 0.35,
-              radius: 10,
+              radius: 18,
               color: $r('sys.color.ohos_id_color_focused_outline_transparent')
             })
             .shadow(ShadowStyle.OUTER_DEFAULT_XS)
@@ -325,16 +325,16 @@ export struct LocalMedia {
                       }
                       .width('100%')
                       .height(60)
-                      .borderRadius(10)
+                      .borderRadius(18)
                       .clip(true)
                     }
                     .width('100%')
                     .height(60)
-                    .borderRadius(10)
+                    .borderRadius(18)
                     .backgroundColor($r('sys.color.background_secondary'))
                     .border({
                       width: 0.35,
-                      radius: 10,
+                      radius: 18,
                       color: $r('sys.color.ohos_id_color_focused_outline_transparent')
                     })
                     .shadow(ShadowStyle.OUTER_DEFAULT_XS)
@@ -379,7 +379,7 @@ export struct LocalMedia {
                   .fontWeight(FontWeight.Medium)
               }
               .height(50)
-              .borderRadius(10)
+              .borderRadius(18)
               .padding({ left: 20, right: 20 })
             }
           } else {
@@ -400,13 +400,13 @@ export struct LocalMedia {
             }
             .width('100%')
             .height(60)
-            .borderRadius(10)
+            .borderRadius(18)
             .margin({ bottom: 10 })
             .padding({ left: 20, right: 20 })
             .backgroundColor($r('sys.color.background_secondary'))
             .border({
               width: 0.35,
-              radius: 10,
+              radius: 18,
               color: $r('sys.color.ohos_id_color_focused_outline_transparent')
             })
             .shadow(ShadowStyle.OUTER_DEFAULT_XS)
@@ -435,16 +435,16 @@ export struct LocalMedia {
                       }
                       .width('100%')
                       .height(60)
-                      .borderRadius(10)
+                      .borderRadius(18)
                       .clip(true)
                     }
                     .width('100%')
                     .height(60)
-                    .borderRadius(10)
+                    .borderRadius(18)
                     .backgroundColor($r('sys.color.background_secondary'))
                     .border({
                       width: 0.35,
-                      radius: 10,
+                      radius: 18,
                       color: $r('sys.color.ohos_id_color_focused_outline_transparent')
                     })
                     .shadow(ShadowStyle.OUTER_DEFAULT_XS)
@@ -477,7 +477,7 @@ export struct LocalMedia {
                   .fontWeight(FontWeight.Medium)
               }
               .height(50)
-              .borderRadius(10)
+              .borderRadius(18)
               .padding({ left: 20, right: 20 })
             }
           }
@@ -485,11 +485,11 @@ export struct LocalMedia {
         .width('100%')
         .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
         .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
-        .borderRadius(10)
+        .borderRadius(18)
         .padding({ left: 20, right: 20, bottom: 20 })
         .border({
           width: 0.35,
-          radius: 10,
+          radius: 18,
           color: $r('sys.color.ohos_id_color_focused_outline_transparent')
         })
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)
