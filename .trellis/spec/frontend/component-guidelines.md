@@ -51,11 +51,11 @@ The official system `immersive-light` effect is reserved for title bars and
 Tab bars in this project. Do not use direct content-area `systemMaterial` for
 these actions; use the shared HDS helper instead.
 
-For the playback page, content controls and title text must keep the existing
-semantic system resources (`sys.color.font`, `sys.color.font_secondary`, and
-the existing slider colors) so their light/dark variants follow the cover
-background design. Only the playback page status-bar content color uses the
-cover luminance result directly as pure black or white.
+For the playback page, content controls, title text, and slider colors must
+select the concrete light or dark values of the existing semantic resources
+from the cover luminance; the ambient page color mode does not follow the
+cover. Only the playback page status-bar content color uses the luminance
+result directly as pure black or white.
 
 ```typescript
 Row() {

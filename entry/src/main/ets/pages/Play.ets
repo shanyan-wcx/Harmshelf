@@ -11,6 +11,12 @@ import { image } from '@kit.ImageKit';
 import { effectKit } from '@kit.ArkGraphics2D';
 import { rcp } from '@kit.RemoteCommunicationKit';
 
+interface PlayColorPalette {
+  primary: string
+  secondary: string
+  sliderBlock: string
+}
+
 @ComponentV2
 export struct Play {
   private chapterScroller: Scroller = new Scroller();
@@ -55,6 +61,18 @@ export struct Play {
     const green = (this.coverColor >>> 8) & 0xff
     const blue = this.coverColor & 0xff
     return red * 0.299 + green * 0.587 + blue * 0.114 > 160 ? Color.Black : Color.White
+  }
+
+  private get playColorPalette(): PlayColorPalette {
+    return this.playControlColor === Color.Black ? {
+      primary: '#182431',
+      secondary: '#99182431',
+      sliderBlock: '#3A3A3B'
+    } : {
+      primary: '#FFFFFF',
+      secondary: '#99FFFFFF',
+      sliderBlock: '#BCBCBC'
+    }
   }
 
   private async updateStatusBarContentColor() {
@@ -1034,7 +1052,7 @@ export struct Play {
                     .width('100%')
                     .fontSize(20)
                     .fontWeight(FontWeight.Medium)
-                    .fontColor($r('sys.color.font'))
+                    .fontColor(this.playColorPalette.primary)
                     .textAlign(TextAlign.Center)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -1046,7 +1064,7 @@ export struct Play {
                     .width('100%')
                     .fontSize(18)
                     .fontWeight(FontWeight.Medium)
-                    .fontColor($r('sys.color.font_secondary'))
+                    .fontColor(this.playColorPalette.secondary)
                     .textAlign(TextAlign.Center)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -1057,16 +1075,15 @@ export struct Play {
                     Text(this.formatSeconds(this.playedPercent * this.getCurrentDuration() / 100))
                       .fontSize(16)
                       .fontWeight(FontWeight.Medium)
-                      .fontColor($r('sys.color.font'))
+                      .fontColor(this.playColorPalette.primary)
 
                     Text(this.formatSeconds(this.getCurrentDuration()))
                       .fontSize(16)
                       .fontWeight(FontWeight.Medium)
-                      .fontColor($r('sys.color.font'))
+                      .fontColor(this.playColorPalette.primary)
                   }
                   .width('100%')
                   .justifyContent(FlexAlign.SpaceBetween)
-                  .padding({ left: 20, right: 20 })
 
                   Slider({
                     value: this.playedPercent,
@@ -1083,9 +1100,9 @@ export struct Play {
                       height: 14
                     })
                     .padding({ left: this.lockPlayer ? 20 : 10, right: this.lockPlayer ? 20 : 10 })
-                    .blockColor($r('app.color.sliderBlock'))
-                    .trackColor($r('sys.color.font_secondary'))
-                    .selectedColor($r('sys.color.font_secondary'))
+                    .blockColor(this.playColorPalette.sliderBlock)
+                    .trackColor(this.playColorPalette.secondary)
+                    .selectedColor(this.playColorPalette.secondary)
                     .sliderInteractionMode(SliderInteraction.SLIDE_AND_CLICK_UP)
                     .onChange((value: number, mode: SliderChangeMode) => {
                       if (mode === SliderChangeMode.Begin) {
@@ -1115,7 +1132,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph($r('sys.symbol.backward_end_fill'))
                       .fontSize(30)
-                      .fontColor([$r('sys.color.font_secondary')])
+                      .fontColor([this.playColorPalette.secondary])
                   }
                   .height(40)
                   .width(40)
@@ -1142,7 +1159,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph(this.gobackwardIcon)
                       .fontSize(34)
-                      .fontColor([$r('sys.color.font_secondary')])
+                      .fontColor([this.playColorPalette.secondary])
                   }
                   .height(50)
                   .width(50)
@@ -1156,7 +1173,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph(this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
                       .fontSize(34)
-                      .fontColor([$r('sys.color.font_secondary')])
+                      .fontColor([this.playColorPalette.secondary])
                   }
                   .height(78)
                   .width(78)
@@ -1197,7 +1214,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph(this.goforwardIcon)
                       .fontSize(34)
-                      .fontColor([$r('sys.color.font_secondary')])
+                      .fontColor([this.playColorPalette.secondary])
                   }
                   .height(50)
                   .width(50)
@@ -1212,7 +1229,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph($r('sys.symbol.forward_end_fill'))
                       .fontSize(30)
-                      .fontColor([$r('sys.color.font_secondary')])
+                      .fontColor([this.playColorPalette.secondary])
                   }
                   .height(40)
                   .width(40)
@@ -1244,7 +1261,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph($r('sys.symbol.bookmark'))
                       .fontSize(30)
-                      .fontColor([$r('sys.color.font_secondary')])
+                      .fontColor([this.playColorPalette.secondary])
                   }
                   .height(45)
                   .width(45)
@@ -1275,7 +1292,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph(this.speedIcon)
                       .fontSize(30)
-                      .fontColor([$r('sys.color.font_secondary')])
+                      .fontColor([this.playColorPalette.secondary])
                   }
                   .height(45)
                   .width(45)
@@ -1298,7 +1315,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph($r('sys.symbol.moon_z'))
                       .fontSize(30)
-                      .fontColor([$r('sys.color.font_secondary')])
+                      .fontColor([this.playColorPalette.secondary])
                   }
                   .height(45)
                   .width(45)
@@ -1321,7 +1338,7 @@ export struct Play {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph($r('sys.symbol.list_bullet'))
                       .fontSize(30)
-                      .fontColor([$r('sys.color.font_secondary')])
+                      .fontColor([this.playColorPalette.secondary])
                   }
                   .height(45)
                   .width(45)
@@ -1380,10 +1397,10 @@ export struct Play {
           Button({ type: ButtonType.Circle }) {
             SymbolGlyph($r('sys.symbol.chevron_down'))
               .fontSize(32)
-              .fontColor([$r('sys.color.font_secondary')])
+              .fontColor([this.playColorPalette.secondary])
           }
-          .height(48)
-          .width(48)
+          .height(40)
+          .width(40)
           .backgroundColor(Color.Transparent)
           .onClick(() => {
             this.showPlay = false
@@ -1402,10 +1419,10 @@ export struct Play {
           Button({ type: ButtonType.Circle }) {
             SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
               .fontSize($r('sys.float.ohos_id_text_size_headline7'))
-              .fontColor([$r('sys.color.font_secondary')])
+              .fontColor([this.playColorPalette.secondary])
           }
-          .height(48)
-          .width(48)
+          .height(40)
+          .width(40)
           .backgroundColor(Color.Transparent)
           .bindMenu([{
             symbolIcon: new SymbolGlyphModifier(this.lockPlayer ? $r('sys.symbol.lock') :
