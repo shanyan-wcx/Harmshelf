@@ -67,6 +67,9 @@ Playback sheets use `SheetOptions.systemMaterial` with the native regular
 `uiMaterial.ImmersiveMaterial`. Sheet options use `ImmersiveActionButton` with
 `barRadius: barHeight / 2`; preserve existing callbacks and use the helper's
 `monopolizeActionEvents: false` for scrollable option lists.
+For selectable playback options, use the immersive helper only for the
+selected item; non-selected items remain ordinary capsule `Button`s. Do not
+pass `barBackgroundColor` or `lightColor` to playback immersive buttons.
 
 ```typescript
 Row() {

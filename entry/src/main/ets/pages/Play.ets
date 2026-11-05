@@ -532,7 +532,6 @@ export struct Play {
         barWidth: 40,
         barHeight: 40,
         barRadius: 20,
-        barBackgroundColor: $r('sys.color.warning'),
         onButtonClick: async () => {
           let status = await deleteBookmark(this.playingItem!.libraryItemId, bookmark.time)
           if (status) {
@@ -645,7 +644,6 @@ export struct Play {
           barWidth: 110,
           barHeight: 45,
           barRadius: 22.5,
-          barBackgroundColor: $r('sys.color.comp_emphasize_secondary'),
           onButtonClick: async () => {
             let time = Date.now()
             let bookmark: Bookmark = {
@@ -683,116 +681,221 @@ export struct Play {
   speedBuilder() {
     Scroll() {
       Column() {
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          barBackgroundColor: this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_50_X ? $r('sys.color.comp_emphasize_secondary') : undefined,
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_50_X
-            this.avPlayer!.setSpeed(this.speed)
-            this.showSpeed = false
+        if (this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_50_X) {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 50,
+            barRadius: 25,
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_50_X
+              this.avPlayer!.setSpeed(this.speed)
+              this.showSpeed = false
+            }
+          }) {
+            Text("0.5x")
+              .fontSize(18)
           }
-        }) {
-          Text("0.5x")
-            .fontSize(18)
+        } else {
+          Button({ type: ButtonType.Normal }) {
+            Text("0.5x")
+              .fontSize(18)
+          }
+            .width('100%')
+            .height(50)
+            .borderRadius(25)
+            .backgroundColor(Color.Transparent)
+            .onClick(() => {
+              this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_50_X
+              this.avPlayer!.setSpeed(this.speed)
+              this.showSpeed = false
+            })
         }
 
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          barBackgroundColor: this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_75_X ? $r('sys.color.comp_emphasize_secondary') : undefined,
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_75_X
-            this.avPlayer!.setSpeed(this.speed)
-            this.showSpeed = false
+        if (this.speed === media.PlaybackSpeed.SPEED_FORWARD_0_75_X) {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 50,
+            barRadius: 25,
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_75_X
+              this.avPlayer!.setSpeed(this.speed)
+              this.showSpeed = false
+            }
+          }) {
+            Text("0.75x")
+              .fontSize(18)
           }
-        }) {
-          Text("0.75x")
-            .fontSize(18)
+        } else {
+          Button({ type: ButtonType.Normal }) {
+            Text("0.75x")
+              .fontSize(18)
+          }
+            .width('100%')
+            .height(50)
+            .borderRadius(25)
+            .backgroundColor(Color.Transparent)
+            .onClick(() => {
+              this.speed = media.PlaybackSpeed.SPEED_FORWARD_0_75_X
+              this.avPlayer!.setSpeed(this.speed)
+              this.showSpeed = false
+            })
         }
 
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          barBackgroundColor: this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_00_X ? $r('sys.color.comp_emphasize_secondary') : undefined,
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
-            this.avPlayer!.setSpeed(this.speed)
-            this.showSpeed = false
+        if (this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_00_X) {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 50,
+            barRadius: 25,
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
+              this.avPlayer!.setSpeed(this.speed)
+              this.showSpeed = false
+            }
+          }) {
+            Text("1x")
+              .fontSize(18)
           }
-        }) {
-          Text("1x")
-            .fontSize(18)
+        } else {
+          Button({ type: ButtonType.Normal }) {
+            Text("1x")
+              .fontSize(18)
+          }
+            .width('100%')
+            .height(50)
+            .borderRadius(25)
+            .backgroundColor(Color.Transparent)
+            .onClick(() => {
+              this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
+              this.avPlayer!.setSpeed(this.speed)
+              this.showSpeed = false
+            })
         }
 
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          barBackgroundColor: this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_25_X ? $r('sys.color.comp_emphasize_secondary') : undefined,
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_25_X
-            this.avPlayer!.setSpeed(this.speed)
-            this.showSpeed = false
+        if (this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_25_X) {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 50,
+            barRadius: 25,
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_25_X
+              this.avPlayer!.setSpeed(this.speed)
+              this.showSpeed = false
+            }
+          }) {
+            Text("1.25x")
+              .fontSize(18)
           }
-        }) {
-          Text("1.25x")
-            .fontSize(18)
+        } else {
+          Button({ type: ButtonType.Normal }) {
+            Text("1.25x")
+              .fontSize(18)
+          }
+            .width('100%')
+            .height(50)
+            .borderRadius(25)
+            .backgroundColor(Color.Transparent)
+            .onClick(() => {
+              this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_25_X
+              this.avPlayer!.setSpeed(this.speed)
+              this.showSpeed = false
+            })
         }
 
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          barBackgroundColor: this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_50_X ? $r('sys.color.comp_emphasize_secondary') : undefined,
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_50_X
-            this.avPlayer!.setSpeed(this.speed)
-            this.showSpeed = false
+        if (this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_50_X) {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 50,
+            barRadius: 25,
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_50_X
+              this.avPlayer!.setSpeed(this.speed)
+              this.showSpeed = false
+            }
+          }) {
+            Text("1.5x")
+              .fontSize(18)
           }
-        }) {
-          Text("1.5x")
-            .fontSize(18)
+        } else {
+          Button({ type: ButtonType.Normal }) {
+            Text("1.5x")
+              .fontSize(18)
+          }
+            .width('100%')
+            .height(50)
+            .borderRadius(25)
+            .backgroundColor(Color.Transparent)
+            .onClick(() => {
+              this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_50_X
+              this.avPlayer!.setSpeed(this.speed)
+              this.showSpeed = false
+            })
         }
 
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          barBackgroundColor: this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_75_X ? $r('sys.color.comp_emphasize_secondary') : undefined,
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_75_X
-            this.avPlayer!.setSpeed(this.speed)
-            this.showSpeed = false
+        if (this.speed === media.PlaybackSpeed.SPEED_FORWARD_1_75_X) {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 50,
+            barRadius: 25,
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_75_X
+              this.avPlayer!.setSpeed(this.speed)
+              this.showSpeed = false
+            }
+          }) {
+            Text("1.75x")
+              .fontSize(18)
           }
-        }) {
-          Text("1.75x")
-            .fontSize(18)
+        } else {
+          Button({ type: ButtonType.Normal }) {
+            Text("1.75x")
+              .fontSize(18)
+          }
+            .width('100%')
+            .height(50)
+            .borderRadius(25)
+            .backgroundColor(Color.Transparent)
+            .onClick(() => {
+              this.speed = media.PlaybackSpeed.SPEED_FORWARD_1_75_X
+              this.avPlayer!.setSpeed(this.speed)
+              this.showSpeed = false
+            })
         }
 
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          barBackgroundColor: this.speed === media.PlaybackSpeed.SPEED_FORWARD_2_00_X ? $r('sys.color.comp_emphasize_secondary') : undefined,
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.speed = media.PlaybackSpeed.SPEED_FORWARD_2_00_X
-            this.avPlayer!.setSpeed(this.speed)
-            this.showSpeed = false
+        if (this.speed === media.PlaybackSpeed.SPEED_FORWARD_2_00_X) {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 50,
+            barRadius: 25,
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.speed = media.PlaybackSpeed.SPEED_FORWARD_2_00_X
+              this.avPlayer!.setSpeed(this.speed)
+              this.showSpeed = false
+            }
+          }) {
+            Text("2x")
+              .fontSize(18)
           }
-        }) {
-          Text("2x")
-            .fontSize(18)
+        } else {
+          Button({ type: ButtonType.Normal }) {
+            Text("2x")
+              .fontSize(18)
+          }
+            .width('100%')
+            .height(50)
+            .borderRadius(25)
+            .backgroundColor(Color.Transparent)
+            .onClick(() => {
+              this.speed = media.PlaybackSpeed.SPEED_FORWARD_2_00_X
+              this.avPlayer!.setSpeed(this.speed)
+              this.showSpeed = false
+            })
         }
       }
       .padding({ left: 20, right: 20, bottom: 25 })
@@ -804,132 +907,122 @@ export struct Play {
   sleepBuilder() {
     Scroll() {
       Column() {
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 5 * 60
-            this.showSleep = false
-          }
-        }) {
+        Button({ type: ButtonType.Normal }) {
           Text("5 min")
             .fontSize(18)
         }
-
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 10 * 60
+        .width('100%')
+        .height(50)
+        .borderRadius(25)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
+            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 5 * 60
             this.showSleep = false
-          }
-        }) {
+        })
+
+        Button({ type: ButtonType.Normal }) {
           Text("10 min")
             .fontSize(18)
         }
-
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 15 * 60
+        .width('100%')
+        .height(50)
+        .borderRadius(25)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
+            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 10 * 60
             this.showSleep = false
-          }
-        }) {
+        })
+
+        Button({ type: ButtonType.Normal }) {
           Text("15 min")
             .fontSize(18)
         }
-
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 30 * 60
+        .width('100%')
+        .height(50)
+        .borderRadius(25)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
+            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 15 * 60
             this.showSleep = false
-          }
-        }) {
+        })
+
+        Button({ type: ButtonType.Normal }) {
           Text("30 min")
             .fontSize(18)
         }
-
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 45 * 60
+        .width('100%')
+        .height(50)
+        .borderRadius(25)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
+            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 30 * 60
             this.showSleep = false
-          }
-        }) {
+        })
+
+        Button({ type: ButtonType.Normal }) {
           Text("45 min")
             .fontSize(18)
         }
-
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 60 * 60
+        .width('100%')
+        .height(50)
+        .borderRadius(25)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
+            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 45 * 60
             this.showSleep = false
-          }
-        }) {
+        })
+
+        Button({ type: ButtonType.Normal }) {
           Text("60 min")
             .fontSize(18)
         }
-
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 90 * 60
+        .width('100%')
+        .height(50)
+        .borderRadius(25)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
+            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 60 * 60
             this.showSleep = false
-          }
-        }) {
+        })
+
+        Button({ type: ButtonType.Normal }) {
           Text("90 min")
             .fontSize(18)
         }
-
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.sleepTime = this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playingItem!.audioTracks[this.playingIndex].duration
+        .width('100%')
+        .height(50)
+        .borderRadius(25)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
+            this.sleepTime = this.playedTime + this.playingItem!.audioTracks[this.playingIndex].startOffset + 90 * 60
             this.showSleep = false
-          }
-        }) {
+        })
+
+        Button({ type: ButtonType.Normal }) {
           Text("章节结束")
             .fontSize(18)
         }
-
-        ImmersiveActionButton({
-          barWidth: '100%',
-          barHeight: 50,
-          barRadius: 25,
-          barBackgroundColor: $r('sys.color.comp_emphasize_secondary'),
-          monopolizeActionEvents: false,
-          onButtonClick: () => {
-            this.sleepTime = 0
+        .width('100%')
+        .height(50)
+        .borderRadius(25)
+        .backgroundColor(Color.Transparent)
+        .onClick(() => {
+            this.sleepTime = this.playingItem!.audioTracks[this.playingIndex].startOffset + this.playingItem!.audioTracks[this.playingIndex].duration
             this.showSleep = false
-          }
-        }) {
+        })
+
+        Button({ type: ButtonType.Normal }) {
           Text("清除定时")
             .fontSize(18)
         }
+        .width('100%')
+        .height(50)
+        .borderRadius(25)
+        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
+        .onClick(() => {
+          this.sleepTime = 0
+          this.showSleep = false
+        })
       }
       .padding({ left: 20, right: 20, bottom: 25 })
     }
@@ -943,13 +1036,56 @@ export struct Play {
         List({ scroller: this.chapterScroller }) {
           ForEach(this.localPlayItem!.tracks, (track: LocalTrack, index: number) => {
             ListItem() {
-              ImmersiveActionButton({
-                barWidth: '100%',
-                barHeight: 50,
-                barRadius: 25,
-                barBackgroundColor: this.playingIndex === index ? $r('sys.color.comp_emphasize_secondary') : undefined,
-                monopolizeActionEvents: false,
-                onButtonClick: async () => {
+              if (this.playingIndex === index) {
+                ImmersiveActionButton({
+                  barWidth: '100%',
+                  barHeight: 50,
+                  barRadius: 25,
+                  monopolizeActionEvents: false,
+                  onButtonClick: async () => {
+                    this.showChapter = false
+                    await this.avPlayer!.reset();
+                    this.playingIndex = index
+                    this.playingTitle = track.title
+                    try {
+                      const file = fs.openSync(track.filePath, fs.OpenMode.READ_ONLY)
+                      try {
+                        this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+                      } catch (_) {
+                        fs.closeSync(file)
+                      }
+                    } catch (_) {
+                      this.getUIContext().getPromptAction().showToast({ message: '播放失败，格式不支持或文件不存在！', duration: 500 })
+                    }
+                  }
+                }) {
+                  Row() {
+                    Text(track.title)
+                      .fontSize(16)
+                      .width('100%')
+                      .layoutWeight(1)
+                      .maxLines(1)
+                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  }
+                  .padding({ left: 15, right: 15 })
+                }
+              } else {
+                Button({ type: ButtonType.Normal }) {
+                  Row() {
+                    Text(track.title)
+                      .fontSize(16)
+                      .width('100%')
+                      .layoutWeight(1)
+                      .maxLines(1)
+                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+                  }
+                }
+                .width('100%')
+                .height(50)
+                .borderRadius(25)
+                .padding({ left: 15, right: 15 })
+                .backgroundColor(Color.Transparent)
+                .onClick(async () => {
                   this.showChapter = false
                   await this.avPlayer!.reset();
                   this.playingIndex = index
@@ -964,17 +1100,7 @@ export struct Play {
                   } catch (_) {
                     this.getUIContext().getPromptAction().showToast({ message: '播放失败，格式不支持或文件不存在！', duration: 500 })
                   }
-                }
-              }) {
-                Row() {
-                  Text(track.title)
-                    .fontSize(16)
-                    .width('100%')
-                    .layoutWeight(1)
-                    .maxLines(1)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
-                }
-                .padding({ left: 15, right: 15 })
+                })
               }
             }
           })
@@ -989,35 +1115,65 @@ export struct Play {
         List({ scroller: this.chapterScroller }) {
           ForEach(this.playingItem!.chapters, (chapter: Chapter, index) => {
             ListItem() {
-              ImmersiveActionButton({
-                barWidth: '100%',
-                barHeight: 50,
-                barRadius: 25,
-                barBackgroundColor: this.playingIndex === index ? $r('sys.color.comp_emphasize_secondary') : undefined,
-                monopolizeActionEvents: false,
-                onButtonClick: async () => {
+              if (this.playingIndex === index) {
+                ImmersiveActionButton({
+                  barWidth: '100%',
+                  barHeight: 50,
+                  barRadius: 25,
+                  monopolizeActionEvents: false,
+                  onButtonClick: async () => {
+                    this.showChapter = false
+                    await this.avPlayer!.reset();
+                    this.isPlaying = true
+                    this.playingIndex = index
+                    this.playingTitle = chapter.title
+                    this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+                  }
+                }) {
+                  Row() {
+                    Text(chapter.title)
+                      .fontSize(16)
+                      .width('100%')
+                      .layoutWeight(1)
+                      .maxLines(1)
+                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+                    Text(this.formatSeconds(chapter.start))
+                      .fontSize(16)
+                      .fontColor($r('sys.color.font_secondary'))
+                      .margin({ left: 10 })
+                  }
+                  .padding({ left: 15, right: 15 })
+                }
+              } else {
+                Button({ type: ButtonType.Normal }) {
+                  Row() {
+                    Text(chapter.title)
+                      .fontSize(16)
+                      .width('100%')
+                      .layoutWeight(1)
+                      .maxLines(1)
+                      .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+                    Text(this.formatSeconds(chapter.start))
+                      .fontSize(16)
+                      .fontColor($r('sys.color.font_secondary'))
+                      .margin({ left: 10 })
+                  }
+                }
+                .width('100%')
+                .height(50)
+                .borderRadius(25)
+                .padding({ left: 15, right: 15 })
+                .backgroundColor(Color.Transparent)
+                .onClick(async () => {
                   this.showChapter = false
                   await this.avPlayer!.reset();
                   this.isPlaying = true
                   this.playingIndex = index
                   this.playingTitle = chapter.title
                   this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
-                }
-              }) {
-                Row() {
-                  Text(chapter.title)
-                    .fontSize(16)
-                    .width('100%')
-                    .layoutWeight(1)
-                    .maxLines(1)
-                    .textOverflow({ overflow: TextOverflow.Ellipsis })
-
-                  Text(this.formatSeconds(chapter.start))
-                    .fontSize(16)
-                    .fontColor($r('sys.color.font_secondary'))
-                    .margin({ left: 10 })
-                }
-                .padding({ left: 15, right: 15 })
+                })
               }
             }
           })
@@ -1499,7 +1655,7 @@ export struct Play {
         .padding({
           left: 20,
           right: 20,
-          top: this.windowAvoidArea.statusBar.visible ? this.windowAvoidArea.statusBar.topRect.height : 0
+          top: (this.windowAvoidArea.statusBar.visible ? this.windowAvoidArea.statusBar.topRect.height : 0) + 8
         })
       }
       .width('100%')
