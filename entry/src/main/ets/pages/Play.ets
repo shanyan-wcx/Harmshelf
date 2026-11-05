@@ -954,33 +954,12 @@ export struct Play {
                 .height(60)
                 .linearGradient({
                   direction: GradientDirection.Bottom,
-                  colors: [
-                    [ColorMetrics.rgba(
-                      (this.coverColor >>> 16) & 0xff,
-                      (this.coverColor >>> 8) & 0xff,
-                      this.coverColor & 0xff,
-                      0
-                    ).color, 0],
-                    [ColorMetrics.rgba(
-                      (this.coverColor >>> 16) & 0xff,
-                      (this.coverColor >>> 8) & 0xff,
-                      this.coverColor & 0xff,
-                      0.03
-                    ).color, 0.25],
-                    [ColorMetrics.rgba(
-                      (this.coverColor >>> 16) & 0xff,
-                      (this.coverColor >>> 8) & 0xff,
-                      this.coverColor & 0xff,
-                      0.18
-                    ).color, 0.55],
-                    [ColorMetrics.rgba(
-                      (this.coverColor >>> 16) & 0xff,
-                      (this.coverColor >>> 8) & 0xff,
-                      this.coverColor & 0xff,
-                      0.55
-                    ).color, 0.8],
-                    [this.coverColor, 1]
-                  ]
+                  colors: [[ColorMetrics.rgba(
+                    (this.coverColor >>> 16) & 0xff,
+                    (this.coverColor >>> 8) & 0xff,
+                    this.coverColor & 0xff,
+                    0
+                  ).color, 0], [this.coverColor, 1]]
                 })
 
                 Column() {
