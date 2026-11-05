@@ -1,6 +1,6 @@
 import { BlurStrategy, HdsActionBar, ActionBarButton, HdsListItem, ActionBarStyle } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
-import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier } from '@kit.ArkUI'
+import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier, window } from '@kit.ArkUI'
 import { ConfigurationConstant } from '@kit.AbilityKit';
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { env } from '../utils/Class';
@@ -12,6 +12,8 @@ import { Logger } from '../utils/Logger';
 @ComponentV2
 export struct Play {
   private chapterScroller: Scroller = new Scroller();
+  @Env(SystemProperties.WINDOW_AVOID_AREA)
+  windowAvoidArea: window.UIEnvWindowAvoidAreaInfoVP
   @Consumer() playSetting: PlaySetting | undefined = PersistenceV2.connect(PlaySetting, () => new PlaySetting());
   @Consumer() displayWidth: number = 0
   @Consumer() displayHeight: number = 0
@@ -827,7 +829,7 @@ export struct Play {
               if (!this.isLocalPlaying) {
                 Image(this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`)
                   .alt($rawfile('nocover.jpg'))
-                  .objectFit(ImageFit.Cover)
+                  .objectFit(ImageFit.Contain)
                   .width('100%')
                   .aspectRatio(1)
                   .draggable(false)
@@ -835,14 +837,14 @@ export struct Play {
               } else if (this.localPlayItem?.coverPath) {
                 Image(fileUri.getUriFromPath(this.localPlayItem.coverPath))
                   .alt($rawfile('nocover.jpg'))
-                  .objectFit(ImageFit.Cover)
+                  .objectFit(ImageFit.Contain)
                   .width('100%')
                   .aspectRatio(1)
                   .draggable(false)
                   .geometryTransition("cover")
               } else {
                 Image($rawfile('nocover.jpg'))
-                  .objectFit(ImageFit.Cover)
+                  .objectFit(ImageFit.Contain)
                   .width('100%')
                   .aspectRatio(1)
                   .draggable(false)
@@ -856,10 +858,10 @@ export struct Play {
                   .alt($rawfile('nocover.jpg'))
                   .objectFit(ImageFit.Cover)
                   .width('100%')
-                  .height(160)
+                  .height(96)
                   .rotate({ angle: 180 })
                   .linearGradientBlur(80, {
-                    fractionStops: [[1, 0], [1, 0.72], [1, 0.88], [0.15, 0.96], [0, 1]],
+                    fractionStops: [[0, 0], [0, 0.2], [1, 0.75], [1, 1]],
                     direction: GradientDirection.Top
                   })
 
@@ -885,11 +887,11 @@ export struct Play {
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
                 }
                 .width('100%')
-                .padding({ left: 20, right: 20, bottom: 16 })
+                .padding({ left: 20, right: 20, top: 8, bottom: 16 })
                 .alignItems(HorizontalAlign.Center)
               }
               .width('100%')
-              .height(160)
+              .height(96)
             }
             .width('100%')
             .aspectRatio(1)
@@ -1220,8 +1222,11 @@ export struct Play {
               .justifyContent(FlexAlign.SpaceBetween)
             }
             .width('100%')
-            .height('100%')
             .layoutWeight(1)
+            .padding({
+              bottom: this.windowAvoidArea.navigationIndicator.visible ?
+                this.windowAvoidArea.navigationIndicator.bottomRect.height : 0
+            })
           }
           .width('100%')
           .layoutWeight(1)
@@ -1280,7 +1285,7 @@ export struct Play {
       }
       .width('100%')
       .height('100%')
-      .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP])
+      .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP, LayoutSafeAreaEdge.BOTTOM])
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
       .clip(false)
   }
