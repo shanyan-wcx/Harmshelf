@@ -1059,6 +1059,7 @@ export struct Play {
                 }
                 .width('100%')
                 .height(50)
+                .padding({ left: 0, right: 0 })
                 .borderRadius(25)
                 .backgroundColor(Color.Transparent)
                 .onClick(async () => {
@@ -1146,6 +1147,7 @@ export struct Play {
                 }
                 .width('100%')
                 .height(50)
+                .padding({ left: 0, right: 0 })
                 .borderRadius(25)
                 .backgroundColor(Color.Transparent)
                 .onClick(async () => {
@@ -1672,7 +1674,7 @@ export struct Play {
             (this.coverColor >>> 16) & 0xff,
             (this.coverColor >>> 8) & 0xff,
             this.coverColor & 0xff,
-            0.5
+            0.3
           ).color, 0], [ColorMetrics.rgba(
             (this.coverColor >>> 16) & 0xff,
             (this.coverColor >>> 8) & 0xff,
