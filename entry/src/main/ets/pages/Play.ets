@@ -1136,6 +1136,7 @@ export struct Play {
         .scrollBar(BarState.Off)
         .borderRadius(10)
         .clip(false)
+        .clipContent(ContentClipMode.BOUNDARY)
       } else {
         List({ scroller: this.chapterScroller }) {
           ForEach(this.playingItem!.chapters, (chapter: Chapter, index) => {
@@ -1216,6 +1217,7 @@ export struct Play {
         .scrollBar(BarState.Off)
         .borderRadius(10)
         .clip(false)
+        .clipContent(ContentClipMode.BOUNDARY)
       }
     }
     .clip(false)
