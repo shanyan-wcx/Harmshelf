@@ -255,6 +255,7 @@ export struct MyNavigation {
   @Consumer() isIndex: boolean = true
   // Keep the animation state in an observable reference so the custom Builder updates immediately.
   @Local miniBarState: MiniBarState = new MiniBarState()
+  private miniBarAnimationActive: boolean = false
   private navigationItems: MainNavigationItem[] = getMainNavigationItems()
 
   @Builder
@@ -317,7 +318,20 @@ export struct MyNavigation {
   }
 
   private onMiniBarStyleChange(style: HdsBarStyle) {
+    if (this.miniBarAnimationActive) {
+      return
+    }
     this.miniBarState.expanded = style === HdsBarStyle.EXPAND
+  }
+
+  private onMiniBarAnimationStart(style: HdsBarStyle) {
+    this.miniBarState.expanded = style !== HdsBarStyle.EXPAND
+    this.miniBarAnimationActive = true
+  }
+
+  private onMiniBarAnimationEnd(style: HdsBarStyle) {
+    this.miniBarState.expanded = style === HdsBarStyle.EXPAND
+    this.miniBarAnimationActive = false
   }
 
   @Builder
@@ -373,10 +387,10 @@ export struct MyNavigation {
           this.onMiniBarStyleChange(style)
         },
         onMiniBarAnimationStart: (style: HdsBarStyle, _: number) => {
-          this.onMiniBarStyleChange(style)
+          this.onMiniBarAnimationStart(style)
         },
         onMiniBarAnimationEnd: (style: HdsBarStyle) => {
-          this.onMiniBarStyleChange(style)
+          this.onMiniBarAnimationEnd(style)
         },
         barLayoutMode: HdsBarLayoutMode.HORIZONTAL
       } : undefined

@@ -130,11 +130,12 @@ the callback then updates the same object immediately without making HdsTabs
 a controlled style input. The expanded root may open the full player, but its
 control row must stop touch propagation so rewind, play, and forward keep
 their own actions. If the native material leaves excess horizontal inset,
-apply the smallest host-specific correction: the standalone capsule keeps
-the measured width and shifts its content right with a small positive x
-offset. Remove any second opacity transition from the expanded/collapsed
-custom roots; HdsTabs already owns the expand/collapse animation. Do not
-change the native bar width.
+apply the smallest host-specific correction: keep the standalone capsule's
+measured host width, expand only its custom content root by the required
+inset, and leave that root's x offset at zero; the tab minibar may keep its
+right-only negative margin. Remove any second opacity transition from the
+expanded/collapsed custom roots; HdsTabs already owns the expand/collapse
+animation. Do not change the native bar width.
 
 For repeated minibar title/subtitle scrolling, use the native Text marquee
 options with `loop <= 0` and a positive `delay` so each round pauses before

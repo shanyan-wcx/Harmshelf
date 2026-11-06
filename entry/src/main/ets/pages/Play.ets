@@ -313,9 +313,8 @@ export struct PlaybackMiniBar {
     .height('100%')
     .alignItems(VerticalAlign.Center)
     .geometryTransition("miniBar")
-    .width('100%')
+    .width(this.isStandalone ? 'calc(100% + 8vp)' : '100%')
     .margin({ right: this.isStandalone ? 0 : -8 })
-    .offset({ x: this.isStandalone ? 8 : 0 })
     .clip(false)
     .onClick(() => {
       this.openPlayer()
