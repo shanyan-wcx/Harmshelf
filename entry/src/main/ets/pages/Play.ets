@@ -1594,7 +1594,7 @@ export struct Play {
                 Column() {
                   Text(this.playingTitle)
                     .width('100%')
-                    .fontSize(20)
+                    .fontSize(18)
                     .fontWeight(FontWeight.Medium)
                     .fontColor(this.playColorPalette.primary)
                     .textAlign(TextAlign.Center)

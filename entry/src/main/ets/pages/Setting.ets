@@ -91,7 +91,7 @@ export struct Setting {
           Row() {
             Text("名称")
               .width(60)
-              .fontSize(20)
+              .fontSize(18)
             TextInput({
               placeholder: '服务器名称'
             })
@@ -101,9 +101,9 @@ export struct Setting {
               .borderRadius(10)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
-              .fontSize(20)
+              .fontSize(18)
               .placeholderFont({
-                size: 20
+                size: 18
               })
               .type(InputType.Normal)
               .enterKeyType(EnterKeyType.Next)
@@ -116,7 +116,7 @@ export struct Setting {
           Row() {
             Text("服务器")
               .width(60)
-              .fontSize(20)
+              .fontSize(18)
             Select([{ value: this.urlHead[0] }, { value: this.urlHead[1] }])
               .value(this.urlHead[0])
               .selected(0)
@@ -126,7 +126,7 @@ export struct Setting {
                 this.urlHeadIdx = index
               })
               .font({
-                size: 20,
+                size: 18,
                 weight: FontWeight.Normal
               })
               .height(40)
@@ -146,9 +146,9 @@ export struct Setting {
               .layoutWeight(1)
               .borderRadius(10)
               .caretColor($r('sys.color.font_secondary'))
-              .fontSize(20)
+              .fontSize(18)
               .placeholderFont({
-                size: 20
+                size: 18
               })
               .type(InputType.URL)
               .enterKeyType(EnterKeyType.Next)
@@ -162,7 +162,7 @@ export struct Setting {
           Row() {
             Text("账号")
               .width(60)
-              .fontSize(20)
+              .fontSize(18)
             TextInput({
               placeholder: 'username'
             })
@@ -172,9 +172,9 @@ export struct Setting {
               .borderRadius(10)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
-              .fontSize(20)
+              .fontSize(18)
               .placeholderFont({
-                size: 20
+                size: 18
               })
               .type(InputType.USER_NAME)
               .enterKeyType(EnterKeyType.Next)
@@ -188,7 +188,7 @@ export struct Setting {
           Row() {
             Text("密码")
               .width(60)
-              .fontSize(20)
+              .fontSize(18)
             TextInput({
               placeholder: 'password'
             })
@@ -198,9 +198,9 @@ export struct Setting {
               .borderRadius(10)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
-              .fontSize(20)
+              .fontSize(18)
               .placeholderFont({
-                size: 20
+                size: 18
               })
               .type(InputType.Password)
               .enterKeyType(EnterKeyType.Next)
@@ -218,7 +218,7 @@ export struct Setting {
               monopolizeActionEvents: false
             }) {
               Text("保存")
-                .fontSize(20)
+                .fontSize(18)
                 .hitTestBehavior(HitTestMode.None)
             }
           }
@@ -290,7 +290,7 @@ export struct Setting {
           Row() {
             Text("名称")
               .width(60)
-              .fontSize(20)
+              .fontSize(18)
             TextInput({
               placeholder: '服务器名称',
               text: this.tmpServername
@@ -301,9 +301,9 @@ export struct Setting {
               .borderRadius(10)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
-              .fontSize(20)
+              .fontSize(18)
               .placeholderFont({
-                size: 20
+                size: 18
               })
               .type(InputType.Normal)
               .enterKeyType(EnterKeyType.Next)
@@ -316,7 +316,7 @@ export struct Setting {
           Row() {
             Text("服务器")
               .width(60)
-              .fontSize(20)
+              .fontSize(18)
             Select([{ value: this.urlHead[0] }, { value: this.urlHead[1] }])
               .value(this.tmpBaseurl.includes("https://") ? this.urlHead[1] : this.urlHead[0])
               .selected(this.tmpBaseurl.includes("https://") ? 1 : 0)
@@ -326,7 +326,7 @@ export struct Setting {
                 this.urlHeadIdx = index
               })
               .font({
-                size: 20,
+                size: 18,
                 weight: FontWeight.Normal
               })
               .height(40)
@@ -347,9 +347,9 @@ export struct Setting {
               .layoutWeight(1)
               .borderRadius(10)
               .caretColor($r('sys.color.font_secondary'))
-              .fontSize(20)
+              .fontSize(18)
               .placeholderFont({
-                size: 20
+                size: 18
               })
               .type(InputType.URL)
               .enterKeyType(EnterKeyType.Next)
@@ -363,7 +363,7 @@ export struct Setting {
           Row() {
             Text("账号")
               .width(60)
-              .fontSize(20)
+              .fontSize(18)
             TextInput({
               placeholder: 'username',
               text: this.tmpUsername
@@ -374,9 +374,9 @@ export struct Setting {
               .borderRadius(10)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
-              .fontSize(20)
+              .fontSize(18)
               .placeholderFont({
-                size: 20
+                size: 18
               })
               .type(InputType.USER_NAME)
               .enterKeyType(EnterKeyType.Next)
@@ -390,7 +390,7 @@ export struct Setting {
           Row() {
             Text("密码")
               .width(60)
-              .fontSize(20)
+              .fontSize(18)
             TextInput({
               placeholder: 'password',
               text: this.tmpPassword
@@ -401,9 +401,9 @@ export struct Setting {
               .borderRadius(10)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
-              .fontSize(20)
+              .fontSize(18)
               .placeholderFont({
-                size: 20
+                size: 18
               })
               .type(InputType.Password)
               .enterKeyType(EnterKeyType.Next)
@@ -422,7 +422,7 @@ export struct Setting {
                 monopolizeActionEvents: false
               }) {
                 Text("保存")
-                  .fontSize(20)
+                  .fontSize(18)
                   .hitTestBehavior(HitTestMode.None)
               }
             }
@@ -490,7 +490,7 @@ export struct Setting {
                 monopolizeActionEvents: false
               }) {
                 Text("删除")
-                  .fontSize(20)
+                  .fontSize(18)
                   .fontColor(Color.Red)
                   .hitTestBehavior(HitTestMode.None)
               }
@@ -669,7 +669,7 @@ export struct Setting {
         Column() {
           Text("服务器设置")
             .width('100%')
-            .fontSize(20)
+            .fontSize(18)
             .fontWeight(FontWeight.Bold)
             .padding({ left: 20, right: 20 })
             .margin({ top: 20, bottom: 5 })
@@ -689,7 +689,7 @@ export struct Setting {
                   Text(loginInfo.name !== "" ? loginInfo.name : loginInfo.server)
                     .width('100%')
                     .layoutWeight(1)
-                    .fontSize(20)
+                    .fontSize(18)
                     .fontWeight(FontWeight.Medium)
                     .margin({ left: 5 })
                     .maxLines(1)
@@ -799,7 +799,7 @@ export struct Setting {
               }
             }) {
               Text("添加")
-                .fontSize(20)
+                .fontSize(18)
                 .fontColor($r('sys.color.font'))
             }
           }
@@ -859,7 +859,7 @@ export struct Setting {
         Column() {
           Text("外观设置")
             .width('100%')
-            .fontSize(20)
+            .fontSize(18)
             .fontWeight(FontWeight.Bold)
             .padding({ left: 20, right: 20 })
             .margin({ top: 20, bottom: 15 })
@@ -915,7 +915,7 @@ export struct Setting {
         Column() {
           Text("播放设置")
             .width('100%')
-            .fontSize(20)
+            .fontSize(18)
             .fontWeight(FontWeight.Bold)
             .padding({ left: 20, right: 20 })
             .margin({ top: 20, bottom: 15 })
@@ -1034,7 +1034,7 @@ export struct Setting {
         Column() {
           Text("下载设置")
             .width('100%')
-            .fontSize(20)
+            .fontSize(18)
             .fontWeight(FontWeight.Bold)
             .padding({ left: 20, right: 20 })
             .margin({ top: 20, bottom: 15 })
@@ -1074,7 +1074,7 @@ export struct Setting {
         Column() {
           Text("其他设置")
             .width('100%')
-            .fontSize(20)
+            .fontSize(18)
             .fontWeight(FontWeight.Bold)
             .padding({ left: 20, right: 20 })
             .margin({ top: 20, bottom: 15 })
