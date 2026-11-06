@@ -935,17 +935,6 @@ export struct Play {
              .clip(false)
           })
 
-          if (this.bookmarks.length === 0) {
-            ListItem() {
-              Column() {
-                Text("没有书签")
-                  .fontSize(18)
-                  .offset({ y: -45 })
-              }
-            }
-            .width('100%')
-            .height('100%')
-          }
         }
         .width('100%')
         .height('100%')

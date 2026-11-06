@@ -37,14 +37,14 @@ export struct DownloadTask {
                 Column() {
                   Row() {
                     Text(task.item.title)
-                      .fontSize(18)
+                      .fontSize(16)
                       .maxLines(1)
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
                       .width('100%')
                       .layoutWeight(1)
 
                     Text(Math.floor(task.item.progress) + "%")
-                      .fontSize(18)
+                      .fontSize(16)
                       .fontColor($r('sys.color.font_secondary'))
                       .margin({ left: 15 })
                   }

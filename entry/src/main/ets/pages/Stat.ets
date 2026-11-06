@@ -225,7 +225,7 @@ export struct Stats {
               Blank()
 
               Row() {
-                Column() {
+                Column({ space: 5 }) {
                   Text("每周收听")
                     .fontSize(14)
 
@@ -237,7 +237,7 @@ export struct Stats {
                     .fontSize(14)
                 }
 
-                Column() {
+                Column({ space: 5 }) {
                   Text("每日平均值")
                     .fontSize(14)
 
@@ -251,7 +251,7 @@ export struct Stats {
                     .fontSize(14)
                 }
 
-                Column() {
+                Column({ space: 5 }) {
                   Text("单日最高")
                     .fontSize(14)
 
@@ -263,7 +263,7 @@ export struct Stats {
                     .fontSize(14)
                 }
 
-                Column() {
+                Column({ space: 5 }) {
                   Text("连续")
                     .fontSize(14)
 
@@ -338,7 +338,7 @@ export struct Stats {
       }
       .width('100%')
       .height('100%')
-      .padding({ top: this.statusBarHeight + (this.displayWidth >= 1000 ? 86 : 66), bottom: getBottomContentInset(0, this.isStartPlaying, 99) })
+      .padding({ top: this.statusBarHeight + (this.displayWidth >= 1000 ? 86 : 66), bottom: getBottomContentInset(0, this.isStartPlaying, 99, false) })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
