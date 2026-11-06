@@ -314,7 +314,7 @@ export struct PlaybackMiniBar {
             .margin({ top: 4 })
         }
         .layoutWeight(1)
-        .margin({ right: 8 })
+        .margin({ right: 4 })
         .clip(false)
         .onClick(() => {
           if (this.canOpenPlayer()) {
