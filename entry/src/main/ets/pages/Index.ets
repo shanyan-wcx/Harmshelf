@@ -289,10 +289,16 @@ struct Index {
     this.pageInfos.setInterception({
       willShow: (from: NavDestinationContext | "navBar", to: NavDestinationContext | "navBar",
         operation: NavigationOperation, animated: boolean) => {
-        if (typeof to === "string") {
-          this.isIndex = true
+        const updateIndexState = () => {
+          this.isIndex = typeof to === "string"
+        }
+        if (animated) {
+          this.getUIContext().animateTo({
+            duration: 280,
+            curve: Curve.Friction
+          }, updateIndexState)
         } else {
-          this.isIndex = false
+          updateIndexState()
         }
       }
     })

@@ -218,7 +218,8 @@ export struct PlaybackMiniBar {
     .height(this.isExpanded() ? 48 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
     .margin({ left: this.isExpanded() ? 4 : 0, right: this.isExpanded() ? 4 : 0 })
     .clip(false)
-    .hitTestBehavior(this.isExpanded() ? HitTestMode.Default : HitTestMode.Transparent)
+    // Let HdsTabs receive collapsed-bar clicks; the cover only owns clicks once expanded.
+    .hitTestBehavior(this.isExpanded() ? HitTestMode.Default : HitTestMode.None)
     .onClick(() => {
       if (this.isExpanded()) {
         this.openPlayer()
@@ -315,7 +316,6 @@ export struct PlaybackMiniBar {
           .margin({ top: 4 })
       }
       .layoutWeight(1)
-      .padding({ left: 4, right: 4 })
       .clip(false)
       .onClick(() => {
         this.openPlayer()
@@ -332,6 +332,11 @@ export struct PlaybackMiniBar {
     .width('100%')
     .height('100%')
     .alignItems(VerticalAlign.Center)
+    .geometryTransition("miniBar")
+    .transition(TransitionEffect.OPACITY.animation({
+      duration: 280,
+      curve: Curve.Friction
+    }))
     .clip(false)
   }
 
@@ -342,6 +347,11 @@ export struct PlaybackMiniBar {
     }
     .width('100%')
     .height('100%')
+    .geometryTransition("miniBar")
+    .transition(TransitionEffect.OPACITY.animation({
+      duration: 280,
+      curve: Curve.Friction
+    }))
     .clip(false)
   }
 
@@ -2065,7 +2075,7 @@ export struct Play {
     }
     .width('100%')
     .height(MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
-    .padding({ left: 16, right: 16 })
+    .padding({ left: 0, right: 0 })
     .margin({ bottom: MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN })
     .clip(false)
     .transition(TransitionEffect.OPACITY.animation({
