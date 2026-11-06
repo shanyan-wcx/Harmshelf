@@ -408,7 +408,7 @@ export struct LibraryItemDetail {
   confirmBuilder() {
     Column() {
       Text("确认从" + this.libraryItem?.media.metadata.title + "的" + this.formatSeconds(this.tmpPlayingItem?.chapters![this.tmpPlayingIndex].start) + "开始播放？")
-        .fontSize(19)
+        .fontSize(18)
         .margin({ bottom: 20 })
 
       if (this.displayWidth >= 600) {
@@ -474,7 +474,7 @@ export struct LibraryItemDetail {
   confirmDownloadBuilder() {
     Column() {
       Text("确认下载" + this.libraryItem?.media.metadata.title + "？")
-        .fontSize(19)
+        .fontSize(18)
         .margin({ bottom: 15 })
 
       Column({ space: 8 }) {

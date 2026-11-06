@@ -193,7 +193,7 @@ export struct EpisodeDetail {
   deleteConfirmBuilder() {
     Column() {
       Text("确认从服务器删除" + this.episode!.title + "？")
-        .fontSize(19)
+        .fontSize(18)
         .margin({ bottom: 20 })
 
       if (this.displayWidth >= 600) {
@@ -258,7 +258,7 @@ export struct EpisodeDetail {
   confirmDownloadBuilder() {
     Column() {
       Text("确认下载" + this.episode?.title + "？")
-        .fontSize(19)
+        .fontSize(18)
         .margin({ bottom: 20 })
 
       if (this.displayWidth >= 600) {

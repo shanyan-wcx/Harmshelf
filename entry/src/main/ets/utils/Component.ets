@@ -1631,7 +1631,7 @@ export struct EpisodeComponent {
   confirmDownloadBuilder() {
     Column() {
       Text("确认下载" + this.item.title + "？")
-        .fontSize(19)
+        .fontSize(18)
         .margin({ bottom: 20 })
 
       if (this.displayWidth >= 600) {
@@ -2412,7 +2412,7 @@ export struct EpisodeComponent1 {
   confirmDownloadBuilder() {
     Column() {
       Text("确认下载" + this.item.title + "？")
-        .fontSize(19)
+        .fontSize(18)
         .margin({ bottom: 20 })
 
       if (this.displayWidth >= 600) {
