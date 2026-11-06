@@ -46,6 +46,14 @@ export struct PlaybackMiniBar {
   @Consumer() playedPercent: number = 0
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Local fadeInterval: number = -1
+  @Local playerCoverTransition: boolean = false
+
+  @Monitor('showPlay')
+  resetPlayerCoverTransition(_: IMonitor) {
+    if (!this.showPlay) {
+      this.playerCoverTransition = false
+    }
+  }
 
   private isExpanded(): boolean {
     return this.forceExpanded || this.miniBarState.expanded
@@ -190,7 +198,10 @@ export struct PlaybackMiniBar {
   }
 
   private openPlayer() {
-    this.showPlay = true
+    this.playerCoverTransition = true
+    this.getUIContext().animateTo({ duration: 280, curve: Curve.Friction }, () => {
+      this.showPlay = true
+    })
   }
 
   @Builder
@@ -205,6 +216,7 @@ export struct PlaybackMiniBar {
         .clipShape(new CircleShape({ width: '100%', height: '100%' }))
         .borderRadius(this.isExpanded() ? 22 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT / 2)
         .clip(true)
+        .geometryTransition(this.playerCoverTransition ? 'playerCoverTransition' : '')
 
       Progress({ value: this.playedPercent, total: 100, type: ProgressType.Ring })
         .width(this.isExpanded() ? 48 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
@@ -1532,7 +1544,8 @@ export struct Play {
                   .width('100%')
                   .aspectRatio(1)
                   .draggable(false)
-                  .geometryTransition("cover")
+                  .geometryTransition('playerCoverTransition')
+                  .id('remotePlayerCover')
               } else if (this.localPlayItem?.coverPath) {
                 Image(fileUri.getUriFromPath(this.localPlayItem.coverPath))
                   .alt($rawfile('nocover.jpg'))
@@ -1540,14 +1553,16 @@ export struct Play {
                   .width('100%')
                   .aspectRatio(1)
                   .draggable(false)
-                  .geometryTransition("cover")
+                  .geometryTransition('playerCoverTransition')
+                  .id('localPlayerCover')
               } else {
                 Image($rawfile('nocover.jpg'))
                   .objectFit(ImageFit.Contain)
                   .width('100%')
                   .aspectRatio(1)
                   .draggable(false)
-                  .geometryTransition("cover")
+                  .geometryTransition('playerCoverTransition')
+                  .id('fallbackPlayerCover')
               }
 
               Stack({ alignContent: Alignment.Bottom }) {
@@ -2070,6 +2085,7 @@ export struct Play {
     .height('100%')
     .hitTestBehavior(HitTestMode.Transparent)
     .bindContentCover(this.showPlay, this.playBuilder(), {
+      modalTransition: ModalTransition.NONE,
       onDisappear: () => {
         this.showPlay = false
         if (this.shouldClosePlayer) {

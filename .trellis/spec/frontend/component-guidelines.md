@@ -137,6 +137,14 @@ right-only negative margin. Remove any second opacity transition from the
 expanded/collapsed custom roots; HdsTabs already owns the expand/collapse
 animation. Do not change the native bar width.
 
+When an expanded minibar opens the full player through `bindContentCover`,
+use `modalTransition: ModalTransition.NONE` and set the shared cover
+`geometryTransition` ID only for the opening `animateTo` transaction. The
+minibar cover and full-player cover must share that ID; clear the minibar
+binding after the cover closes so the cover does not participate in
+minibar-to-non-tab transitions. Give each full-player `if/else` cover branch a
+stable node ID.
+
 For an `if/else` geometry transition, add a stable `.id(...)` to the first
 node under both branches (and to each parallel first node) so a retriggered
 transition reuses the existing nodes instead of ghosting; keep the shared
