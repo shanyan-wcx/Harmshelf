@@ -509,78 +509,113 @@ export struct Play {
   }
 
   @Builder
+  bookmarkEnd(bookmark: Bookmark, index: number) {
+    Row() {
+      Row() {
+        ImmersiveActionButton({
+          barWidth: 40,
+          barHeight: 40,
+          onButtonClick: () => {
+            this.showBookmark = false
+            this.editBookmarkIndex = index
+            this.tmpBookmarkTitle = bookmark.title
+            this.tmpBookmarkTime = bookmark.time
+            this.showEditBookmark = true
+          }
+        }) {
+          SymbolGlyph($r('sys.symbol.square_and_pencil'))
+            .fontSize(18)
+            .fontColor([$r('sys.color.font')])
+            .hitTestBehavior(HitTestMode.None)
+        }
+      }
+      .width(40)
+      .height(40)
+      .margin({ left: 10, right: 10 })
+      .clip(false)
+
+      Row() {
+        ImmersiveActionButton({
+          barWidth: 40,
+          barHeight: 40,
+          onButtonClick: async () => {
+            let status = await deleteBookmark(this.playingItem!.libraryItemId, bookmark.time)
+            if (status) {
+              this.showBookmark = false
+              this.getUIContext().getPromptAction().showToast({
+                message: '删除书签成功！',
+                duration: 500
+              });
+            } else {
+              this.getUIContext().getPromptAction().showToast({
+                message: '删除书签失败，请检查网络！',
+                duration: 500
+              });
+            }
+          }
+        }) {
+          SymbolGlyph($r('sys.symbol.trash_fill'))
+            .fontSize(18)
+            .fontColor([Color.Red])
+            .hitTestBehavior(HitTestMode.None)
+        }
+      }
+      .width(40)
+      .height(40)
+      .margin({ left: 10, right: 10 })
+      .clip(false)
+    }
+    .clip(false)
+  }
+
+  @Builder
   bookmarkBuilder() {
     Column() {
       Stack() {
         List() {
            ForEach(this.bookmarks, (bookmark: Bookmark, index) => {
-             HdsListItem({
-               hdsListItemCard: {
-                 cardBorderRadius: 10,
-                 cardBackgroundColor: Color.Transparent,
-                 textItem: {
-                   primaryText: {
-                     text: bookmark.title.length === 0 ? this.formatTime(bookmark.createdAt) : bookmark.title,
-                     modifier: new TextModifier().fontSize(16)
+             ListItem() {
+               HdsListItem({
+                 hdsListItemCard: {
+                   cardBorderRadius: 10,
+                   cardBackgroundColor: Color.Transparent,
+                   textItem: {
+                     primaryText: {
+                       text: bookmark.title.length === 0 ? this.formatTime(bookmark.createdAt) : bookmark.title,
+                       modifier: new TextModifier().fontSize(16)
+                     },
+                     primaryPrefixSymbol: {
+                       symbol: $r('sys.symbol.bookmark')
+                     },
+                     secondaryText: {
+                       text: this.formatSeconds(bookmark.time),
+                       modifier: new TextModifier().fontSize(16).fontColor($r('sys.color.font_secondary'))
+                     },
+                     secondaryPrefixSymbol: {
+                       symbol: $r('sys.symbol.clock')
+                     }
                    },
-                   primaryPrefixSymbol: {
-                     symbol: $r('sys.symbol.bookmark')
-                   },
-                   secondaryText: {
-                     text: this.formatSeconds(bookmark.time),
-                     modifier: new TextModifier().fontSize(16).fontColor($r('sys.color.font_secondary'))
-                   },
-                   secondaryPrefixSymbol: {
-                     symbol: $r('sys.symbol.clock')
+                   onClick: async () => {
+                     this.showBookmark = false
+                     await this.avPlayer!.reset();
+                     this.isPlaying = true
+                     await this.getPlayContent(this.playingItem!, bookmark.time)
+                     this.getUIContext().getPromptAction().showToast({
+                       message: '跳转书签成功！',
+                       duration: 500
+                     });
                    }
-                 },
-                 onClick: async () => {
-                   this.showBookmark = false
-                   await this.avPlayer!.reset();
-                   this.isPlaying = true
-                   await this.getPlayContent(this.playingItem!, bookmark.time)
-                   this.getUIContext().getPromptAction().showToast({
-                     message: '跳转书签成功！',
-                     duration: 500
-                   });
                  }
-               },
-               swipeActionOptions: {
-                 icons: [
-                   {
-                     icon: new SymbolGlyphModifier($r('sys.symbol.square_and_pencil')).fontSize(18)
-                       .fontColor([$r('sys.color.font')]),
-                     backgroundColor: $r('sys.color.comp_background_tertiary'),
-                     onAction: () => {
-                       this.showBookmark = false
-                       this.editBookmarkIndex = index
-                       this.tmpBookmarkTitle = bookmark.title
-                       this.tmpBookmarkTime = bookmark.time
-                       this.showEditBookmark = true
-                     }
-                   }
-                 ],
-                 deleteIconOptions: {
-                   backgroundColor: $r('sys.color.comp_background_tertiary'),
-                   iconColor: Color.Red,
-                   onAction: async () => {
-                     let status = await deleteBookmark(this.playingItem!.libraryItemId, bookmark.time)
-                     if (status) {
-                       this.showBookmark = false
-                       this.getUIContext().getPromptAction().showToast({
-                         message: '删除书签成功！',
-                         duration: 500
-                       });
-                     } else {
-                       this.getUIContext().getPromptAction().showToast({
-                         message: '删除书签失败，请检查网络！',
-                         duration: 500
-                       });
-                     }
-                   }
+               })
+             }
+             .swipeAction({
+               end: {
+                 builder: () => {
+                   this.bookmarkEnd(bookmark, index)
                  }
                }
              })
+             .clip(false)
           })
 
           if (this.bookmarks.length === 0) {
