@@ -760,3 +760,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 31: 修复非 Tab 进度环尺寸
+
+**Date**: 2026-11-06
+**Task**: 修复非 Tab 进度环尺寸
+**Branch**: `main`
+
+### Summary
+
+将非 Tab 播放条展开态进度环从 48vp 改为 44vp，与封面外圈完全重合；收起态保持 56vp。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `0f9c5e6` | (see git log) |
+
+### Status
+
+[OK] **Completed**

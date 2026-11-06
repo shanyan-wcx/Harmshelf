@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 30
+- **Total Sessions**: 31
 - **Last Active**: 2026-11-06
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~762 | Active |
+| `journal-1.md` | ~783 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 31 | 2026-11-06 | 修复非 Tab 进度环尺寸 | `0f9c5e6` | `main` |
 | 30 | 2026-11-06 | 修复非 Tab 播放条进度环叠放 | `4768328` | `main` |
 | 29 | 2026-11-06 | 恢复播放器 minibar 原生动画 | `12a71f2` | `main` |
 | 28 | 2026-11-06 | 播放器 minibar 拖拽全屏转场 | `292cd57` | `main` |
