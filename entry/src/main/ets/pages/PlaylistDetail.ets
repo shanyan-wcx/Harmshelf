@@ -169,6 +169,12 @@ export struct PlaylistDetail {
         .width("100%")
         .height(45)
         .borderRadius(10)
+        .border({
+          width: 0.35,
+          radius: 10,
+          color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+        })
+        .shadow(ShadowStyle.OUTER_DEFAULT_XS)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
@@ -188,6 +194,12 @@ export struct PlaylistDetail {
         .width("100%")
         .height(120)
         .borderRadius(10)
+        .border({
+          width: 0.35,
+          radius: 10,
+          color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+        })
+        .shadow(ShadowStyle.OUTER_DEFAULT_XS)
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)

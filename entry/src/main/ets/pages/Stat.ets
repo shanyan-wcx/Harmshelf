@@ -338,7 +338,7 @@ export struct Stats {
       }
       .width('100%')
       .height('100%')
-      .padding({ top: this.statusBarHeight + (this.displayWidth >= 1000 ? 86 : 66), bottom: getBottomContentInset(0, this.isStartPlaying, 99, false) })
+      .padding({ top: this.statusBarHeight + (this.displayWidth >= 1000 ? 86 : 66), bottom: getBottomContentInset(20, this.isStartPlaying, 104) })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)

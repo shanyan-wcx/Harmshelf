@@ -99,6 +99,12 @@ export struct Setting {
               .height(40)
               .layoutWeight(1)
               .borderRadius(10)
+              .border({
+                width: 0.35,
+                radius: 10,
+                color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+              })
+              .shadow(ShadowStyle.OUTER_DEFAULT_XS)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(18)
@@ -145,6 +151,12 @@ export struct Setting {
               .margin({ right: -20 })
               .layoutWeight(1)
               .borderRadius(10)
+              .border({
+                width: 0.35,
+                radius: 10,
+                color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+              })
+              .shadow(ShadowStyle.OUTER_DEFAULT_XS)
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(18)
               .placeholderFont({
@@ -170,6 +182,12 @@ export struct Setting {
               .height(40)
               .layoutWeight(1)
               .borderRadius(10)
+              .border({
+                width: 0.35,
+                radius: 10,
+                color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+              })
+              .shadow(ShadowStyle.OUTER_DEFAULT_XS)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(18)
@@ -196,6 +214,12 @@ export struct Setting {
               .height(40)
               .layoutWeight(1)
               .borderRadius(10)
+              .border({
+                width: 0.35,
+                radius: 10,
+                color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+              })
+              .shadow(ShadowStyle.OUTER_DEFAULT_XS)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(18)
@@ -299,6 +323,12 @@ export struct Setting {
               .height(40)
               .layoutWeight(1)
               .borderRadius(10)
+              .border({
+                width: 0.35,
+                radius: 10,
+                color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+              })
+              .shadow(ShadowStyle.OUTER_DEFAULT_XS)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(18)
@@ -346,6 +376,12 @@ export struct Setting {
               .margin({ right: -20 })
               .layoutWeight(1)
               .borderRadius(10)
+              .border({
+                width: 0.35,
+                radius: 10,
+                color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+              })
+              .shadow(ShadowStyle.OUTER_DEFAULT_XS)
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(18)
               .placeholderFont({
@@ -372,6 +408,12 @@ export struct Setting {
               .height(40)
               .layoutWeight(1)
               .borderRadius(10)
+              .border({
+                width: 0.35,
+                radius: 10,
+                color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+              })
+              .shadow(ShadowStyle.OUTER_DEFAULT_XS)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(18)
@@ -399,6 +441,12 @@ export struct Setting {
               .height(40)
               .layoutWeight(1)
               .borderRadius(10)
+              .border({
+                width: 0.35,
+                radius: 10,
+                color: $r('sys.color.ohos_id_color_focused_outline_transparent')
+              })
+              .shadow(ShadowStyle.OUTER_DEFAULT_XS)
               .margin({ left: 15 })
               .caretColor($r('sys.color.font_secondary'))
               .fontSize(18)
