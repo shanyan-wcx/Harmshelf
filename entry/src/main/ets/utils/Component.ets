@@ -2091,8 +2091,8 @@ export struct EpisodeComponent {
               if (this.showPlayLoading) {
                 Column() {
                   LoadingProgress()
-                    .width(18)
-                    .height(18)
+                    .width(16)
+                    .height(16)
                     .color($r('sys.color.ohos_id_color_titlebar_icon'))
                 }
               } else {
@@ -2106,7 +2106,7 @@ export struct EpisodeComponent {
               }
 
               Text(this.formatDuration(this.item.duration!))
-                .fontSize(18)
+                .fontSize(17)
                 .fontWeight(FontWeight.Medium)
                 .maxLines(1)
                 .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -2808,8 +2808,8 @@ export struct EpisodeComponent1 {
             if (this.showPlayLoading) {
               Column() {
                 LoadingProgress()
-                  .width(18)
-                  .height(18)
+                  .width(16)
+                  .height(16)
                   .color($r('sys.color.ohos_id_color_titlebar_icon'))
               }
             } else {
@@ -2823,7 +2823,7 @@ export struct EpisodeComponent1 {
             }
 
             Text(this.formatDuration(this.item.duration!))
-              .fontSize(18)
+              .fontSize(17)
               .fontWeight(FontWeight.Medium)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
