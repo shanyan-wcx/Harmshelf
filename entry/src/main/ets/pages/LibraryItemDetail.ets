@@ -2293,6 +2293,7 @@ export struct LibraryItemDetail {
           right: 20,
           bottom: this.isStartPlaying ? MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT + MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN : 0
         })
+        .animation({ duration: 280, curve: Curve.Friction })
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .scrollBar(BarState.Off)
         .align(Alignment.Top)
