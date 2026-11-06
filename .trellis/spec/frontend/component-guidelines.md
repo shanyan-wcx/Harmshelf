@@ -143,7 +143,11 @@ use `modalTransition: ModalTransition.NONE` and set the shared cover
 minibar cover and full-player cover must share that ID; clear the minibar
 binding after the cover closes so the cover does not participate in
 minibar-to-non-tab transitions. Give each full-player `if/else` cover branch a
-stable node ID.
+stable node ID. Because `ModalTransition.NONE` removes the content-cover's
+default visual transition, pair the shared geometry id on both source and
+target cover nodes with the same visible `.transition(...)`; otherwise the
+cover may be inserted at its final position even though the geometry binding
+is present.
 
 For an `if/else` geometry transition, add a stable `.id(...)` to the first
 node under both branches (and to each parallel first node) so a retriggered

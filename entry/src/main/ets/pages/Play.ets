@@ -216,6 +216,10 @@ export struct PlaybackMiniBar {
         .clipShape(new CircleShape({ width: '100%', height: '100%' }))
         .borderRadius(this.isExpanded() ? 22 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT / 2)
         .clip(true)
+        .transition(TransitionEffect.OPACITY.animation({
+          duration: 280,
+          curve: Curve.Friction
+        }))
         .geometryTransition(this.playerCoverTransition ? 'playerCoverTransition' : '')
 
       Progress({ value: this.playedPercent, total: 100, type: ProgressType.Ring })
@@ -325,7 +329,7 @@ export struct PlaybackMiniBar {
     .alignItems(VerticalAlign.Center)
     .geometryTransition("miniBar")
     .id('expandedMiniBar')
-    .width(this.isStandalone ? 'calc(100% + 24vp)' : '100%')
+    .width(this.isStandalone ? 'calc(100% + 22vp)' : '100%')
     .margin({ right: this.isStandalone ? 0 : -8 })
     .clip(false)
     .onClick(() => {
@@ -1544,6 +1548,10 @@ export struct Play {
                   .width('100%')
                   .aspectRatio(1)
                   .draggable(false)
+                  .transition(TransitionEffect.OPACITY.animation({
+                    duration: 280,
+                    curve: Curve.Friction
+                  }))
                   .geometryTransition('playerCoverTransition')
                   .id('remotePlayerCover')
               } else if (this.localPlayItem?.coverPath) {
@@ -1553,6 +1561,10 @@ export struct Play {
                   .width('100%')
                   .aspectRatio(1)
                   .draggable(false)
+                  .transition(TransitionEffect.OPACITY.animation({
+                    duration: 280,
+                    curve: Curve.Friction
+                  }))
                   .geometryTransition('playerCoverTransition')
                   .id('localPlayerCover')
               } else {
@@ -1561,6 +1573,10 @@ export struct Play {
                   .width('100%')
                   .aspectRatio(1)
                   .draggable(false)
+                  .transition(TransitionEffect.OPACITY.animation({
+                    duration: 280,
+                    curve: Curve.Friction
+                  }))
                   .geometryTransition('playerCoverTransition')
                   .id('fallbackPlayerCover')
               }

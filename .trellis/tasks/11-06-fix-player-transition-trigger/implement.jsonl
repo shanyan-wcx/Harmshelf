@@ -1,0 +1,2 @@
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"播放器 minibar、geometryTransition 与 bindContentCover 的现有约束。"}
+{"file":".trellis/spec/frontend/directory-structure.md","reason":"确认播放器页面的实现边界和入口文件。"}

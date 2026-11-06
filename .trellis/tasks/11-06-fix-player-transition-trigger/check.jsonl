@@ -1,0 +1,2 @@
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"检查共享封面 geometryTransition、节点 id、动画和裁切约束。"}
+{"file":".trellis/spec/frontend/type-safety.md","reason":"检查 ArkTS 状态字段与组件修改是否遵守项目类型约定。"}
