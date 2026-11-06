@@ -296,7 +296,7 @@ export struct PlaybackMiniBar {
 
           Text(this.getPlaybackSubtitle())
             .width('100%')
-            .fontSize(13)
+            .fontSize(12)
             .fontColor($r('sys.color.font_secondary'))
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.MARQUEE })
