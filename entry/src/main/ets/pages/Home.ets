@@ -316,7 +316,7 @@ export struct Home {
       } else {
         Column() {
           Text("没有服务器")
-            .fontSize(32)
+            .fontSize(24)
         }
         .width('100%')
         .height('100%')

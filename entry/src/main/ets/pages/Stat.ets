@@ -303,12 +303,12 @@ export struct Stats {
 
                   Column() {
                     Text(recentSession.mediaMetadata.title)
-                      .fontSize(14)
+                      .fontSize(15)
                       .maxLines(1)
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                     Text(recentSession.date)
-                      .fontSize(12)
+                      .fontSize(13)
                       .fontColor($r('sys.color.font_secondary'))
                       .maxLines(1)
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -346,7 +346,7 @@ export struct Stats {
     } else {
       Column() {
         Text("没有服务器")
-          .fontSize(32)
+          .fontSize(24)
       }
       .width('100%')
       .height('100%')

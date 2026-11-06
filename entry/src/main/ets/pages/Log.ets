@@ -186,7 +186,7 @@ export struct Log {
 
         if (!this.showLoadingProgress && this.displayLogs.length === 0) {
           Text('没有日志')
-            .fontSize(32)
+            .fontSize(24)
             .fontColor($r('sys.color.font'))
             .margin({ bottom: 56 })
         }

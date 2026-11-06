@@ -32,7 +32,7 @@ export struct RecentEpisodes {
 
           Column() {
             Text("没有剧集")
-              .fontSize(32)
+              .fontSize(24)
               .fontColor($r('sys.color.font'))
           }
           .width('100%')

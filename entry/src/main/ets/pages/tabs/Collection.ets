@@ -52,7 +52,7 @@ export struct AllCollections {
 
         Column() {
           Text("没有收藏")
-            .fontSize(32)
+            .fontSize(24)
             .fontColor($r('sys.color.font'))
         }
         .width('100%')

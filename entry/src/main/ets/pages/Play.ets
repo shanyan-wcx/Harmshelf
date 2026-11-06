@@ -939,7 +939,8 @@ export struct Play {
             ListItem() {
               Column() {
                 Text("没有书签")
-                  .fontSize(24)
+                  .fontSize(18)
+                  .offset({ y: -45 })
               }
             }
             .width('100%')

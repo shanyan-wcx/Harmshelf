@@ -61,7 +61,7 @@ export struct AllPlaylists {
 
         Column() {
           Text("没有播放列表")
-            .fontSize(32)
+            .fontSize(24)
             .fontColor($r('sys.color.font'))
         }
         .width('100%')
