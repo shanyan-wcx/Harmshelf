@@ -676,3 +676,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 27: 修复播放器 minibar 状态与全屏转场
+
+**Date**: 2026-11-06
+**Task**: 修复播放器 minibar 状态与全屏转场
+**Branch**: `main`
+
+### Summary
+
+修复 minibar 快速展开收起的过期回调与动画态触摸穿透，合并稳定 Builder 根节点；移除播放器封面和播放页根节点的透明度转场，保留 geometryTransition 共享元素转场；DevEco API 26 debug 构建通过。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `7ac1fdd` | (see git log) |
+
+### Status
+
+[OK] **Completed**
