@@ -701,7 +701,7 @@ export struct EpisodeDetail {
                     Row() {
                       SymbolGlyph($r('sys.symbol.play_fill'))
                         .fontWeight(FontWeight.Normal)
-                        .fontSize(17)
+                        .fontSize(18)
                         .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
                         .hitTestBehavior(HitTestMode.None)
                         .margin({ bottom: 1 })
@@ -744,7 +744,7 @@ export struct EpisodeDetail {
               }) {
                 SymbolGlyph($r('sys.symbol.download'))
                   .fontWeight(FontWeight.Medium)
-                  .fontSize($r('sys.float.ohos_id_text_size_headline8'))
+                  .fontSize($r('sys.float.ohos_id_text_size_headline7'))
                   .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
                   .hitTestBehavior(HitTestMode.None)
                 }
@@ -774,7 +774,7 @@ export struct EpisodeDetail {
               }) {
                 SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
                   .fontWeight(FontWeight.Medium)
-                  .fontSize($r('sys.float.ohos_id_text_size_headline8'))
+                  .fontSize($r('sys.float.ohos_id_text_size_headline7'))
                   .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
                   .hitTestBehavior(HitTestMode.None)
                 }
@@ -807,7 +807,7 @@ export struct EpisodeDetail {
             HmParseHTML({
               htmlStr: this.episode!.description.replace(/<br\s*\/?>/gi, '')
                 .replace(/<ul([\s\S]*?)<\/ul>/gi, '<p><ul$1</ul></p>'),
-              baseFontSize: 17,
+              baseFontSize: 16,
               baseFontColor: env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK ? '#fff' : '#000',
               onClickCallback: (e: ClickEvent, node: Node) => {
                 if (node.tag === 'a' && node.props.href !== undefined) {

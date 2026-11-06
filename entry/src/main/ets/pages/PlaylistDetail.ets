@@ -425,8 +425,8 @@ export struct PlaylistDetail {
                   if (this.showPlayLoading) {
                     Column() {
                       LoadingProgress()
-                        .width(30)
-                        .height(30)
+                        .width(28)
+                        .height(28)
                         .color($r('sys.color.ohos_id_color_titlebar_icon'))
                     }
                   } else {
@@ -439,7 +439,7 @@ export struct PlaylistDetail {
                         .margin({ bottom: 1 })
 
                       Text(" 播放")
-                        .fontSize(18)
+                        .fontSize(17)
                         .fontWeight(FontWeight.Medium)
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })

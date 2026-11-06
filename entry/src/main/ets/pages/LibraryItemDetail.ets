@@ -1337,7 +1337,7 @@ export struct LibraryItemDetail {
                           Row() {
                             SymbolGlyph($r('sys.symbol.play_fill'))
                               .fontWeight(FontWeight.Normal)
-                              .fontSize(17)
+                              .fontSize(18)
                               .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
                               .hitTestBehavior(HitTestMode.None)
                               .margin({ bottom: 1 })
@@ -1381,7 +1381,7 @@ export struct LibraryItemDetail {
                       }) {
                         SymbolGlyph($r('sys.symbol.download'))
                           .fontWeight(FontWeight.Medium)
-                          .fontSize($r('sys.float.ohos_id_text_size_headline8'))
+                          .fontSize($r('sys.float.ohos_id_text_size_headline7'))
                           .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
                           .hitTestBehavior(HitTestMode.None)
                       }
@@ -1412,7 +1412,7 @@ export struct LibraryItemDetail {
                     }) {
                       SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
                         .fontWeight(FontWeight.Medium)
-                        .fontSize($r('sys.float.ohos_id_text_size_headline8'))
+                        .fontSize($r('sys.float.ohos_id_text_size_headline7'))
                         .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
                         .hitTestBehavior(HitTestMode.None)
                     }
@@ -1496,7 +1496,7 @@ export struct LibraryItemDetail {
                 Column() {
                   Row() {
                     Text("作者")
-                      .fontSize(17)
+                      .fontSize(16)
                       .margin({ right: 20 })
                       .fontColor($r('sys.color.font_secondary'))
                       .width(this.library?.mediaType === 'book' ? 68 : 34)
@@ -1508,7 +1508,7 @@ export struct LibraryItemDetail {
                         ForEach(this.libraryItem!.media.metadata.authors, (author: Author, index) => {
                           Row() {
                             Text(author.name)
-                              .fontSize(17)
+                              .fontSize(16)
                               .decoration({
                                 type: TextDecorationType.Underline
                               })
@@ -1523,7 +1523,7 @@ export struct LibraryItemDetail {
                             if (this.libraryItem!.media.metadata.authors &&
                               index < this.libraryItem!.media.metadata.authors.length - 1) {
                               Text(", ")
-                                .fontSize(17)
+                                .fontSize(16)
                             }
                           }
                           .margin({ top: 5 })
@@ -1534,7 +1534,7 @@ export struct LibraryItemDetail {
                       .margin({ top: -5 })
                     } else if (this.library?.mediaType === 'podcast') {
                       Text(this.libraryItem!.media.metadata.author)
-                        .fontSize(17)
+                        .fontSize(16)
                         .width('100%')
                         .layoutWeight(1)
                         .maxLines(1)
@@ -1557,7 +1557,7 @@ export struct LibraryItemDetail {
                   if (this.libraryItem?.media.metadata.seriesName) {
                     Row() {
                       Text("系列")
-                        .fontSize(17)
+                        .fontSize(16)
                         .margin({ right: 20 })
                         .fontColor($r('sys.color.font_secondary'))
                         .width(68)
@@ -1565,7 +1565,7 @@ export struct LibraryItemDetail {
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                       Text(this.libraryItem?.media.metadata.seriesName)
-                        .fontSize(17)
+                        .fontSize(16)
                         .width('100%')
                         .layoutWeight(1)
                         .maxLines(1)
@@ -1590,7 +1590,7 @@ export struct LibraryItemDetail {
                   if (this.library?.mediaType === 'book') {
                     Row() {
                       Text("持续时间")
-                        .fontSize(17)
+                        .fontSize(16)
                         .margin({ right: 20 })
                         .fontColor($r('sys.color.font_secondary'))
                         .width(68)
@@ -1598,7 +1598,7 @@ export struct LibraryItemDetail {
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                       Text(this.formatDuration(this.libraryItem!.media.duration))
-                        .fontSize(17)
+                        .fontSize(16)
                         .width('100%')
                         .layoutWeight(1)
                         .maxLines(1)
@@ -1612,7 +1612,7 @@ export struct LibraryItemDetail {
                   if (this.library?.mediaType === 'book') {
                     Row() {
                       Text("演播者")
-                        .fontSize(17)
+                        .fontSize(16)
                         .margin({ top: 5, right: 20 })
                         .fontColor($r('sys.color.font_secondary'))
                         .width(68)
@@ -1623,7 +1623,7 @@ export struct LibraryItemDetail {
                         ForEach(this.libraryItem!.media.metadata.narrators, (narrator: string, index) => {
                           Row() {
                             Text(narrator)
-                              .fontSize(17)
+                              .fontSize(16)
                               .decoration({
                                 type: TextDecorationType.Underline
                               })
@@ -1638,7 +1638,7 @@ export struct LibraryItemDetail {
                             if (this.libraryItem!.media.metadata.narrators &&
                               index < this.libraryItem!.media.metadata.narrators.length - 1) {
                               Text(", ")
-                                .fontSize(17)
+                                .fontSize(16)
                             }
                           }
                           .margin({ top: 5 })
@@ -1656,7 +1656,7 @@ export struct LibraryItemDetail {
                   if (this.libraryItem!.media.metadata.genres.length > 0) {
                     Row() {
                       Text("流派")
-                        .fontSize(17)
+                        .fontSize(16)
                         .margin({ top: 5, right: 20 })
                         .fontColor($r('sys.color.font_secondary'))
                         .width(this.library?.mediaType === 'book' ? 68 : 34)
@@ -1667,7 +1667,7 @@ export struct LibraryItemDetail {
                         ForEach(this.libraryItem!.media.metadata.genres, (genre: string, index) => {
                           Row() {
                             Text(genre)
-                              .fontSize(17)
+                              .fontSize(16)
                               .decoration({
                                 type: TextDecorationType.Underline
                               })
@@ -1681,7 +1681,7 @@ export struct LibraryItemDetail {
 
                             if (index < this.libraryItem!.media.metadata.genres.length - 1) {
                               Text(", ")
-                                .fontSize(17)
+                                .fontSize(16)
                             }
                           }
                           .margin({ top: 5 })
@@ -1699,7 +1699,7 @@ export struct LibraryItemDetail {
                   if (this.libraryItem!.media.tags.length > 0) {
                     Row() {
                       Text("标签")
-                        .fontSize(17)
+                        .fontSize(16)
                         .margin({ top: 5, right: 20 })
                         .fontColor($r('sys.color.font_secondary'))
                         .width(this.library?.mediaType === 'book' ? 68 : 34)
@@ -1710,7 +1710,7 @@ export struct LibraryItemDetail {
                         ForEach(this.libraryItem!.media.tags, (tag: string, index) => {
                           Row() {
                             Text(tag)
-                              .fontSize(17)
+                              .fontSize(16)
                               .decoration({
                                 type: TextDecorationType.Underline
                               })
@@ -1724,7 +1724,7 @@ export struct LibraryItemDetail {
 
                             if (index < this.libraryItem!.media.tags.length - 1) {
                               Text(", ")
-                                .fontSize(17)
+                                .fontSize(16)
                             }
                           }
                           .margin({ top: 5 })
@@ -1742,7 +1742,7 @@ export struct LibraryItemDetail {
                   if (this.library?.mediaType === 'book') {
                     Row() {
                       Text("发布年份")
-                        .fontSize(17)
+                        .fontSize(16)
                         .margin({ right: 20 })
                         .fontColor($r('sys.color.font_secondary'))
                         .width(68)
@@ -1750,7 +1750,7 @@ export struct LibraryItemDetail {
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                       Text(this.libraryItem!.media.metadata.publishedYear)
-                        .fontSize(17)
+                        .fontSize(16)
                         .width('100%')
                         .layoutWeight(1)
                         .maxLines(1)
@@ -1790,7 +1790,7 @@ export struct LibraryItemDetail {
                         .replace(/\n{3,}/g, '\n\n')
                         .trim()
                     )
-                      .fontSize(17)
+                      .fontSize(16)
                       .width('100%')
                       .maxLines(this.maxIntroLine)
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -1799,7 +1799,7 @@ export struct LibraryItemDetail {
                     Button({ type: ButtonType.Normal }) {
                       Row() {
                         Text(this.showMoreIntro ? "收起" : "阅读更多")
-                          .fontSize(17)
+                          .fontSize(16)
                           .fontWeight(FontWeight.Medium)
                           .maxLines(1)
 
@@ -1954,13 +1954,13 @@ export struct LibraryItemDetail {
                       ListItem() {
                         Row() {
                           Text(chapter.title)
-                            .fontSize(17)
+                            .fontSize(16)
                             .fontWeight(FontWeight.Medium)
                             .width('100%')
                             .layoutWeight(1)
 
                           Text(this.formatSeconds(chapter.start))
-                            .fontSize(16)
+                            .fontSize(15)
                             .fontWeight(FontWeight.Medium)
                             .fontColor($r('sys.color.font_secondary'))
                             .margin({ left: 20 })
@@ -2079,13 +2079,13 @@ export struct LibraryItemDetail {
                       ListItem() {
                         Row() {
                           Text(audioFile.metadata.filename)
-                            .fontSize(17)
+                            .fontSize(16)
                             .fontWeight(FontWeight.Medium)
                             .width('100%')
                             .layoutWeight(1)
 
                           Text(this.formatSeconds(audioFile.duration))
-                            .fontSize(16)
+                            .fontSize(15)
                             .fontWeight(FontWeight.Medium)
                             .fontColor($r('sys.color.font_secondary'))
                             .margin({ left: 20 })
