@@ -118,6 +118,10 @@ return transition appear to work while the forward transition snaps.
 
 HdsTabs `miniBarWidth` must use explicit vp values because the API does not
 accept percentages for its width ranges; the documented maximum is 328vp.
+For a left-right HdsTabs layout, set `barFloatingStyle.barWidth` to the same
+breakpoint values as `miniBarWidth`; otherwise the native layout can size the
+expanded minibar independently from the tab bar. Bind `miniBarStyle` to the
+current native style instead of resetting it to `COLLAPSE` during rebuilds.
 For the non-tab playback capsule, use `width('calc(100% - 40vp)')` with a
 600vp maximum so narrow screens retain 20vp side margins without allowing the
 capsule to grow beyond the desktop limit.

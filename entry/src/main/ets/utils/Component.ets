@@ -346,6 +346,7 @@ export struct MyNavigation {
     .divider({ mode: DividerMode.NONE })
     .clip(false)
     .barFloatingStyle({
+      barWidth: { smallWidth: 328, mediumWidth: 328, largeWidth: 328 },
       barSideMargin: 16,
       barBottomMargin: MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN,
       gradientMask: { maskColor: Color.Transparent },
@@ -356,7 +357,7 @@ export struct MyNavigation {
       miniBar: this.isStartPlaying && this.isIndex ? {
         miniBarBuilder: () => this.miniBarBuilder(),
         miniBarWidth: { smallWidth: 328, mediumWidth: 328, largeWidth: 328 },
-        miniBarStyle: HdsBarStyle.COLLAPSE,
+        miniBarStyle: this.miniBarStyle,
         enableMiniBarClip: false,
         onBarStyleChange: (miniBarStyle: HdsBarStyle) => {
           this.onMiniBarStyleChange(miniBarStyle)

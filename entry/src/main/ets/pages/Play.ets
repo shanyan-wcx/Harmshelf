@@ -204,6 +204,8 @@ export struct PlaybackMiniBar {
         .height(this.isExpanded() ? 44 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
         .draggable(false)
         .clipShape(new CircleShape({ width: '100%', height: '100%' }))
+        .borderRadius(this.isExpanded() ? 22 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT / 2)
+        .clip(true)
         .geometryTransition("cover")
 
       Progress({ value: this.playedPercent, total: 100, type: ProgressType.Ring })
