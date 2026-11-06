@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 20
-- **Last Active**: 2026-10-27
+- **Total Sessions**: 21
+- **Last Active**: 2026-11-06
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~552 | Active |
+| `journal-1.md` | ~573 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 21 | 2026-11-06 | 修复播放条状态同步与跑马灯 | `48c68ee` | `main` |
 | 20 | 2026-10-27 | 搜索结果沉浸光感列表样式 | `10515d8` | `main` |
 | 19 | 2026-10-27 | 修复最新页面剧集按钮间距 | `558d296` | `main` |
 | 18 | 2026-10-27 | 统一最新页面剧集按钮样式 | `1f5b1ce` | `main` |

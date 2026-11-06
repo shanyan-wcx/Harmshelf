@@ -550,3 +550,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 21: 修复播放条状态同步与跑马灯
+
+**Date**: 2026-11-06
+**Task**: 修复播放条状态同步与跑马灯
+**Branch**: `main`
+
+### Summary
+
+按 HdsTabs 与 ArkUI 文档修复 minibar 展开/收起内容延迟：通过 @ObservedV2 状态引用同步自定义 Builder，非 tab 条改为向右 8vp 校正；标题和副标题使用原生 Text marquee loop=-1、delay=3000；DevEco debug 构建通过并提交。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `48c68ee` | (see git log) |
+
+### Status
+
+[OK] **Completed**
