@@ -781,3 +781,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 32: 调整指定页面字号
+
+**Date**: 2026-11-06
+**Task**: 调整指定页面字号
+**Branch**: `main`
+
+### Summary
+
+将首页全部区块标题、统计页全部标题、最新剧集标题、剧集数量标题、设置项名称、日志、关于及关于区域文本从20vp调整为18vp；保留symbol和区块标题不变。静态检查通过，Debug构建因本机Hvigor锁文件权限失败未完成。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `057ca83` | (see git log) |
+
+### Status
+
+[OK] **Completed**
