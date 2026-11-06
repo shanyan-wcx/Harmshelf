@@ -28,7 +28,7 @@ export struct SubHome {
             Column() {
               Row() {
                 Text("继续收听")
-                  .fontSize(20)
+                  .fontSize(18)
                   .fontWeight(FontWeight.Medium)
 
                 pageUpDown({
@@ -89,7 +89,7 @@ export struct SubHome {
             Column() {
               Row() {
                 Text("最新剧集")
-                  .fontSize(20)
+                  .fontSize(18)
                   .fontWeight(FontWeight.Medium)
 
                 pageUpDown({
@@ -135,7 +135,7 @@ export struct SubHome {
             Column() {
               Row() {
                 Text("最近添加")
-                  .fontSize(20)
+                  .fontSize(18)
                   .fontWeight(FontWeight.Medium)
 
                 pageUpDown({
@@ -181,7 +181,7 @@ export struct SubHome {
             Column() {
               Row() {
                 Text("发现")
-                  .fontSize(20)
+                  .fontSize(18)
                   .fontWeight(FontWeight.Medium)
 
                 pageUpDown({
@@ -228,7 +228,7 @@ export struct SubHome {
             Column() {
               Row() {
                 Text("再次收听")
-                  .fontSize(20)
+                  .fontSize(18)
                   .fontWeight(FontWeight.Medium)
 
                 pageUpDown({
@@ -289,7 +289,7 @@ export struct SubHome {
             Column() {
               Row() {
                 Text("最新作者")
-                  .fontSize(20)
+                  .fontSize(18)
                   .fontWeight(FontWeight.Medium)
 
                 pageUpDown({

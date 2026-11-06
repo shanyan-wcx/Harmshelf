@@ -17,7 +17,7 @@ export struct RecentEpisodes {
       Scroll(this.recentEpisodesScroller) {
         Column() {
           Text("最新剧集")
-            .fontSize(20)
+            .fontSize(18)
             .fontWeight(FontWeight.Medium)
             .margin({ top: 16 })
 

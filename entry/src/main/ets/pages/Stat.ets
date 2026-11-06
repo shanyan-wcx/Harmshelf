@@ -162,7 +162,7 @@ export struct Stats {
           GridCol({ span: this.displayWidth >= 1000 ? 2 : 1 }) {
             Column() {
               Text("你的统计数据")
-                .fontSize(20)
+                .fontSize(18)
                 .fontWeight(FontWeight.Medium)
                 .margin({ bottom: 10 })
                 .width('100%')
@@ -214,7 +214,7 @@ export struct Stats {
           GridCol({ span: 1 }) {
             Column() {
               Text("收听分钟数（最近七天）")
-                .fontSize(20)
+                .fontSize(18)
                 .fontWeight(FontWeight.Medium)
                 .margin({ bottom: 20, left: 5 })
                 .width('100%')
@@ -289,7 +289,7 @@ export struct Stats {
           GridCol({ span: 1 }) {
             Column() {
               Text("历史会话")
-                .fontSize(20)
+                .fontSize(18)
                 .fontWeight(FontWeight.Medium)
                 .margin({ bottom: 6 })
                 .width('100%')

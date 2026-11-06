@@ -549,9 +549,9 @@ export struct Setting {
         .margin({ top: 5 })
       Row() {
         Text("版本号")
-          .fontSize(20)
+          .fontSize(18)
         Text('v' + bundleInfo.versionName)
-          .fontSize(20)
+          .fontSize(18)
       }
       .width('100%')
       .margin({ top: 20 })
@@ -559,7 +559,7 @@ export struct Setting {
 
       Row() {
         Text("项目地址")
-          .fontSize(20)
+          .fontSize(18)
         Image($r('app.media.github'))
           .width(25)
           .height(25)
@@ -579,9 +579,9 @@ export struct Setting {
 
       Row() {
         Text("隐私政策")
-          .fontSize(20)
+          .fontSize(18)
         Text("访问链接")
-          .fontSize(20)
+          .fontSize(18)
           .decoration({
             type: TextDecorationType.Underline
           })
@@ -600,9 +600,9 @@ export struct Setting {
 
       Row() {
         Text("用户协议")
-          .fontSize(20)
+          .fontSize(18)
         Text("访问链接")
-          .fontSize(20)
+          .fontSize(18)
           .decoration({
             type: TextDecorationType.Underline
           })
@@ -622,7 +622,7 @@ export struct Setting {
       Divider().margin({ top: 18, bottom: 12 })
 
       Text("赞助支持")
-        .fontSize(20)
+        .fontSize(18)
         .fontWeight(FontWeight.Medium)
 
       Text("如果喜欢 Harmshelf，欢迎赞助支持 🙏")
@@ -867,7 +867,7 @@ export struct Setting {
 
           Row() {
             Text("主题")
-              .fontSize(20)
+              .fontSize(18)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
             Select(this.themes)
@@ -923,7 +923,7 @@ export struct Setting {
 
           Row() {
             Text("淡入淡出")
-              .fontSize(20)
+              .fontSize(18)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
@@ -940,7 +940,7 @@ export struct Setting {
 
           Row() {
             Text("与其他应用同时播放")
-              .fontSize(20)
+              .fontSize(18)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
@@ -958,7 +958,7 @@ export struct Setting {
 
           Row() {
             Text("全局记忆倍速")
-              .fontSize(20)
+              .fontSize(18)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
@@ -981,7 +981,7 @@ export struct Setting {
 
           Row() {
             Text("快进快退时间")
-              .fontSize(20)
+              .fontSize(18)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
@@ -1042,7 +1042,7 @@ export struct Setting {
 
           Row() {
             Text("跳过本地同名文件")
-              .fontSize(20)
+              .fontSize(18)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
@@ -1082,7 +1082,7 @@ export struct Setting {
 
           Row() {
             Text("隐藏举报功能")
-              .fontSize(20)
+              .fontSize(18)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
@@ -1114,7 +1114,7 @@ export struct Setting {
         Button({ type: ButtonType.Normal }) {
           Row() {
             Text("日志")
-              .fontSize(20)
+              .fontSize(18)
               .fontColor($r('sys.color.font'))
 
             SymbolGlyph($r('sys.symbol.chevron_right'))
@@ -1146,7 +1146,7 @@ export struct Setting {
         Button({ type: ButtonType.Normal }) {
           Row() {
             Text("关于")
-              .fontSize(20)
+              .fontSize(18)
               .fontColor($r('sys.color.font'))
 
             SymbolGlyph($r('sys.symbol.chevron_right'))

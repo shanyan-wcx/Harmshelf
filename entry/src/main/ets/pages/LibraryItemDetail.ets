@@ -2141,7 +2141,7 @@ export struct LibraryItemDetail {
                   Row() {
                     Row() {
                       Text("剧集 (" + this.libraryItem?.media.episodes?.length + ")")
-                        .fontSize(20)
+                        .fontSize(18)
                         .fontWeight(FontWeight.Medium)
                     }
                     .height(18)
