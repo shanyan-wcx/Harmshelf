@@ -170,34 +170,34 @@ export struct Stats {
               Row() {
                 Column() {
                   Text(this.finishedNum !== -1 ? this.finishedNum.toString() : "0")
-                    .fontSize(this.displayWidth >= 1000 ? 48 : 36)
+                    .fontSize(this.displayWidth >= 1000 ? 36 : 28)
                     .fontWeight(FontWeight.Bold)
                     .margin({ bottom: 5 })
 
                   Text("已完成的项目")
-                    .fontSize(16)
+                    .fontSize(14)
                     .fontColor($r('sys.color.font_secondary'))
                 }
 
                 Column() {
                   Text(this.stats?.days ? Object.keys(this.stats?.days).length.toString() : "0")
-                    .fontSize(this.displayWidth >= 1000 ? 48 : 36)
+                    .fontSize(this.displayWidth >= 1000 ? 36 : 28)
                     .fontWeight(FontWeight.Bold)
                     .margin({ bottom: 5 })
 
                   Text("收听天数")
-                    .fontSize(16)
+                    .fontSize(14)
                     .fontColor($r('sys.color.font_secondary'))
                 }
 
                 Column() {
                   Text(this.stats?.totalTime ? (Math.floor(this.stats?.totalTime / 60)).toString() : "0")
-                    .fontSize(this.displayWidth >= 1000 ? 48 : 36)
+                    .fontSize(this.displayWidth >= 1000 ? 36 : 28)
                     .fontWeight(FontWeight.Bold)
                     .margin({ bottom: 5 })
 
                   Text("收听分钟数")
-                    .fontSize(16)
+                    .fontSize(14)
                     .fontColor($r('sys.color.font_secondary'))
                 }
               }
@@ -227,52 +227,52 @@ export struct Stats {
               Row() {
                 Column() {
                   Text("每周收听")
-                    .fontSize(16)
+                    .fontSize(14)
 
                   Text(this.minutes.reduce((acc, cur) => acc + cur, 0).toString())
-                    .fontSize(this.displayWidth >= 1000 ? 48 : 36)
+                    .fontSize(this.displayWidth >= 1000 ? 36 : 28)
                     .fontWeight(FontWeight.Bold)
 
                   Text("分钟")
-                    .fontSize(16)
+                    .fontSize(14)
                 }
 
                 Column() {
                   Text("每日平均值")
-                    .fontSize(16)
+                    .fontSize(14)
 
                   Text(this.minutes.length > 0 ?
                     (Math.floor(this.minutes.reduce((acc, cur) => acc + cur, 0) / this.minutes.length)).toString() :
                     "0")
-                    .fontSize(this.displayWidth >= 1000 ? 48 : 36)
+                    .fontSize(this.displayWidth >= 1000 ? 36 : 28)
                     .fontWeight(FontWeight.Bold)
 
                   Text("分钟")
-                    .fontSize(16)
+                    .fontSize(14)
                 }
 
                 Column() {
                   Text("单日最高")
-                    .fontSize(16)
+                    .fontSize(14)
 
                   Text(this.minutes.length > 0 ? Math.max(...this.minutes).toString() : "0")
-                    .fontSize(this.displayWidth >= 1000 ? 48 : 36)
+                    .fontSize(this.displayWidth >= 1000 ? 36 : 28)
                     .fontWeight(FontWeight.Bold)
 
                   Text("分钟")
-                    .fontSize(16)
+                    .fontSize(14)
                 }
 
                 Column() {
                   Text("连续")
-                    .fontSize(16)
+                    .fontSize(14)
 
                   Text(this.getConsecutiveDays(this.stats?.days).toString())
-                    .fontSize(this.displayWidth >= 1000 ? 48 : 36)
+                    .fontSize(this.displayWidth >= 1000 ? 36 : 28)
                     .fontWeight(FontWeight.Bold)
 
                   Text("天")
-                    .fontSize(16)
+                    .fontSize(14)
                 }
               }
               .width('100%')
@@ -297,18 +297,18 @@ export struct Stats {
               ForEach(this.stats?.recentSessions, (recentSession: RecentSession, index) => {
                 Row() {
                   Text((index + 1) + ".")
-                    .fontSize(16)
+                    .fontSize(14)
                     .fontColor($r('sys.color.font_secondary'))
                     .width(40)
 
                   Column() {
                     Text(recentSession.mediaMetadata.title)
-                      .fontSize(16)
+                      .fontSize(14)
                       .maxLines(1)
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                     Text(recentSession.date)
-                      .fontSize(15)
+                      .fontSize(12)
                       .fontColor($r('sys.color.font_secondary'))
                       .maxLines(1)
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -318,7 +318,7 @@ export struct Stats {
                   .alignItems(HorizontalAlign.Start)
 
                   Text(this.formatDuration(recentSession.timeListening))
-                    .fontSize(16)
+                    .fontSize(14)
                     .fontColor($r('sys.color.font_secondary'))
                     .margin({ left: 20 })
                     .textAlign(TextAlign.End)
