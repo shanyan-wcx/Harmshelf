@@ -361,6 +361,12 @@ export struct MyNavigation {
         onBarStyleChange: (miniBarStyle: HdsBarStyle) => {
           this.onMiniBarStyleChange(miniBarStyle)
         },
+        onMiniBarAnimationStart: (miniBarStyle: HdsBarStyle, _: number) => {
+          this.onMiniBarStyleChange(miniBarStyle)
+        },
+        onMiniBarAnimationEnd: (miniBarStyle: HdsBarStyle) => {
+          this.onMiniBarStyleChange(miniBarStyle)
+        },
         barLayoutMode: HdsBarLayoutMode.HORIZONTAL
       } : undefined
     })

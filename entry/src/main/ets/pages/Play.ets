@@ -200,23 +200,23 @@ export struct PlaybackMiniBar {
       Image(this.getCoverSource())
         .alt($rawfile('nocover.jpg'))
         .objectFit(ImageFit.Cover)
-        .width(this.isExpanded() ? 54 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
-        .height(this.isExpanded() ? 54 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
+        .width(this.isExpanded() ? 44 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
+        .height(this.isExpanded() ? 44 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
         .draggable(false)
         .clipShape(new CircleShape({ width: '100%', height: '100%' }))
         .geometryTransition("cover")
 
       Progress({ value: this.playedPercent, total: 100, type: ProgressType.Ring })
-        .width(this.isExpanded() ? 62 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
-        .height(this.isExpanded() ? 62 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
+        .width(this.isExpanded() ? 48 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
+        .height(this.isExpanded() ? 48 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
         .style({
           strokeWidth: 3,
           enableSmoothEffect: true
         })
     }
-    .width(this.isExpanded() ? 62 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
-    .height(this.isExpanded() ? 62 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
-    .margin({ left: this.isExpanded() ? 8 : 0, right: this.isExpanded() ? 8 : 0 })
+    .width(this.isExpanded() ? 48 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
+    .height(this.isExpanded() ? 48 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
+    .margin({ left: this.isExpanded() ? 4 : 0, right: this.isExpanded() ? 4 : 0 })
     .clip(false)
     .hitTestBehavior(this.isExpanded() ? HitTestMode.Default : HitTestMode.Transparent)
     .onClick(() => {
@@ -248,6 +248,7 @@ export struct PlaybackMiniBar {
     Button({ type: ButtonType.Circle }) {
       SymbolGlyph(this.gobackwardIcon)
         .fontSize(24)
+        .fontColor([$r('sys.color.font_secondary')])
     }
     .width(40)
     .height(40)
@@ -262,6 +263,7 @@ export struct PlaybackMiniBar {
     Button({ type: ButtonType.Circle }) {
       SymbolGlyph(this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
         .fontSize(24)
+        .fontColor([$r('sys.color.font_secondary')])
     }
     .width(40)
     .height(40)
@@ -276,6 +278,7 @@ export struct PlaybackMiniBar {
     Button({ type: ButtonType.Circle }) {
       SymbolGlyph(this.goforwardIcon)
         .fontSize(24)
+        .fontColor([$r('sys.color.font_secondary')])
     }
     .width(40)
     .height(40)
@@ -314,6 +317,9 @@ export struct PlaybackMiniBar {
       .layoutWeight(1)
       .padding({ left: 4, right: 4 })
       .clip(false)
+      .onClick(() => {
+        this.openPlayer()
+      })
 
       Row({ space: 4 }) {
         this.rewindButton()
@@ -2062,6 +2068,10 @@ export struct Play {
     .padding({ left: 16, right: 16 })
     .margin({ bottom: MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN })
     .clip(false)
+    .transition(TransitionEffect.OPACITY.animation({
+      duration: 280,
+      curve: Curve.Friction
+    }))
   }
 
   build() {
