@@ -313,7 +313,8 @@ export struct PlaybackMiniBar {
     .height('100%')
     .alignItems(VerticalAlign.Center)
     .geometryTransition("miniBar")
-    .width(this.isStandalone ? 'calc(100% + 8vp)' : '100%')
+    .id('expandedMiniBar')
+    .width(this.isStandalone ? 'calc(100% + 16vp)' : '100%')
     .margin({ right: this.isStandalone ? 0 : -8 })
     .clip(false)
     .onClick(() => {
@@ -329,6 +330,7 @@ export struct PlaybackMiniBar {
     .width('100%')
     .height('100%')
     .geometryTransition("miniBar")
+    .id('collapsedMiniBar')
     .clip(false)
   }
 

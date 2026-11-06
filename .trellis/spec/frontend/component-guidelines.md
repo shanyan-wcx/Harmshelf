@@ -137,6 +137,11 @@ right-only negative margin. Remove any second opacity transition from the
 expanded/collapsed custom roots; HdsTabs already owns the expand/collapse
 animation. Do not change the native bar width.
 
+For an `if/else` geometry transition, add a stable `.id(...)` to the first
+node under both branches (and to each parallel first node) so a retriggered
+transition reuses the existing nodes instead of ghosting; keep the shared
+`geometryTransition` id on both roots.
+
 For repeated minibar title/subtitle scrolling, use the native Text marquee
 options with `loop <= 0` and a positive `delay` so each round pauses before
 the next one. Do not add a manual timer that toggles `start`; it can lag
