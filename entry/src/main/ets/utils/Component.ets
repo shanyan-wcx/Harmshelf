@@ -243,6 +243,7 @@ export struct MyNavigation {
   @Consumer() isStartPlaying: boolean = false
   @Local isDownloadEmpty: boolean = true
   @Consumer() isIndex: boolean = true
+  // This state only selects the PlaybackMiniBar content; HdsTabs keeps its native style state.
   @Provider() miniBarStyle: HdsBarStyle = HdsBarStyle.COLLAPSE
   private navigationItems: MainNavigationItem[] = getMainNavigationItems()
 
@@ -305,8 +306,8 @@ export struct MyNavigation {
     this.pageInfos.clear()
   }
 
-  private onMiniBarStyleChange(miniBarStyle: HdsBarStyle) {
-    this.miniBarStyle = miniBarStyle
+  private onMiniBarStyleChange(style: HdsBarStyle) {
+    this.miniBarStyle = style
   }
 
   @Builder
@@ -346,7 +347,6 @@ export struct MyNavigation {
     .divider({ mode: DividerMode.NONE })
     .clip(false)
     .barFloatingStyle({
-      barWidth: { smallWidth: 328, mediumWidth: 328, largeWidth: 328 },
       barSideMargin: 16,
       barBottomMargin: MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN,
       gradientMask: { maskColor: Color.Transparent },
@@ -356,17 +356,15 @@ export struct MyNavigation {
       },
       miniBar: this.isStartPlaying && this.isIndex ? {
         miniBarBuilder: () => this.miniBarBuilder(),
-        miniBarWidth: { smallWidth: 328, mediumWidth: 328, largeWidth: 328 },
-        miniBarStyle: this.miniBarStyle,
         enableMiniBarClip: false,
-        onBarStyleChange: (miniBarStyle: HdsBarStyle) => {
-          this.onMiniBarStyleChange(miniBarStyle)
+        onBarStyleChange: (style: HdsBarStyle) => {
+          this.onMiniBarStyleChange(style)
         },
-        onMiniBarAnimationStart: (miniBarStyle: HdsBarStyle, _: number) => {
-          this.onMiniBarStyleChange(miniBarStyle)
+        onMiniBarAnimationStart: (style: HdsBarStyle, _: number) => {
+          this.onMiniBarStyleChange(style)
         },
-        onMiniBarAnimationEnd: (miniBarStyle: HdsBarStyle) => {
-          this.onMiniBarStyleChange(miniBarStyle)
+        onMiniBarAnimationEnd: (style: HdsBarStyle) => {
+          this.onMiniBarStyleChange(style)
         },
         barLayoutMode: HdsBarLayoutMode.HORIZONTAL
       } : undefined

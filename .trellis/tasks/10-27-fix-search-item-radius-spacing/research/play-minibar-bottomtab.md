@@ -50,7 +50,7 @@
 
 ### Minimal implementation plan
 
-1. 以 `Component.ets:bottomTabBarBuilder()` 的官方 `Tabs.barFloatingStyle.miniBar` 为带 bottom tab 页的唯一渲染入口。minibar 初始态建议 `HdsBarStyle.COLLAPSE`；显式 `HdsBarLayoutMode.HORIZONTAL`；`miniBarWidth` 使用官方上限范围（展开宽度不超过 328vp），不要固定一个跨断点的超宽值。
+1. 以 `Component.ets:bottomTabBarBuilder()` 的官方 `Tabs.barFloatingStyle.miniBar` 为带 bottom tab 页的唯一渲染入口。保留显式 `HdsBarLayoutMode.HORIZONTAL`，省略 `barWidth` 和 `miniBarWidth`，让官方默认断点计算使 minibar 长度跟随 TabsBar；不要把原生样式作为受控 `miniBarStyle` 回写。
 2. 抽出一个共享的 player-mini-bar builder/component seam，保持 `Play` 的全局状态和现有三种动作只由一处维护。当前 `Play.ets` 反向 import 了 `Component.ets` 的 `ImmersiveActionButton`，若让 `Component.ets` 直接 import `Play`，可能形成 ArkTS 模块环依赖。优先通过 `Index` 向 `MyNavigation` 传 `@BuilderParam`/动作闭包，或把纯 player mini-bar 和动作适配放到不反向依赖 `Component.ets` 的新 utility；不要用两个独立的播放状态机。具体拆分方式需以 ArkTS 编译器对 builder/cycle 的限制验证。
 3. 带 tab 的 collapsed builder 只渲染圆形 cover + progress ring，cover 尺寸填满官方 minibar 可视高度且不加 margin；保留 `ProgressType.Ring` 与 `playedPercent`，删除 rotate/animation。expanded builder 使用 left-right：左侧圆形 cover 带小 margin，中间是标题/副标题，右侧只有 rewind/play/fast-forward。移除 `stopButton`，全屏菜单里的“关闭播放器”不变。
 4. 对无 bottom tab 的 pushed 页面，复用同一套状态/动作和 cover/text/control builder，但由 `Play` 或新的共享 bar host 渲染一个与 bottom tab 相同的视觉高度（官方 floating capsule 参考 56vp）、immersive-light capsule。cover 在左，标题/副标题占剩余宽度，三个控制在右。位置应由 navigationIndicator safe area + `hasBottomTab=false` 的布局语义决定，替换现有 `.height(0).margin({ bottom: 108 })`；不要再叠加一条 root bottom tab。

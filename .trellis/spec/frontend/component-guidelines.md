@@ -116,12 +116,12 @@ same short UI animation in both directions and give the equivalent bar roots a
 shared `geometryTransition` id; animating only the custom capsule makes the
 return transition appear to work while the forward transition snaps.
 
-HdsTabs `miniBarWidth` must use explicit vp values because the API does not
-accept percentages for its width ranges; the documented maximum is 328vp.
-For a left-right HdsTabs layout, set `barFloatingStyle.barWidth` to the same
-breakpoint values as `miniBarWidth`; otherwise the native layout can size the
-expanded minibar independently from the tab bar. Bind `miniBarStyle` to the
-current native style instead of resetting it to `COLLAPSE` during rebuilds.
+For a left-right HdsTabs layout, keep `barWidth` and `miniBarWidth` unset so
+the official default breakpoint calculation supplies the same width to the
+TabsBar and minibar. Keep `barLayoutMode: HORIZONTAL` explicit. Do not bind
+`miniBarStyle` back to HdsTabs: callbacks may update only the
+`PlaybackMiniBar` content state, while the native HdsTabs style remains
+uncontrolled so its single expand/collapse animation is not rebuilt or reset.
 For the non-tab playback capsule, use `width('calc(100% - 40vp)')` with a
 600vp maximum so narrow screens retain 20vp side margins without allowing the
 capsule to grow beyond the desktop limit.
