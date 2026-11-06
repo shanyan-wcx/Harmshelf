@@ -634,3 +634,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 25: 增加 minibar 到全屏播放页的封面转场
+
+**Date**: 2026-11-06
+**Task**: 增加 minibar 到全屏播放页的封面转场
+**Branch**: `main`
+
+### Summary
+
+为展开 minibar 和非 Tab 播放条进入全屏播放页增加条件性共享封面转场：打开时通过 animateTo 显示 ContentCover，关闭默认模态动画，关闭后清理绑定；保留条整体过渡与原有播放交互；DevEco API 26 Debug 构建成功。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `8a17dc9` | (see git log) |
+
+### Status
+
+[OK] **Completed**
