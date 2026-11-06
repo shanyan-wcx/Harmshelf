@@ -122,6 +122,16 @@ TabsBar and minibar. Keep `barLayoutMode: HORIZONTAL` explicit. Do not bind
 `miniBarStyle` back to HdsTabs: callbacks may update only the
 `PlaybackMiniBar` content state, while the native HdsTabs style remains
 uncontrolled so its single expand/collapse animation is not rebuilt or reset.
+When the minibar content is supplied through a trailing `@BuilderParam`, do
+not depend on a no-argument builder to observe the native style callback.
+Pass an explicit `{ expanded: boolean }` builder option from the HdsTabs host
+to `PlaybackMiniBar({ forceExpanded: options.expanded })`; this keeps the
+custom content in sync with the native bar state without making HdsTabs a
+controlled style input. The expanded root may open the full player, but its
+control row must stop touch propagation so rewind, play, and forward keep
+their own actions. If the native material leaves excess horizontal inset,
+apply a small negative left/right margin to the shared expanded content root;
+do not change the native bar width.
 For the non-tab playback capsule, use `width('calc(100% - 40vp)')` with a
 600vp maximum so narrow screens retain 20vp side margins without allowing the
 capsule to grow beyond the desktop limit.

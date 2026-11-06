@@ -33,8 +33,8 @@
 
 ### Bottom-tab placement and route/layout detection
 
-- `entry/src/main/ets/utils/Component.ets:201-340` 的 `MyNavigation` 是底部导航宿主。`isBottomTabDevice()`（约 254-256 行）只按 `phone || tablet` 判断设备能力；`bottomTabBarBuilder()`（约 293-340 行）创建 `Tabs`，配置 `barOverlap(true)`、`vertical(false)`、`barHeight('auto')`，并在 `barFloatingStyle` 中使用 `barSideMargin: 16`、`barBottomMargin: MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN` 和 `ImmersiveMaterial`。这里是带 bottom tab 页面接入官方 `miniBar` 的唯一现成宿主；当前没有 `miniBar` 字段。
-- `MyNavigation.bottomTabBarBuilder()` 的 `Tabs` 已经是官方 HDS floating 风格的正确入口，最小方向是在现有 `barFloatingStyle` 增加 `miniBar: { miniBarBuilder: ... }`，并设置 `barLayoutMode: HdsBarLayoutMode.HORIZONTAL`、合适的 `miniBarWidth`/初始 `miniBarStyle`。不要在 `Play.build()` 再绘制第二个底部胶囊，否则会和 tab bar 重叠、重复占用触摸区。
+- `entry/src/main/ets/utils/Component.ets:201-340` 的 `MyNavigation` 是底部导航宿主。`isBottomTabDevice()`（约 254-256 行）只按 `phone || tablet` 判断设备能力；`bottomTabBarBuilder()`（约 293-340 行）创建 `Tabs`，配置 `barOverlap(true)`、`vertical(false)`、`barHeight('auto')`，并在 `barFloatingStyle` 中使用 `barSideMargin: 16`、`barBottomMargin: MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN` 和 `ImmersiveMaterial`。这里是带 bottom tab 页面接入官方 `miniBar` 的唯一现成宿主。
+- `MyNavigation.bottomTabBarBuilder()` 的 `Tabs` 已经是官方 HDS floating 风格的正确入口，最小方向是在现有 `barFloatingStyle` 增加 `miniBar: { miniBarBuilder: ... }`，并设置 `barLayoutMode: HdsBarLayoutMode.HORIZONTAL`；宽度交给官方默认断点计算，避免固定 `barWidth`/`miniBarWidth`，也不要把回调状态作为受控 `miniBarStyle` 回写。不要在 `Play.build()` 再绘制第二个底部胶囊，否则会和 tab bar 重叠、重复占用触摸区。
 - `Component.ets:431-573` 的 `MyNavigation.build()` 在 phone/tablet 走 `bottomTabBarBuilder()`，其他设备走 `HdsSideBar`/页面内容。`Component.ets:65-76` 的 `getMainNavigationItems()` 是 tab item 的单一来源。
 - `entry/src/main/ets/pages/Index.ets:109-210` 提供所有播放状态，并在约 1166-1222 行的 `ContentPanelBuilder()` 用 `Stack { MyNavigation(); if (isStartPlaying) Play(); ... }` 把 `Play` 作为覆盖层放在导航上方。因此当前 `Play` 与具体路由没有布局分支；改造时必须把“当前实际可见 bottom tab”作为反应式布局状态传下去，不能只复用设备类型判断。
 - `Index.ets:283-297` 的 `registerInterception()` 在 root 与 pushed `HdsNavDestination` 间切换 `isIndex`。`Index.ets:301-312` 的 `isBottomTabDevice()` 与 `MyNavigation` 版本相同，只表示设备类别。建议把 `isIndex`/当前 nav destination 与设备类别结合，形成 `hasBottomTab`，而不是把 `isBottomTabDevice()` 直接当成当前页面是否有 tab。
@@ -51,12 +51,13 @@
 ### Minimal implementation plan
 
 1. 以 `Component.ets:bottomTabBarBuilder()` 的官方 `Tabs.barFloatingStyle.miniBar` 为带 bottom tab 页的唯一渲染入口。保留显式 `HdsBarLayoutMode.HORIZONTAL`，省略 `barWidth` 和 `miniBarWidth`，让官方默认断点计算使 minibar 长度跟随 TabsBar；不要把原生样式作为受控 `miniBarStyle` 回写。
-2. 抽出一个共享的 player-mini-bar builder/component seam，保持 `Play` 的全局状态和现有三种动作只由一处维护。当前 `Play.ets` 反向 import 了 `Component.ets` 的 `ImmersiveActionButton`，若让 `Component.ets` 直接 import `Play`，可能形成 ArkTS 模块环依赖。优先通过 `Index` 向 `MyNavigation` 传 `@BuilderParam`/动作闭包，或把纯 player mini-bar 和动作适配放到不反向依赖 `Component.ets` 的新 utility；不要用两个独立的播放状态机。具体拆分方式需以 ArkTS 编译器对 builder/cycle 的限制验证。
+2. 抽出一个共享的 player-mini-bar builder/component seam，保持 `Play` 的全局状态和现有三种动作只由一处维护。当前 `Play.ets` 反向 import 了 `Component.ets` 的 `ImmersiveActionButton`，若让 `Component.ets` 直接 import `Play`，可能形成 ArkTS 模块环依赖。通过 `Index` 向 `MyNavigation` 传带 `{ expanded: boolean }` 参数的 `@BuilderParam`，让自定义内容显式跟随 HdsTabs 回调状态；不要依赖无参尾随 builder 的跨组件状态刷新，也不要用两个独立的播放状态机。具体拆分方式需以 ArkTS 编译器对 builder/cycle 的限制验证。
 3. 带 tab 的 collapsed builder 只渲染圆形 cover + progress ring，cover 尺寸填满官方 minibar 可视高度且不加 margin；保留 `ProgressType.Ring` 与 `playedPercent`，删除 rotate/animation。expanded builder 使用 left-right：左侧圆形 cover 带小 margin，中间是标题/副标题，右侧只有 rewind/play/fast-forward。移除 `stopButton`，全屏菜单里的“关闭播放器”不变。
 4. 对无 bottom tab 的 pushed 页面，复用同一套状态/动作和 cover/text/control builder，但由 `Play` 或新的共享 bar host 渲染一个与 bottom tab 相同的视觉高度（官方 floating capsule 参考 56vp）、immersive-light capsule。cover 在左，标题/副标题占剩余宽度，三个控制在右。位置应由 navigationIndicator safe area + `hasBottomTab=false` 的布局语义决定，替换现有 `.height(0).margin({ bottom: 108 })`；不要再叠加一条 root bottom tab。
 5. 标题/副标题只在 expanded layout 创建 marquee。优先使用 `TextOverflow.MARQUEE` + `marqueeOptions` 或 `Marquee` 的有限 `loop: 1`；需求是“滚动一遍、暂停、再重复”，不能使用 `loop: -1` 的无间隔连续滚动。`delay` 只表示轮次间等待，若 `loop: 1` 结束后组件不会自动重新开始，则用状态/组件 identity 或 `onFinish` + pause timer 重新 arm；实现前需在 API 26 真机验证 completed marquee 是否能通过 `start` 重启。短文本应保持静态，不强行触发动画。
 6. 删除 `rotateAngle`、`rotateTimer`、`startRotate`、`stopRotate`、focus/lifecycle rotation calls，以及 `primaryButtonBuilder()` 中的 `.rotate`/`.animation`/`.onAppear(startRotate)`；保留 `geometryTransition("cover")` 只有在它与官方 HdsTabs/全屏 cover 过渡不冲突时。检查 71x71 ring 在官方 `enableMiniBarClip` 默认 true 下是否被裁剪，必要时只对播放器 host 设置不裁剪，避免扩大整个 tab bar 的触摸/绘制范围。
 7. 保持现有 full-screen `bindContentCover` 和 sheets 只归 `playBuilder()`；minibar builder 不携带 bookmark/speed/sleep/chapter sheets、全屏 close menu、bottom safe-area padding。播放器动作继续调用已有 callbacks，让 AV session、progress ring、自动下一曲和 `isPlaying` 保持同一状态源。
+8. 展开态共享内容根增加全屏打开点击；快退、播放、快进所在的子行停止触摸冒泡，避免根点击覆盖按钮动作。为使封面进度环和最右控制与胶囊端部对齐，在共享展开根使用小幅负左右外边距；该校正不能改变 HdsTabs/native capsule 的宽度。
 
 ### Pitfalls to verify during implementation
 

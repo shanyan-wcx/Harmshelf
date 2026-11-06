@@ -1,4 +1,4 @@
-import { HdsBarStyle, HdsListItem } from '@kit.UIDesignKit'
+import { HdsListItem } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
 import { ColorMetrics, CircleShape, PersistenceV2, SymbolGlyphModifier, TextModifier, uiMaterial, window } from '@kit.ArkUI'
 import { common } from '@kit.AbilityKit'
@@ -27,7 +27,6 @@ interface PlayColorPalette {
 @ComponentV2
 export struct PlaybackMiniBar {
   @Param forceExpanded: boolean = false
-  @Consumer() miniBarStyle: HdsBarStyle = HdsBarStyle.COLLAPSE
   @Consumer() playSetting: PlaySetting | undefined = PersistenceV2.connect(PlaySetting, () => new PlaySetting());
   @Consumer() isPlaying: boolean = false
   @Consumer() showPlay: boolean = false
@@ -49,7 +48,7 @@ export struct PlaybackMiniBar {
   @Local marqueeRestartTimer: number = -1
 
   private isExpanded(): boolean {
-    return this.forceExpanded || this.miniBarStyle === HdsBarStyle.EXPAND
+    return this.forceExpanded
   }
 
   private getCoverSource(): string | Resource {
@@ -330,16 +329,23 @@ export struct PlaybackMiniBar {
       }
       .margin({ right: 8 })
       .clip(false)
+      .onTouch((event: TouchEvent) => {
+        event.stopPropagation()
+      })
     }
     .width('100%')
     .height('100%')
     .alignItems(VerticalAlign.Center)
     .geometryTransition("miniBar")
+    .margin({ left: -8, right: -8 })
     .transition(TransitionEffect.OPACITY.animation({
       duration: 280,
       curve: Curve.Friction
     }))
     .clip(false)
+    .onClick(() => {
+      this.openPlayer()
+    })
   }
 
   @Builder

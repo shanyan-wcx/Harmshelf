@@ -71,6 +71,11 @@ export interface MainNavigationItem {
   symbol: Resource
   label: string
 }
+
+export interface MiniBarBuilderOptions {
+  expanded: boolean
+}
+
 export function getMainNavigationItems(): MainNavigationItem[] {
   return [
     { symbol: $r('sys.symbol.house'), label: '首页' },
@@ -244,15 +249,15 @@ export struct MyNavigation {
   @Local isDownloadEmpty: boolean = true
   @Consumer() isIndex: boolean = true
   // This state only selects the PlaybackMiniBar content; HdsTabs keeps its native style state.
-  @Provider() miniBarStyle: HdsBarStyle = HdsBarStyle.COLLAPSE
+  @Local miniBarStyle: HdsBarStyle = HdsBarStyle.COLLAPSE
   private navigationItems: MainNavigationItem[] = getMainNavigationItems()
 
   @Builder
-  defaultMiniBarBuilder() {
+  defaultMiniBarBuilder(_: MiniBarBuilderOptions) {
     Blank()
   }
 
-  @BuilderParam miniBarBuilder: () => void = this.defaultMiniBarBuilder
+  @BuilderParam miniBarBuilder: (options: MiniBarBuilderOptions) => void = this.defaultMiniBarBuilder
 
   @Monitor('downloadCount')
   async updateMenus(monitor: IMonitor) {
@@ -355,7 +360,9 @@ export struct MyNavigation {
         materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
       },
       miniBar: this.isStartPlaying && this.isIndex ? {
-        miniBarBuilder: () => this.miniBarBuilder(),
+        miniBarBuilder: () => this.miniBarBuilder({
+          expanded: this.miniBarStyle === HdsBarStyle.EXPAND
+        }),
         enableMiniBarClip: false,
         onBarStyleChange: (style: HdsBarStyle) => {
           this.onMiniBarStyleChange(style)

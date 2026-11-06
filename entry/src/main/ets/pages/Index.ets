@@ -2,7 +2,7 @@ import app from '@system.app';
 import { HdsSideBar, HdsSideMenu, HdsSideMenuMainItem } from '@kit.UIDesignKit';
 import { common, ConfigurationConstant, WantAgent, wantAgent } from '@kit.AbilityKit';
 import { PersistenceV2, SymbolGlyphModifier, Type, window } from '@kit.ArkUI';
-import { getMainNavigationItems, MyNavigation } from '../utils/Component';
+import { getMainNavigationItems, MiniBarBuilderOptions, MyNavigation } from '../utils/Component';
 import {
   Episode,
   Library,
@@ -1203,11 +1203,14 @@ struct Index {
 
   //内容区
   @Builder
+  playbackMiniBarBuilder(options: MiniBarBuilderOptions) {
+    PlaybackMiniBar({ forceExpanded: options.expanded })
+  }
+
+  @Builder
   ContentPanelBuilder() {
     Stack() {
-      MyNavigation() {
-        PlaybackMiniBar()
-      }
+      MyNavigation({ miniBarBuilder: this.playbackMiniBarBuilder })
 
       if (this.isStartPlaying) {
         Play()
