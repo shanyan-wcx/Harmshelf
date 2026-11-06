@@ -27,6 +27,7 @@ interface PlayColorPalette {
 @ComponentV2
 export struct PlaybackMiniBar {
   @Param forceExpanded: boolean = false
+  @Param isStandalone: boolean = false
   @Consumer() playSetting: PlaySetting | undefined = PersistenceV2.connect(PlaySetting, () => new PlaySetting());
   @Consumer() isPlaying: boolean = false
   @Consumer() showPlay: boolean = false
@@ -333,15 +334,12 @@ export struct PlaybackMiniBar {
         event.stopPropagation()
       })
     }
-    .width('100%')
     .height('100%')
     .alignItems(VerticalAlign.Center)
     .geometryTransition("miniBar")
-    .margin({ left: -8, right: -8 })
-    .transition(TransitionEffect.OPACITY.animation({
-      duration: 280,
-      curve: Curve.Friction
-    }))
+    .width(this.isStandalone ? 'calc(100% + 16vp)' : '100%')
+    .margin({ right: this.isStandalone ? 0 : -8 })
+    .offset({ x: this.isStandalone ? -8 : 0 })
     .clip(false)
     .onClick(() => {
       this.openPlayer()
@@ -356,10 +354,6 @@ export struct PlaybackMiniBar {
     .width('100%')
     .height('100%')
     .geometryTransition("miniBar")
-    .transition(TransitionEffect.OPACITY.animation({
-      duration: 280,
-      curve: Curve.Friction
-    }))
     .clip(false)
   }
 
@@ -2078,7 +2072,7 @@ export struct Play {
         barRadius: MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT / 2,
         monopolizeActionEvents: false
       }) {
-        PlaybackMiniBar({ forceExpanded: true })
+        PlaybackMiniBar({ forceExpanded: true, isStandalone: true })
       }
     }
     .width('calc(100% - 40vp)')

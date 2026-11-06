@@ -57,7 +57,7 @@
 5. 标题/副标题只在 expanded layout 创建 marquee。优先使用 `TextOverflow.MARQUEE` + `marqueeOptions` 或 `Marquee` 的有限 `loop: 1`；需求是“滚动一遍、暂停、再重复”，不能使用 `loop: -1` 的无间隔连续滚动。`delay` 只表示轮次间等待，若 `loop: 1` 结束后组件不会自动重新开始，则用状态/组件 identity 或 `onFinish` + pause timer 重新 arm；实现前需在 API 26 真机验证 completed marquee 是否能通过 `start` 重启。短文本应保持静态，不强行触发动画。
 6. 删除 `rotateAngle`、`rotateTimer`、`startRotate`、`stopRotate`、focus/lifecycle rotation calls，以及 `primaryButtonBuilder()` 中的 `.rotate`/`.animation`/`.onAppear(startRotate)`；保留 `geometryTransition("cover")` 只有在它与官方 HdsTabs/全屏 cover 过渡不冲突时。检查 71x71 ring 在官方 `enableMiniBarClip` 默认 true 下是否被裁剪，必要时只对播放器 host 设置不裁剪，避免扩大整个 tab bar 的触摸/绘制范围。
 7. 保持现有 full-screen `bindContentCover` 和 sheets 只归 `playBuilder()`；minibar builder 不携带 bookmark/speed/sleep/chapter sheets、全屏 close menu、bottom safe-area padding。播放器动作继续调用已有 callbacks，让 AV session、progress ring、自动下一曲和 `isPlaying` 保持同一状态源。
-8. 展开态共享内容根增加全屏打开点击；快退、播放、快进所在的子行停止触摸冒泡，避免根点击覆盖按钮动作。为使封面进度环和最右控制与胶囊端部对齐，在共享展开根使用小幅负左右外边距；该校正不能改变 HdsTabs/native capsule 的宽度。
+8. 展开态共享内容根增加全屏打开点击；快退、播放、快进所在的子行停止触摸冒泡，避免根点击覆盖按钮动作。页签 minibar 使用右侧小幅负外边距保留封面左侧圆弧间隙；无 tab 胶囊则将共享内容宽度增加 16vp 并向左偏移 8vp，实际校正不能改变 HdsTabs/native capsule 的宽度。展开/收起内容根不再叠加第二层透明度动画，避免原生动效结束后内容延迟切换。
 
 ### Pitfalls to verify during implementation
 

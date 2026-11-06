@@ -130,8 +130,12 @@ custom content in sync with the native bar state without making HdsTabs a
 controlled style input. The expanded root may open the full player, but its
 control row must stop touch propagation so rewind, play, and forward keep
 their own actions. If the native material leaves excess horizontal inset,
-apply a small negative left/right margin to the shared expanded content root;
-do not change the native bar width.
+apply the smallest host-specific correction: the tab minibar may use a
+right-only negative margin, while the standalone capsule should expand its
+content width by the same amount and use a negative x offset. Remove any
+second opacity transition from the expanded/collapsed custom roots; HdsTabs
+already owns the expand/collapse animation. Do not change the native bar
+width.
 For the non-tab playback capsule, use `width('calc(100% - 40vp)')` with a
 600vp maximum so narrow screens retain 20vp side margins without allowing the
 capsule to grow beyond the desktop limit.
