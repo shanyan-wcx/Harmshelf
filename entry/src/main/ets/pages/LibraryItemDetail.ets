@@ -1893,7 +1893,7 @@ export struct LibraryItemDetail {
                     }) {
                       Row() {
                         Text("章节 " + this.libraryItem?.media.chapters?.length)
-                          .fontSize(18)
+                          .fontSize(17)
                           .fontWeight(FontWeight.Medium)
                         SymbolGlyph(this.showChapters ? $r('sys.symbol.arrowtriangle_up_fill') :
                           $r('sys.symbol.arrowtriangle_down_fill'))
@@ -2030,7 +2030,7 @@ export struct LibraryItemDetail {
                     }) {
                       Row() {
                         Text("音轨 " + this.libraryItem?.media.audioFiles?.length)
-                          .fontSize(18)
+                          .fontSize(17)
                           .fontWeight(FontWeight.Medium)
                         SymbolGlyph(this.showAudioFiles ? $r('sys.symbol.arrowtriangle_up_fill') :
                           $r('sys.symbol.arrowtriangle_down_fill'))
