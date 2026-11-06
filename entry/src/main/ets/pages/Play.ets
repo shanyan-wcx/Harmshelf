@@ -531,7 +531,7 @@ export struct Play {
       }
       .width(40)
       .height(40)
-      .margin({ left: 10, right: 10 })
+      .margin({ left: 0, right: 10 })
       .clip(false)
 
       Row() {
@@ -562,7 +562,7 @@ export struct Play {
       }
       .width(40)
       .height(40)
-      .margin({ left: 10, right: 10 })
+      .margin({ left: 10, right: 20 })
       .clip(false)
     }
     .clip(false)
