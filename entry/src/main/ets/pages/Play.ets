@@ -2073,7 +2073,8 @@ export struct Play {
         PlaybackMiniBar({ forceExpanded: true })
       }
     }
-    .width('100%')
+    .width('calc(100% - 40vp)')
+    .constraintSize({ maxWidth: 600 })
     .height(MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
     .padding({ left: 0, right: 0 })
     .margin({ bottom: MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN })

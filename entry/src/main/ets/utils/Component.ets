@@ -355,7 +355,7 @@ export struct MyNavigation {
       },
       miniBar: this.isStartPlaying && this.isIndex ? {
         miniBarBuilder: () => this.miniBarBuilder(),
-        miniBarWidth: { smallWidth: '100%', mediumWidth: '100%', largeWidth: '100%' },
+        miniBarWidth: { smallWidth: 328, mediumWidth: 328, largeWidth: 328 },
         miniBarStyle: HdsBarStyle.COLLAPSE,
         enableMiniBarClip: false,
         onBarStyleChange: (miniBarStyle: HdsBarStyle) => {

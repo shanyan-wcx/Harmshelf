@@ -116,6 +116,12 @@ same short UI animation in both directions and give the equivalent bar roots a
 shared `geometryTransition` id; animating only the custom capsule makes the
 return transition appear to work while the forward transition snaps.
 
+HdsTabs `miniBarWidth` must use explicit vp values because the API does not
+accept percentages for its width ranges; the documented maximum is 328vp.
+For the non-tab playback capsule, use `width('calc(100% - 40vp)')` with a
+600vp maximum so narrow screens retain 20vp side margins without allowing the
+capsule to grow beyond the desktop limit.
+
 Pass `menuItems` for menus that belong to an immersive action. The shared
 helper binds the array on the custom HdsTabs bar builder; do not put
 `bindMenu` on the outer `Row`, because `monopolizeEvents(true)` prevents that
