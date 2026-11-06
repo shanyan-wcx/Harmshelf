@@ -640,7 +640,7 @@ export struct EpisodeDetail {
               }) {
                 Column() {
                   Text("你的进度：" + Math.round((this.itemProgress?.progress ?? 0) * 100) + "%")
-                    .fontSize(17)
+                    .fontSize(16)
                     .fontWeight(FontWeight.Medium)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -649,7 +649,7 @@ export struct EpisodeDetail {
                     "已听完 " + (this.itemProgress ? this.formatTime(this.itemProgress?.finishedAt) : "未知") : "剩余 " +
                       (this.itemProgress ?
                         this.formatDuration(this.itemProgress.duration - this.itemProgress.currentTime) : "未知"))
-                    .fontSize(15)
+                    .fontSize(13)
                     .fontColor($r('sys.color.font_secondary'))
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -694,20 +694,20 @@ export struct EpisodeDetail {
                 Row() {
                   if (this.showPlayLoading) {
                     LoadingProgress()
-                      .width(30)
-                      .height(30)
+                      .width(28)
+                      .height(28)
                       .color($r('sys.color.ohos_id_color_titlebar_icon'))
                   } else {
                     Row() {
                       SymbolGlyph($r('sys.symbol.play_fill'))
                         .fontWeight(FontWeight.Normal)
-                        .fontSize(18)
+                        .fontSize(17)
                         .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
                         .hitTestBehavior(HitTestMode.None)
                         .margin({ bottom: 1 })
 
                       Text(" 播放")
-                        .fontSize(18)
+                        .fontSize(17)
                         .fontWeight(FontWeight.Medium)
                         .fontColor($r('sys.color.ohos_id_color_titlebar_icon'))
                         .maxLines(1)
@@ -744,7 +744,7 @@ export struct EpisodeDetail {
               }) {
                 SymbolGlyph($r('sys.symbol.download'))
                   .fontWeight(FontWeight.Medium)
-                  .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+                  .fontSize($r('sys.float.ohos_id_text_size_headline8'))
                   .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
                   .hitTestBehavior(HitTestMode.None)
                 }
@@ -774,7 +774,7 @@ export struct EpisodeDetail {
               }) {
                 SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
                   .fontWeight(FontWeight.Medium)
-                  .fontSize($r('sys.float.ohos_id_text_size_headline7'))
+                  .fontSize($r('sys.float.ohos_id_text_size_headline8'))
                   .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
                   .hitTestBehavior(HitTestMode.None)
                 }

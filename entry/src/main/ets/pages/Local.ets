@@ -272,7 +272,7 @@ export struct LocalMedia {
             Button({ type: ButtonType.Normal }) {
               Row() {
                 Text("返回上一级")
-                  .fontSize(18)
+                  .fontSize(16)
                   .fontWeight(FontWeight.Medium)
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -386,7 +386,7 @@ export struct LocalMedia {
             Button({ type: ButtonType.Normal }) {
               Row() {
                 Text("返回上一级")
-                  .fontSize(18)
+                  .fontSize(16)
                   .fontWeight(FontWeight.Medium)
                   .maxLines(1)
                   .textOverflow({ overflow: TextOverflow.Ellipsis })

@@ -1275,7 +1275,7 @@ export struct AuthorComponent {
           Row() {
             Text(this.author.name)
               .fontSize(16)
-              .minFontSize(13)
+              .minFontSize(12)
               .maxFontSize(16)
               .fontWeight(FontWeight.Medium)
               .width('calc(100% + 16vp)')
@@ -1405,7 +1405,7 @@ export struct AuthorComponent1 {
           Row() {
             Text(this.author.name)
               .fontSize(16)
-              .minFontSize(13)
+              .minFontSize(12)
               .maxFontSize(16)
               .fontWeight(FontWeight.Medium)
               .width('calc(100% + 16vp)')
