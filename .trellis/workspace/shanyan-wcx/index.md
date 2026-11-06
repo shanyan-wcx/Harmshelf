@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 21
+- **Total Sessions**: 22
 - **Last Active**: 2026-11-06
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~573 | Active |
+| `journal-1.md` | ~594 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 22 | 2026-11-06 | 修复播放 minibar 切换延迟与非 Tab 条边距 | `807e6ed` | `main` |
 | 21 | 2026-11-06 | 修复播放条状态同步与跑马灯 | `48c68ee` | `main` |
 | 20 | 2026-10-27 | 搜索结果沉浸光感列表样式 | `10515d8` | `main` |
 | 19 | 2026-10-27 | 修复最新页面剧集按钮间距 | `558d296` | `main` |

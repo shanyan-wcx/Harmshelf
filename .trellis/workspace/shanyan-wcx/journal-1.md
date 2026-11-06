@@ -571,3 +571,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 22: 修复播放 minibar 切换延迟与非 Tab 条边距
+
+**Date**: 2026-11-06
+**Task**: 修复播放 minibar 切换延迟与非 Tab 条边距
+**Branch**: `main`
+
+### Summary
+
+修复 HdsTabs minibar 动画回调的状态覆盖，动画开始即切换内容并在结束同步最终状态；调整非 Tab 播放胶囊内部宽度以收窄左侧空白并保持右侧对齐；DevEco API 26 debug 构建成功。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `807e6ed` | (see git log) |
+
+### Status
+
+[OK] **Completed**
