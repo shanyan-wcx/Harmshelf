@@ -1,0 +1,3 @@
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"确认ArkUI组件状态、布局与裁切约定，作为本次UI修复的实现约束。"}
+{"file":".trellis/spec/frontend/state-management.md","reason":"确认MiniBarState的可观察状态和Builder数据流约定，避免继续引入快照式状态。"}
+{"file":".trellis/tasks/11-06-fix-minibar-state-inset/research/root-cause.md","reason":"记录HdsTabs回调语义、现有失败修复和本次根因，实施时按此验证。"}
