@@ -37,7 +37,6 @@ import {
   removeFromCollection,
   removeFromPlaylist,
   updateProgress } from "../utils/Api";
-import { getBottomContentInset } from '../utils/Layout';
 import { media } from "@kit.MediaKit";
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
@@ -2291,7 +2290,7 @@ export struct LibraryItemDetail {
           top: 64 + this.statusBarHeight,
           left: 20,
           right: 20,
-          bottom: getBottomContentInset(0, this.isStartPlaying, 84, false)
+          bottom: this.isStartPlaying ? 84 : 0
         })
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .scrollBar(BarState.Off)

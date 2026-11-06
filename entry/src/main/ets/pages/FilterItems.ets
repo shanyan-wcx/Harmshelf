@@ -2,7 +2,6 @@ import { gradientBlurTitleBarStyle, LibraryItemComponent1 } from "../utils/Compo
 import { Filter1, LibraryItem, Progress, Media, Series } from "../utils/Interface";
 import { LengthMetrics } from "@kit.ArkUI";
 import { HdsNavDestination, HdsNavDestinationAttribute } from "@kit.UIDesignKit";
-import { getBottomContentInset } from '../utils/Layout';
 
 @Builder
 export function filterItemsBuilder(name: string, filter: Filter1) {
@@ -134,7 +133,7 @@ export struct FilterItems {
             left: 20,
             right: 20,
             top: 64 + this.statusBarHeight,
-            bottom: getBottomContentInset(0, this.isStartPlaying, 84, false)
+            bottom: this.isStartPlaying ? 84 : 0
           })
           .clip(false)
           .onReachEnd(async () => {
