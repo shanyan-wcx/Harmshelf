@@ -1,7 +1,8 @@
-import { BlurStrategy, HdsActionBar, ActionBarButton, HdsListItem, ActionBarStyle } from '@kit.UIDesignKit'
+import { HdsBarStyle, HdsListItem } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
-import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier, uiMaterial, window } from '@kit.ArkUI'
+import { ColorMetrics, CircleShape, PersistenceV2, SymbolGlyphModifier, TextModifier, uiMaterial, window } from '@kit.ArkUI'
 import { common } from '@kit.AbilityKit'
+import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { createBookmark, deleteBookmark, getBookmarks } from '../utils/Api';
 import { PlaySetting } from './Index';
@@ -11,12 +12,354 @@ import { image } from '@kit.ImageKit';
 import { effectKit } from '@kit.ArkGraphics2D';
 import { rcp } from '@kit.RemoteCommunicationKit';
 import { ImmersiveActionButton } from '../utils/Component';
+import {
+  MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN,
+  MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT
+} from '../utils/Layout';
 
 interface PlayColorPalette {
   primary: string
   secondary: string
   sliderBlock: string
   sliderTrack: string
+}
+
+@ComponentV2
+export struct PlaybackMiniBar {
+  @Param forceExpanded: boolean = false
+  @Consumer() miniBarStyle: HdsBarStyle = HdsBarStyle.COLLAPSE
+  @Consumer() playSetting: PlaySetting | undefined = PersistenceV2.connect(PlaySetting, () => new PlaySetting());
+  @Consumer() isPlaying: boolean = false
+  @Consumer() showPlay: boolean = false
+  @Consumer() playingItem: PlayItem | undefined = undefined
+  @Consumer() localPlayItem: LocalPlayItem | undefined = undefined
+  @Consumer() isLocalPlaying: boolean = false
+  @Consumer() baseUrl: string = ""
+  @Consumer() apiToken: string = ""
+  @Consumer() playingTitle: string = "-"
+  @Consumer() playingIndex: number = 0
+  @Consumer() gobackwardIcon: Resource = $r('sys.symbol.gobackward_10')
+  @Consumer() goforwardIcon: Resource = $r('sys.symbol.goforward_10')
+  @Consumer() playStartTime: number = 0
+  @Consumer() playedTime: number = 0
+  @Consumer() playedPercent: number = 0
+  @Consumer() avPlayer: media.AVPlayer | undefined = undefined
+  @Local fadeInterval: number = -1
+  @Local marqueeStart: boolean = true
+  @Local marqueeRestartTimer: number = -1
+
+  private isExpanded(): boolean {
+    return this.forceExpanded || this.miniBarStyle === HdsBarStyle.EXPAND
+  }
+
+  private getCoverSource(): string | Resource {
+    if (this.isLocalPlaying) {
+      const coverPath = this.localPlayItem?.coverPath ?? ''
+      return coverPath ? fileUri.getUriFromPath(coverPath) : $rawfile('nocover.jpg')
+    }
+    if (!this.baseUrl || !this.playingItem?.libraryItemId) {
+      return $rawfile('nocover.jpg')
+    }
+    return this.baseUrl + `/api/items/${this.playingItem.libraryItemId}/cover?token=${this.apiToken}`
+  }
+
+  private getPlaybackSubtitle(): string {
+    if (this.isLocalPlaying) {
+      return '本地文件'
+    }
+    if (this.playingItem?.mediaType === 'book') {
+      return this.playingItem.mediaMetadata.authors?.map(item => item.name).join(', ') ?? '-'
+    }
+    return this.playingItem?.displayAuthor ?? '-'
+  }
+
+  private getCurrentDuration(): number {
+    if (this.isLocalPlaying) {
+      return this.localPlayItem?.tracks[this.playingIndex]?.duration ?? 0
+    }
+    return this.playingItem?.audioTracks[this.playingIndex]?.duration ?? 0
+  }
+
+  private isSeekable(): boolean {
+    return this.avPlayer !== undefined &&
+      ['prepared', 'playing', 'paused', 'completed'].includes(this.avPlayer.state)
+  }
+
+  private seekBackward() {
+    if (!this.isSeekable()) {
+      return
+    }
+    const skipIntervals = this.playSetting?.skipIntervals ?? 10
+    this.avPlayer!.seek(this.playedTime - skipIntervals > 0 ?
+      (this.playedTime - skipIntervals) * 1000 : 0)
+  }
+
+  private seekForward() {
+    if (!this.isSeekable()) {
+      return
+    }
+    const skipIntervals = this.playSetting?.skipIntervals ?? 10
+    const duration = this.getCurrentDuration()
+    this.avPlayer!.seek(this.playedTime + skipIntervals < duration ?
+      (this.playedTime + skipIntervals) * 1000 : duration * 1000)
+  }
+
+  private fadeIn() {
+    if (this.avPlayer === undefined) {
+      return
+    }
+    this.isPlaying = true
+    if (this.fadeInterval !== -1) {
+      clearInterval(this.fadeInterval)
+    }
+    let volume = 0
+    const step = 50
+    const increment = step / 1000
+    this.avPlayer.setVolume(volume)
+    this.avPlayer.play()
+    const interval = setInterval(() => {
+      volume += increment
+      if (volume >= 1.0) {
+        this.avPlayer!.setVolume(1.0)
+        clearInterval(interval)
+        this.fadeInterval = -1
+      } else {
+        this.avPlayer!.setVolume(volume)
+      }
+    }, step)
+    this.fadeInterval = interval
+  }
+
+  private fadeOut() {
+    if (this.avPlayer === undefined) {
+      return
+    }
+    this.isPlaying = false
+    if (this.fadeInterval !== -1) {
+      clearInterval(this.fadeInterval)
+    }
+    let volume = 1.0
+    const step = 50
+    const decrement = step / 1000
+    const interval = setInterval(() => {
+      volume -= decrement
+      if (volume <= 0.0) {
+        this.avPlayer!.setVolume(0.0)
+        clearInterval(interval)
+        this.fadeInterval = -1
+        this.avPlayer!.pause()
+      } else {
+        this.avPlayer!.setVolume(volume)
+      }
+    }, step)
+    this.fadeInterval = interval
+  }
+
+  private async togglePlayback() {
+    if (this.avPlayer === undefined) {
+      return
+    }
+    if (this.isPlaying) {
+      if (this.avPlayer.state === 'playing') {
+        if (this.playSetting?.fadeInOut) {
+          this.fadeOut()
+        } else {
+          this.avPlayer.pause()
+        }
+      }
+      return
+    }
+    if (this.avPlayer.state === 'error') {
+      this.isPlaying = true
+      const savedPosition = this.playedTime
+      await this.avPlayer.reset()
+      this.playStartTime = savedPosition
+      if (this.isLocalPlaying) {
+        const file = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
+        this.avPlayer.fdSrc = { fd: file.fd, offset: 0, length: -1 }
+      } else if (this.playingItem) {
+        this.avPlayer.url = this.baseUrl + this.playingItem.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+      }
+      this.avPlayer.prepare()
+    } else if (['paused', 'completed'].includes(this.avPlayer.state)) {
+      if (this.playSetting?.fadeInOut) {
+        this.fadeIn()
+      } else {
+        this.avPlayer.play()
+      }
+    }
+  }
+
+  private openPlayer() {
+    this.showPlay = true
+  }
+
+  @Builder
+  coverBuilder() {
+    Stack() {
+      Image(this.getCoverSource())
+        .alt($rawfile('nocover.jpg'))
+        .objectFit(ImageFit.Cover)
+        .width(this.isExpanded() ? 54 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
+        .height(this.isExpanded() ? 54 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
+        .draggable(false)
+        .clipShape(new CircleShape({ width: '100%', height: '100%' }))
+        .geometryTransition("cover")
+
+      Progress({ value: this.playedPercent, total: 100, type: ProgressType.Ring })
+        .width(this.isExpanded() ? 62 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
+        .height(this.isExpanded() ? 62 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
+        .style({
+          strokeWidth: 3,
+          enableSmoothEffect: true
+        })
+    }
+    .width(this.isExpanded() ? 62 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
+    .height(this.isExpanded() ? 62 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
+    .margin({ left: this.isExpanded() ? 8 : 0, right: this.isExpanded() ? 8 : 0 })
+    .clip(false)
+    .hitTestBehavior(this.isExpanded() ? HitTestMode.Default : HitTestMode.Transparent)
+    .onClick(() => {
+      if (this.isExpanded()) {
+        this.openPlayer()
+      }
+    })
+  }
+
+  private restartMarquee() {
+    if (this.marqueeRestartTimer !== -1) {
+      return
+    }
+    this.marqueeStart = false
+    this.marqueeRestartTimer = setTimeout(() => {
+      this.marqueeStart = true
+      this.marqueeRestartTimer = -1
+    }, 1500)
+  }
+
+  private onMarqueeStateChange(state: MarqueeState) {
+    if (state === MarqueeState.FINISH) {
+      this.restartMarquee()
+    }
+  }
+
+  @Builder
+  rewindButton() {
+    Button({ type: ButtonType.Circle }) {
+      SymbolGlyph(this.gobackwardIcon)
+        .fontSize(24)
+    }
+    .width(40)
+    .height(40)
+    .backgroundColor(Color.Transparent)
+    .onClick(() => {
+      this.seekBackward()
+    })
+  }
+
+  @Builder
+  playPauseButton() {
+    Button({ type: ButtonType.Circle }) {
+      SymbolGlyph(this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
+        .fontSize(24)
+    }
+    .width(40)
+    .height(40)
+    .backgroundColor(Color.Transparent)
+    .onClick(async () => {
+      await this.togglePlayback()
+    })
+  }
+
+  @Builder
+  forwardButton() {
+    Button({ type: ButtonType.Circle }) {
+      SymbolGlyph(this.goforwardIcon)
+        .fontSize(24)
+    }
+    .width(40)
+    .height(40)
+    .backgroundColor(Color.Transparent)
+    .onClick(() => {
+      this.seekForward()
+    })
+  }
+
+  @Builder
+  expandedBarBuilder() {
+    Row() {
+      this.coverBuilder()
+
+      Column() {
+        Text(this.playingTitle || '-')
+          .width('100%')
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.MARQUEE })
+          .marqueeOptions({ start: this.marqueeStart, loop: 1, step: 4, fadeout: true })
+          .onMarqueeStateChange((state: MarqueeState) => {
+            this.onMarqueeStateChange(state)
+          })
+
+        Text(this.getPlaybackSubtitle())
+          .width('100%')
+          .fontColor($r('sys.color.font_secondary'))
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.MARQUEE })
+          .marqueeOptions({ start: this.marqueeStart, loop: 1, step: 4, fadeout: true })
+          .onMarqueeStateChange((state: MarqueeState) => {
+            this.onMarqueeStateChange(state)
+          })
+          .margin({ top: 4 })
+      }
+      .layoutWeight(1)
+      .padding({ left: 4, right: 4 })
+      .clip(false)
+
+      Row({ space: 4 }) {
+        this.rewindButton()
+        this.playPauseButton()
+        this.forwardButton()
+      }
+      .margin({ right: 8 })
+      .clip(false)
+    }
+    .width('100%')
+    .height('100%')
+    .alignItems(VerticalAlign.Center)
+    .clip(false)
+  }
+
+  @Builder
+  collapsedBarBuilder() {
+    Stack({ alignContent: Alignment.Center }) {
+      this.coverBuilder()
+    }
+    .width('100%')
+    .height('100%')
+    .clip(false)
+  }
+
+  @Builder
+  barBuilder() {
+    if (this.isExpanded()) {
+      this.expandedBarBuilder()
+    } else {
+      this.collapsedBarBuilder()
+    }
+  }
+
+  aboutToDisappear() {
+    if (this.fadeInterval !== -1) {
+      clearInterval(this.fadeInterval)
+    }
+    if (this.marqueeRestartTimer !== -1) {
+      clearTimeout(this.marqueeRestartTimer)
+    }
+  }
+
+  build() {
+    this.barBuilder()
+  }
 }
 
 @ComponentV2
@@ -29,6 +372,7 @@ export struct Play {
   @Consumer() displayHeight: number = 0
   @Consumer() isPlaying: boolean = false
   @Consumer() isStartPlaying: boolean = false
+  @Consumer() isIndex: boolean = true
   @Consumer() showPlay: boolean = false
   @Consumer() playingItem: PlayItem | undefined = undefined
   @Consumer() localPlayItem: LocalPlayItem | undefined = undefined
@@ -49,8 +393,6 @@ export struct Play {
   @Consumer() sliderMoving: boolean = false
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Consumer() speed: media.PlaybackSpeed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
-  @Local rotateAngle: number = 0
-  @Local rotateTimer: number = -1
   @Local sliderValue: number = 0
   @Local fadeInterval: number = -1
   @Local coverColor: number = 0xff181818
@@ -103,15 +445,6 @@ export struct Play {
     } catch (_) {
     }
   }
-  @Consumer() isOnFocus: boolean = true
-  @Monitor('isOnFocus')
-  onFocusChange() {
-    if (!this.isOnFocus) {
-      this.stopRotate()
-    } else if (this.isPlaying) {
-      this.startRotate()
-    }
-  }
 
   async aboutToAppear() {
     try {
@@ -126,7 +459,6 @@ export struct Play {
   }
 
   aboutToDisappear() {
-    this.stopRotate()
     if (this.fadeInterval !== -1) {
       clearInterval(this.fadeInterval)
     }
@@ -179,6 +511,7 @@ export struct Play {
   @Monitor('showPlay')
   async refreshShownCoverColor(_: IMonitor) {
     if (this.showPlay) {
+      this.changeSpeedIcon()
       await this.updateStatusBarContentColor()
       await this.refreshCoverColor()
     } else {
@@ -264,16 +597,6 @@ export struct Play {
   async speedMonitoring(_: IMonitor) {
     this.changeSpeedIcon()
   }
-  @Monitor('gobackwardIcon')
-  async changeIcon(_: IMonitor) {
-    this.goBackwardButton.baseIcon = this.gobackwardIcon
-    this.goForwardButton.baseIcon = this.goforwardIcon
-  }
-  @Monitor('isPlaying')
-  async changeIcon2(_: IMonitor) {
-    this.playPauseButton.baseIcon = this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill');
-  }
-
   changeSpeedIcon() {
     switch(this.speed) {
       case media.PlaybackSpeed.SPEED_FORWARD_0_50_X:
@@ -418,23 +741,6 @@ export struct Play {
     Logger.info(`共playItem.audioTracks.length条音轨`)
     Logger.info(`播放序号为this.playingIndex`)
     Logger.info(`起始位置为this.playStartTime`)
-  }
-
-  startRotate() {
-    if (this.rotateTimer !== -1) {
-      return
-    }
-    this.rotateTimer = setInterval(() => {
-      this.rotateAngle += 0.1
-    }, 10)
-  }
-
-  stopRotate() {
-    if (this.rotateTimer === -1) {
-      return
-    }
-    clearInterval(this.rotateTimer)
-    this.rotateTimer = -1
   }
 
   @Builder
@@ -1735,48 +2041,38 @@ export struct Play {
         .hitTestBehavior(HitTestMode.None)
   }
 
-  @Builder
-  primaryButtonBuilder() {
-    Button({ type: ButtonType.Circle }) {
-      Stack() {
-        Image(this.isLocalPlaying ?
-          (this.localPlayItem?.coverPath ? fileUri.getUriFromPath(this.localPlayItem.coverPath) : $rawfile('nocover.jpg')) :
-          (this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`))
-          .alt($rawfile('nocover.jpg'))
-          .objectFit(ImageFit.Cover)
-          .width(65)
-          .height(65)
-          .draggable(false)
-          .clipShape(new CircleShape({ width: '100%', height: '100%' }))
-          .geometryTransition("cover")
-          .rotate({ angle: this.rotateAngle })
-          .animation({
-            duration: 10,
-            curve: Curve.Linear
-          })
-          .onAppear(() => {
-            this.startRotate()
-          })
+  private isBottomTabDevice(): boolean {
+    return deviceInfo.deviceType === 'phone' || deviceInfo.deviceType === 'tablet'
+  }
 
-        Progress({ value: this.playedPercent, total: 100, type: ProgressType.Ring })
-          .width(71)
-          .height(71)
-          .style({
-            strokeWidth: 3,
-            enableSmoothEffect: true
-          })
+  @Builder
+  desktopMiniBarBuilder() {
+    Row() {
+      ImmersiveActionButton({
+        barWidth: '100%',
+        barHeight: MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT,
+        barRadius: MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT / 2,
+        monopolizeActionEvents: false
+      }) {
+        PlaybackMiniBar({ forceExpanded: true })
       }
-      .width(70)
-      .height(70)
     }
-    .width(70)
-    .height(70)
-    .backgroundColor(Color.Transparent)
-    .backgroundBlurStyle(BlurStyle.Thin)
-    .shadow({
-      radius: 10,
-      color: $r('sys.color.font')
-    })
+    .width('100%')
+    .height(MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
+    .padding({ left: 16, right: 16 })
+    .margin({ bottom: MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN })
+    .clip(false)
+  }
+
+  build() {
+    Stack({ alignContent: Alignment.Bottom }) {
+      if ((!this.isBottomTabDevice() || !this.isIndex) && this.isStartPlaying) {
+        this.desktopMiniBarBuilder()
+      }
+    }
+    .width('100%')
+    .height('100%')
+    .hitTestBehavior(HitTestMode.Transparent)
     .bindContentCover(this.showPlay, this.playBuilder(), {
       onDisappear: () => {
         this.showPlay = false
@@ -1787,99 +2083,5 @@ export struct Play {
         }
       }
     })
-    .onClick(() => {
-      this.showPlay = true
-      this.changeSpeedIcon()
-    })
-  }
-
-  goBackwardButton: ActionBarButton = new ActionBarButton({
-    baseIcon: this.gobackwardIcon,
-    onClick: () => {
-      if (!['prepared', 'playing', 'paused', 'completed'].includes(this.avPlayer!.state)) return
-      this.avPlayer!.seek(this.playedTime - this.playSetting!.skipIntervals > 0 ? (this.playedTime - this.playSetting!.skipIntervals) * 1000 : 0)
-    }
-  })
-
-  stopButton: ActionBarButton = new ActionBarButton({
-    baseIcon: $r('sys.symbol.stop_circle'),
-    onClick: () => {
-      this.avPlayer!.stop()
-      if (this.showPlay) {
-        this.shouldClosePlayer = true
-        this.showPlay = false
-      } else {
-        this.isStartPlaying = false
-        this.isPlaying = false
-      }
-    }
-  })
-
-  playPauseButton: ActionBarButton = new ActionBarButton({
-    baseIcon: this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'),
-    onClick: async () => {
-      if (this.isPlaying) {
-        if (this.avPlayer!.state === 'playing') {
-          if (this.playSetting?.fadeInOut) {
-            this.fadeOut()
-          } else {
-            this.avPlayer!.pause()
-          }
-        }
-      } else {
-        if (this.avPlayer!.state === 'error') {
-          this.isPlaying = true
-          const savedPosition = this.playedTime
-          await this.avPlayer!.reset()
-          this.playStartTime = savedPosition
-          if (this.isLocalPlaying) {
-            const file = fs.openSync(this.localPlayItem!.tracks[this.playingIndex].filePath, fs.OpenMode.READ_ONLY)
-            this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
-          } else {
-            this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
-          }
-          this.avPlayer!.prepare()
-        } else if (['paused', 'completed'].includes(this.avPlayer!.state)) {
-          if (this.playSetting?.fadeInOut) {
-            this.fadeIn()
-          } else {
-            this.avPlayer!.play()
-          }
-        }
-      }
-    }
-  })
-
-  goForwardButton: ActionBarButton = new ActionBarButton({
-    baseIcon: this.goforwardIcon,
-    onClick: () => {
-      if (!['prepared', 'playing', 'paused', 'completed'].includes(this.avPlayer!.state)) return
-      let dur = this.getCurrentDuration()
-      this.avPlayer!.seek(this.playedTime + this.playSetting!.skipIntervals < dur ? (this.playedTime + this.playSetting!.skipIntervals) * 1000 : dur * 1000)
-    }
-  })
-
-  build() {
-    Column() {
-      HdsActionBar({
-        startButtons: [this.goBackwardButton, this.stopButton],
-        endButtons: [this.playPauseButton, this.goForwardButton],
-        primaryButtonBuilder: (): void => this.primaryButtonBuilder(),
-        primaryButtonBuilderWidth: LengthMetrics.vp(70),
-        isExpand: true,
-        blurStrategy: BlurStrategy.ENABLE,
-        actionBarStyle: new ActionBarStyle({
-          backgroundColor: new ColorMetrics(),
-          backgroundBlurStyle: BlurStyle.COMPONENT_THIN
-        })
-      })
-        .height(0)
-        .hitTestBehavior(HitTestMode.BLOCK_HIERARCHY)
-        .margin({ bottom: 108 })
-    }
-    .width('100%')
-    .height('100%')
-    .hitTestBehavior(HitTestMode.Transparent)
-    .justifyContent(FlexAlign.End)
   }
 }

@@ -10,6 +10,8 @@ import {
   HdsNavigationTitleMode,
   HdsNavigationMenuItemOptions,
   HdsTabs,
+  HdsBarStyle,
+  HdsBarLayoutMode,
   DividerMode,
   BottomBuilderShowType,
   hdsMaterial,
@@ -54,7 +56,10 @@ import { DownloadStatus, DownloadTaskInfo, DownloadManager } from "./Class";
 import { DownloadSetting } from "../pages/Index";
 import { fileUri, fileIo as fs } from "@kit.CoreFileKit";
 import { Logger } from './Logger';
-import { MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN } from './Layout';
+import {
+  MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN,
+  MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT
+} from './Layout';
 
 let deviceTypeInfo: string = deviceInfo.deviceType;
 
@@ -235,8 +240,18 @@ export struct MyNavigation {
   @Consumer() showLoadingProgress: boolean = false
   @Consumer() downloadTasks: DownloadTaskInfo[] = []
   @Consumer() downloadCount: number = 0
+  @Consumer() isStartPlaying: boolean = false
   @Local isDownloadEmpty: boolean = true
+  @Consumer() isIndex: boolean = true
+  @Provider() miniBarStyle: HdsBarStyle = HdsBarStyle.COLLAPSE
   private navigationItems: MainNavigationItem[] = getMainNavigationItems()
+
+  @Builder
+  defaultMiniBarBuilder() {
+    Blank()
+  }
+
+  @BuilderParam miniBarBuilder: () => void = this.defaultMiniBarBuilder
 
   @Monitor('downloadCount')
   async updateMenus(monitor: IMonitor) {
@@ -290,9 +305,13 @@ export struct MyNavigation {
     this.pageInfos.clear()
   }
 
+  private onMiniBarStyleChange(miniBarStyle: HdsBarStyle) {
+    this.miniBarStyle = miniBarStyle
+  }
+
   @Builder
   bottomTabBarBuilder() {
-    Tabs({ barPosition: BarPosition.End, index: this.pageIndex }) {
+    HdsTabs({ index: this.pageIndex }) {
       TabContent() {
         Home()
       }
@@ -315,25 +334,35 @@ export struct MyNavigation {
     }
     .width('100%')
     .height('100%')
-    .barGridAlign({ sm: 4, md: 4, lg: 4, margin: 16 })
     .barOverlap(true)
+    .barPosition(BarPosition.End)
     .vertical(false)
     .scrollable(false)
-    .animationCurve(Curve.Friction)
+    .barMode(BarMode.Fixed)
     .animationDuration(280)
-    .barHeight('auto')
+    .barHeight(MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
     .barBackgroundColor(Color.Transparent)
+    .barBackgroundBlurStyle(BlurStyle.NONE)
+    .divider({ mode: DividerMode.NONE })
+    .clip(false)
     .barFloatingStyle({
       barSideMargin: 16,
       barBottomMargin: MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN,
-      maskColor: Color.Transparent,
-      maskHeight: 0,
-      systemMaterial: new uiMaterial.ImmersiveMaterial({
-        style: uiMaterial.ImmersiveStyle.ULTRA_THIN,
-        applyShadow: true,
-        interactive: true,
-        lightEffect: { color: Color.White }
-      })
+      gradientMask: { maskColor: Color.Transparent },
+      systemMaterialEffect: {
+        materialType: hdsMaterial.MaterialType.IMMERSIVE,
+        materialLevel: hdsMaterial.MaterialLevel.ADAPTIVE
+      },
+      miniBar: this.isStartPlaying && this.isIndex ? {
+        miniBarBuilder: () => this.miniBarBuilder(),
+        miniBarWidth: { smallWidth: 328, mediumWidth: 328, largeWidth: 328 },
+        miniBarStyle: HdsBarStyle.COLLAPSE,
+        enableMiniBarClip: false,
+        onBarStyleChange: (miniBarStyle: HdsBarStyle) => {
+          this.onMiniBarStyleChange(miniBarStyle)
+        },
+        barLayoutMode: HdsBarLayoutMode.HORIZONTAL
+      } : undefined
     })
     .onChange((index: number) => {
       this.onBottomTabChange(index)

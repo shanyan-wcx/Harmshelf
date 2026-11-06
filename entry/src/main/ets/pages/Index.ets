@@ -21,7 +21,7 @@ import {
   Collection,
   SkipSettings
 } from '../utils/Interface';
-import { Play } from './Play';
+import { Play, PlaybackMiniBar } from './Play';
 import { deviceInfo } from '@kit.BasicServicesKit';
 import { avSession } from '@kit.AVSessionKit';
 import { BusinessError } from '@kit.BasicServicesKit';
@@ -1199,7 +1199,9 @@ struct Index {
   @Builder
   ContentPanelBuilder() {
     Stack() {
-      MyNavigation()
+      MyNavigation() {
+        PlaybackMiniBar()
+      }
 
       if (this.isStartPlaying) {
         Play()
