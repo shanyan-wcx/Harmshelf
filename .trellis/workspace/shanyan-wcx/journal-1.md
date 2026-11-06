@@ -592,3 +592,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 23: 修复 minibar 转场闪烁与非 Tab 宽度
+
+**Date**: 2026-11-06
+**Task**: 修复 minibar 转场闪烁与非 Tab 宽度
+**Branch**: `main`
+
+### Summary
+
+为 minibar 几何转场分支补充稳定节点 ID，避免切换到非 Tab 条时封面重影闪烁；非 Tab 内容宽度由 +8vp 调整为 +16vp，保持外层边距、最大宽度和 Tab 布局不变；DevEco API 26 Debug 构建成功。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `dac0d9e` | (see git log) |
+
+### Status
+
+[OK] **Completed**
