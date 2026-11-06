@@ -206,11 +206,11 @@ export struct PlaybackMiniBar {
       Image(this.getCoverSource())
         .alt($rawfile('nocover.jpg'))
         .objectFit(ImageFit.Cover)
-        .width(this.isExpanded() ? 41 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT - 3)
-        .height(this.isExpanded() ? 41 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT - 3)
+        .width(this.isExpanded() ? 40 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT - 4)
+        .height(this.isExpanded() ? 40 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT - 4)
         .draggable(false)
         .clipShape(new CircleShape({ width: '100%', height: '100%' }))
-        .borderRadius(this.isExpanded() ? 20.5 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT / 2 - 1.5)
+        .borderRadius(this.isExpanded() ? 20 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT / 2 - 2)
         .clip(true)
         .transition(TransitionEffect.IDENTITY)
 
@@ -219,7 +219,7 @@ export struct PlaybackMiniBar {
         .height(this.isExpanded() ? 44 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
         .color($r('sys.color.comp_background_secondary'))
         .style({
-          strokeWidth: 1.5,
+          strokeWidth: 2,
           enableSmoothEffect: false
         })
 
@@ -228,7 +228,7 @@ export struct PlaybackMiniBar {
         .height(this.isExpanded() ? 44 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
         .color($r('sys.color.icon_sub_emphasize'))
         .style({
-          strokeWidth: 1.5,
+          strokeWidth: 2,
           enableSmoothEffect: true
         })
     }
