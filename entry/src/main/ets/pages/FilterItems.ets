@@ -2,6 +2,7 @@ import { gradientBlurTitleBarStyle, LibraryItemComponent1 } from "../utils/Compo
 import { Filter1, LibraryItem, Progress, Media, Series } from "../utils/Interface";
 import { LengthMetrics } from "@kit.ArkUI";
 import { HdsNavDestination, HdsNavDestinationAttribute } from "@kit.UIDesignKit";
+import { MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN, MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT } from '../utils/Layout';
 
 @Builder
 export function filterItemsBuilder(name: string, filter: Filter1) {
@@ -133,7 +134,7 @@ export struct FilterItems {
             left: 20,
             right: 20,
             top: 64 + this.statusBarHeight,
-            bottom: this.isStartPlaying ? 84 : 0
+            bottom: this.isStartPlaying ? MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT + MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN : 0
           })
           .clip(false)
           .onReachEnd(async () => {
