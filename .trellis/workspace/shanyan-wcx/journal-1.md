@@ -655,3 +655,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 26: 修复播放器全屏封面转场
+
+**Date**: 2026-11-06
+**Task**: 修复播放器全屏封面转场
+**Branch**: `main`
+
+### Summary
+
+将非 Tab 播放条内容宽度从 +24vp 调整为 +22vp；为 minibar 与全屏播放器共享封面补齐 280ms Friction 透明度转场，保留条件 geometryTransition、稳定节点 id 和既有交互；DevEco CLI debug 构建成功，任务已归档。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `04ae6b4` | (see git log) |
+
+### Status
+
+[OK] **Completed**
