@@ -289,14 +289,14 @@ export struct PlaybackMiniBar {
         Column() {
           Text(this.playingTitle || '-')
             .width('100%')
-            .fontSize(15)
+            .fontSize(14)
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.MARQUEE })
             .marqueeOptions({ start: true, loop: -1, delay: 3000, step: 4, fadeout: true })
 
           Text(this.getPlaybackSubtitle())
             .width('100%')
-            .fontSize(15)
+            .fontSize(14)
             .fontColor($r('sys.color.font_secondary'))
             .maxLines(1)
             .textOverflow({ overflow: TextOverflow.MARQUEE })
@@ -311,7 +311,7 @@ export struct PlaybackMiniBar {
           }
         })
 
-        Row({ space: 4 }) {
+        Row({ space: 0 }) {
           this.rewindButton()
           this.playPauseButton()
           this.forwardButton()
