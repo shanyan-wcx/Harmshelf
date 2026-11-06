@@ -697,3 +697,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 28: 播放器 minibar 拖拽全屏转场
+
+**Date**: 2026-11-06
+**Task**: 播放器 minibar 拖拽全屏转场
+**Branch**: `main`
+
+### Summary
+
+实现 HdsTabs 播放条目标状态立即生效；为 minibar 与非 Tab 播放条增加向上拖拽、直接点击和全屏反向收起的共享进度转场；移除封面 geometryTransition，仅保留 miniBar 条切换转场；API 26 Debug 构建通过。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `292cd57` | (see git log) |
+
+### Status
+
+[OK] **Completed**

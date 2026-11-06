@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 27
+- **Total Sessions**: 28
 - **Last Active**: 2026-11-06
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~699 | Active |
+| `journal-1.md` | ~720 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 28 | 2026-11-06 | 播放器 minibar 拖拽全屏转场 | `292cd57` | `main` |
 | 27 | 2026-11-06 | 修复播放器 minibar 状态与全屏转场 | `7ac1fdd` | `main` |
 | 26 | 2026-11-06 | 修复播放器全屏封面转场 | `04ae6b4` | `main` |
 | 25 | 2026-11-06 | 增加 minibar 到全屏播放页的封面转场 | `8a17dc9` | `main` |
