@@ -1226,6 +1226,7 @@ export struct AuthorComponent {
               Row() {
                 Text(Math.min(this.author.numBooks ?? 0, 99).toString())
                   .fontSize(11)
+                  .fontColor($r('sys.color.font_secondary'))
                   .fontWeight(FontWeight.Medium)
                   .width('100%')
                   .maxLines(1)
@@ -1274,7 +1275,7 @@ export struct AuthorComponent {
           Row() {
             Text(this.author.name)
               .fontSize(16)
-              .minFontSize(12)
+              .minFontSize(13)
               .maxFontSize(16)
               .fontWeight(FontWeight.Medium)
               .width('calc(100% + 16vp)')
@@ -1355,6 +1356,7 @@ export struct AuthorComponent1 {
               Row() {
                 Text(Math.min(this.author.numBooks ?? 0, 99).toString())
                   .fontSize(11)
+                  .fontColor($r('sys.color.font_secondary'))
                   .fontWeight(FontWeight.Medium)
                   .width('100%')
                   .maxLines(1)
@@ -1403,7 +1405,7 @@ export struct AuthorComponent1 {
           Row() {
             Text(this.author.name)
               .fontSize(16)
-              .minFontSize(12)
+              .minFontSize(13)
               .maxFontSize(16)
               .fontWeight(FontWeight.Medium)
               .width('calc(100% + 16vp)')
@@ -1501,6 +1503,7 @@ export struct RecentEpisodeComponent {
             }) {
               Text("剧集")
                 .fontSize(12)
+                .fontColor($r('sys.color.font_secondary'))
             }
           }
           .width(38)

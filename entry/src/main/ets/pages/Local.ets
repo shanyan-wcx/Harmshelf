@@ -218,7 +218,7 @@ export struct LocalMedia {
               Button({ type: ButtonType.Normal }) {
                 Row() {
                   Text(folder)
-                    .fontSize(18)
+                    .fontSize(16)
                     .fontWeight(FontWeight.Medium)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -309,7 +309,7 @@ export struct LocalMedia {
                       Stack() {
                         Row() {
                           Text(folder)
-                            .fontSize(18)
+                            .fontSize(16)
                             .fontWeight(FontWeight.Medium)
                             .maxLines(1)
                             .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -423,7 +423,7 @@ export struct LocalMedia {
                       Stack() {
                         Row() {
                           Text(file)
-                            .fontSize(18)
+                            .fontSize(16)
                             .fontWeight(FontWeight.Medium)
                             .maxLines(1)
                             .textOverflow({ overflow: TextOverflow.Ellipsis })

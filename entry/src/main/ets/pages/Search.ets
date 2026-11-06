@@ -99,14 +99,21 @@ export struct SearchMedia {
                         .fontSize(16)
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
-                        .margin({ bottom: 5 })
+                        .margin({ bottom: 3 })
 
                       Text((libraryItemSearchResult.libraryItem.media.metadata.authorName ?? "-"))
                         .fontSize(13)
                         .fontColor($r('sys.color.font_secondary'))
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        .margin({ bottom: 5 })
+
+                      Text((libraryItemSearchResult.libraryItem.media.chapters?.length ?? 0) + " 章节")
+                        .fontSize(13)
+                        .fontColor($r('sys.color.font_secondary'))
                     }
+                    .width('100%')
+                    .layoutWeight(1)
                     .alignItems(HorizontalAlign.Start)
                   }
                   .width('100%')
@@ -154,14 +161,21 @@ export struct SearchMedia {
                         .fontSize(16)
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
-                        .margin({ bottom: 5 })
+                        .margin({ bottom: 3 })
 
                       Text((libraryItemSearchResult.libraryItem.media.metadata.author ?? "-"))
                         .fontSize(13)
                         .fontColor($r('sys.color.font_secondary'))
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
+                        .margin({ bottom: 5 })
+
+                      Text((libraryItemSearchResult.libraryItem.media.episodes?.length ?? 0) + " 剧集")
+                        .fontSize(13)
+                        .fontColor($r('sys.color.font_secondary'))
                     }
+                    .width('100%')
+                    .layoutWeight(1)
                     .alignItems(HorizontalAlign.Start)
                   }
                   .width('100%')
