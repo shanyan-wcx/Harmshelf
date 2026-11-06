@@ -205,7 +205,6 @@ export struct PlaybackMiniBar {
         .clipShape(new CircleShape({ width: '100%', height: '100%' }))
         .borderRadius(this.isExpanded() ? 22 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT / 2)
         .clip(true)
-        .geometryTransition("cover")
 
       Progress({ value: this.playedPercent, total: 100, type: ProgressType.Ring })
         .width(this.isExpanded() ? 48 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
@@ -314,7 +313,7 @@ export struct PlaybackMiniBar {
     .alignItems(VerticalAlign.Center)
     .geometryTransition("miniBar")
     .id('expandedMiniBar')
-    .width(this.isStandalone ? 'calc(100% + 16vp)' : '100%')
+    .width(this.isStandalone ? 'calc(100% + 24vp)' : '100%')
     .margin({ right: this.isStandalone ? 0 : -8 })
     .clip(false)
     .onClick(() => {
