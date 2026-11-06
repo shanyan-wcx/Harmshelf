@@ -11,7 +11,7 @@ import { Logger } from '../utils/Logger';
 import { image } from '@kit.ImageKit';
 import { effectKit } from '@kit.ArkGraphics2D';
 import { rcp } from '@kit.RemoteCommunicationKit';
-import { ImmersiveActionButton, MiniBarState } from '../utils/Component';
+import { ImmersiveActionButton, MiniBarState, PlayerTransitionState } from '../utils/Component';
 import {
   MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN,
   MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT
@@ -29,6 +29,9 @@ export struct PlaybackMiniBar {
   @Param forceExpanded: boolean = false
   @Param isStandalone: boolean = false
   @Param miniBarState: MiniBarState = new MiniBarState()
+  @Consumer() displayWidth: number = 0
+  @Consumer() displayHeight: number = 0
+  @Consumer() playerTransitionState: PlayerTransitionState = new PlayerTransitionState()
   @Consumer() playSetting: PlaySetting | undefined = PersistenceV2.connect(PlaySetting, () => new PlaySetting());
   @Consumer() isPlaying: boolean = false
   @Consumer() showPlay: boolean = false
@@ -46,21 +49,90 @@ export struct PlaybackMiniBar {
   @Consumer() playedPercent: number = 0
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Local fadeInterval: number = -1
-  @Local playerCoverTransition: boolean = false
-
-  @Monitor('showPlay')
-  resetPlayerCoverTransition(_: IMonitor) {
-    if (!this.showPlay) {
-      this.playerCoverTransition = false
-    }
-  }
 
   private isExpanded(): boolean {
     return this.forceExpanded || this.miniBarState.expanded
   }
 
   private canOpenPlayer(): boolean {
-    return this.isExpanded() && !this.miniBarState.animating && !this.showPlay
+    return this.isExpanded() && !this.showPlay
+  }
+
+  private getTransitionSourceWidth(): number {
+    if (!this.isExpanded()) {
+      return MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT
+    }
+    if (this.isStandalone) {
+      return Math.min(Math.max(this.displayWidth - 40, MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT), 600)
+    }
+    return Math.max(this.displayWidth - 32, MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
+  }
+
+  private setTransitionSource() {
+    this.playerTransitionState.sourceWidth = this.getTransitionSourceWidth()
+    this.playerTransitionState.sourceCenterY = this.displayHeight > 0 ?
+      this.displayHeight - MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN - MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT / 2 : 0
+  }
+
+  private startPlayerTransition() {
+    if (this.showPlay || this.playerTransitionState.active) {
+      return
+    }
+    this.setTransitionSource()
+    this.playerTransitionState.opening = true
+    this.playerTransitionState.active = true
+    this.playerTransitionState.progress = 0
+    this.showPlay = true
+    this.getUIContext().animateTo({
+      duration: 320,
+      curve: Curve.Friction,
+      onFinish: () => {
+        this.playerTransitionState.progress = 1
+        this.playerTransitionState.active = false
+      }
+    }, () => {
+      this.playerTransitionState.progress = 1
+    })
+  }
+
+  private updatePlayerTransition(offsetY: number) {
+    if (!this.playerTransitionState.active || !this.playerTransitionState.opening) {
+      return
+    }
+    const distance = Math.max(this.displayHeight * 0.75, 1)
+    this.playerTransitionState.progress = Math.max(0, Math.min(1, -offsetY / distance))
+  }
+
+  private finishPlayerDrag() {
+    if (!this.playerTransitionState.active || !this.playerTransitionState.opening) {
+      return
+    }
+    this.getUIContext().animateTo({
+      duration: 260,
+      curve: Curve.Friction,
+      onFinish: () => {
+        this.playerTransitionState.progress = 1
+        this.playerTransitionState.active = false
+      }
+    }, () => {
+      this.playerTransitionState.progress = 1
+    })
+  }
+
+  private playerOpenGesture() {
+    return PanGesture({ direction: PanDirection.Up, distance: 1 })
+      .onActionStart(() => {
+        if (this.showPlay || this.playerTransitionState.active) {
+          return
+        }
+        this.startPlayerTransition()
+      })
+      .onActionUpdate((event: GestureEvent) => {
+        this.updatePlayerTransition(event.offsetY)
+      })
+      .onActionEnd(() => {
+        this.finishPlayerDrag()
+      })
   }
 
   private getCoverSource(): string | Resource {
@@ -205,16 +277,7 @@ export struct PlaybackMiniBar {
     if (!this.canOpenPlayer()) {
       return
     }
-    this.playerCoverTransition = true
-    this.getUIContext().animateTo({
-      duration: 280,
-      curve: Curve.Friction,
-      onFinish: () => {
-        this.playerCoverTransition = false
-      }
-    }, () => {
-      this.showPlay = true
-    })
+    this.startPlayerTransition()
   }
 
   @Builder
@@ -230,7 +293,6 @@ export struct PlaybackMiniBar {
         .borderRadius(this.isExpanded() ? 22 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT / 2)
         .clip(true)
         .transition(TransitionEffect.IDENTITY)
-        .geometryTransition(this.playerCoverTransition ? 'playerCoverTransition' : '')
 
       Progress({ value: this.playedPercent, total: 100, type: ProgressType.Ring })
         .width(this.isExpanded() ? 48 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
@@ -347,12 +409,13 @@ export struct PlaybackMiniBar {
     .width(this.isExpanded() && this.isStandalone ? 'calc(100% + 22vp)' : '100%')
     .margin({ right: this.isExpanded() ? (this.isStandalone ? 0 : -8) : 0 })
     .clip(false)
-    .hitTestBehavior(this.canOpenPlayer() ? HitTestMode.Default : HitTestMode.None)
+    .hitTestBehavior(this.canOpenPlayer() ? HitTestMode.Default : HitTestMode.Transparent)
     .onClick(() => {
       if (this.canOpenPlayer()) {
         this.openPlayer()
       }
     })
+    .gesture(this.playerOpenGesture())
   }
 
   aboutToDisappear() {
@@ -378,6 +441,7 @@ export struct Play {
   @Consumer() isStartPlaying: boolean = false
   @Consumer() isIndex: boolean = true
   @Consumer() showPlay: boolean = false
+  @Consumer() playerTransitionState: PlayerTransitionState = new PlayerTransitionState()
   @Consumer() playingItem: PlayItem | undefined = undefined
   @Consumer() localPlayItem: LocalPlayItem | undefined = undefined
   @Consumer() isLocalPlaying: boolean = false
@@ -423,6 +487,57 @@ export struct Play {
       sliderBlock: '#BCBCBC',
       sliderTrack: '#19FFFFFF'
     }
+  }
+
+  private getPlayerTransitionProgress(): number {
+    if (!this.playerTransitionState.active) {
+      return 1
+    }
+    return Math.max(0, Math.min(1, this.playerTransitionState.progress))
+  }
+
+  private getPlayerTransitionScaleX(): number {
+    if (this.displayWidth <= 0) {
+      return 1
+    }
+    const sourceScale = Math.min(this.playerTransitionState.sourceWidth / this.displayWidth, 1)
+    return sourceScale + (1 - sourceScale) * this.getPlayerTransitionProgress()
+  }
+
+  private getPlayerTransitionScaleY(): number {
+    if (this.displayHeight <= 0) {
+      return 1
+    }
+    const sourceScale = MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT / this.displayHeight
+    return sourceScale + (1 - sourceScale) * this.getPlayerTransitionProgress()
+  }
+
+  private getPlayerTransitionCenterY(): string {
+    if (this.displayHeight <= 0 || this.playerTransitionState.sourceCenterY <= 0) {
+      return '50%'
+    }
+    const center = Math.max(0, Math.min(100,
+      this.playerTransitionState.sourceCenterY / this.displayHeight * 100))
+    return `${center}%`
+  }
+
+  private closePlayerTransition() {
+    if (!this.showPlay || this.playerTransitionState.active) {
+      return
+    }
+    this.playerTransitionState.opening = false
+    this.playerTransitionState.active = true
+    this.getUIContext().animateTo({
+      duration: 320,
+      curve: Curve.Friction,
+      onFinish: () => {
+        this.showPlay = false
+        this.playerTransitionState.progress = 1
+        this.playerTransitionState.active = false
+      }
+    }, () => {
+      this.playerTransitionState.progress = 0
+    })
   }
 
   private async updateStatusBarContentColor() {
@@ -519,6 +634,8 @@ export struct Play {
       await this.updateStatusBarContentColor()
       await this.refreshCoverColor()
     } else {
+      this.playerTransitionState.active = false
+      this.playerTransitionState.progress = 1
       await this.restoreStatusBarContentColor()
     }
   }
@@ -1546,7 +1663,6 @@ export struct Play {
                   .aspectRatio(1)
                   .draggable(false)
                   .transition(TransitionEffect.IDENTITY)
-                  .geometryTransition('playerCoverTransition')
                   .id('remotePlayerCover')
               } else if (this.localPlayItem?.coverPath) {
                 Image(fileUri.getUriFromPath(this.localPlayItem.coverPath))
@@ -1556,7 +1672,6 @@ export struct Play {
                   .aspectRatio(1)
                   .draggable(false)
                   .transition(TransitionEffect.IDENTITY)
-                  .geometryTransition('playerCoverTransition')
                   .id('localPlayerCover')
               } else {
                 Image($rawfile('nocover.jpg'))
@@ -1565,7 +1680,6 @@ export struct Play {
                   .aspectRatio(1)
                   .draggable(false)
                   .transition(TransitionEffect.IDENTITY)
-                  .geometryTransition('playerCoverTransition')
                   .id('fallbackPlayerCover')
               }
 
@@ -1965,7 +2079,7 @@ export struct Play {
             barHeight: 40,
             barRadius: 20,
             onButtonClick: () => {
-              this.showPlay = false
+              this.closePlayerTransition()
             }
           }) {
             SymbolGlyph($r('sys.symbol.chevron_down'))
@@ -2030,6 +2144,14 @@ export struct Play {
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
       .transition(TransitionEffect.IDENTITY)
       .clip(false)
+      .scale({
+        x: this.getPlayerTransitionScaleX(),
+        y: this.getPlayerTransitionScaleY(),
+        centerX: '50%',
+        centerY: this.getPlayerTransitionCenterY()
+      })
+      .borderRadius(this.playerTransitionState.active ? MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT / 2 : 0)
+      .clip(this.playerTransitionState.active)
 
       Column()
         .width('100%')

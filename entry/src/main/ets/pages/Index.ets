@@ -2,7 +2,7 @@ import app from '@system.app';
 import { HdsSideBar, HdsSideMenu, HdsSideMenuMainItem } from '@kit.UIDesignKit';
 import { common, ConfigurationConstant, WantAgent, wantAgent } from '@kit.AbilityKit';
 import { PersistenceV2, SymbolGlyphModifier, Type, window } from '@kit.ArkUI';
-import { getMainNavigationItems, MiniBarBuilderOptions, MyNavigation } from '../utils/Component';
+import { getMainNavigationItems, MiniBarBuilderOptions, MyNavigation, PlayerTransitionState } from '../utils/Component';
 import {
   Episode,
   Library,
@@ -172,6 +172,7 @@ struct Index {
   @Provider() isStartPlaying: boolean = false
   @Provider() isPlaying: boolean = false
   @Provider() showPlay: boolean = false
+  @Provider() playerTransitionState: PlayerTransitionState = new PlayerTransitionState()
   @Provider() playingItem: PlayItem | undefined = undefined
   @Provider() localPlayItem: LocalPlayItem | undefined = undefined
   @Provider() isLocalPlaying: boolean = false

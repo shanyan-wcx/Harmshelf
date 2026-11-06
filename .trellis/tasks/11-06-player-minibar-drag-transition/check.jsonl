@@ -1,0 +1,3 @@
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"检查交互目标状态立即生效、HdsTabs 折叠点击不被自定义 PanGesture 吞掉，以及转场期间不新增透明度动画。"}
+{"file":".trellis/spec/frontend/type-safety.md","reason":"检查 PlayerTransitionState 的观察引用、GestureEvent offset/velocity 类型和变换参数。"}
+{"file":".trellis/tasks/11-06-player-minibar-drag-transition/research/root-cause.md","reason":"验证根因、失败尝试与可回归验收路径。"}
