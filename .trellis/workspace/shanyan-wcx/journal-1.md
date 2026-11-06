@@ -718,3 +718,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 29: 恢复播放器 minibar 原生动画
+
+**Date**: 2026-11-06
+**Task**: 恢复播放器 minibar 原生动画
+**Branch**: `main`
+
+### Summary
+
+移除播放条向上拖拽、共享进度缩放和自定义全屏转场；恢复 HdsTabs minibar 原生展开收起命中链，播放条点击打开全屏、左上角按钮关闭全屏，并恢复 bindContentCover 系统默认动画。API 26 Debug 构建通过。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `12a71f2` | (see git log) |
+
+### Status
+
+[OK] **Completed**
