@@ -149,6 +149,17 @@ target cover nodes with the same visible `.transition(...)`; otherwise the
 cover may be inserted at its final position even though the geometry binding
 is present.
 
+Treat HdsTabs minibar callbacks as an unsequenced event stream: the animation
+start callback reports the style at the beginning of the animation, while the
+end callback reports the style at the end, but neither carries an operation
+id. Store the expected target style in the shared observed state and ignore an
+end callback whose style is no longer the current target; otherwise rapid
+reverse gestures can commit an old result and leave the custom builder stale.
+Expose the animation-active flag through the same observed state and gate all
+custom full-player click handlers with it. A plain private boolean in the
+navigation owner cannot reliably update the nested minibar builder's hit-test
+state.
+
 For an `if/else` geometry transition, add a stable `.id(...)` to the first
 node under both branches (and to each parallel first node) so a retriggered
 transition reuses the existing nodes instead of ghosting; keep the shared

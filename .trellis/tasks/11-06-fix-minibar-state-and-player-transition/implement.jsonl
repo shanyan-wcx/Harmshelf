@@ -1,0 +1,2 @@
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"遵守 HdsTabs minibar、共享几何转场和播放器状态引用的现有约束。"}
+{"file":".trellis/tasks/11-06-fix-minibar-state-and-player-transition/research/root-cause.md","reason":"本任务对 HdsTabs 回调时序、Builder 节点稳定性和 geometryTransition 的研究证据。"}
