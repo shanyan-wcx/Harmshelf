@@ -51,6 +51,7 @@ export struct Add {
               color: $r('sys.color.ohos_id_color_focused_outline_transparent')
             })
             .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+            .clip(false)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({
@@ -86,6 +87,7 @@ export struct Add {
               color: $r('sys.color.ohos_id_color_focused_outline_transparent')
             })
             .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+            .clip(false)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({
@@ -121,6 +123,7 @@ export struct Add {
               color: $r('sys.color.ohos_id_color_focused_outline_transparent')
             })
             .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+            .clip(false)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({
@@ -156,6 +159,7 @@ export struct Add {
               color: $r('sys.color.ohos_id_color_focused_outline_transparent')
             })
             .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+            .clip(false)
             .caretColor($r('sys.color.font_secondary'))
             .fontSize(18)
             .placeholderFont({

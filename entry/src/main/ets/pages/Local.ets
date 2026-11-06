@@ -10,6 +10,7 @@ import { ImmersiveActionButton } from '../utils/Component';
 @ComponentV2
 export struct LocalMedia {
   @Consumer() LocalMediaScroller: Scroller = new Scroller()
+  @Consumer() pageIndex: number = 0
   @Consumer() statusBarHeight: number = 0
   @Consumer() colorMode: ColorMode | undefined = PersistenceV2.connect(ColorMode, () => new ColorMode());
   @Consumer() isStartPlaying: boolean = false
@@ -34,6 +35,84 @@ export struct LocalMedia {
   @Local downloadPath: string = ""
   private audioExts = ['mp3', 'flac', 'wav', 'aac', 'm4a', 'm4b', 'ogg'];
 
+  private async listDirectories(path: string): Promise<string[]> {
+    let directories: string[] = []
+    try {
+      const entries = await fs.listFile(path)
+      for (let name of entries) {
+        const stat = await fs.stat(`${path}/${name}`)
+        if (stat.isDirectory()) {
+          directories.push(name)
+        }
+      }
+    } catch (_) {}
+    return directories
+  }
+
+  private async listAudioFiles(path: string): Promise<string[]> {
+    let files: string[] = []
+    try {
+      const entries = await fs.listFile(path)
+      for (let name of entries) {
+        const stat = await fs.stat(`${path}/${name}`)
+        if (stat.isFile() && this.isAudioFile(name)) {
+          files.push(name)
+        }
+      }
+    } catch (_) {}
+    return files
+  }
+
+  private async refreshCurrentLevel() {
+    if (this.downloadPath === '') {
+      return
+    }
+    if (this.folderDeep === 0) {
+      this.folderList = await this.listDirectories(this.downloadPath)
+      return
+    }
+    if (this.folderIdx >= this.folderList.length) {
+      this.folderDeep = 0
+      await this.refreshCurrentLevel()
+      return
+    }
+
+    const folderPath = `${this.downloadPath}/${this.folderList[this.folderIdx]}`
+    if (this.folderDeep === 1) {
+      this.subFolderList = await this.listDirectories(folderPath)
+      if (this.subFolderIdx >= this.subFolderList.length) {
+        this.subFolderIdx = 0
+      }
+      return
+    }
+    if (this.subFolderIdx >= this.subFolderList.length) {
+      this.folderDeep = 1
+      await this.refreshCurrentLevel()
+      return
+    }
+
+    this.audioFolderList = await this.listAudioFiles(
+      `${folderPath}/${this.subFolderList[this.subFolderIdx]}`)
+  }
+
+  @Monitor('pageIndex')
+  async refreshOnEnter(_: IMonitor) {
+    if (this.pageIndex === 2) {
+      await this.refreshCurrentLevel()
+    }
+  }
+
+  @Monitor('downloadUri')
+  async refreshDownloadPath(_: IMonitor) {
+    if (this.downloadUri === '') {
+      return
+    }
+    this.downloadPath = new fileUri.FileUri(this.downloadUri).path
+    if (this.pageIndex === 2) {
+      await this.refreshCurrentLevel()
+    }
+  }
+
   isAudioFile(fileName: string): boolean {
     let ext = fileName.split('.').pop();
     if (!ext) {
@@ -44,16 +123,7 @@ export struct LocalMedia {
 
   async aboutToAppear() {
     this.downloadPath = new fileUri.FileUri(this.downloadUri).path
-    try {
-      const entries = await fs.listFile(this.downloadPath);
-      for (let name of entries) {
-        const fullPath = `${this.downloadPath}/${name}`;
-        const stat = await fs.stat(fullPath);
-        if (stat.isDirectory()) {
-          this.folderList.push(name);
-        }
-      }
-    } catch (_) {}
+    await this.refreshCurrentLevel()
   }
 
   getCurrentAudioFolderPath(): string {
