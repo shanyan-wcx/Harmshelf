@@ -59,6 +59,10 @@ export struct PlaybackMiniBar {
     return this.forceExpanded || this.miniBarState.expanded
   }
 
+  private canOpenPlayer(): boolean {
+    return this.isExpanded() && !this.miniBarState.animating && !this.showPlay
+  }
+
   private getCoverSource(): string | Resource {
     if (this.isLocalPlaying) {
       const coverPath = this.localPlayItem?.coverPath ?? ''
@@ -198,8 +202,17 @@ export struct PlaybackMiniBar {
   }
 
   private openPlayer() {
+    if (!this.canOpenPlayer()) {
+      return
+    }
     this.playerCoverTransition = true
-    this.getUIContext().animateTo({ duration: 280, curve: Curve.Friction }, () => {
+    this.getUIContext().animateTo({
+      duration: 280,
+      curve: Curve.Friction,
+      onFinish: () => {
+        this.playerCoverTransition = false
+      }
+    }, () => {
       this.showPlay = true
     })
   }
@@ -216,10 +229,7 @@ export struct PlaybackMiniBar {
         .clipShape(new CircleShape({ width: '100%', height: '100%' }))
         .borderRadius(this.isExpanded() ? 22 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT / 2)
         .clip(true)
-        .transition(TransitionEffect.OPACITY.animation({
-          duration: 280,
-          curve: Curve.Friction
-        }))
+        .transition(TransitionEffect.IDENTITY)
         .geometryTransition(this.playerCoverTransition ? 'playerCoverTransition' : '')
 
       Progress({ value: this.playedPercent, total: 100, type: ProgressType.Ring })
@@ -235,9 +245,9 @@ export struct PlaybackMiniBar {
     .margin({ left: this.isExpanded() ? 4 : 0, right: this.isExpanded() ? 4 : 0 })
     .clip(false)
     // Let HdsTabs receive collapsed-bar clicks; the cover only owns clicks once expanded.
-    .hitTestBehavior(this.isExpanded() ? HitTestMode.Default : HitTestMode.None)
+    .hitTestBehavior(this.canOpenPlayer() ? HitTestMode.Default : HitTestMode.None)
     .onClick(() => {
-      if (this.isExpanded()) {
+      if (this.canOpenPlayer()) {
         this.openPlayer()
       }
     })
@@ -289,73 +299,60 @@ export struct PlaybackMiniBar {
   }
 
   @Builder
-  expandedBarBuilder() {
+  barBuilder() {
     Row() {
       this.coverBuilder()
 
-      Column() {
-        Text(this.playingTitle || '-')
-          .width('100%')
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.MARQUEE })
-          .marqueeOptions({ start: true, loop: -1, delay: 3000, step: 4, fadeout: true })
+      if (this.isExpanded()) {
+        Column() {
+          Text(this.playingTitle || '-')
+            .width('100%')
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.MARQUEE })
+            .marqueeOptions({ start: true, loop: -1, delay: 3000, step: 4, fadeout: true })
 
-        Text(this.getPlaybackSubtitle())
-          .width('100%')
-          .fontColor($r('sys.color.font_secondary'))
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.MARQUEE })
-          .marqueeOptions({ start: true, loop: -1, delay: 3000, step: 4, fadeout: true })
-          .margin({ top: 4 })
-      }
-      .layoutWeight(1)
-      .clip(false)
-      .onClick(() => {
-        this.openPlayer()
-      })
+          Text(this.getPlaybackSubtitle())
+            .width('100%')
+            .fontColor($r('sys.color.font_secondary'))
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.MARQUEE })
+            .marqueeOptions({ start: true, loop: -1, delay: 3000, step: 4, fadeout: true })
+            .margin({ top: 4 })
+        }
+        .layoutWeight(1)
+        .clip(false)
+        .onClick(() => {
+          if (this.canOpenPlayer()) {
+            this.openPlayer()
+          }
+        })
 
-      Row({ space: 4 }) {
-        this.rewindButton()
-        this.playPauseButton()
-        this.forwardButton()
+        Row({ space: 4 }) {
+          this.rewindButton()
+          this.playPauseButton()
+          this.forwardButton()
+        }
+        .margin({ right: 8 })
+        .clip(false)
+        .onTouch((event: TouchEvent) => {
+          event.stopPropagation()
+        })
       }
-      .margin({ right: 8 })
-      .clip(false)
-      .onTouch((event: TouchEvent) => {
-        event.stopPropagation()
-      })
     }
     .height('100%')
     .alignItems(VerticalAlign.Center)
+    .justifyContent(this.isExpanded() ? FlexAlign.Start : FlexAlign.Center)
     .geometryTransition("miniBar")
-    .id('expandedMiniBar')
-    .width(this.isStandalone ? 'calc(100% + 22vp)' : '100%')
-    .margin({ right: this.isStandalone ? 0 : -8 })
+    .id('miniBarRoot')
+    .width(this.isExpanded() && this.isStandalone ? 'calc(100% + 22vp)' : '100%')
+    .margin({ right: this.isExpanded() ? (this.isStandalone ? 0 : -8) : 0 })
     .clip(false)
+    .hitTestBehavior(this.canOpenPlayer() ? HitTestMode.Default : HitTestMode.None)
     .onClick(() => {
-      this.openPlayer()
+      if (this.canOpenPlayer()) {
+        this.openPlayer()
+      }
     })
-  }
-
-  @Builder
-  collapsedBarBuilder() {
-    Stack({ alignContent: Alignment.Center }) {
-      this.coverBuilder()
-    }
-    .width('100%')
-    .height('100%')
-    .geometryTransition("miniBar")
-    .id('collapsedMiniBar')
-    .clip(false)
-  }
-
-  @Builder
-  barBuilder() {
-    if (this.isExpanded()) {
-      this.expandedBarBuilder()
-    } else {
-      this.collapsedBarBuilder()
-    }
   }
 
   aboutToDisappear() {
@@ -1548,10 +1545,7 @@ export struct Play {
                   .width('100%')
                   .aspectRatio(1)
                   .draggable(false)
-                  .transition(TransitionEffect.OPACITY.animation({
-                    duration: 280,
-                    curve: Curve.Friction
-                  }))
+                  .transition(TransitionEffect.IDENTITY)
                   .geometryTransition('playerCoverTransition')
                   .id('remotePlayerCover')
               } else if (this.localPlayItem?.coverPath) {
@@ -1561,10 +1555,7 @@ export struct Play {
                   .width('100%')
                   .aspectRatio(1)
                   .draggable(false)
-                  .transition(TransitionEffect.OPACITY.animation({
-                    duration: 280,
-                    curve: Curve.Friction
-                  }))
+                  .transition(TransitionEffect.IDENTITY)
                   .geometryTransition('playerCoverTransition')
                   .id('localPlayerCover')
               } else {
@@ -1573,10 +1564,7 @@ export struct Play {
                   .width('100%')
                   .aspectRatio(1)
                   .draggable(false)
-                  .transition(TransitionEffect.OPACITY.animation({
-                    duration: 280,
-                    curve: Curve.Friction
-                  }))
+                  .transition(TransitionEffect.IDENTITY)
                   .geometryTransition('playerCoverTransition')
                   .id('fallbackPlayerCover')
               }
@@ -2040,6 +2028,7 @@ export struct Play {
       .height(LayoutPolicy.matchParent)
       .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP, LayoutSafeAreaEdge.BOTTOM])
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
+      .transition(TransitionEffect.IDENTITY)
       .clip(false)
 
       Column()

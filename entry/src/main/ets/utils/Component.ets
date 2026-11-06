@@ -79,6 +79,8 @@ export interface MiniBarBuilderOptions {
 @ObservedV2
 export class MiniBarState {
   @Trace expanded: boolean = false
+  @Trace animating: boolean = false
+  @Trace targetStyle: HdsBarStyle = HdsBarStyle.COLLAPSE
 }
 
 export function getMainNavigationItems(): MainNavigationItem[] {
@@ -255,7 +257,6 @@ export struct MyNavigation {
   @Consumer() isIndex: boolean = true
   // Keep the animation state in an observable reference so the custom Builder updates immediately.
   @Local miniBarState: MiniBarState = new MiniBarState()
-  private miniBarAnimationActive: boolean = false
   private navigationItems: MainNavigationItem[] = getMainNavigationItems()
 
   @Builder
@@ -318,20 +319,26 @@ export struct MyNavigation {
   }
 
   private onMiniBarStyleChange(style: HdsBarStyle) {
-    if (this.miniBarAnimationActive) {
+    if (this.miniBarState.animating) {
       return
     }
     this.miniBarState.expanded = style === HdsBarStyle.EXPAND
+    this.miniBarState.targetStyle = style
   }
 
   private onMiniBarAnimationStart(style: HdsBarStyle) {
-    this.miniBarState.expanded = style !== HdsBarStyle.EXPAND
-    this.miniBarAnimationActive = true
+    const targetStyle = style === HdsBarStyle.COLLAPSE ? HdsBarStyle.EXPAND : HdsBarStyle.COLLAPSE
+    this.miniBarState.targetStyle = targetStyle
+    this.miniBarState.animating = true
+    this.miniBarState.expanded = targetStyle === HdsBarStyle.EXPAND
   }
 
   private onMiniBarAnimationEnd(style: HdsBarStyle) {
+    if (!this.miniBarState.animating || style !== this.miniBarState.targetStyle) {
+      return
+    }
     this.miniBarState.expanded = style === HdsBarStyle.EXPAND
-    this.miniBarAnimationActive = false
+    this.miniBarState.animating = false
   }
 
   @Builder
