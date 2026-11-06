@@ -829,7 +829,7 @@ export struct Play {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 4, bottom: 25 })
   }
 
   @Builder
@@ -1028,6 +1028,7 @@ export struct Play {
       .margin({ left: 20, right: 20, bottom: 20 })
       .borderRadius(10)
     }
+    .padding({ top: 4 })
   }
 
   @Builder
@@ -1286,7 +1287,7 @@ export struct Play {
             })
         }
       }
-      .padding({ left: 20, right: 20, bottom: 25 })
+      .padding({ left: 20, right: 20, top: 4, bottom: 25 })
     }
     .scrollBar(BarState.Off)
   }
@@ -1351,7 +1352,7 @@ export struct Play {
         this.sleepOptionBuilder("章节结束", -1)
         this.sleepOptionBuilder("清除定时", 0)
       }
-      .padding({ left: 20, right: 20, bottom: 25 })
+      .padding({ left: 20, right: 20, top: 4, bottom: 25 })
     }
     .scrollBar(BarState.Off)
   }
@@ -1530,6 +1531,7 @@ export struct Play {
       }
     }
     .clip(false)
+    .padding({ top: 4 })
   }
 
   @Builder
@@ -1829,7 +1831,7 @@ export struct Play {
                     this.showBookmark = !this.showBookmark;
                   })
                   .bindSheet(this.showBookmark, this.bookmarkBuilder(), {
-                    height: SheetSize.MEDIUM,
+                    height: 564,
                     preferType: SheetType.CENTER,
                     systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
                     title: {
@@ -1908,7 +1910,7 @@ export struct Play {
                     this.showChapter = !this.showChapter;
                   })
                   .bindSheet(this.showChapter, this.chapterBuilder(), {
-                    height: SheetSize.MEDIUM,
+                    height: 564,
                     preferType: SheetType.CENTER,
                     systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
                     title: {

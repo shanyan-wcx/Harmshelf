@@ -1747,7 +1747,7 @@ export struct EpisodeComponent {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 4, bottom: 25 })
   }
 
   @Builder
@@ -1856,6 +1856,7 @@ export struct EpisodeComponent {
       .padding({ left: 20, right: 20 })
       .margin({ bottom: 25 })
     }
+    .padding({ top: 4 })
   }
 
   @Builder
@@ -1982,7 +1983,7 @@ export struct EpisodeComponent {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 4, bottom: 25 })
   }
 
   build() {
@@ -2222,7 +2223,7 @@ export struct EpisodeComponent {
         .clip(false)
         .bindSheet(this.showPlaylists, this.playlistsBuilder(), {
           systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
-          height: SheetSize.MEDIUM,
+          height: 564,
           preferType: SheetType.CENTER,
           title: {
             title: "播放列表"
@@ -2545,7 +2546,7 @@ export struct EpisodeComponent1 {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 4, bottom: 25 })
   }
 
   @Builder
@@ -2654,6 +2655,7 @@ export struct EpisodeComponent1 {
       .padding({ left: 20, right: 20 })
       .margin({ bottom: 25 })
     }
+    .padding({ top: 4 })
   }
 
   @Builder
@@ -2780,7 +2782,7 @@ export struct EpisodeComponent1 {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 4, bottom: 25 })
   }
 
   build() {
@@ -2932,7 +2934,7 @@ export struct EpisodeComponent1 {
         .clip(false)
         .bindSheet(this.showPlaylists, this.playlistsBuilder(), {
           systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
-          height: SheetSize.MEDIUM,
+          height: 564,
           preferType: SheetType.CENTER,
           title: {
             title: "播放列表"
@@ -3189,7 +3191,7 @@ export struct ReportPanel {
       }
       .width('100%')
       .height('100%')
-      .padding({ left: 20, right: 20, bottom: 25 })
+      .padding({ left: 20, right: 20, top: 4, bottom: 25 })
 
       Column() {
         LoadingProgress()
