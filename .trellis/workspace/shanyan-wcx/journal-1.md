@@ -739,3 +739,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 30: 修复非 Tab 播放条进度环叠放
+
+**Date**: 2026-11-06
+**Task**: 修复非 Tab 播放条进度环叠放
+**Branch**: `main`
+
+### Summary
+
+将 PlaybackMiniBar 封面 Stack 改为 Alignment.Center，使非 Tab 播放条的 48vp 进度环居中覆盖 44vp 封面，保持封面尺寸不变。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `4768328` | (see git log) |
+
+### Status
+
+[OK] **Completed**
