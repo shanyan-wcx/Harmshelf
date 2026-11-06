@@ -106,16 +106,15 @@ chain must use `.clip(false)` so the native material edge/shadow is not cut by
 an ancestor. Do not remove unrelated `.clip(true)` modifiers used to mask
 media thumbnails or content rows.
 
-For a playback minibar, let the native HdsTabs container own collapsed taps.
-Keep the collapsed cover on `HitTestMode.None`, keep the minibar root
-transparent to the parent, and attach only an upward `PanGesture` to that root
-so an upward drag can open the full player without consuming the native
-expand tap. Once the bar is expanded, the root can claim clicks to open the
-full player. When the minibar is replaced by the non-tab playback capsule
-during navigation, drive the route state through the same short UI animation
-in both directions and give the equivalent bar roots a shared
-`geometryTransition` id; animating only the custom capsule makes the return
-transition appear to work while the forward transition snaps.
+For a playback minibar, let the native HdsTabs container own collapsed taps
+and its expand/collapse gesture. Keep the collapsed cover and the custom
+minibar root on `HitTestMode.None`; only an expanded bar after the native
+animation completes may claim a click to open the full player. When the
+minibar is replaced by the non-tab playback capsule during navigation, drive
+the route state through the same short UI animation in both directions and
+give the equivalent bar roots a shared `geometryTransition` id; animating only
+the custom capsule makes the return transition appear to work while the
+forward transition snaps.
 
 For a left-right HdsTabs layout, keep `barWidth` and `miniBarWidth` unset so
 the official default breakpoint calculation supplies the same width to the
@@ -139,13 +138,11 @@ expanded/collapsed custom roots; HdsTabs already owns the expand/collapse
 animation. Do not change the native bar width.
 
 When a minibar or non-tab capsule opens the full player through
-`bindContentCover`, use `modalTransition: ModalTransition.NONE`. Store the
-source bar geometry in a shared observed `PlayerTransitionState`, expose its
-progress to the full-player root, and interpolate the root `scale` around the
-bar's bottom-center anchor; this supports both direct morphing and continuous
-upward drag without a default blur or opacity transition. The cover image is
-not a geometry-transition source/target. Keep `geometryTransition("miniBar")`
-only on the equivalent minibar and non-tab bar roots used for route changes.
+`bindContentCover`, do not override `modalTransition`; the system default
+content-cover animation is the intended transition. Do not add a drag-driven
+scale, custom radius, opacity, or cover-image geometry transition. Keep
+`geometryTransition("miniBar")` only on the equivalent minibar and non-tab
+bar roots used for route changes.
 
 Treat HdsTabs minibar callbacks as an unsequenced event stream: the animation
 start callback reports the style at the beginning of the animation, while the
@@ -153,10 +150,10 @@ end callback reports the style at the end, but neither carries an operation
 id. Store the expected target style in the shared observed state and ignore an
 end callback whose style is no longer the current target; otherwise rapid
 reverse gestures can commit an old result and leave the custom builder stale.
-Apply the target `expanded` value at animation start so the custom builder's
-hit-test and click behavior follow the operation immediately. The HdsTabs
-`animating` flag is for stale-callback protection only and must not block the
-target operation's click path.
+Apply the target `expanded` value at animation start so the custom builder
+renders the target content, but keep the `animating` flag in the full-player
+click guard until the native expand/collapse animation ends. This prevents a
+tap intended for HdsTabs from opening the player while the bar is moving.
 
 For an `if/else` geometry transition, add a stable `.id(...)` to the first
 node under both branches (and to each parallel first node) so a retriggered

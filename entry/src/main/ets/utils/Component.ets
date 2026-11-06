@@ -83,15 +83,6 @@ export class MiniBarState {
   @Trace targetStyle: HdsBarStyle = HdsBarStyle.COLLAPSE
 }
 
-@ObservedV2
-export class PlayerTransitionState {
-  @Trace active: boolean = false
-  @Trace opening: boolean = true
-  @Trace progress: number = 1
-  @Trace sourceWidth: number = 56
-  @Trace sourceCenterY: number = 0
-}
-
 export function getMainNavigationItems(): MainNavigationItem[] {
   return [
     { symbol: $r('sys.symbol.house'), label: '首页' },
