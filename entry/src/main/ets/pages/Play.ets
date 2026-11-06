@@ -218,7 +218,7 @@ export struct PlaybackMiniBar {
         .width(this.isExpanded() ? 48 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
         .height(this.isExpanded() ? 48 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
         .style({
-          strokeWidth: 3,
+          strokeWidth: 2,
           enableSmoothEffect: true
         })
     }
