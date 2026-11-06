@@ -34,7 +34,7 @@ export struct DownloadTask {
           Repeat<DownloadTaskInfo>(this.downloadTasks)
             .each((task: RepeatItem<DownloadTaskInfo>) => {
               ListItem() {
-                Column({ space: 8 }) {
+                Column({ space: 16 }) {
                   Row() {
                     Text(task.item.title)
                       .fontSize(16)
