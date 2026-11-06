@@ -713,14 +713,14 @@ export struct LibraryItemComponent {
 
       Column() {
         Text(this.item.media.metadata.title)
-          .fontSize(18)
+          .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .margin({ top: 5 })
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(this.library?.mediaType === 'book' ? (this.item.media.metadata.authorName ?? "-") :
           (this.item.media.metadata.author ?? "-"))
-          .fontSize(15)
+          .fontSize(13)
           .fontColor($r('sys.color.font_secondary'))
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -808,14 +808,14 @@ export struct LibraryItemComponent1 {
 
       Column() {
         Text(this.item.media.metadata.title)
-          .fontSize(18)
+          .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .margin({ top: 5 })
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(this.library?.mediaType === 'book' ? (this.item.media.metadata.authorName ?? "-") :
           (this.item.media.metadata.author ?? "-"))
-          .fontSize(15)
+          .fontSize(13)
           .fontColor($r('sys.color.font_secondary'))
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -926,7 +926,7 @@ export struct SeriesItemComponent {
           }
         }) {
           Text(this.series.name)
-            .fontSize(17)
+            .fontSize(16)
             .fontWeight(FontWeight.Medium)
             .width('100%')
             .maxLines(1)
@@ -1047,7 +1047,7 @@ export struct CollectionItemComponent {
           }
         }) {
           Text(this.collection.name)
-            .fontSize(17)
+            .fontSize(16)
             .fontWeight(FontWeight.Medium)
             .width('100%')
             .maxLines(1)
@@ -1156,7 +1156,7 @@ export struct PlaylistItemComponent {
           }
         }) {
           Text(this.playlist.name)
-            .fontSize(17)
+            .fontSize(16)
             .fontWeight(FontWeight.Medium)
             .width('100%')
             .maxLines(1)
@@ -1273,9 +1273,9 @@ export struct AuthorComponent {
         }) {
           Row() {
             Text(this.author.name)
-              .fontSize(18)
-              .minFontSize(13)
-              .maxFontSize(18)
+              .fontSize(16)
+              .minFontSize(12)
+              .maxFontSize(16)
               .fontWeight(FontWeight.Medium)
               .width('calc(100% + 16vp)')
               .maxLines(1)
@@ -1402,9 +1402,9 @@ export struct AuthorComponent1 {
         }) {
           Row() {
             Text(this.author.name)
-              .fontSize(18)
-              .minFontSize(13)
-              .maxFontSize(18)
+              .fontSize(16)
+              .minFontSize(12)
+              .maxFontSize(16)
               .fontWeight(FontWeight.Medium)
               .width('calc(100% + 16vp)')
               .maxLines(1)
@@ -1536,13 +1536,13 @@ export struct RecentEpisodeComponent {
 
       Column() {
         Text(this.item.recentEpisode?.title ?? "-")
-          .fontSize(18)
+          .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .margin({ top: 5 })
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
         Text(this.item.media.metadata.title)
-          .fontSize(15)
+          .fontSize(13)
           .fontColor($r('sys.color.font_secondary'))
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })

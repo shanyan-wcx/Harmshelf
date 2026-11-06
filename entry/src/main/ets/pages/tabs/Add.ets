@@ -225,13 +225,13 @@ export struct Add {
 
                 Column() {
                   Text(searchPodcast.title)
-                    .fontSize(17)
+                    .fontSize(16)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
                     .margin({ bottom: 3 })
 
                   Text("by " + searchPodcast.artistName)
-                    .fontSize(15)
+                    .fontSize(13)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
                     .margin({ bottom: 5 })

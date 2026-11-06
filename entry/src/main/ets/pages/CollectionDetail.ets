@@ -430,7 +430,7 @@ export struct CollectionDetail {
                             .objectFit(ImageFit.Cover)
                             .width(55)
                             .aspectRatio(1)
-                            .borderRadius(18)
+                            .borderRadius(10)
                             .margin({ right: 10 })
                             .draggable(false)
 
@@ -442,7 +442,7 @@ export struct CollectionDetail {
 
                             Text(book.mediaType === 'book' ? (book.media!.metadata.authorName ?? "-") :
                               (book.media!.metadata.author ?? "-"))
-                              .fontSize(14)
+                              .fontSize(13)
                               .fontColor($r('sys.color.font_secondary'))
                               .maxLines(1)
                               .textOverflow({ overflow: TextOverflow.Ellipsis })

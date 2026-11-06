@@ -466,7 +466,7 @@ export struct PlaylistDetail {
                           .objectFit(ImageFit.Cover)
                           .width(55)
                           .aspectRatio(1)
-                          .borderRadius(18)
+                          .borderRadius(10)
                           .margin({ right: 10 })
                           .draggable(false)
 
@@ -481,7 +481,7 @@ export struct PlaylistDetail {
                             (item.libraryItem!.media.metadata.authorName ?? "-") :
                             (this.libraryItems.find(item1 => item1.id === item.libraryItemId)?.media.metadata.author ??
                               "-"))
-                            .fontSize(14)
+                            .fontSize(13)
                             .fontColor($r('sys.color.font_secondary'))
                             .maxLines(1)
                             .textOverflow({ overflow: TextOverflow.Ellipsis })

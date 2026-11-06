@@ -96,13 +96,13 @@ export struct SearchMedia {
 
                     Column() {
                       Text(libraryItemSearchResult.libraryItem.media.metadata.title)
-                        .fontSize(19)
+                        .fontSize(16)
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
                         .margin({ bottom: 5 })
 
                       Text((libraryItemSearchResult.libraryItem.media.metadata.authorName ?? "-"))
-                        .fontSize(16)
+                        .fontSize(13)
                         .fontColor($r('sys.color.font_secondary'))
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
@@ -151,13 +151,13 @@ export struct SearchMedia {
 
                     Column() {
                       Text(libraryItemSearchResult.libraryItem.media.metadata.title)
-                        .fontSize(19)
+                        .fontSize(16)
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
                         .margin({ bottom: 5 })
 
                       Text((libraryItemSearchResult.libraryItem.media.metadata.author ?? "-"))
-                        .fontSize(16)
+                        .fontSize(13)
                         .fontColor($r('sys.color.font_secondary'))
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
