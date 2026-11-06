@@ -303,9 +303,9 @@ export struct MyNavigation {
       normal: new SymbolGlyphModifier(item.symbol)
         .fontColor([$r('sys.color.font_secondary')]),
       selected: new SymbolGlyphModifier(item.symbol)
-        .fontColor([$r('sys.color.icon_sub_emphasize')])
+        .fontColor([$r('sys.color.comp_emphasize_secondary')])
     }, item.label).labelStyle({
-      selectedColor: $r('sys.color.icon_sub_emphasize'),
+      selectedColor: $r('sys.color.comp_emphasize_secondary'),
       unselectedColor: $r('sys.color.font_secondary')
     })
   }

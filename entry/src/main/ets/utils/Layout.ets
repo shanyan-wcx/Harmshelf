@@ -14,7 +14,7 @@ function isBottomTabDevice(): boolean {
 export function getBottomContentInset(unplayedInset: number, isStartPlaying: boolean = false,
   playingInset: number = unplayedInset, hasBottomTab: boolean = true): number {
   if (isBottomTabDevice()) {
-    return hasBottomTab ? Math.max(MOBILE_BOTTOM_TAB_INSET, unplayedInset) : unplayedInset;
+    return hasBottomTab || isStartPlaying ? Math.max(MOBILE_BOTTOM_TAB_INSET, unplayedInset) : unplayedInset;
   }
   return isStartPlaying ? playingInset : unplayedInset;
 }
