@@ -1,0 +1,2 @@
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"确认geometryTransition、bindContentCover和Builder分支稳定节点的项目约定。"}
+{"file":".trellis/spec/frontend/state-management.md","reason":"确认showPlay与本地转场状态的ArkUI V2状态更新方式。"}

@@ -1,0 +1,2 @@
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"实现后复核共享封面转场、模态动画和稳定节点ID是否符合规范。"}
+{"file":".trellis/tasks/11-06-minibar-to-player-transition/design.md","reason":"逐项核对打开全屏的状态时序和转场范围。"}
