@@ -802,3 +802,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 33: 统一20号字体为18号
+
+**Date**: 2026-11-06
+**Task**: 统一20号字体为18号
+**Branch**: `main`
+
+### Summary
+
+将 entry/src/main/ets 中所有非 symbol 的 20 号字体配置统一调整为 18，包含 Play 标题和 Setting 页服务器表单、区块、设置项及按钮；保留 LibraryItemDetail 的勾选 symbol 20 号。源代码静态扫描无遗漏，git diff --check 通过。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `e895384` | (see git log) |
+
+### Status
+
+[OK] **Completed**
