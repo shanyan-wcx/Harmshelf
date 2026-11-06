@@ -273,7 +273,7 @@ export struct CollectionDetail {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, top: 4, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   build() {

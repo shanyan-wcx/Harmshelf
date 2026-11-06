@@ -401,7 +401,7 @@ export struct LibraryItemDetail {
         }
       })
     }
-    .padding({ left: 20, right: 20, top: 4, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   async downloadLibraryItem() {
@@ -544,7 +544,7 @@ export struct LibraryItemDetail {
         })
       }
     }
-    .padding({ left: 20, right: 20, top: 4, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   @Builder
@@ -652,7 +652,7 @@ export struct LibraryItemDetail {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, top: 4, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   @Builder
@@ -761,7 +761,7 @@ export struct LibraryItemDetail {
       .padding({ left: 20, right: 20 })
       .margin({ bottom: 25 })
     }
-    .padding({ top: 4 })
+    .padding({ top: 8 })
   }
 
   @Builder
@@ -886,7 +886,7 @@ export struct LibraryItemDetail {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, top: 4, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   @Builder
@@ -995,7 +995,7 @@ export struct LibraryItemDetail {
       .padding({ left: 20, right: 20 })
       .margin({ bottom: 25 })
     }
-    .padding({ top: 4 })
+    .padding({ top: 8 })
   }
 
   @Builder
@@ -1116,7 +1116,7 @@ export struct LibraryItemDetail {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, top: 4, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   @Builder
@@ -1239,7 +1239,7 @@ export struct LibraryItemDetail {
       }
       .margin({ top: 15 })
     }
-    .padding({ left: 20, right: 20, top: 4, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   sortEpisodes(sortBy: number, sortByStr: string) {
@@ -1468,7 +1468,7 @@ export struct LibraryItemDetail {
                   .clip(false)
                   .bindSheet(this.showPlaylists, this.playlistsBuilder(), {
                     systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
-                    height: 564,
+                    height: SheetSize.MEDIUM,
                     preferType: SheetType.CENTER,
                     title: {
                       title: "播放列表"
@@ -1879,7 +1879,7 @@ export struct LibraryItemDetail {
                 .margin({ top: 15 })
                 .bindSheet(this.showCollections, this.collectionsBuilder(), {
                   systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
-                  height: 564,
+                  height: SheetSize.MEDIUM,
                   preferType: SheetType.CENTER,
                   title: {
                     title: "收藏"
@@ -2242,7 +2242,7 @@ export struct LibraryItemDetail {
                       .clip(false)
                       .bindSheet(this.showFeedEpisodes, this.feedEpisodesBuilder(), {
                         systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
-                        height: 564,
+                        height: SheetSize.MEDIUM,
                         preferType: SheetType.CENTER,
                         title: {
                           title: "剧集 " + this.feedEpisodes.length
@@ -2361,7 +2361,7 @@ export struct LibraryItemDetail {
       .clip(false)
       .bindSheet(this.showReport, this.reportBuilder(), {
         systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
-        height: 344,
+        height: 348,
         preferType: SheetType.CENTER,
         title: {
           title: "举报内容"
