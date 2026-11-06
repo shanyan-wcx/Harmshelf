@@ -63,9 +63,7 @@ export struct DownloadTask {
                         $r('sys.color.comp_emphasize_secondary')))
                 }
                 .width('100%')
-                .height(80)
-                .padding({ left: 16, right: 16 })
-                .justifyContent(FlexAlign.Center)
+                .padding({ left: 16, right: 16, top: 16, bottom: 16 })
                 .borderRadius(18)
                 .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                 .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -78,9 +76,8 @@ export struct DownloadTask {
                 .clip(false)
               }
               .width('100%')
+              .padding({ left: 20, right: 20 })
               .margin({
-                left: 20,
-                right: 20,
                 top: task.index === 0 ? this.statusBarHeight + 56 : 0,
                 bottom: task.index === this.downloadTasks.length - 1 ? getBottomContentInset(12, this.isStartPlaying, 89, false) : 12
               })
