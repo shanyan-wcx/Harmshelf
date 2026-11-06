@@ -202,7 +202,7 @@ export struct PlaybackMiniBar {
 
   @Builder
   coverBuilder() {
-    Stack() {
+    Stack({ alignContent: Alignment.Center }) {
       Image(this.getCoverSource())
         .alt($rawfile('nocover.jpg'))
         .objectFit(ImageFit.Cover)
