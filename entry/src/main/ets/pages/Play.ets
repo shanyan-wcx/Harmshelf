@@ -226,7 +226,7 @@ export struct PlaybackMiniBar {
       Progress({ value: this.playedPercent, total: 100, type: ProgressType.Ring })
         .width(this.isExpanded() ? 44 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
         .height(this.isExpanded() ? 44 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
-        .color($r('sys.color.icon_sub_emphasize'))
+        .color($r('sys.color.comp_emphasize_secondary'))
         .style({
           strokeWidth: 2,
           enableSmoothEffect: true
