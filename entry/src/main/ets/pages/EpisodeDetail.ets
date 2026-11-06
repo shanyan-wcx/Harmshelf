@@ -743,7 +743,6 @@ export struct EpisodeDetail {
                 }
               }) {
                 SymbolGlyph($r('sys.symbol.download'))
-                  .fontWeight(FontWeight.Medium)
                   .fontSize($r('sys.float.ohos_id_text_size_headline7'))
                   .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
                   .hitTestBehavior(HitTestMode.None)
@@ -773,7 +772,6 @@ export struct EpisodeDetail {
                 menuItems: this.moreMenus,
               }) {
                 SymbolGlyph($r('sys.symbol.dot_grid_2x2'))
-                  .fontWeight(FontWeight.Medium)
                   .fontSize($r('sys.float.ohos_id_text_size_headline7'))
                   .fontColor([$r('sys.color.ohos_id_color_titlebar_icon')])
                   .hitTestBehavior(HitTestMode.None)

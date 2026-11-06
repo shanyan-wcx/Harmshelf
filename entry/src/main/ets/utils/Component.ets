@@ -2091,8 +2091,8 @@ export struct EpisodeComponent {
               if (this.showPlayLoading) {
                 Column() {
                   LoadingProgress()
-                    .width(20)
-                    .height(20)
+                    .width(18)
+                    .height(18)
                     .color($r('sys.color.ohos_id_color_titlebar_icon'))
                 }
               } else {
@@ -2808,8 +2808,8 @@ export struct EpisodeComponent1 {
             if (this.showPlayLoading) {
               Column() {
                 LoadingProgress()
-                  .width(20)
-                  .height(20)
+                  .width(18)
+                  .height(18)
                   .color($r('sys.color.ohos_id_color_titlebar_icon'))
               }
             } else {
