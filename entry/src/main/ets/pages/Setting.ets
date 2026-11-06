@@ -287,7 +287,7 @@ export struct Setting {
             }
           })
         }
-        .padding({ left: 20, right: 20, top: 6, bottom: 25 })
+        .padding({ left: 20, right: 20, top: 8, bottom: 25 })
       }
       .width('100%')
       .height('100%')
@@ -571,7 +571,7 @@ export struct Setting {
             })
           }
         }
-        .padding({ left: 20, right: 20, top: 6, bottom: 25 })
+        .padding({ left: 20, right: 20, top: 8, bottom: 25 })
       }
       .width('100%')
       .height('100%')
@@ -710,7 +710,7 @@ export struct Setting {
       .margin({ top: 12 })
     }
     .width('100%')
-    .padding({ left: 20, right: 20, top: 6, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   aboutToAppear() {
@@ -864,7 +864,7 @@ export struct Setting {
           .margin({ top: 10 })
           .bindSheet(this.showAddServer, this.AddServerBuilder(), {
             systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
-            height: 386,
+            height: 388,
             preferType: SheetType.CENTER,
             title: {
               title: "添加服务器"
@@ -895,7 +895,7 @@ export struct Setting {
         .clip(false)
         .bindSheet(this.showEditServer, this.EditServerBuilder(), {
           systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
-          height: 386,
+          height: 388,
           preferType: SheetType.CENTER,
           title: {
             title: "编辑服务器"

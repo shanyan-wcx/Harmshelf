@@ -829,7 +829,7 @@ export struct Play {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, top: 6, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   @Builder
@@ -1028,7 +1028,7 @@ export struct Play {
       .margin({ left: 20, right: 20, bottom: 20 })
       .borderRadius(10)
     }
-    .padding({ top: 6 })
+    .padding({ top: 8 })
   }
 
   @Builder
@@ -1287,7 +1287,7 @@ export struct Play {
             })
         }
       }
-      .padding({ left: 20, right: 20, top: 6, bottom: 25 })
+      .padding({ left: 20, right: 20, top: 8, bottom: 25 })
     }
     .scrollBar(BarState.Off)
   }
@@ -1352,7 +1352,7 @@ export struct Play {
         this.sleepOptionBuilder("章节结束", -1)
         this.sleepOptionBuilder("清除定时", 0)
       }
-      .padding({ left: 20, right: 20, top: 6, bottom: 25 })
+      .padding({ left: 20, right: 20, top: 8, bottom: 25 })
     }
     .scrollBar(BarState.Off)
   }
@@ -1531,7 +1531,7 @@ export struct Play {
       }
     }
     .clip(false)
-    .padding({ top: 6 })
+    .padding({ top: 8 })
   }
 
   @Builder

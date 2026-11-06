@@ -1747,7 +1747,7 @@ export struct EpisodeComponent {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, top: 6, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   @Builder
@@ -1856,7 +1856,7 @@ export struct EpisodeComponent {
       .padding({ left: 20, right: 20 })
       .margin({ bottom: 25 })
     }
-    .padding({ top: 6 })
+    .padding({ top: 8 })
   }
 
   @Builder
@@ -1983,7 +1983,7 @@ export struct EpisodeComponent {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, top: 6, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   build() {
@@ -2546,7 +2546,7 @@ export struct EpisodeComponent1 {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, top: 6, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   @Builder
@@ -2655,7 +2655,7 @@ export struct EpisodeComponent1 {
       .padding({ left: 20, right: 20 })
       .margin({ bottom: 25 })
     }
-    .padding({ top: 6 })
+    .padding({ top: 8 })
   }
 
   @Builder
@@ -2782,7 +2782,7 @@ export struct EpisodeComponent1 {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, top: 6, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   build() {
@@ -3191,7 +3191,7 @@ export struct ReportPanel {
       }
       .width('100%')
       .height('100%')
-    .padding({ left: 20, right: 20, top: 6, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
 
       Column() {
         LoadingProgress()

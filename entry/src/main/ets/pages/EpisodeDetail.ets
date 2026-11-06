@@ -251,7 +251,7 @@ export struct EpisodeDetail {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, top: 6, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   @Builder
@@ -355,7 +355,7 @@ export struct EpisodeDetail {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, top: 6, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   @Builder
@@ -462,7 +462,7 @@ export struct EpisodeDetail {
       .padding({ left: 20, right: 20 })
       .margin({ bottom: 25 })
     }
-    .padding({ top: 6 })
+    .padding({ top: 8 })
   }
 
   @Builder
@@ -585,7 +585,7 @@ export struct EpisodeDetail {
         .clip(false)
       }
     }
-    .padding({ left: 20, right: 20, top: 6, bottom: 25 })
+    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
   }
 
   build() {
@@ -894,7 +894,7 @@ export struct EpisodeDetail {
       })
       .bindSheet(this.showReport, this.reportBuilder(), {
         systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
-        height: 346,
+        height: 348,
         preferType: SheetType.CENTER,
         title: {
           title: "举报内容"
