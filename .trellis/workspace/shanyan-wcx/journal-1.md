@@ -613,3 +613,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 24: 去除 minibar 封面过渡并扩大非 Tab 内容
+
+**Date**: 2026-11-06
+**Task**: 去除 minibar 封面过渡并扩大非 Tab 内容
+**Branch**: `main`
+
+### Summary
+
+移除 PlaybackMiniBar 封面自身的 geometryTransition，仅保留 minibar 条根节点过渡；非 Tab 内容宽度调整为 calc(100% + 24vp)；DevEco API 26 Debug 构建成功。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `4fb1940` | (see git log) |
+
+### Status
+
+[OK] **Completed**

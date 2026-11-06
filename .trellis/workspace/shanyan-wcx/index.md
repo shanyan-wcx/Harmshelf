@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 23
+- **Total Sessions**: 24
 - **Last Active**: 2026-11-06
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~615 | Active |
+| `journal-1.md` | ~636 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 24 | 2026-11-06 | 去除 minibar 封面过渡并扩大非 Tab 内容 | `4fb1940` | `main` |
 | 23 | 2026-11-06 | 修复 minibar 转场闪烁与非 Tab 宽度 | `dac0d9e` | `main` |
 | 22 | 2026-11-06 | 修复播放 minibar 切换延迟与非 Tab 条边距 | `807e6ed` | `main` |
 | 21 | 2026-11-06 | 修复播放条状态同步与跑马灯 | `48c68ee` | `main` |
