@@ -123,19 +123,23 @@ TabsBar and minibar. Keep `barLayoutMode: HORIZONTAL` explicit. Do not bind
 `PlaybackMiniBar` content state, while the native HdsTabs style remains
 uncontrolled so its single expand/collapse animation is not rebuilt or reset.
 When the minibar content is supplied through a trailing `@BuilderParam`, do
-not depend on a no-argument builder to observe the native style callback.
-Pass an explicit `{ expanded: boolean }` builder option from the HdsTabs host
-to `PlaybackMiniBar({ forceExpanded: options.expanded })`; this keeps the
-custom content in sync with the native bar state without making HdsTabs a
-controlled style input. The expanded root may open the full player, but its
+not depend on a no-argument builder or a by-value boolean to observe the
+native style callback. Pass a stable `@ObservedV2` state reference in the
+builder options and let `PlaybackMiniBar` read its traced `expanded` field;
+the callback then updates the same object immediately without making HdsTabs
+a controlled style input. The expanded root may open the full player, but its
 control row must stop touch propagation so rewind, play, and forward keep
 their own actions. If the native material leaves excess horizontal inset,
-apply the smallest host-specific correction: the tab minibar may use a
-right-only negative margin, while the standalone capsule should expand its
-content width by the same amount and use a negative x offset. Remove any
-second opacity transition from the expanded/collapsed custom roots; HdsTabs
-already owns the expand/collapse animation. Do not change the native bar
-width.
+apply the smallest host-specific correction: the standalone capsule keeps
+the measured width and shifts its content right with a small positive x
+offset. Remove any second opacity transition from the expanded/collapsed
+custom roots; HdsTabs already owns the expand/collapse animation. Do not
+change the native bar width.
+
+For repeated minibar title/subtitle scrolling, use the native Text marquee
+options with `loop <= 0` and a positive `delay` so each round pauses before
+the next one. Do not add a manual timer that toggles `start`; it can lag
+behind the HdsTabs animation and is unnecessary on API 26.
 For the non-tab playback capsule, use `width('calc(100% - 40vp)')` with a
 600vp maximum so narrow screens retain 20vp side margins without allowing the
 capsule to grow beyond the desktop limit.

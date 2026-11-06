@@ -73,7 +73,12 @@ export interface MainNavigationItem {
 }
 
 export interface MiniBarBuilderOptions {
-  expanded: boolean
+  state: MiniBarState
+}
+
+@ObservedV2
+export class MiniBarState {
+  @Trace expanded: boolean = false
 }
 
 export function getMainNavigationItems(): MainNavigationItem[] {
@@ -248,8 +253,8 @@ export struct MyNavigation {
   @Consumer() isStartPlaying: boolean = false
   @Local isDownloadEmpty: boolean = true
   @Consumer() isIndex: boolean = true
-  // This state only selects the PlaybackMiniBar content; HdsTabs keeps its native style state.
-  @Local miniBarStyle: HdsBarStyle = HdsBarStyle.COLLAPSE
+  // Keep the animation state in an observable reference so the custom Builder updates immediately.
+  @Local miniBarState: MiniBarState = new MiniBarState()
   private navigationItems: MainNavigationItem[] = getMainNavigationItems()
 
   @Builder
@@ -312,7 +317,7 @@ export struct MyNavigation {
   }
 
   private onMiniBarStyleChange(style: HdsBarStyle) {
-    this.miniBarStyle = style
+    this.miniBarState.expanded = style === HdsBarStyle.EXPAND
   }
 
   @Builder
@@ -361,7 +366,7 @@ export struct MyNavigation {
       },
       miniBar: this.isStartPlaying && this.isIndex ? {
         miniBarBuilder: () => this.miniBarBuilder({
-          expanded: this.miniBarStyle === HdsBarStyle.EXPAND
+          state: this.miniBarState
         }),
         enableMiniBarClip: false,
         onBarStyleChange: (style: HdsBarStyle) => {

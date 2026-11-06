@@ -1204,7 +1204,7 @@ struct Index {
   //内容区
   @Builder
   playbackMiniBarBuilder(options: MiniBarBuilderOptions) {
-    PlaybackMiniBar({ forceExpanded: options.expanded })
+    PlaybackMiniBar({ miniBarState: options.state })
   }
 
   @Builder

@@ -11,7 +11,7 @@ import { Logger } from '../utils/Logger';
 import { image } from '@kit.ImageKit';
 import { effectKit } from '@kit.ArkGraphics2D';
 import { rcp } from '@kit.RemoteCommunicationKit';
-import { ImmersiveActionButton } from '../utils/Component';
+import { ImmersiveActionButton, MiniBarState } from '../utils/Component';
 import {
   MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN,
   MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT
@@ -28,6 +28,7 @@ interface PlayColorPalette {
 export struct PlaybackMiniBar {
   @Param forceExpanded: boolean = false
   @Param isStandalone: boolean = false
+  @Param miniBarState: MiniBarState = new MiniBarState()
   @Consumer() playSetting: PlaySetting | undefined = PersistenceV2.connect(PlaySetting, () => new PlaySetting());
   @Consumer() isPlaying: boolean = false
   @Consumer() showPlay: boolean = false
@@ -45,11 +46,9 @@ export struct PlaybackMiniBar {
   @Consumer() playedPercent: number = 0
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Local fadeInterval: number = -1
-  @Local marqueeStart: boolean = true
-  @Local marqueeRestartTimer: number = -1
 
   private isExpanded(): boolean {
-    return this.forceExpanded
+    return this.forceExpanded || this.miniBarState.expanded
   }
 
   private getCoverSource(): string | Resource {
@@ -229,23 +228,6 @@ export struct PlaybackMiniBar {
     })
   }
 
-  private restartMarquee() {
-    if (this.marqueeRestartTimer !== -1) {
-      return
-    }
-    this.marqueeStart = false
-    this.marqueeRestartTimer = setTimeout(() => {
-      this.marqueeStart = true
-      this.marqueeRestartTimer = -1
-    }, 1500)
-  }
-
-  private onMarqueeStateChange(state: MarqueeState) {
-    if (state === MarqueeState.FINISH) {
-      this.restartMarquee()
-    }
-  }
-
   @Builder
   rewindButton() {
     Button({ type: ButtonType.Circle }) {
@@ -301,20 +283,14 @@ export struct PlaybackMiniBar {
           .width('100%')
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.MARQUEE })
-          .marqueeOptions({ start: this.marqueeStart, loop: 1, step: 4, fadeout: true })
-          .onMarqueeStateChange((state: MarqueeState) => {
-            this.onMarqueeStateChange(state)
-          })
+          .marqueeOptions({ start: true, loop: -1, delay: 3000, step: 4, fadeout: true })
 
         Text(this.getPlaybackSubtitle())
           .width('100%')
           .fontColor($r('sys.color.font_secondary'))
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.MARQUEE })
-          .marqueeOptions({ start: this.marqueeStart, loop: 1, step: 4, fadeout: true })
-          .onMarqueeStateChange((state: MarqueeState) => {
-            this.onMarqueeStateChange(state)
-          })
+          .marqueeOptions({ start: true, loop: -1, delay: 3000, step: 4, fadeout: true })
           .margin({ top: 4 })
       }
       .layoutWeight(1)
@@ -337,9 +313,9 @@ export struct PlaybackMiniBar {
     .height('100%')
     .alignItems(VerticalAlign.Center)
     .geometryTransition("miniBar")
-    .width(this.isStandalone ? 'calc(100% + 16vp)' : '100%')
+    .width('100%')
     .margin({ right: this.isStandalone ? 0 : -8 })
-    .offset({ x: this.isStandalone ? -8 : 0 })
+    .offset({ x: this.isStandalone ? 8 : 0 })
     .clip(false)
     .onClick(() => {
       this.openPlayer()
@@ -369,9 +345,6 @@ export struct PlaybackMiniBar {
   aboutToDisappear() {
     if (this.fadeInterval !== -1) {
       clearInterval(this.fadeInterval)
-    }
-    if (this.marqueeRestartTimer !== -1) {
-      clearTimeout(this.marqueeRestartTimer)
     }
   }
 

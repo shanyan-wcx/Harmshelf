@@ -51,13 +51,13 @@
 ### Minimal implementation plan
 
 1. 以 `Component.ets:bottomTabBarBuilder()` 的官方 `Tabs.barFloatingStyle.miniBar` 为带 bottom tab 页的唯一渲染入口。保留显式 `HdsBarLayoutMode.HORIZONTAL`，省略 `barWidth` 和 `miniBarWidth`，让官方默认断点计算使 minibar 长度跟随 TabsBar；不要把原生样式作为受控 `miniBarStyle` 回写。
-2. 抽出一个共享的 player-mini-bar builder/component seam，保持 `Play` 的全局状态和现有三种动作只由一处维护。当前 `Play.ets` 反向 import 了 `Component.ets` 的 `ImmersiveActionButton`，若让 `Component.ets` 直接 import `Play`，可能形成 ArkTS 模块环依赖。通过 `Index` 向 `MyNavigation` 传带 `{ expanded: boolean }` 参数的 `@BuilderParam`，让自定义内容显式跟随 HdsTabs 回调状态；不要依赖无参尾随 builder 的跨组件状态刷新，也不要用两个独立的播放状态机。具体拆分方式需以 ArkTS 编译器对 builder/cycle 的限制验证。
+2. 抽出一个共享的 player-mini-bar builder/component seam，保持 `Play` 的全局状态和现有三种动作只由一处维护。当前 `Play.ets` 反向 import 了 `Component.ets` 的 `ImmersiveActionButton`，若让 `Component.ets` 直接 import `Play`，可能形成 ArkTS 模块环依赖。通过 `Index` 向 `MyNavigation` 传带稳定 `@ObservedV2` 状态引用的 `@BuilderParam`，让自定义内容在 HdsTabs 回调后立即跟随状态；不要依赖无参尾随 builder 或普通 boolean 的跨组件状态刷新，也不要用两个独立的播放状态机。具体拆分方式需以 ArkTS 编译器对 builder/cycle 的限制验证。
 3. 带 tab 的 collapsed builder 只渲染圆形 cover + progress ring，cover 尺寸填满官方 minibar 可视高度且不加 margin；保留 `ProgressType.Ring` 与 `playedPercent`，删除 rotate/animation。expanded builder 使用 left-right：左侧圆形 cover 带小 margin，中间是标题/副标题，右侧只有 rewind/play/fast-forward。移除 `stopButton`，全屏菜单里的“关闭播放器”不变。
 4. 对无 bottom tab 的 pushed 页面，复用同一套状态/动作和 cover/text/control builder，但由 `Play` 或新的共享 bar host 渲染一个与 bottom tab 相同的视觉高度（官方 floating capsule 参考 56vp）、immersive-light capsule。cover 在左，标题/副标题占剩余宽度，三个控制在右。位置应由 navigationIndicator safe area + `hasBottomTab=false` 的布局语义决定，替换现有 `.height(0).margin({ bottom: 108 })`；不要再叠加一条 root bottom tab。
-5. 标题/副标题只在 expanded layout 创建 marquee。优先使用 `TextOverflow.MARQUEE` + `marqueeOptions` 或 `Marquee` 的有限 `loop: 1`；需求是“滚动一遍、暂停、再重复”，不能使用 `loop: -1` 的无间隔连续滚动。`delay` 只表示轮次间等待，若 `loop: 1` 结束后组件不会自动重新开始，则用状态/组件 identity 或 `onFinish` + pause timer 重新 arm；实现前需在 API 26 真机验证 completed marquee 是否能通过 `start` 重启。短文本应保持静态，不强行触发动画。
+5. 标题/副标题只在 expanded layout 创建 marquee。使用 `TextOverflow.MARQUEE` + `marqueeOptions({ loop: -1, delay: 3000 })`；API 26 声明明确 `loop <= 0` 会持续循环，`delay` 是每轮之间的等待时间。短文本仍保持静态，因为 marquee 只在内容超出组件宽度时产生移动。不要用手动定时器反复切换 `start`，避免与 HdsTabs 状态更新产生滞后。
 6. 删除 `rotateAngle`、`rotateTimer`、`startRotate`、`stopRotate`、focus/lifecycle rotation calls，以及 `primaryButtonBuilder()` 中的 `.rotate`/`.animation`/`.onAppear(startRotate)`；保留 `geometryTransition("cover")` 只有在它与官方 HdsTabs/全屏 cover 过渡不冲突时。检查 71x71 ring 在官方 `enableMiniBarClip` 默认 true 下是否被裁剪，必要时只对播放器 host 设置不裁剪，避免扩大整个 tab bar 的触摸/绘制范围。
 7. 保持现有 full-screen `bindContentCover` 和 sheets 只归 `playBuilder()`；minibar builder 不携带 bookmark/speed/sleep/chapter sheets、全屏 close menu、bottom safe-area padding。播放器动作继续调用已有 callbacks，让 AV session、progress ring、自动下一曲和 `isPlaying` 保持同一状态源。
-8. 展开态共享内容根增加全屏打开点击；快退、播放、快进所在的子行停止触摸冒泡，避免根点击覆盖按钮动作。页签 minibar 使用右侧小幅负外边距保留封面左侧圆弧间隙；无 tab 胶囊则将共享内容宽度增加 16vp 并向左偏移 8vp，实际校正不能改变 HdsTabs/native capsule 的宽度。展开/收起内容根不再叠加第二层透明度动画，避免原生动效结束后内容延迟切换。
+8. 展开态共享内容根增加全屏打开点击；快退、播放、快进所在的子行停止触摸冒泡，避免根点击覆盖按钮动作。实际运行发现无 tab 胶囊的负偏移会让左边距过小、右边距过大，因此保持内容宽度为 `100%`，只向右偏移 8vp；不要改变 HdsTabs/native capsule 的宽度。展开/收起内容根不再叠加第二层透明度动画，避免原生动效结束后内容延迟切换。
 
 ### Pitfalls to verify during implementation
 
@@ -66,7 +66,7 @@
 - **Clip/ring**：HdsTabs `enableMiniBarClip` 默认 true；cover/ring/shadow 若超出 capsule 边界可能被裁剪。只扩大可视 host 或关闭 mini bar clip 前，先确认不会让 ring 穿出 tab capsule 并截断相邻 tab 的触摸区。
 - **Hit testing**：当前外层 `Play` 是 `HitTestMode.Transparent`，内部 HdsActionBar 是 `BLOCK_HIERARCHY`。新 bar 仍应让透明区域穿透页面、只让 cover/三个控制消费触摸。不要给全屏 overlay 加一个覆盖整屏的 `BLOCK_HIERARCHY`；也不要在 HdsTabs container 与 child controls 同时加竞争性 `onClick`。
 - **Collapsed click semantics**：官方 HdsTabs 需要处理 minibar/tabbar 的折叠切换；现有 cover 又需要打开 `showPlay`。要在产品上确定 collapsed cover 的一次点击是“展开 minibar”还是“打开 full-screen”，并按官方 controller/callback 做单一动作，避免 nested Button、`bindContentCover` 和 HdsTabs 手势互相吞事件。
-- **Marquee restart**：`loop: 1` 本身只保证一次；`delay` 不等同于无限循环的暂停策略。重启可能需要重建 marquee 节点/改变 key 或在 `onFinish` 后再 arm，且标题切换时要取消旧 timer。不要在两个文本上开持续 loop，避免标题和副标题失去同步或长期耗电。
+- **Marquee restart**：API 26 的 `TextMarqueeOptions` 已明确 `loop <= 0` 会持续循环，`delay` 是每轮之间的等待时间，因此无需通过 `onFinish` 和手动 timer 重启。仍需在真机确认长标题、副标题的滚动速度和两条文字的同步观感。
 - **Sheet 生命周期**：`Play.playBuilder()` 的 sheets 会在 `onWillAppear`/`onDisappear` 更新 sleep/speed/chapter 状态。若把 controls builder 抽出，保留这些 sheet 的 owner 在 full-screen 页面，不要让 miniature host 持有一个隐藏 sheet 或沿用全屏的 `chapterScroller`。
 - **Material scope**：项目规范 `component-guidelines.md` 规定 content-area actions 使用共享 HDS `ImmersiveActionButton`，system immersive-light 主要给 title/tab bars；本需求的 no-tab capsule 是边界案例。应复用 HDS container/共享按钮能力，并在设计/规范层确认该 capsule 的 material 例外，避免 `systemMaterial` + 自建 blur/shadow/background 叠加。
 - **Route detection**：`isBottomTabDevice()` 只表示 phone/tablet，不能证明当前 pushed route 仍显示 bottom tab。沿用 `isIndex`/nav destination 或页面已有 `hasBottomTab=false` inset 语义，并在 phone/tablet 的 Search/Detail/Download 等页面真机确认 HdsNavigation 是否仍保留 root tab。
@@ -99,5 +99,5 @@
 - 未在仓库中找到现成 `Marquee`、`TextOverflow.MARQUEE`、`marqueeOptions` 或 title/subtitle repeated-scroll helper；marquee 是新增实现点。
 - 未在当前 `HdsActionBar` 用法中找到一个可直接表达“左 cover + 中间文本 + 右三按钮”的现成 expanded layout；`HdsActionBar` 当前是 primary button + start/end button arrays，需通过官方 HdsTabs `miniBarBuilder` 或新的共享 builder 重新组织。
 - `HdsTabsFloatingStyle` 声明没有独立 radius 字段；胶囊外观应依赖 HDS floating/material，而不是在 `barFloatingStyle` 中添加未声明属性。
-- 只做了源码、SDK 声明和官方文档的只读核查，未运行真机/模拟器；collapsed 点击优先级、HdsTabs 动画回调时序、marquee 完成后重启方式、71x71 progress ring 是否被默认 clip 裁切，都必须在 API 26 目标设备上验证。
-- AGENTS.md 要求命令前缀 `rtk`，但当前环境没有可执行的 `rtk`；因此本次检索使用等价的 PowerShell/`rg` 只读命令。未进行 build、git 操作或任何源文件修改。
+- 只做了源码、SDK 声明和官方文档的核查，并完成 DevEco debug 构建；collapsed 点击优先级、HdsTabs 动画回调在真机上的最终视觉效果、71x71 progress ring 是否被默认 clip 裁切，仍需在 API 26 目标设备上验证。
+- AGENTS.md 要求命令前缀 `rtk`，但当前环境没有可执行的 `rtk`；因此本次检索和构建使用等价的 PowerShell/`rg`/DevEco CLI 命令。
