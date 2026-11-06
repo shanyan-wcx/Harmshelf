@@ -463,7 +463,7 @@ export struct Play {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: () => {
               this.showEditBookmark = false
@@ -474,7 +474,7 @@ export struct Play {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .width('50%')
         .layoutWeight(1)
         .clip(false)
@@ -482,7 +482,7 @@ export struct Play {
         Row() {
           ImmersiveActionButton({
             barWidth: '100%',
-            barHeight: 40,
+            barHeight: 50,
             monopolizeActionEvents: false,
             onButtonClick: async () => {
               let bookmark: Bookmark = {
@@ -511,7 +511,7 @@ export struct Play {
               .hitTestBehavior(HitTestMode.None)
           }
         }
-        .height(40)
+        .height(50)
         .width('50%')
         .layoutWeight(1)
         .clip(false)
