@@ -460,49 +460,61 @@ export struct Play {
         })
 
       Row({ space: 20 }) {
-        Button({ type: ButtonType.Normal }) {
-          Text("取消")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false,
+            onButtonClick: () => {
+              this.showEditBookmark = false
+            }
+          }) {
+            Text("取消")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_background_tertiary'))
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
-        .onClick(() => {
-          this.showEditBookmark = false
-        })
+        .clip(false)
 
-        Button({ type: ButtonType.Normal }) {
-          Text("确认")
-            .fontSize(18)
+        Row() {
+          ImmersiveActionButton({
+            barWidth: '100%',
+            barHeight: 40,
+            monopolizeActionEvents: false,
+            onButtonClick: async () => {
+              let bookmark: Bookmark = {
+                libraryItemId: this.playingItem!.libraryItemId,
+                title: this.tmpBookmarkTitle,
+                time: this.tmpBookmarkTime,
+                createdAt: Date.now()
+              }
+              let status = await createBookmark(this.playingItem!.libraryItemId, bookmark)
+              if (status) {
+                this.showEditBookmark = false
+                this.getUIContext().getPromptAction().showToast({
+                  message: '编辑书签成功！',
+                  duration: 500
+                });
+              } else {
+                this.getUIContext().getPromptAction().showToast({
+                  message: '编辑书签失败，请检查网络！',
+                  duration: 500
+                });
+              }
+            }
+          }) {
+            Text("确认")
+              .fontSize(18)
+              .hitTestBehavior(HitTestMode.None)
+          }
         }
-        .backgroundColor($r('sys.color.comp_emphasize_secondary'))
         .height(40)
         .width('50%')
         .layoutWeight(1)
-        .borderRadius(10)
-        .onClick(async () => {
-          let bookmark: Bookmark = {
-            libraryItemId: this.playingItem!.libraryItemId,
-            title: this.tmpBookmarkTitle,
-            time: this.tmpBookmarkTime,
-            createdAt: Date.now()
-          }
-          let status = await createBookmark(this.playingItem!.libraryItemId, bookmark)
-          if (status) {
-            this.showEditBookmark = false
-            this.getUIContext().getPromptAction().showToast({
-              message: '编辑书签成功！',
-              duration: 500
-            });
-          } else {
-            this.getUIContext().getPromptAction().showToast({
-              message: '编辑书签失败，请检查网络！',
-              duration: 500
-            });
-          }
-        })
+        .clip(false)
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
