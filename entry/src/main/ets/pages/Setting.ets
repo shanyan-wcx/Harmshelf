@@ -672,7 +672,7 @@ export struct Setting {
             .fontSize(18)
             .fontWeight(FontWeight.Bold)
             .padding({ left: 20, right: 20 })
-            .margin({ top: 20, bottom: 5 })
+            .margin({ top: 15, bottom: 5 })
             .textAlign(TextAlign.Center)
 
           ForEach(this.serverSetting?.loginInfos, (loginInfo: LoginInfo, index) => {
@@ -862,7 +862,7 @@ export struct Setting {
             .fontSize(18)
             .fontWeight(FontWeight.Bold)
             .padding({ left: 20, right: 20 })
-            .margin({ top: 20, bottom: 15 })
+            .margin({ top: 15, bottom: 15 })
             .textAlign(TextAlign.Center)
 
           Row() {
@@ -918,7 +918,7 @@ export struct Setting {
             .fontSize(18)
             .fontWeight(FontWeight.Bold)
             .padding({ left: 20, right: 20 })
-            .margin({ top: 20, bottom: 15 })
+            .margin({ top: 15, bottom: 15 })
             .textAlign(TextAlign.Center)
 
           Row() {
@@ -1037,7 +1037,7 @@ export struct Setting {
             .fontSize(18)
             .fontWeight(FontWeight.Bold)
             .padding({ left: 20, right: 20 })
-            .margin({ top: 20, bottom: 15 })
+            .margin({ top: 15, bottom: 15 })
             .textAlign(TextAlign.Center)
 
           Row() {
@@ -1077,7 +1077,7 @@ export struct Setting {
             .fontSize(18)
             .fontWeight(FontWeight.Bold)
             .padding({ left: 20, right: 20 })
-            .margin({ top: 20, bottom: 15 })
+            .margin({ top: 15, bottom: 15 })
             .textAlign(TextAlign.Center)
 
           Row() {
