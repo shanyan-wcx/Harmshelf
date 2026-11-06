@@ -823,3 +823,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 34: 调整封面卡片字号与圆角
+
+**Date**: 2026-11-06
+**Task**: 调整封面卡片字号与圆角
+**Branch**: `main`
+
+### Summary
+
+统一首页、搜索、添加及详情列表的标题/作者字号，系列收藏播放列表标题改为16，作者卡片自适应范围改为12-16，详情列表封面圆角与搜索项统一为10。DevEco 构建因环境中的 Hvigor daemon 锁未执行。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `ea29d71` | (see git log) |
+
+### Status
+
+[OK] **Completed**
