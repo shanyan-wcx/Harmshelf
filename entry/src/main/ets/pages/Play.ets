@@ -560,7 +560,7 @@ export struct Play {
       const picker = await effectKit.createColorPicker(pixelMap)
       let color: effectKit.Color | undefined = undefined
       try {
-        color = await picker.getMainColor()
+        color = picker.getLargestProportionColor()
       } catch (_) {
         color = picker.getAverageColor()
       }
