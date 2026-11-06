@@ -404,6 +404,83 @@ export struct LibraryItemDetail {
     .padding({ left: 20, right: 20, bottom: 25 })
   }
 
+  async downloadLibraryItem() {
+    const maxTracks = this.libraryItem?.media.tracks?.length ?? 0
+    const start = this.downloadStart === '' ? 1 : Number(this.downloadStart)
+    const end = this.downloadEnd === '' ? maxTracks : Number(this.downloadEnd)
+    if (start <= 0) {
+      this.getUIContext().getPromptAction().showToast({ message: '起始章节必须大于0', duration: 1500 })
+      return
+    }
+    if (start >= end) {
+      this.getUIContext().getPromptAction().showToast({ message: '起始章节必须小于结束章节', duration: 1500 })
+      return
+    }
+    if (end > maxTracks) {
+      this.getUIContext().getPromptAction().showToast({ message: `结束章节不能超过最大章节数${maxTracks}`, duration: 1500 })
+      return
+    }
+    this.showConfirmDownload = false
+    this.getUIContext().getPromptAction().showToast({
+      message: '开始下载！',
+      duration: 500
+    });
+    const downloadPath = new fileUri.FileUri(this.downloadUri).path
+    const dir = downloadPath + "/有声书/" + this.libraryItem?.media.metadata.title
+    const existsDir = fs.accessSync(dir)
+    if (!existsDir) {
+      fs.mkdirSync(dir);
+    }
+    const tracks = this.libraryItem?.media.tracks ?? []
+    for (let i = start - 1; i < end; i++) {
+      const track = tracks[i]
+      if (!track) continue
+      const filePath = dir + "/" + track.metadata.filename
+      if (this.downloadSetting?.skipExistingFiles && fs.accessSync(filePath)) {
+        Logger.info(`文件已存在，跳过: ${filePath}`)
+      } else {
+        const task = new DownloadTaskInfo()
+        task.mediaType = this.libraryItem!.mediaType
+        task.folder = this.libraryItem!.media.metadata.title
+        task.id = this.libraryItem!.id + "_" + track.index
+        task.title = track.metadata.filename
+        task.url = this.baseUrl + track.contentUrl + "?token=" + this.apiToken
+        task.filePath = filePath
+        this.downloadTasks.push(task)
+        this.downloadCount = this.downloadTasks.length
+        this.downloadManager!.add(
+          this.libraryItem!.mediaType,
+          this.libraryItem!.media.metadata.title,
+          this.libraryItem!.id + "_" + track.index,
+          track.metadata.filename,
+          this.baseUrl + track.contentUrl + "?token=" + this.apiToken,
+          filePath,
+          (info) => {
+            Logger.info(`Progress: ${info.title} ${Math.floor(info.progress)}%`);
+            let index = this.downloadTasks.findIndex(t => t.id === info.id)
+            if (index >= 0) {
+              this.downloadTasks[index].progress = info.progress;
+            }
+          },
+          (info) => {
+            Logger.info(`Status changed: ${info.title} ${info.status}`);
+            let index = this.downloadTasks.findIndex(t => t.id === info.id)
+            if (index >= 0) {
+              if (info.status === DownloadStatus.Removed) {
+                this.downloadTasks.splice(index, 1);
+                this.downloadCount = this.downloadTasks.length
+              } else {
+                this.downloadTasks[index].status = info.status;
+              }
+            }
+          }
+        )
+      }
+    }
+    const coverUrl = this.baseUrl + `/api/items/${this.libraryItem!.id}/cover?token=${this.apiToken}`
+    this.downloadManager!.downloadCover(coverUrl, dir + "/cover.jpg")
+  }
+
   @Builder
   confirmBuilder() {
     Column() {
@@ -547,7 +624,9 @@ export struct LibraryItemDetail {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 50,
-            monopolizeActionEvents: false
+            onButtonClick: async () => {
+              await this.downloadLibraryItem()
+            }
           }) {
             Text("确认")
               .fontSize(18)
@@ -557,82 +636,6 @@ export struct LibraryItemDetail {
         .height(50)
         .layoutWeight(1)
         .clip(false)
-        .onClick(async () => {
-          const maxTracks = this.libraryItem?.media.tracks?.length ?? 0
-          const start = this.downloadStart === '' ? 1 : Number(this.downloadStart)
-          const end = this.downloadEnd === '' ? maxTracks : Number(this.downloadEnd)
-          if (start <= 0) {
-            this.getUIContext().getPromptAction().showToast({ message: '起始章节必须大于0', duration: 1500 })
-            return
-          }
-          if (start >= end) {
-            this.getUIContext().getPromptAction().showToast({ message: '起始章节必须小于结束章节', duration: 1500 })
-            return
-          }
-          if (end > maxTracks) {
-            this.getUIContext().getPromptAction().showToast({ message: `结束章节不能超过最大章节数${maxTracks}`, duration: 1500 })
-            return
-          }
-          this.showConfirmDownload = false
-          this.getUIContext().getPromptAction().showToast({
-            message: '开始下载！',
-            duration: 500
-          });
-          const downloadPath = new fileUri.FileUri(this.downloadUri).path
-          const dir = downloadPath + "/有声书/" + this.libraryItem?.media.metadata.title
-          const existsDir = fs.accessSync(dir)
-          if (!existsDir) {
-            fs.mkdirSync(dir);
-          }
-          const tracks = this.libraryItem?.media.tracks ?? []
-          for (let i = start - 1; i < end; i++) {
-            const track = tracks[i]
-            if (!track) continue
-            const filePath = dir + "/" + track.metadata.filename
-            if (this.downloadSetting?.skipExistingFiles && fs.accessSync(filePath)) {
-              Logger.info(`文件已存在，跳过: ${filePath}`)
-            } else {
-              const task = new DownloadTaskInfo()
-              task.mediaType = this.libraryItem!.mediaType
-              task.folder = this.libraryItem!.media.metadata.title
-              task.id = this.libraryItem!.id + "_" + track.index
-              task.title = track.metadata.filename
-              task.url = this.baseUrl + track.contentUrl + "?token=" + this.apiToken
-              task.filePath = filePath
-              this.downloadTasks.push(task)
-              this.downloadCount = this.downloadTasks.length
-              this.downloadManager!.add(
-                this.libraryItem!.mediaType,
-                this.libraryItem!.media.metadata.title,
-                this.libraryItem!.id + "_" + track.index,
-                track.metadata.filename,
-                this.baseUrl + track.contentUrl + "?token=" + this.apiToken,
-                filePath,
-                (info) => {
-                  Logger.info(`Progress: ${info.title} ${Math.floor(info.progress)}%`);
-                  let index = this.downloadTasks.findIndex(t => t.id === info.id)
-                  if (index >= 0) {
-                    this.downloadTasks[index].progress = info.progress;
-                  }
-                },
-                (info) => {
-                  Logger.info(`Status changed: ${info.title} ${info.status}`);
-                  let index = this.downloadTasks.findIndex(t => t.id === info.id)
-                  if (index >= 0) {
-                    if (info.status === DownloadStatus.Removed) {
-                      this.downloadTasks.splice(index, 1);
-                      this.downloadCount = this.downloadTasks.length
-                    } else {
-                      this.downloadTasks[index].status = info.status;
-                    }
-                  }
-                }
-              )
-            }
-          }
-          const coverUrl = this.baseUrl + `/api/items/${this.libraryItem!.id}/cover?token=${this.apiToken}`
-          this.downloadManager!.downloadCover(coverUrl, dir + "/cover.jpg")
-        })
       }
     }
     .padding({ left: 20, right: 20, bottom: 25 })
