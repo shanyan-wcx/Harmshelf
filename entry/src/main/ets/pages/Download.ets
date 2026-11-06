@@ -34,7 +34,7 @@ export struct DownloadTask {
           Repeat<DownloadTaskInfo>(this.downloadTasks)
             .each((task: RepeatItem<DownloadTaskInfo>) => {
               ListItem() {
-                Column() {
+                Column({ space: 8 }) {
                   Row() {
                     Text(task.item.title)
                       .fontSize(16)
@@ -50,7 +50,6 @@ export struct DownloadTask {
                   }
                   .width('100%')
                   .justifyContent(FlexAlign.SpaceBetween)
-                  .margin({ top: 15 })
 
                   Progress({
                     value: task.item.status === DownloadStatus.Failed ? 100 : task.item.progress,
@@ -58,22 +57,34 @@ export struct DownloadTask {
                     type: ProgressType.Linear
                   })
                     .width('100%')
-                    .margin({ top: 12, bottom: 17 })
                     .style({ strokeWidth: 6, enableSmoothEffect: false })
                     .color(task.item.status === DownloadStatus.Failed ? $r('sys.color.warning') :
                       (task.item.status === DownloadStatus.Paused ? $r('sys.color.comp_background_tertiary') :
                         $r('sys.color.comp_emphasize_secondary')))
                 }
                 .width('100%')
-                .padding({
-                  left: 20,
-                  right: 20
+                .height(80)
+                .padding({ left: 16, right: 16 })
+                .justifyContent(FlexAlign.Center)
+                .borderRadius(18)
+                .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+                .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
+                .border({
+                  width: 0.35,
+                  radius: 18,
+                  color: $r('sys.color.ohos_id_color_focused_outline_transparent')
                 })
+                .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+                .clip(false)
               }
+              .width('100%')
               .margin({
-                top: task.index === 0 ? this.statusBarHeight + 49 : 0,
-                bottom: task.index === this.downloadTasks.length - 1 ? getBottomContentInset(10, this.isStartPlaying, 89, false) : 0
+                left: 20,
+                right: 20,
+                top: task.index === 0 ? this.statusBarHeight + 56 : 0,
+                bottom: task.index === this.downloadTasks.length - 1 ? getBottomContentInset(12, this.isStartPlaying, 89, false) : 12
               })
+              .clip(false)
             })
             .virtualScroll({ totalCount: this.downloadTasks.length })
             .key(task => task.id)
@@ -83,16 +94,34 @@ export struct DownloadTask {
         .height('100%')
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .scrollBar(BarState.Off)
-        .divider({
-          strokeWidth: 1,
-          startMargin: 20,
-          endMargin: 20,
-          color: $r('app.color.divider')
+        .clip(false)
+
+      if (this.downloadTasks.length === 0) {
+        Column({ space: 8 }) {
+          SymbolGlyph($r('sys.symbol.download'))
+            .fontSize(48)
+            .fontColor([$r('sys.color.font_secondary')])
+
+          Text("暂无下载任务")
+            .fontSize(18)
+
+          Text("下载的内容会显示在这里")
+            .fontSize(13)
+            .fontColor($r('sys.color.font_secondary'))
+        }
+        .width('100%')
+        .height('100%')
+        .padding({
+          top: this.statusBarHeight + 56,
+          bottom: getBottomContentInset(20, this.isStartPlaying, 89, false)
         })
+        .justifyContent(FlexAlign.Center)
+      }
       }
       .width('100%')
       .height('100%')
-      .alignContent(Alignment.End)
+      .alignContent(Alignment.Top)
+      .clip(false)
     }
     .width('100%')
     .height('100%')
