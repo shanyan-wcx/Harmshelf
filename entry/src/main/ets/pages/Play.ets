@@ -446,7 +446,7 @@ export struct Play {
   }
 
   private get shouldAddPlaybackBottomInset(): boolean {
-    return (!this.shouldOverlayPlaybackControls && this.displayWidth >= 1000) ||
+    return this.displayWidth >= 1000 ||
       (this.isBottomTabDevice() && this.isFloatingWindow)
   }
 
