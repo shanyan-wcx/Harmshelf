@@ -931,7 +931,7 @@ export struct Play {
                        modifier: new TextModifier().fontSize(16).fontColor(this.playColorPalette.primary)
                      },
                      primaryPrefixSymbol: {
-                       symbol: this.playbackSheetSymbol($r('sys.symbol.bookmark'), this.playColorPalette.primary)
+                       symbol: this.playbackSheetSymbol($r('sys.symbol.bookmark'), this.playColorPalette.secondary)
                      },
                      secondaryText: {
                        text: this.formatSeconds(bookmark.time),
