@@ -846,6 +846,14 @@ export struct Setting {
               barWidth: '100%',
               barHeight: 50,
               onButtonClick: () => {
+                if (!this.showAddServer) {
+                  this.tmpServername = ""
+                  this.tmpBaseurl = ""
+                  this.tmpUrl = ""
+                  this.tmpUsername = ""
+                  this.tmpPassword = ""
+                  this.urlHeadIdx = 0
+                }
                 this.showAddServer = !this.showAddServer;
               }
             }) {
@@ -867,11 +875,6 @@ export struct Setting {
             showClose: false,
             onDisappear: () => {
               this.showAddServer = false
-              this.tmpServername = ""
-              this.tmpBaseurl = ""
-              this.tmpUrl = ""
-              this.tmpUsername = ""
-              this.tmpPassword = ""
             }
           })
         }
