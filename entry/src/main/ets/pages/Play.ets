@@ -1626,7 +1626,6 @@ export struct Play {
                 }
                 .width('100%')
 
-                Column() {
                   Column() {
                   Row() {
                     Text(this.formatSeconds(this.playedPercent * this.getCurrentDuration() / 100))
@@ -1944,8 +1943,6 @@ export struct Play {
                     this.showEditBookmark = false
                   }
                 })
-              }
-              .width('100%')
               }
               .width('100%')
               .height('100%')
