@@ -3148,7 +3148,32 @@ export struct ReportPanel {
             ImmersiveActionButton({
               barWidth: '100%',
               barHeight: 50,
-              monopolizeActionEvents: false
+              onButtonClick: async () => {
+                if (!this.reason.trim()) {
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '请填写举报原因！',
+                    duration: 800
+                  })
+                  return
+                }
+
+                this.showProgress = true
+                let success = true
+                this.showProgress = false
+
+                if (success === true) {
+                  this.onClose()
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '举报已提交，感谢反馈！',
+                    duration: 1000
+                  });
+                } else {
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '提交失败，请检查网络！',
+                    duration: 1000
+                  });
+                }
+              }
             }) {
               Text("提交")
                 .fontSize(18)
@@ -3159,32 +3184,6 @@ export struct ReportPanel {
           .layoutWeight(1)
           .height(50)
           .clip(false)
-          .onClick(async () => {
-            if (!this.reason.trim()) {
-              this.getUIContext().getPromptAction().showToast({
-                message: '请填写举报原因！',
-                duration: 800
-              })
-              return
-            }
-
-            this.showProgress = true
-            let success = true
-            this.showProgress = false
-
-            if (success === true) {
-              this.onClose()
-              this.getUIContext().getPromptAction().showToast({
-                message: '举报已提交，感谢反馈！',
-                duration: 1000
-              });
-            } else {
-              this.getUIContext().getPromptAction().showToast({
-                message: '提交失败，请检查网络！',
-                duration: 1000
-              });
-            }
-          })
         }
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)

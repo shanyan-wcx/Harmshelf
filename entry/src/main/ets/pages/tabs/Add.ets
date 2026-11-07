@@ -199,7 +199,21 @@ export struct Add {
             ImmersiveActionButton({
               barWidth: 160,
               barHeight: 50,
-              monopolizeActionEvents: false
+              onButtonClick: async () => {
+                let podcast1 = await addPodcast(this.library!.id, this.library!.folders[0].id, this.library!.folders[0].fullPath + "/" + searchPodcast.title, searchPodcast, podcast, this.autoDownload[index])
+                if (podcast1) {
+                  this.showConfirm[index] = false
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '添加成功！',
+                    duration: 500
+                  });
+                } else {
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '添加播客失败，请检查网络！',
+                    duration: 500
+                  });
+                }
+              }
             }) {
               Text("提交")
                 .fontSize(18)
@@ -209,21 +223,6 @@ export struct Add {
           .height(50)
           .width(160)
           .clip(false)
-          .onClick(async () => {
-            let podcast1 = await addPodcast(this.library!.id, this.library!.folders[0].id, this.library!.folders[0].fullPath + "/" + searchPodcast.title, searchPodcast, podcast, this.autoDownload[index])
-            if (podcast1) {
-              this.showConfirm[index] = false
-              this.getUIContext().getPromptAction().showToast({
-                message: '添加成功！',
-                duration: 500
-              });
-            } else {
-              this.getUIContext().getPromptAction().showToast({
-                message: '添加播客失败，请检查网络！',
-                duration: 500
-              });
-            }
-          })
         }
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)

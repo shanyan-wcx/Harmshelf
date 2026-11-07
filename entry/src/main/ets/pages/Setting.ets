@@ -243,7 +243,39 @@ export struct Setting {
             ImmersiveActionButton({
               barWidth: '100%',
               barHeight: 50,
-              monopolizeActionEvents: false
+              onButtonClick: async () => {
+                if (this.tmpUrl === "") {
+                  this.getUIContext().getPromptAction().showToast({
+                    message: '服务器地址不能为空！',
+                    duration: 500
+                  });
+                } else {
+                  this.showProgress = true
+                  this.tmpBaseurl = this.urlHead[this.urlHeadIdx] + this.tmpUrl
+                  let loginInfo: LoginInfo = {
+                    name: this.tmpServername,
+                    server: this.tmpBaseurl,
+                    username: this.tmpUsername,
+                    password: this.tmpPassword
+                  }
+                  let info = await getLogin(loginInfo)
+                  if (info !== null) {
+                    this.serverSetting!.loginInfos.push(loginInfo)
+                    this.showProgress = false
+                    this.showAddServer = false
+                    this.getUIContext().getPromptAction().showToast({
+                      message: '添加服务器成功！',
+                      duration: 500
+                    });
+                  } else {
+                    this.showProgress = false
+                    this.getUIContext().getPromptAction().showToast({
+                      message: '连接服务器失败！',
+                      duration: 500
+                    });
+                  }
+                }
+              }
             }) {
               Text("保存")
                 .fontSize(18)
@@ -253,39 +285,6 @@ export struct Setting {
           .width('100%')
           .height(50)
           .clip(false)
-          .onClick(async () => {
-            if (this.tmpUrl === "") {
-              this.getUIContext().getPromptAction().showToast({
-                message: '服务器地址不能为空！',
-                duration: 500
-              });
-            } else {
-              this.showProgress = true
-              this.tmpBaseurl = this.urlHead[this.urlHeadIdx] + this.tmpUrl
-              let loginInfo: LoginInfo = {
-                name: this.tmpServername,
-                server: this.tmpBaseurl,
-                username: this.tmpUsername,
-                password: this.tmpPassword
-              }
-              let info = await getLogin(loginInfo)
-              if (info !== null) {
-                this.serverSetting!.loginInfos.push(loginInfo)
-                this.showProgress = false
-                this.showAddServer = false
-                this.getUIContext().getPromptAction().showToast({
-                  message: '添加服务器成功！',
-                  duration: 500
-                });
-              } else {
-                this.showProgress = false
-                this.getUIContext().getPromptAction().showToast({
-                  message: '连接服务器失败！',
-                  duration: 500
-                });
-              }
-            }
-          })
         }
         .padding({ left: 20, right: 20, top: 8, bottom: 25 })
       }
@@ -474,7 +473,59 @@ export struct Setting {
               ImmersiveActionButton({
                 barWidth: '100%',
                 barHeight: 50,
-                monopolizeActionEvents: false
+                onButtonClick: async () => {
+                  if (this.tmpUrl === "") {
+                    this.getUIContext().getPromptAction().showToast({
+                      message: '服务器地址不能为空！',
+                      duration: 500
+                    });
+                  } else {
+                    this.showProgress = true
+                    this.tmpBaseurl = this.urlHead[this.urlHeadIdx] + this.tmpUrl
+                    let loginInfo: LoginInfo = {
+                      name: this.tmpServername,
+                      server: this.tmpBaseurl,
+                      username: this.tmpUsername,
+                      password: this.tmpPassword
+                    }
+                    let info = await getLogin(loginInfo)
+                    if (info !== null) {
+                      this.serverSetting!.loginInfos[this.editServerIndex] = loginInfo
+                      this.isConnect = true
+                      this.serverName = loginInfo.name
+                      this.baseUrl = loginInfo.server
+                      this.username = loginInfo.username
+                      this.password = loginInfo.password
+                      this.apiToken = info[0]
+                      this.libraries = await getLibraries()
+                      this.selectOptions = []
+                      if (this.libraries.length > 0) {
+                        this.library =
+                          this.library ? this.libraries.find(library => library.id === this.library!.id)??this.libraries[0] : this.libraries[0]
+                        this.libraries.forEach((library, index) => {
+                          this.selectOptions.push({ value: library.name })
+                        })
+                        this.selectLibraryIndex = this.libraries.findIndex(library => library.id === this.library!.id)
+                        if (this.selectLibraryIndex === -1) {
+                          this.selectLibraryIndex = 0
+                        }
+                      }
+                      this.user = await getUser()
+                      this.showProgress = false
+                      this.showEditServer = false
+                      this.getUIContext().getPromptAction().showToast({
+                        message: '编辑服务器成功！',
+                        duration: 500
+                      });
+                    } else {
+                      this.showProgress = false
+                      this.getUIContext().getPromptAction().showToast({
+                        message: '连接服务器失败！',
+                        duration: 500
+                      });
+                    }
+                  }
+                }
               }) {
                 Text("保存")
                   .fontSize(18)
@@ -484,65 +535,26 @@ export struct Setting {
             .layoutWeight(1)
             .height(50)
             .clip(false)
-            .onClick(async () => {
-              if (this.tmpUrl === "") {
-                this.getUIContext().getPromptAction().showToast({
-                  message: '服务器地址不能为空！',
-                  duration: 500
-                });
-              } else {
-                this.showProgress = true
-                this.tmpBaseurl = this.urlHead[this.urlHeadIdx] + this.tmpUrl
-                let loginInfo: LoginInfo = {
-                  name: this.tmpServername,
-                  server: this.tmpBaseurl,
-                  username: this.tmpUsername,
-                  password: this.tmpPassword
-                }
-                let info = await getLogin(loginInfo)
-                if (info !== null) {
-                  this.serverSetting!.loginInfos[this.editServerIndex] = loginInfo
-                  this.isConnect = true
-                  this.serverName = loginInfo.name
-                  this.baseUrl = loginInfo.server
-                  this.username = loginInfo.username
-                  this.password = loginInfo.password
-                  this.apiToken = info[0]
-                  this.libraries = await getLibraries()
-                  this.selectOptions = []
-                  if (this.libraries.length > 0) {
-                    this.library =
-                      this.library ? this.libraries.find(library => library.id === this.library!.id)??this.libraries[0] : this.libraries[0]
-                    this.libraries.forEach((library, index) => {
-                      this.selectOptions.push({ value: library.name })
-                    })
-                    this.selectLibraryIndex = this.libraries.findIndex(library => library.id === this.library!.id)
-                    if (this.selectLibraryIndex === -1) {
-                      this.selectLibraryIndex = 0
-                    }
-                  }
-                  this.user = await getUser()
-                  this.showProgress = false
-                  this.showEditServer = false
-                  this.getUIContext().getPromptAction().showToast({
-                    message: '编辑服务器成功！',
-                    duration: 500
-                  });
-                } else {
-                  this.showProgress = false
-                  this.getUIContext().getPromptAction().showToast({
-                    message: '连接服务器失败！',
-                    duration: 500
-                  });
-                }
-              }
-            })
 
             Row() {
               ImmersiveActionButton({
                 barWidth: '100%',
                 barHeight: 50,
-                monopolizeActionEvents: false
+                onButtonClick: async () => {
+                  if (this.editServerIndex !== this.serverIndex?.serverIndex) {
+                    this.serverSetting!.loginInfos.splice(this.editServerIndex, 1)
+                    this.showEditServer = false
+                    this.getUIContext().getPromptAction().showToast({
+                      message: '删除服务器成功！',
+                      duration: 500
+                    });
+                  } else {
+                    this.getUIContext().getPromptAction().showToast({
+                      message: '无法删除选中的服务器！',
+                      duration: 500
+                    });
+                  }
+                }
               }) {
                 Text("删除")
                   .fontSize(18)
@@ -553,21 +565,6 @@ export struct Setting {
             .layoutWeight(1)
             .height(50)
             .clip(false)
-            .onClick(async () => {
-              if (this.editServerIndex !== this.serverIndex?.serverIndex) {
-                this.serverSetting!.loginInfos.splice(this.editServerIndex, 1)
-                this.showEditServer = false
-                this.getUIContext().getPromptAction().showToast({
-                  message: '删除服务器成功！',
-                  duration: 500
-                });
-              } else {
-                this.getUIContext().getPromptAction().showToast({
-                  message: '无法删除选中的服务器！',
-                  duration: 500
-                });
-              }
-            })
           }
         }
         .padding({ left: 20, right: 20, top: 8, bottom: 25 })
