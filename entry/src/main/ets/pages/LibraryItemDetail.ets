@@ -38,6 +38,7 @@ import {
   removeFromPlaylist,
   updateProgress } from "../utils/Api";
 import { media } from "@kit.MediaKit";
+import { deviceInfo } from "@kit.BasicServicesKit";
 import { DownloadManager, DownloadStatus, DownloadTaskInfo } from '../utils/Class';
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { MOBILE_BOTTOM_TAB_BAR_BOTTOM_MARGIN, MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT } from '../utils/Layout';
@@ -2054,7 +2055,8 @@ export struct LibraryItemDetail {
                   }
                   .width('100%')
                   .height(this.contentHeight - (this.showMoreIntro ? 156 : 184) +
-                    (!this.showMoreIntro && this.displayWidth >= 1000 ? 40 : 0))
+                    (!this.showMoreIntro && this.displayWidth >= 1000 ? 40 : 0) -
+                    (deviceInfo.deviceType === 'tablet' ? 30 : 0))
                   .borderRadius(30)
                   .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -2169,7 +2171,8 @@ export struct LibraryItemDetail {
                   }
                   .width('100%')
                   .height(this.contentHeight - (this.showMoreIntro ? 156 : 184) +
-                    (!this.showMoreIntro && this.displayWidth >= 1000 ? 40 : 0))
+                    (!this.showMoreIntro && this.displayWidth >= 1000 ? 40 : 0) -
+                    (deviceInfo.deviceType === 'tablet' ? 30 : 0))
                   .borderRadius(30)
                   .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
