@@ -397,9 +397,14 @@ export struct Play {
   @Local sliderValue: number = 0
   @Local fadeInterval: number = -1
   @Local coverColor: number = 0xff181818
+  @Local isFloatingWindow: boolean = false
   private coverColorKey: string = ''
   private coverColorRequest: number = 0
   private previousStatusBarContentColor: string = ''
+  private playbackWindow: window.Window | undefined = undefined
+  private windowStatusCallback: (status: window.WindowStatusType) => void = (status: window.WindowStatusType) => {
+    this.isFloatingWindow = status === window.WindowStatusType.FLOATING
+  }
 
   private get playControlColor(): Color {
     const red = (this.coverColor >>> 16) & 0xff
@@ -438,6 +443,11 @@ export struct Play {
   private get playbackGradientBottomOffset(): number {
     return this.shouldOverlayPlaybackControls ?
       Math.max(0, this.playbackCoverHeight - this.displayHeight * 2 / 3) : 0
+  }
+
+  private get shouldAddPlaybackBottomInset(): boolean {
+    return (!this.shouldOverlayPlaybackControls && this.displayWidth >= 1000) ||
+      (this.isBottomTabDevice() && this.isFloatingWindow)
   }
 
   @Builder
@@ -485,6 +495,9 @@ export struct Play {
     try {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
       const mainWindow = await window.getLastWindow(context)
+      this.playbackWindow = mainWindow
+      this.isFloatingWindow = mainWindow.getWindowStatus() === window.WindowStatusType.FLOATING
+      mainWindow.on('windowStatusDidChange', this.windowStatusCallback)
       this.previousStatusBarContentColor = mainWindow.getWindowSystemBarProperties().statusBarContentColor ?? ''
       if (this.showPlay) {
         await this.updateStatusBarContentColor()
@@ -498,6 +511,10 @@ export struct Play {
       clearInterval(this.fadeInterval)
     }
     this.coverColorRequest++
+    if (this.playbackWindow) {
+      this.playbackWindow.off('windowStatusDidChange', this.windowStatusCallback)
+      this.playbackWindow = undefined
+    }
     this.restoreStatusBarContentColor()
   }
   @Local shouldClosePlayer: boolean = false
@@ -2036,7 +2053,7 @@ export struct Play {
                 right: 20,
                 bottom: (this.windowAvoidArea.navigationIndicator.visible ?
                   this.windowAvoidArea.navigationIndicator.bottomRect.height : 0) +
-                  (!this.shouldOverlayPlaybackControls && this.displayWidth >= 1000 ? 20 : 0)
+                  (this.shouldAddPlaybackBottomInset ? 20 : 0)
               })
             }
             .width('100%')
