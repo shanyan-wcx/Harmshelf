@@ -1591,7 +1591,7 @@ export struct Play {
         reference: BreakpointsReference.WindowSize
       },
       gutter: {
-        x: 20
+        x: 0
       }
     }) {
       GridCol({ span: 1 }) {
