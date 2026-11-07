@@ -432,6 +432,12 @@ export struct Play {
       .textAlign(TextAlign.Start)
   }
 
+  private playbackSheetSymbol(resource: Resource, color: string): SymbolGlyphModifier {
+    const modifier = new SymbolGlyphModifier(resource)
+    modifier.fontColor([color])
+    return modifier
+  }
+
   private async updateStatusBarContentColor() {
     try {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
@@ -925,14 +931,14 @@ export struct Play {
                        modifier: new TextModifier().fontSize(16).fontColor(this.playColorPalette.primary)
                      },
                      primaryPrefixSymbol: {
-                       symbol: $r('sys.symbol.bookmark')
+                       symbol: this.playbackSheetSymbol($r('sys.symbol.bookmark'), this.playColorPalette.primary)
                      },
                      secondaryText: {
                        text: this.formatSeconds(bookmark.time),
                        modifier: new TextModifier().fontSize(16).fontColor(this.playColorPalette.secondary)
                      },
                      secondaryPrefixSymbol: {
-                       symbol: $r('sys.symbol.clock')
+                       symbol: this.playbackSheetSymbol($r('sys.symbol.clock'), this.playColorPalette.secondary)
                      }
                    },
                    onClick: async () => {
