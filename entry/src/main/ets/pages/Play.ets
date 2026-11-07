@@ -1,4 +1,4 @@
-import { HdsListItem } from '@kit.UIDesignKit'
+import { HdsBarStyle, HdsListItem } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
 import { ColorMetrics, CircleShape, PersistenceV2, SymbolGlyphModifier, TextModifier, uiMaterial, window } from '@kit.ArkUI'
 import { common } from '@kit.AbilityKit'
@@ -52,7 +52,9 @@ export struct PlaybackMiniBar {
   }
 
   private canOpenPlayer(): boolean {
-    return this.isExpanded() && !this.miniBarState.animating && !this.showPlay
+    const isExpanding = this.miniBarState.animating &&
+      this.miniBarState.targetStyle === HdsBarStyle.EXPAND
+    return this.isExpanded() && (!this.miniBarState.animating || isExpanding) && !this.showPlay
   }
 
   private getCoverSource(): string | Resource {
