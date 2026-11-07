@@ -447,7 +447,7 @@ export struct Play {
 
   private get shouldAddPlaybackBottomInset(): boolean {
     return deviceInfo.deviceType === '2in1' ||
-      (this.isBottomTabDevice() && this.isFloatingWindow)
+      this.isFloatingWindow
   }
 
   @Builder
