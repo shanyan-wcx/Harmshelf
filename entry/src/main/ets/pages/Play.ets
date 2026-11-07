@@ -1646,7 +1646,7 @@ export struct Play {
 
               if (this.displayWidth >= 1000) {
                 Column()
-                  .width(160)
+                  .width(200)
                   .height('100%')
                   .position({ right: 0 })
                   .linearGradient({
@@ -1656,27 +1656,7 @@ export struct Play {
                       (this.coverColor >>> 8) & 0xff,
                       this.coverColor & 0xff,
                       0
-                    ).color, 0], [ColorMetrics.rgba(
-                      (this.coverColor >>> 16) & 0xff,
-                      (this.coverColor >>> 8) & 0xff,
-                      this.coverColor & 0xff,
-                      0.08
-                    ).color, 0.2], [ColorMetrics.rgba(
-                      (this.coverColor >>> 16) & 0xff,
-                      (this.coverColor >>> 8) & 0xff,
-                      this.coverColor & 0xff,
-                      0.2
-                    ).color, 0.4], [ColorMetrics.rgba(
-                      (this.coverColor >>> 16) & 0xff,
-                      (this.coverColor >>> 8) & 0xff,
-                      this.coverColor & 0xff,
-                      0.4
-                    ).color, 0.6], [ColorMetrics.rgba(
-                      (this.coverColor >>> 16) & 0xff,
-                      (this.coverColor >>> 8) & 0xff,
-                      this.coverColor & 0xff,
-                      0.7
-                    ).color, 0.8], [this.coverColor, 1]]
+                    ).color, 0], [this.coverColor, 1]]
                   })
               }
             }
