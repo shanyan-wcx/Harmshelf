@@ -2054,7 +2054,7 @@ export struct LibraryItemDetail {
                   }
                   .width('100%')
                   .height(this.contentHeight - (this.showMoreIntro ? 156 : 184) +
-                    (!this.showMoreIntro && this.displayWidth >= 1000 ? 30 : 0))
+                    (!this.showMoreIntro && this.displayWidth >= 1000 ? 40 : 0))
                   .borderRadius(30)
                   .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -2169,7 +2169,7 @@ export struct LibraryItemDetail {
                   }
                   .width('100%')
                   .height(this.contentHeight - (this.showMoreIntro ? 156 : 184) +
-                    (!this.showMoreIntro && this.displayWidth >= 1000 ? 30 : 0))
+                    (!this.showMoreIntro && this.displayWidth >= 1000 ? 40 : 0))
                   .borderRadius(30)
                   .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
