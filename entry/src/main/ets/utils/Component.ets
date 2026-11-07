@@ -470,9 +470,9 @@ export struct MyNavigation {
         })
         .onSubmit(async (query) => {
           if (query.length !== 0) {
-            this.addScroller.scrollEdge(Edge.Top)
             this.showLoadingProgress = true
             this.searchPodcasts = await searchPodcastLibrary(this.term)
+            this.addScroller.scrollEdge(Edge.Top)
             this.showLoadingProgress = false
           }
         })
