@@ -8,8 +8,8 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 34
-- **Last Active**: 2026-11-06
+- **Total Sessions**: 35
+- **Last Active**: 2026-11-07
 <!-- @@@/auto:current-status -->
 
 ---
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~846 | Active |
+| `journal-1.md` | ~867 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 35 | 2026-11-07 | 统一弹出面板内容高度 | `7875054` | `main` |
 | 34 | 2026-11-06 | 调整封面卡片字号与圆角 | `ea29d71` | `main` |
 | 33 | 2026-11-06 | 统一20号字体为18号 | `e895384` | `main` |
 | 32 | 2026-11-06 | 调整指定页面字号 | `057ca83` | `main` |

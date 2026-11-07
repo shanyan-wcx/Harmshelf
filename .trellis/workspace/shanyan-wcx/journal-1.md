@@ -844,3 +844,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 35: 统一弹出面板内容高度
+
+**Date**: 2026-11-07
+**Task**: 统一弹出面板内容高度
+**Branch**: `main`
+
+### Summary
+
+将确认添加、服务器编辑和举报面板改为 FIT_CONTENT，移除百分比高度根节点，保留 8vp 顶部间距与 MEDIUM 列表面板；DevEco 构建通过并完成任务归档。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `7875054` | (see git log) |
+
+### Status
+
+[OK] **Completed**
