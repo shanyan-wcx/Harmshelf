@@ -1,0 +1,4 @@
+{"file":".trellis/spec/frontend/index.md","reason":"按前端规范入口执行质量检查。"}
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"检查面板内 ImmersiveActionButton 的回调、裁切和布局没有回归。"}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"确认共享 ReportPanel 的修改覆盖两个页面绑定。"}
+{"file":".trellis/tasks/11-07-normalize-sheet-content-height/implement.md","reason":"按计划执行全量 bindSheet 扫描、构建和提交前检查。"}

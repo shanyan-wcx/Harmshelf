@@ -1,0 +1,5 @@
+{"file":".trellis/spec/frontend/index.md","reason":"前端规范入口和预开发检查清单。"}
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"核对共享面板、沉浸按钮、裁切和交互约定。"}
+{"file":".trellis/spec/guides/code-reuse-thinking-guide.md","reason":"举报面板由多个页面复用，确保高度修复集中在共享组件。"}
+{"file":".trellis/tasks/11-07-normalize-sheet-content-height/prd.md","reason":"本任务的范围、验收条件和 API 26 高度规则。"}
+{"file":".trellis/tasks/11-07-normalize-sheet-content-height/design.md","reason":"固定高度面板到 FIT_CONTENT 的布局边界和回滚方案。"}
