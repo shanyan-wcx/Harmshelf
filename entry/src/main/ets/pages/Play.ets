@@ -2081,15 +2081,14 @@ export struct Play {
       .transition(TransitionEffect.IDENTITY)
           .clip(false)
         }
-        .padding({ left: 20, right: 20 })
-
       if (this.displayWidth >= 1000) {
         GridCol({ span: 1 }) {
           Column()
             .width('100%')
             .height('100%')
+            .backgroundColor(this.coverColor)
+            .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
         }
-        .padding({ left: 20, right: 20 })
       }
     }
     .width('100%')
