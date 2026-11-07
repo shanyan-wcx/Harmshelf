@@ -2053,7 +2053,7 @@ export struct LibraryItemDetail {
                     .clip(true)
                   }
                   .width('100%')
-                  .height(this.contentHeight - 180)
+                  .height(this.contentHeight - 182)
                   .borderRadius(30)
                   .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -2167,7 +2167,7 @@ export struct LibraryItemDetail {
                     .clip(true)
                   }
                   .width('100%')
-                  .height(this.contentHeight - 180)
+                  .height(this.contentHeight - 182)
                   .borderRadius(30)
                   .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
