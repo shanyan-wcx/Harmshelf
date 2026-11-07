@@ -865,3 +865,24 @@ Implemented and verified native immersive controls on project and episode detail
 ### Status
 
 [OK] **Completed**
+
+
+## Session 36: 适配播放页弹出面板文字颜色
+
+**Date**: 2026-11-07
+**Task**: 适配播放页弹出面板文字颜色
+**Branch**: `main`
+
+### Summary
+
+为全屏播放页五个弹出面板增加动态标题和内容文字颜色，复用封面主色调色板；保留8vp内容避让、材质与交互。DevEco API 26构建成功。
+
+### Git Commits
+
+| Hash | Message |
+|------|---------|
+| `d5428ba` | (see git log) |
+
+### Status
+
+[OK] **Completed**

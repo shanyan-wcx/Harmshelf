@@ -8,7 +8,7 @@
 
 <!-- @@@auto:current-status -->
 - **Active File**: `journal-1.md`
-- **Total Sessions**: 35
+- **Total Sessions**: 36
 - **Last Active**: 2026-11-07
 <!-- @@@/auto:current-status -->
 
@@ -19,7 +19,7 @@
 <!-- @@@auto:active-documents -->
 | File | Lines | Status |
 |------|-------|--------|
-| `journal-1.md` | ~867 | Active |
+| `journal-1.md` | ~888 | Active |
 <!-- @@@/auto:active-documents -->
 
 ---
@@ -29,6 +29,7 @@
 <!-- @@@auto:session-history -->
 | # | Date | Title | Commits | Branch |
 |---|------|-------|---------|--------|
+| 36 | 2026-11-07 | 适配播放页弹出面板文字颜色 | `d5428ba` | `main` |
 | 35 | 2026-11-07 | 统一弹出面板内容高度 | `7875054` | `main` |
 | 34 | 2026-11-06 | 调整封面卡片字号与圆角 | `ea29d71` | `main` |
 | 33 | 2026-11-06 | 统一20号字体为18号 | `e895384` | `main` |
