@@ -1689,7 +1689,7 @@ export struct Play {
                 Row() {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph($r('sys.symbol.backward_end_fill'))
-                      .fontSize(30)
+                      .fontSize(28)
                       .fontColor([this.playColorPalette.secondary])
                   }
                   .height(40)
@@ -1792,7 +1792,7 @@ export struct Play {
 
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph($r('sys.symbol.forward_end_fill'))
-                      .fontSize(30)
+                      .fontSize(28)
                       .fontColor([this.playColorPalette.secondary])
                   }
                   .height(40)
