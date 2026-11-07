@@ -1648,6 +1648,7 @@ export struct Play {
                 Column()
                   .width(160)
                   .height('100%')
+                  .position({ right: 0 })
                   .linearGradient({
                     direction: GradientDirection.Right,
                     colors: [[ColorMetrics.rgba(
