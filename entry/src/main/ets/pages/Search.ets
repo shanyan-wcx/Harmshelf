@@ -55,6 +55,7 @@ export struct SearchMedia {
           })
           .onSubmit(async (query) => {
             if (query.length !== 0) {
+              this.searchScroller.scrollEdge(Edge.Top)
               this.showLoadingProgress = true
               this.searchResult = await searchLibrary(this.library!.id, encodeURIComponent(query))
               if (this.searchResult) {
