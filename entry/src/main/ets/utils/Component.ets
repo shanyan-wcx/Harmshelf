@@ -3026,34 +3026,36 @@ export struct pageUpDown {
 
   build() {
     Row() {
-      Button({ type: ButtonType.Normal }) {
+      ImmersiveActionButton({
+        barWidth: 25,
+        barHeight: 25,
+        onButtonClick: () => {
+          this.scroller.scrollPage({ next: false, animation: true })
+        }
+      }) {
         SymbolGlyph($r('sys.symbol.chevron_left'))
           .fontWeight(FontWeight.Normal)
           .fontSize($r('sys.float.ohos_id_text_size_headline9'))
           .fontColor([$r('sys.color.font')])
+          .hitTestBehavior(HitTestMode.None)
       }
-      .backgroundColor($r('sys.color.ohos_id_color_button_normal'))
-      .height(25)
-      .width(25)
-      .borderRadius(5)
-      .onClick(() => {
-        this.scroller.scrollPage({ next: false, animation: true })
-      })
 
-      Button({ type: ButtonType.Normal }) {
-        SymbolGlyph($r('sys.symbol.chevron_right'))
-          .fontWeight(FontWeight.Normal)
-          .fontSize($r('sys.float.ohos_id_text_size_headline9'))
-          .fontColor([$r('sys.color.font')])
+      Row() {
+        ImmersiveActionButton({
+          barWidth: 25,
+          barHeight: 25,
+          onButtonClick: () => {
+            this.scroller.scrollPage({ next: true, animation: true })
+          }
+        }) {
+          SymbolGlyph($r('sys.symbol.chevron_right'))
+            .fontWeight(FontWeight.Normal)
+            .fontSize($r('sys.float.ohos_id_text_size_headline9'))
+            .fontColor([$r('sys.color.font')])
+            .hitTestBehavior(HitTestMode.None)
+        }
       }
       .margin({ left: 12 })
-      .backgroundColor($r('sys.color.ohos_id_color_button_normal'))
-      .height(25)
-      .width(25)
-      .borderRadius(5)
-      .onClick(() => {
-        this.scroller.scrollPage({ next: true, animation: true })
-      })
     }
     .visibility(deviceTypeInfo === '2in1' ? Visibility.Visible : Visibility.None)
   }
