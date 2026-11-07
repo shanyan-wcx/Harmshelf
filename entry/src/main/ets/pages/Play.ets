@@ -429,7 +429,7 @@ export struct Play {
       .fontSize($r('sys.float.ohos_id_text_size_headline8'))
       .fontWeight(FontWeight.Medium)
       .fontColor(this.playColorPalette.primary)
-      .textAlign(TextAlign.Center)
+      .textAlign(TextAlign.Start)
   }
 
   private async updateStatusBarContentColor() {
@@ -865,7 +865,7 @@ export struct Play {
         }) {
           SymbolGlyph($r('sys.symbol.square_and_pencil'))
             .fontSize(18)
-            .fontColor([$r('sys.color.font')])
+            .fontColor([this.playColorPalette.secondary])
             .hitTestBehavior(HitTestMode.None)
         }
       }
