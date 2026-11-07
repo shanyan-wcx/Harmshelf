@@ -2036,7 +2036,7 @@ export struct Play {
                 right: 20,
                 bottom: (this.windowAvoidArea.navigationIndicator.visible ?
                   this.windowAvoidArea.navigationIndicator.bottomRect.height : 0) +
-                  (this.displayWidth >= 1000 ? 20 : 0)
+                  (!this.shouldOverlayPlaybackControls && this.displayWidth >= 1000 ? 20 : 0)
               })
             }
             .width('100%')
