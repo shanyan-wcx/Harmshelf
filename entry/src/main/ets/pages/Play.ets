@@ -1646,16 +1646,18 @@ export struct Play {
 
               if (this.displayWidth >= 1000) {
                 Column()
-                  .width('100%')
+                  .width(120)
                   .height('100%')
+                  .position({ right: -8 })
+                  .blur(16)
                   .linearGradient({
                     direction: GradientDirection.Right,
-                    colors: [[Color.Transparent, 0], [Color.Transparent, 0.7], [ColorMetrics.rgba(
+                    colors: [[ColorMetrics.rgba(
                       (this.coverColor >>> 16) & 0xff,
                       (this.coverColor >>> 8) & 0xff,
                       this.coverColor & 0xff,
-                      0.35
-                    ).color, 0.85], [this.coverColor, 1]]
+                      0
+                    ).color, 0], [this.coverColor, 1]]
                   })
               }
             }
