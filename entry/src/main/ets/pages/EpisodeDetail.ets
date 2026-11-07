@@ -894,7 +894,7 @@ export struct EpisodeDetail {
       })
       .bindSheet(this.showReport, this.reportBuilder(), {
         systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
-        height: 348,
+        height: SheetSize.FIT_CONTENT,
         preferType: SheetType.CENTER,
         title: {
           title: "举报内容"

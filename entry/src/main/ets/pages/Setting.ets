@@ -290,7 +290,6 @@ export struct Setting {
         .padding({ left: 20, right: 20, top: 8, bottom: 25 })
       }
       .width('100%')
-      .height('100%')
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
@@ -301,13 +300,13 @@ export struct Setting {
           .height(45)
       }
       .width('100%')
-      .height('100%')
+      .height(105)
       .padding({ bottom: 60 })
       .justifyContent(FlexAlign.Center)
+      .align(Alignment.Center)
       .visibility(this.showProgress ? Visibility.Visible : Visibility.None)
     }
     .width('100%')
-    .height('100%')
   }
 
   @Builder
@@ -574,7 +573,6 @@ export struct Setting {
         .padding({ left: 20, right: 20, top: 8, bottom: 25 })
       }
       .width('100%')
-      .height('100%')
       .scrollBar(BarState.Off)
       .align(Alignment.Top)
 
@@ -584,13 +582,13 @@ export struct Setting {
           .height(45)
       }
       .width('100%')
-      .height('100%')
+      .height(105)
       .padding({ bottom: 60 })
       .justifyContent(FlexAlign.Center)
+      .align(Alignment.Center)
       .visibility(this.showProgress ? Visibility.Visible : Visibility.None)
     }
     .width('100%')
-    .height('100%')
   }
 
   @Builder
@@ -864,7 +862,7 @@ export struct Setting {
           .margin({ top: 10 })
           .bindSheet(this.showAddServer, this.AddServerBuilder(), {
             systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
-            height: 388,
+            height: SheetSize.FIT_CONTENT,
             preferType: SheetType.CENTER,
             title: {
               title: "添加服务器"
@@ -895,7 +893,7 @@ export struct Setting {
         .clip(false)
         .bindSheet(this.showEditServer, this.EditServerBuilder(), {
           systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
-          height: 388,
+          height: SheetSize.FIT_CONTENT,
           preferType: SheetType.CENTER,
           title: {
             title: "编辑服务器"

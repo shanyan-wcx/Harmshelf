@@ -228,10 +228,9 @@ export struct Add {
         .width('100%')
         .justifyContent(FlexAlign.SpaceBetween)
       }
+      .padding({ left: 20, right: 20, top: 8, bottom: 15 })
     }
     .width('100%')
-    .height('100%')
-    .padding({ left: 20, right: 20, top: 8, bottom: 15 })
     .scrollBar(BarState.Off)
   }
 
@@ -302,7 +301,7 @@ export struct Add {
               .clip(false)
               .bindSheet(this.showConfirm[index], this.confirmBuilder(searchPodcast, this.podcast!, index), {
                 systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
-                height: 457,
+                height: SheetSize.FIT_CONTENT,
                 preferType: SheetType.CENTER,
                 title: {
                   title: "确认添加"

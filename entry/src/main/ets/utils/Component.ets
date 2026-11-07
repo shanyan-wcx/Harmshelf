@@ -3190,8 +3190,7 @@ export struct ReportPanel {
         .justifyContent(FlexAlign.SpaceBetween)
       }
       .width('100%')
-      .height('100%')
-    .padding({ left: 20, right: 20, top: 8, bottom: 25 })
+      .padding({ left: 20, right: 20, top: 8, bottom: 25 })
 
       Column() {
         LoadingProgress()
@@ -3199,11 +3198,11 @@ export struct ReportPanel {
           .height(45)
       }
       .width('100%')
-      .height('100%')
+      .height(45)
       .justifyContent(FlexAlign.Center)
+      .align(Alignment.Center)
       .visibility(this.showProgress ? Visibility.Visible : Visibility.None)
     }
     .width('100%')
-    .height('100%')
   }
 }
