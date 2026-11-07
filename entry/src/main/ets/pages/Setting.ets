@@ -866,7 +866,7 @@ export struct Setting {
           .height(50)
           .margin({ top: 10 })
           .bindSheet(this.showAddServer, this.AddServerBuilder(), {
-            systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+            systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
             height: SheetSize.FIT_CONTENT,
             preferType: SheetType.CENTER,
             title: {
@@ -892,7 +892,7 @@ export struct Setting {
         .shadow(ShadowStyle.OUTER_DEFAULT_XS)
         .clip(false)
         .bindSheet(this.showEditServer, this.EditServerBuilder(), {
-          systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+          systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
           height: SheetSize.FIT_CONTENT,
           preferType: SheetType.CENTER,
           title: {
@@ -1229,7 +1229,7 @@ export struct Setting {
           this.showAbout = !this.showAbout;
         })
         .bindSheet(this.showAbout, this.AboutBuilder(), {
-          systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+          systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
           height: SheetSize.FIT_CONTENT,
           preferType: SheetType.CENTER,
           title: {

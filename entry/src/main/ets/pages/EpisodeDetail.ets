@@ -768,7 +768,7 @@ export struct EpisodeDetail {
               .height(45)
               .clip(false)
               .bindSheet(this.showConfirmDownload, this.confirmDownloadBuilder(), {
-                systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+                systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
                 height: SheetSize.FIT_CONTENT,
                 preferType: SheetType.CENTER,
                 title: {
@@ -800,7 +800,7 @@ export struct EpisodeDetail {
             .width('100%')
             .clip(false)
             .bindSheet(this.showPlaylists, this.playlistsBuilder(), {
-              systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+              systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
               height: SheetSize.MEDIUM,
               preferType: SheetType.CENTER,
               title: {
@@ -839,7 +839,7 @@ export struct EpisodeDetail {
           }
           .width('100%')
           .bindSheet(this.showCreatePlaylist, this.createPlaylistBuilder(), {
-            systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+            systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
             height: SheetSize.FIT_CONTENT,
             preferType: SheetType.CENTER,
             title: {
@@ -881,7 +881,7 @@ export struct EpisodeDetail {
       .alignContent(Alignment.End)
       .clip(false)
       .bindSheet(this.showDeleteConfirm, this.deleteConfirmBuilder(), {
-        systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+        systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
         height: SheetSize.FIT_CONTENT,
         preferType: SheetType.CENTER,
         title: {
@@ -893,7 +893,7 @@ export struct EpisodeDetail {
         }
       })
       .bindSheet(this.showReport, this.reportBuilder(), {
-        systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+        systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
         height: SheetSize.FIT_CONTENT,
         preferType: SheetType.CENTER,
         title: {

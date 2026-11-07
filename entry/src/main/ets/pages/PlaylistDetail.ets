@@ -696,7 +696,7 @@ export struct PlaylistDetail {
     .backgroundColor($r('sys.color.background_secondary'))
     .bindToScrollable([this.PlaylistDetailScroller])
     .bindSheet(this.showEditPlaylist, this.editPlaylistBuilder(), {
-      systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+      systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
       height: SheetSize.FIT_CONTENT,
       preferType: SheetType.CENTER,
       title: {

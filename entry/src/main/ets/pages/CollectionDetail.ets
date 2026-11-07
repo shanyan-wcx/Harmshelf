@@ -643,7 +643,7 @@ export struct CollectionDetail {
     .backgroundColor($r('sys.color.background_secondary'))
     .bindToScrollable([this.CollectionDetailScroller])
     .bindSheet(this.showEditCollection, this.editCollectionBuilder(), {
-      systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+      systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
       height: SheetSize.FIT_CONTENT,
       preferType: SheetType.CENTER,
       title: {

@@ -1838,7 +1838,7 @@ export struct Play {
                   .bindSheet(this.showBookmark, this.bookmarkBuilder(), {
                     height: SheetSize.MEDIUM,
                     preferType: SheetType.CENTER,
-                    systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+                    systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
                     title: {
                       title: "书签 " + this.bookmarks.length
                     },
@@ -1868,7 +1868,7 @@ export struct Play {
                   .bindSheet(this.showSpeed, this.speedBuilder(), {
                     height: SheetSize.FIT_CONTENT,
                     preferType: SheetType.CENTER,
-                    systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+                    systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
                     title: {
                       title: "速度"
                     },
@@ -1892,7 +1892,7 @@ export struct Play {
                   .bindSheet(this.showSleep, this.sleepBuilder(), {
                     height: SheetSize.FIT_CONTENT,
                     preferType: SheetType.CENTER,
-                    systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+                    systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
                     title: {
                       title: "睡眠定时"
                     },
@@ -1917,7 +1917,7 @@ export struct Play {
                   .bindSheet(this.showChapter, this.chapterBuilder(), {
                     height: SheetSize.MEDIUM,
                     preferType: SheetType.CENTER,
-                    systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+                    systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
                     title: {
                       title: this.isLocalPlaying ? ("章节 " + this.localPlayItem!.tracks.length) : ("章节 " + this.playingItem?.chapters.length)
                     },
@@ -1936,7 +1936,7 @@ export struct Play {
                 .bindSheet(this.showEditBookmark, this.editBookmarkBuilder(), {
                   height: SheetSize.FIT_CONTENT,
                   preferType: SheetType.CENTER,
-                  systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+                  systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
                   title: {
                     title: "编辑书签 " + this.formatSeconds(this.bookmarks[this.editBookmarkIndex]?.time??0)
                   },

@@ -299,7 +299,7 @@ export struct Add {
               })
               .clip(false)
               .bindSheet(this.showConfirm[index], this.confirmBuilder(searchPodcast, this.podcast!, index), {
-                systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.REGULAR }),
+                systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
                 height: SheetSize.FIT_CONTENT,
                 preferType: SheetType.CENTER,
                 title: {
