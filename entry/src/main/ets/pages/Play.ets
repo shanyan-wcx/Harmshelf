@@ -252,6 +252,7 @@ export struct PlaybackMiniBar {
     Button({ type: ButtonType.Circle }) {
       SymbolGlyph(this.gobackwardIcon)
         .fontSize(26)
+        .fontWeight(FontWeight.Medium)
         .fontColor([$r('sys.color.font_secondary')])
     }
     .width(40)
@@ -267,6 +268,7 @@ export struct PlaybackMiniBar {
     Button({ type: ButtonType.Circle }) {
       SymbolGlyph(this.isPlaying ? $r('sys.symbol.pause') : $r('sys.symbol.play_fill'))
         .fontSize(26)
+        .fontWeight(FontWeight.Medium)
         .fontColor([$r('sys.color.font_secondary')])
     }
     .width(40)
@@ -282,6 +284,7 @@ export struct PlaybackMiniBar {
     Button({ type: ButtonType.Circle }) {
       SymbolGlyph(this.goforwardIcon)
         .fontSize(26)
+        .fontWeight(FontWeight.Medium)
         .fontColor([$r('sys.color.font_secondary')])
     }
     .width(40)
@@ -1824,7 +1827,7 @@ export struct Play {
                 Row() {
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph($r('sys.symbol.bookmark'))
-                      .fontSize(28)
+                      .fontSize(24)
                       .fontColor([this.playColorPalette.secondary])
                   }
                   .height(45)
@@ -1856,7 +1859,7 @@ export struct Play {
 
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph(this.speedIcon)
-                      .fontSize(28)
+                      .fontSize(24)
                       .fontColor([this.playColorPalette.secondary])
                   }
                   .height(45)
@@ -1880,7 +1883,7 @@ export struct Play {
 
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph($r('sys.symbol.moon_z'))
-                      .fontSize(28)
+                      .fontSize(24)
                       .fontColor([this.playColorPalette.secondary])
                   }
                   .height(45)
@@ -1904,7 +1907,7 @@ export struct Play {
 
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph($r('sys.symbol.list_bullet'))
-                      .fontSize(28)
+                      .fontSize(24)
                       .fontColor([this.playColorPalette.secondary])
                   }
                   .height(45)
