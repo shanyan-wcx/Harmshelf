@@ -2082,7 +2082,6 @@ export struct Play {
           .clip(false)
         }
         .padding({ left: 20, right: 20 })
-      }
 
       if (this.displayWidth >= 1000) {
         GridCol({ span: 1 }) {
