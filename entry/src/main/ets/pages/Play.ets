@@ -446,7 +446,7 @@ export struct Play {
   }
 
   private get shouldAddPlaybackBottomInset(): boolean {
-    return this.displayWidth >= 1000 ||
+    return deviceInfo.deviceType === '2in1' ||
       (this.isBottomTabDevice() && this.isFloatingWindow)
   }
 
