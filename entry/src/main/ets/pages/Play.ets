@@ -1716,7 +1716,7 @@ export struct Play {
 
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph(this.gobackwardIcon)
-                      .fontSize(34)
+                      .fontSize(32)
                       .fontColor([this.playColorPalette.secondary])
                   }
                   .height(50)
@@ -1730,9 +1730,9 @@ export struct Play {
 
                   Row() {
                     ImmersiveActionButton({
-                      barWidth: 78,
-                      barHeight: 78,
-                      barRadius: 39,
+                      barWidth: 76,
+                      barHeight: 76,
+                      barRadius: 38,
                       onButtonClick: async () => {
                         if (this.isPlaying) {
                           if (this.avPlayer!.state === 'playing') {
@@ -1770,14 +1770,14 @@ export struct Play {
                         .fontColor([this.playColorPalette.secondary])
                     }
                   }
-                  .height(78)
-                  .width(78)
+                  .height(76)
+                  .width(76)
                   .margin({ left: 6, right: 6 })
                   .clip(false)
 
                   Button({ type: ButtonType.Circle }) {
                     SymbolGlyph(this.goforwardIcon)
-                      .fontSize(34)
+                      .fontSize(32)
                       .fontColor([this.playColorPalette.secondary])
                   }
                   .height(50)
