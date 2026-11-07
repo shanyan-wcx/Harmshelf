@@ -136,7 +136,7 @@ export struct LibraryItemDetail {
     if (deviceInfo.deviceType === '2in1') {
       return this.showMoreIntro ? 0 : 40
     }
-    return deviceInfo.deviceType === 'tablet' ? -38 : 0
+    return 0
   }
 
   @Monitor('syncTime')
