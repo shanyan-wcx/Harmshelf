@@ -422,6 +422,24 @@ export struct Play {
     }
   }
 
+  private get playbackCoverHeight(): number {
+    return this.displayWidth >= 1000 ? this.displayWidth / 2 : this.displayWidth
+  }
+
+  private get shouldOverlayPlaybackControls(): boolean {
+    return this.displayHeight > 0 && this.playbackCoverHeight >= this.displayHeight * 2 / 3
+  }
+
+  private get playbackControlsHeight(): number {
+    return this.shouldOverlayPlaybackControls ? this.displayHeight / 3 :
+      Math.max(0, this.displayHeight - this.playbackCoverHeight)
+  }
+
+  private get playbackGradientBottomOffset(): number {
+    return this.shouldOverlayPlaybackControls ?
+      Math.max(0, this.playbackCoverHeight - this.displayHeight * 2 / 3) : 0
+  }
+
   @Builder
   playbackSheetTitleBuilder(title: string) {
     Text(title)
@@ -1596,7 +1614,7 @@ export struct Play {
     }) {
       GridCol({ span: 1 }) {
         Stack({ alignContent: Alignment.TopStart }) {
-          Column() {
+          Stack({ alignContent: Alignment.TopStart }) {
             Stack({ alignContent: Alignment.Bottom }) {
               if (!this.isLocalPlaying) {
                 Image(this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`)
@@ -1643,6 +1661,7 @@ export struct Play {
               }
               .width('100%')
               .height(200)
+              .position({ bottom: this.playbackGradientBottomOffset })
 
               if (this.displayWidth >= 1000) {
                 Column()
@@ -2021,10 +2040,11 @@ export struct Play {
               })
             }
             .width('100%')
-            .layoutWeight(1)
+            .height(this.playbackControlsHeight)
+            .position({ bottom: 0 })
           }
           .width('100%')
-          .layoutWeight(1)
+          .height('100%')
           .clip(false)
         Row() {
           ImmersiveActionButton({
