@@ -1581,8 +1581,22 @@ export struct Play {
 
   @Builder
   playBuilder() {
-    Stack({ alignContent: Alignment.TopStart }) {
-      Column() {
+    GridRow({
+      columns: {
+        xs: 1,
+        sm: 2,
+      },
+      breakpoints: {
+        value: ['1000vp'],
+        reference: BreakpointsReference.WindowSize
+      },
+      gutter: {
+        x: 20
+      }
+    }) {
+      GridCol({ span: 1 }) {
+        Stack({ alignContent: Alignment.TopStart }) {
+          Column() {
             Stack({ alignContent: Alignment.Bottom }) {
               if (!this.isLocalPlaying) {
                 Image(this.baseUrl + `/api/items/${this.playingItem?.libraryItemId}/cover?token=${this.apiToken}`)
@@ -2065,7 +2079,22 @@ export struct Play {
       .ignoreLayoutSafeArea([LayoutSafeAreaType.SYSTEM], [LayoutSafeAreaEdge.TOP, LayoutSafeAreaEdge.BOTTOM])
       .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP])
       .transition(TransitionEffect.IDENTITY)
-      .clip(false)
+          .clip(false)
+        }
+        .padding({ left: 20, right: 20 })
+      }
+
+      if (this.displayWidth >= 1000) {
+        GridCol({ span: 1 }) {
+          Column()
+            .width('100%')
+            .height('100%')
+        }
+        .padding({ left: 20, right: 20 })
+      }
+    }
+    .width('100%')
+    .height('100%')
 
       Column()
         .width('100%')
