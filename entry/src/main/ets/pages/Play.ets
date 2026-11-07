@@ -2041,7 +2041,7 @@ export struct Play {
             }
             .width('100%')
             .height(this.playbackControlsHeight)
-            .position({ bottom: 0 })
+            .align(Alignment.Bottom)
           }
           .width('100%')
           .height('100%')
