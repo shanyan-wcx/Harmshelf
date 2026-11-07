@@ -67,6 +67,13 @@ Playback sheets use `SheetOptions.systemMaterial` with the native regular
 `uiMaterial.ImmersiveMaterial`. Sheet options use `ImmersiveActionButton` with
 `barRadius: barHeight / 2`; preserve existing callbacks and use the helper's
 `monopolizeActionEvents: false` for scrollable option lists.
+
+`SheetTitleOptions` exposes only title and subtitle text. When a playback sheet
+title must follow the cover-luminance palette, pass a `CustomBuilder` to
+`SheetOptions.title` and set the title `Text.fontColor()` from
+`playColorPalette.primary`. The custom title replaces title content only; it
+does not remove the native title area or its content clipping. Keep the
+existing `top: 8` content padding that protects the first item and its shadow.
 For selectable playback options, use the immersive helper only for the
 selected item; non-selected items remain ordinary capsule `Button`s. Do not
 pass `barBackgroundColor` or `lightColor` to playback immersive buttons.

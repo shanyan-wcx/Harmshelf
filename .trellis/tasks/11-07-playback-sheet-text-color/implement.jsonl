@@ -1,0 +1,3 @@
+{"file":".trellis/spec/frontend/index.md","reason":"Frontend pre-development checklist and quality rules for ArkTS UI changes."}
+{"file":".trellis/spec/frontend/component-guidelines.md","reason":"Playback controls and sheet material/color conventions used by Play.ets."}
+{"file":".trellis/tasks/11-07-playback-sheet-text-color/research/sheet-title-color.md","reason":"Verified SheetTitleOptions limitations and CustomBuilder/TextInput APIs for dynamic colors."}

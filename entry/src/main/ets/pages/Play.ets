@@ -422,6 +422,16 @@ export struct Play {
     }
   }
 
+  @Builder
+  playbackSheetTitleBuilder(title: string) {
+    Text(title)
+      .width('100%')
+      .fontSize($r('sys.float.ohos_id_text_size_headline8'))
+      .fontWeight(FontWeight.Medium)
+      .fontColor(this.playColorPalette.primary)
+      .textAlign(TextAlign.Center)
+  }
+
   private async updateStatusBarContentColor() {
     try {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
@@ -764,6 +774,8 @@ export struct Play {
         .margin({ bottom: 20 })
         .caretColor($r('sys.color.font_secondary'))
         .fontSize(18)
+        .fontColor(this.playColorPalette.primary)
+        .placeholderColor(this.playColorPalette.secondary)
         .placeholderFont({
           size: 18
         })
@@ -785,6 +797,7 @@ export struct Play {
           }) {
             Text("取消")
               .fontSize(18)
+              .fontColor(this.playColorPalette.primary)
               .hitTestBehavior(HitTestMode.None)
           }
         }
@@ -822,6 +835,7 @@ export struct Play {
           }) {
             Text("确认")
               .fontSize(18)
+              .fontColor(this.playColorPalette.primary)
               .hitTestBehavior(HitTestMode.None)
           }
         }
@@ -908,14 +922,14 @@ export struct Play {
                    textItem: {
                      primaryText: {
                        text: bookmark.title.length === 0 ? this.formatTime(bookmark.createdAt) : bookmark.title,
-                       modifier: new TextModifier().fontSize(16)
+                       modifier: new TextModifier().fontSize(16).fontColor(this.playColorPalette.primary)
                      },
                      primaryPrefixSymbol: {
                        symbol: $r('sys.symbol.bookmark')
                      },
                      secondaryText: {
                        text: this.formatSeconds(bookmark.time),
-                       modifier: new TextModifier().fontSize(16).fontColor($r('sys.color.font_secondary'))
+                       modifier: new TextModifier().fontSize(16).fontColor(this.playColorPalette.secondary)
                      },
                      secondaryPrefixSymbol: {
                        symbol: $r('sys.symbol.clock')
@@ -986,6 +1000,8 @@ export struct Play {
           .margin({ right: 15 })
           .caretColor($r('sys.color.font_secondary'))
           .fontSize(18)
+          .fontColor(this.playColorPalette.primary)
+          .placeholderColor(this.playColorPalette.secondary)
           .placeholderFont({
             size: 18
           })
@@ -1024,6 +1040,7 @@ export struct Play {
         }) {
           Text("创建书签")
             .fontSize(18)
+            .fontColor(this.playColorPalette.primary)
         }
       }
       .padding({ top: 10, bottom: 5 })
@@ -1052,6 +1069,7 @@ export struct Play {
             }) {
               Text("0.5x")
                 .fontSize(18)
+                .fontColor(this.playColorPalette.primary)
             }
           }
           .width('100%')
@@ -1061,6 +1079,7 @@ export struct Play {
           Button({ type: ButtonType.Normal }) {
             Text("0.5x")
               .fontSize(18)
+              .fontColor(this.playColorPalette.primary)
           }
             .width('100%')
             .height(50)
@@ -1088,6 +1107,7 @@ export struct Play {
             }) {
               Text("0.75x")
                 .fontSize(18)
+                .fontColor(this.playColorPalette.primary)
             }
           }
           .width('100%')
@@ -1097,6 +1117,7 @@ export struct Play {
           Button({ type: ButtonType.Normal }) {
             Text("0.75x")
               .fontSize(18)
+              .fontColor(this.playColorPalette.primary)
           }
             .width('100%')
             .height(50)
@@ -1124,6 +1145,7 @@ export struct Play {
             }) {
               Text("1x")
                 .fontSize(18)
+                .fontColor(this.playColorPalette.primary)
             }
           }
           .width('100%')
@@ -1133,6 +1155,7 @@ export struct Play {
           Button({ type: ButtonType.Normal }) {
             Text("1x")
               .fontSize(18)
+              .fontColor(this.playColorPalette.primary)
           }
             .width('100%')
             .height(50)
@@ -1160,6 +1183,7 @@ export struct Play {
             }) {
               Text("1.25x")
                 .fontSize(18)
+                .fontColor(this.playColorPalette.primary)
             }
           }
           .width('100%')
@@ -1169,6 +1193,7 @@ export struct Play {
           Button({ type: ButtonType.Normal }) {
             Text("1.25x")
               .fontSize(18)
+              .fontColor(this.playColorPalette.primary)
           }
             .width('100%')
             .height(50)
@@ -1196,6 +1221,7 @@ export struct Play {
             }) {
               Text("1.5x")
                 .fontSize(18)
+                .fontColor(this.playColorPalette.primary)
             }
           }
           .width('100%')
@@ -1205,6 +1231,7 @@ export struct Play {
           Button({ type: ButtonType.Normal }) {
             Text("1.5x")
               .fontSize(18)
+              .fontColor(this.playColorPalette.primary)
           }
             .width('100%')
             .height(50)
@@ -1232,6 +1259,7 @@ export struct Play {
             }) {
               Text("1.75x")
                 .fontSize(18)
+                .fontColor(this.playColorPalette.primary)
             }
           }
           .width('100%')
@@ -1241,6 +1269,7 @@ export struct Play {
           Button({ type: ButtonType.Normal }) {
             Text("1.75x")
               .fontSize(18)
+              .fontColor(this.playColorPalette.primary)
           }
             .width('100%')
             .height(50)
@@ -1268,6 +1297,7 @@ export struct Play {
             }) {
               Text("2x")
                 .fontSize(18)
+                .fontColor(this.playColorPalette.primary)
             }
           }
           .width('100%')
@@ -1277,6 +1307,7 @@ export struct Play {
           Button({ type: ButtonType.Normal }) {
             Text("2x")
               .fontSize(18)
+              .fontColor(this.playColorPalette.primary)
           }
             .width('100%')
             .height(50)
@@ -1322,6 +1353,7 @@ export struct Play {
         }) {
           Text(label)
             .fontSize(18)
+            .fontColor(this.playColorPalette.primary)
         }
       }
       .width('100%')
@@ -1331,6 +1363,7 @@ export struct Play {
       Button({ type: ButtonType.Normal }) {
         Text(label)
           .fontSize(18)
+          .fontColor(this.playColorPalette.primary)
       }
       .width('100%')
       .height(50)
@@ -1393,6 +1426,7 @@ export struct Play {
                     Row() {
                       Text(track.title)
                         .fontSize(16)
+                        .fontColor(this.playColorPalette.primary)
                         .width('100%')
                         .layoutWeight(1)
                         .maxLines(1)
@@ -1409,6 +1443,7 @@ export struct Play {
                   Row() {
                     Text(track.title)
                       .fontSize(16)
+                      .fontColor(this.playColorPalette.primary)
                       .width('100%')
                       .layoutWeight(1)
                       .maxLines(1)
@@ -1472,6 +1507,7 @@ export struct Play {
                     Row() {
                       Text(chapter.title)
                         .fontSize(16)
+                        .fontColor(this.playColorPalette.primary)
                         .width('100%')
                         .layoutWeight(1)
                         .maxLines(1)
@@ -1479,7 +1515,7 @@ export struct Play {
 
                       Text(this.formatSeconds(chapter.start))
                         .fontSize(16)
-                        .fontColor($r('sys.color.font_secondary'))
+                        .fontColor(this.playColorPalette.secondary)
                         .margin({ left: 10 })
                     }
                     .padding({ left: 15, right: 15 })
@@ -1493,6 +1529,7 @@ export struct Play {
                   Row() {
                     Text(chapter.title)
                       .fontSize(16)
+                      .fontColor(this.playColorPalette.primary)
                       .width('100%')
                       .layoutWeight(1)
                       .maxLines(1)
@@ -1500,7 +1537,7 @@ export struct Play {
 
                     Text(this.formatSeconds(chapter.start))
                       .fontSize(16)
-                      .fontColor($r('sys.color.font_secondary'))
+                      .fontColor(this.playColorPalette.secondary)
                       .margin({ left: 10 })
                   }
                   .padding({ left: 27, right: 27 })
@@ -1839,9 +1876,7 @@ export struct Play {
                     height: SheetSize.MEDIUM,
                     preferType: SheetType.CENTER,
                     systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
-                    title: {
-                      title: "书签 " + this.bookmarks.length
-                    },
+                    title: this.playbackSheetTitleBuilder("书签 " + this.bookmarks.length),
                     showClose: false,
                     onWillAppear: async () => {
                       this.showProgress = true
@@ -1869,9 +1904,7 @@ export struct Play {
                     height: SheetSize.FIT_CONTENT,
                     preferType: SheetType.CENTER,
                     systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
-                    title: {
-                      title: "速度"
-                    },
+                    title: this.playbackSheetTitleBuilder("速度"),
                     showClose: false,
                     onDisappear: () => {
                       this.showSpeed = false
@@ -1893,9 +1926,7 @@ export struct Play {
                     height: SheetSize.FIT_CONTENT,
                     preferType: SheetType.CENTER,
                     systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
-                    title: {
-                      title: "睡眠定时"
-                    },
+                    title: this.playbackSheetTitleBuilder("睡眠定时"),
                     showClose: false,
                     onDisappear: () => {
                       this.showSleep = false
@@ -1918,9 +1949,7 @@ export struct Play {
                     height: SheetSize.MEDIUM,
                     preferType: SheetType.CENTER,
                     systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
-                    title: {
-                      title: this.isLocalPlaying ? ("章节 " + this.localPlayItem!.tracks.length) : ("章节 " + this.playingItem?.chapters.length)
-                    },
+                    title: this.playbackSheetTitleBuilder(this.isLocalPlaying ? ("章节 " + this.localPlayItem!.tracks.length) : ("章节 " + this.playingItem?.chapters.length)),
                     showClose: false,
                     onWillAppear: () => {
                       this.chapterScroller.scrollToIndex(this.playingIndex, false, ScrollAlign.CENTER)
@@ -1937,9 +1966,7 @@ export struct Play {
                   height: SheetSize.FIT_CONTENT,
                   preferType: SheetType.CENTER,
                   systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
-                  title: {
-                    title: "编辑书签 " + this.formatSeconds(this.bookmarks[this.editBookmarkIndex]?.time??0)
-                  },
+                  title: this.playbackSheetTitleBuilder("编辑书签 " + this.formatSeconds(this.bookmarks[this.editBookmarkIndex]?.time??0)),
                   showClose: false,
                   onDisappear: () => {
                     this.showEditBookmark = false
