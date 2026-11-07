@@ -1730,9 +1730,9 @@ export struct Play {
 
                   Row() {
                     ImmersiveActionButton({
-                      barWidth: 76,
-                      barHeight: 76,
-                      barRadius: 38,
+                      barWidth: 75,
+                      barHeight: 75,
+                      barRadius: 37.5,
                       onButtonClick: async () => {
                         if (this.isPlaying) {
                           if (this.avPlayer!.state === 'playing') {
@@ -1770,8 +1770,8 @@ export struct Play {
                         .fontColor([this.playColorPalette.secondary])
                     }
                   }
-                  .height(76)
-                  .width(76)
+                  .height(75)
+                  .width(75)
                   .margin({ left: 6, right: 6 })
                   .clip(false)
 
