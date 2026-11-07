@@ -871,7 +871,7 @@ export struct Play {
         }) {
           SymbolGlyph($r('sys.symbol.square_and_pencil'))
             .fontSize(18)
-            .fontColor([this.playColorPalette.secondary])
+            .fontColor([this.playColorPalette.primary])
             .hitTestBehavior(HitTestMode.None)
         }
       }
