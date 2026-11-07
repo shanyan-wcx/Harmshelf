@@ -131,6 +131,14 @@ export struct LibraryItemDetail {
   @Local tmpCollectionDescription: string = ""
   @Local tmpCollectionItem: PlayItem | undefined = undefined
   @Local updateTime: number = 0
+
+  private get detailListHeightAdjustment(): number {
+    if (deviceInfo.deviceType === '2in1') {
+      return this.showMoreIntro ? 0 : 40
+    }
+    return deviceInfo.deviceType === 'tablet' ? -38 : 0
+  }
+
   @Monitor('syncTime')
   async refreshProgress(monitor: IMonitor) {
     this.itemProgress = undefined
@@ -2054,9 +2062,7 @@ export struct LibraryItemDetail {
                     .clip(true)
                   }
                   .width('100%')
-                  .height(this.contentHeight - (this.showMoreIntro ? 156 : 184) +
-                    (!this.showMoreIntro && this.displayWidth >= 1000 ? 40 : 0) -
-                    (deviceInfo.deviceType === 'tablet' ? 30 : 0))
+                  .height(this.contentHeight - (this.showMoreIntro ? 156 : 184) + this.detailListHeightAdjustment)
                   .borderRadius(30)
                   .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
@@ -2170,9 +2176,7 @@ export struct LibraryItemDetail {
                     .clip(true)
                   }
                   .width('100%')
-                  .height(this.contentHeight - (this.showMoreIntro ? 156 : 184) +
-                    (!this.showMoreIntro && this.displayWidth >= 1000 ? 40 : 0) -
-                    (deviceInfo.deviceType === 'tablet' ? 30 : 0))
+                  .height(this.contentHeight - (this.showMoreIntro ? 156 : 184) + this.detailListHeightAdjustment)
                   .borderRadius(30)
                   .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
                   .backgroundColor($r('sys.color.ohos_id_color_card_bg'))
