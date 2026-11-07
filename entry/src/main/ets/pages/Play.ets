@@ -1623,6 +1623,10 @@ export struct Play {
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
                     .margin({ top: 6 })
 
+                }
+                .width('100%')
+
+                Column() {
                   Column() {
                   Row() {
                     Text(this.formatSeconds(this.playedPercent * this.getCurrentDuration() / 100))
@@ -1678,10 +1682,8 @@ export struct Play {
                       }
                     })
                     .hitTestBehavior(this.lockPlayer ? HitTestMode.None : HitTestMode.Default)
-                }
-                .width('100%')
-                }
-                .width('100%')
+                  }
+                  .width('100%')
 
                 Row() {
                   Button({ type: ButtonType.Circle }) {
@@ -1942,6 +1944,8 @@ export struct Play {
                     this.showEditBookmark = false
                   }
                 })
+              }
+              .width('100%')
               }
               .width('100%')
               .height('100%')
