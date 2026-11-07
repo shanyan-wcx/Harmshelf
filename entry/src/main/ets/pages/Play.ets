@@ -1599,6 +1599,9 @@ export struct Play {
                 .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.BOTTOM])
 
               Column() {
+                Row()
+                  .height(0)
+
                 Column() {
                   Text(this.playingTitle)
                     .width('100%')
@@ -1608,7 +1611,6 @@ export struct Play {
                     .textAlign(TextAlign.Center)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
-                    .margin({ top: 8 })
 
                   Text(this.isLocalPlaying ? "本地文件" :
                     (this.playingItem?.mediaType === 'book' ?
