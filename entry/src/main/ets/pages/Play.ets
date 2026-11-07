@@ -2015,8 +2015,9 @@ export struct Play {
               .padding({
                 left: 20,
                 right: 20,
-                bottom: this.windowAvoidArea.navigationIndicator.visible ?
-                  this.windowAvoidArea.navigationIndicator.bottomRect.height : 0
+                bottom: (this.windowAvoidArea.navigationIndicator.visible ?
+                  this.windowAvoidArea.navigationIndicator.bottomRect.height : 0) +
+                  (this.displayWidth >= 1000 ? 20 : 0)
               })
             }
             .width('100%')
@@ -2087,7 +2088,8 @@ export struct Play {
         .padding({
           left: 20,
           right: 20,
-          top: (this.windowAvoidArea.statusBar.visible ? this.windowAvoidArea.statusBar.topRect.height : 0) + 8
+          top: (this.windowAvoidArea.statusBar.visible ? this.windowAvoidArea.statusBar.topRect.height : 0) + 8 +
+            (this.displayWidth >= 1000 ? 20 : 0)
         })
       }
       .width('100%')

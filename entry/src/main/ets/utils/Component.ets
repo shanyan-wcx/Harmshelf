@@ -3027,8 +3027,8 @@ export struct pageUpDown {
   build() {
     Row() {
       ImmersiveActionButton({
-        barWidth: 25,
-        barHeight: 25,
+        barWidth: 24,
+        barHeight: 24,
         onButtonClick: () => {
           this.scroller.scrollPage({ next: false, animation: true })
         }
@@ -3042,8 +3042,8 @@ export struct pageUpDown {
 
       Row() {
         ImmersiveActionButton({
-          barWidth: 25,
-          barHeight: 25,
+          barWidth: 24,
+          barHeight: 24,
           onButtonClick: () => {
             this.scroller.scrollPage({ next: true, animation: true })
           }
