@@ -869,13 +869,7 @@ export struct Play {
     .height(88)
     .padding(8)
     .borderRadius(18)
-    .backgroundColor(ColorMetrics.rgba(
-      (this.coverColor >>> 16) & 0xff,
-      (this.coverColor >>> 8) & 0xff,
-      this.coverColor & 0xff,
-      0.18
-    ).color)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_THIN)
+    .backgroundColor(this.playColorPalette.sliderTrack)
     .border({
       width: 0.35,
       radius: 18,
