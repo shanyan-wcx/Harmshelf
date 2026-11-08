@@ -470,12 +470,13 @@ export struct PlaylistDetail {
               .alignItems(VerticalAlign.Center)
 
               List({ space: 12 }) {
-                ForEach(this.playlist1!.items, (item: PlaylistItem, index) => {
+                Repeat<PlaylistItem>(this.playlist1!.items)
+                  .each((repeatItem: RepeatItem<PlaylistItem>) => {
                   ListItem() {
                     Stack() {
                       Stack() {
                         Row() {
-                        Image(this.baseUrl + `/api/items/${item.libraryItemId}/cover?token=${this.apiToken}`)
+                        Image(this.baseUrl + `/api/items/${repeatItem.item.libraryItemId}/cover?token=${this.apiToken}`)
                           .alt($rawfile('nocover.jpg'))
                           .objectFit(ImageFit.Cover)
                           .width(55)
@@ -485,15 +486,15 @@ export struct PlaylistDetail {
                           .draggable(false)
 
                         Column() {
-                          Text(this.library?.mediaType === 'book' ? item.libraryItem!.media.metadata.title :
-                            item.episode!.title)
+                          Text(this.library?.mediaType === 'book' ? repeatItem.item.libraryItem!.media.metadata.title :
+                            repeatItem.item.episode!.title)
                             .fontSize(16)
                             .maxLines(1)
                             .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                           Text(this.library?.mediaType === 'book' ?
-                            (item.libraryItem!.media.metadata.authorName ?? "-") :
-                            (this.libraryItems.find(item1 => item1.id === item.libraryItemId)?.media.metadata.author ??
+                            (repeatItem.item.libraryItem!.media.metadata.authorName ?? "-") :
+                            (this.libraryItems.find(item1 => item1.id === repeatItem.item.libraryItemId)?.media.metadata.author ??
                               "-"))
                             .fontSize(13)
                             .fontColor($r('sys.color.font_secondary'))
@@ -501,8 +502,8 @@ export struct PlaylistDetail {
                             .textOverflow({ overflow: TextOverflow.Ellipsis })
 
                           Text(this.formatDuration(this.library?.mediaType === 'book' ?
-                            item.libraryItem!.media.duration :
-                            item.episode!.duration!))
+                            repeatItem.item.libraryItem!.media.duration :
+                            repeatItem.item.episode!.duration!))
                             .fontSize(12)
                             .fontColor($r('sys.color.font_secondary'))
                             .maxLines(1)
@@ -520,7 +521,7 @@ export struct PlaylistDetail {
                             this.toCloseIndex = this.playingIndex
                             this.toCloseSession = this.playingItem
                             if (this.library?.mediaType === 'book') {
-                              this.playingItem = await getPlayItem(item.libraryItemId)
+                              this.playingItem = await getPlayItem(repeatItem.item.libraryItemId)
                               if (this.playingItem) {
                                 await this.avPlayer!.reset();
                                 this.isStartPlaying = true
@@ -528,7 +529,7 @@ export struct PlaylistDetail {
                                 await this.getPlayContent(this.playingItem!)
                               }
                             } else if (this.library?.mediaType === 'podcast') {
-                              this.playingItem = await getPlayItem(item.libraryItemId, item.episodeId!)
+                              this.playingItem = await getPlayItem(repeatItem.item.libraryItemId, repeatItem.item.episodeId!)
                               if (this.playingItem) {
                                 await this.avPlayer!.reset();
                                 this.isStartPlaying = true
@@ -558,13 +559,13 @@ export struct PlaylistDetail {
 
                       Progress({
                         value: this.library?.mediaType === 'book' ?
-                          (this.progress.find(p => p.libraryItemId === item.libraryItemId)?.progress ?? 0) * 100 :
-                          (this.progress.find(p => p.episodeId === item.episodeId)?.progress ?? 0) * 100,
+                          (this.progress.find(p => p.libraryItemId === repeatItem.item.libraryItemId)?.progress ?? 0) * 100 :
+                          (this.progress.find(p => p.episodeId === repeatItem.item.episodeId)?.progress ?? 0) * 100,
                         total: 100,
                         type: ProgressType.Linear
                       })
                         .width('100%')
-                        .color(this.progress.find(p => p.libraryItemId === item.libraryItemId)?.progress === 1 ?
+                        .color(this.progress.find(p => p.libraryItemId === repeatItem.item.libraryItemId)?.progress === 1 ?
                           $r('sys.color.ohos_id_color_palette4') :
                           $r('sys.color.multi_color_11'))
                         .backgroundColor(Color.Transparent)
@@ -600,10 +601,10 @@ export struct PlaylistDetail {
                     .alignContent(Alignment.Bottom)
                     .onClick(() => {
                       if (this.library?.mediaType === 'book') {
-                        this.libraryItem = item.libraryItem
+                        this.libraryItem = repeatItem.item.libraryItem
                         this.pageInfos.pushPathByName('libraryItemDetail', null)
                       } else {
-                        this.episode = item.episode
+                        this.episode = repeatItem.item.episode
                         this.pageInfos.pushPathByName('episodeDetail', null)
                       }
                     })
@@ -611,13 +612,16 @@ export struct PlaylistDetail {
                   .swipeAction({
                     end: {
                       builder: () => {
-                        this.playlistEnd(index)
+                        this.playlistEnd(repeatItem.index)
                       }
                     }
                   })
                   .clip(false)
-                })
+                  })
+                  .virtualScroll({ totalCount: this.playlist1!.items.length })
+                  .key((item: PlaylistItem) => item.libraryItemId + ':' + (item.episodeId ?? ''))
               }
+              .cachedCount(2)
               .clip(false)
             }
             .width('100%')

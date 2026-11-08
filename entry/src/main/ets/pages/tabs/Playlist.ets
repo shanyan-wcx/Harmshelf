@@ -28,15 +28,18 @@ export struct AllPlaylists {
                 (this.displayWidth >= 600 ? 2 : 1))))
           .clip(false)
 
-          ForEach(this.playlists, (playlist: Playlist, index) => {
+          Repeat<Playlist>(this.playlists)
+            .each((repeatItem: RepeatItem<Playlist>) => {
             GridItem() {
               PlaylistItemComponent({
-                playlist: playlist
+                playlist: repeatItem.item
               })
-                .margin({ bottom: index === this.playlists.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
+                .margin({ bottom: repeatItem.index === this.playlists.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
             }
             .clip(false)
-          })
+            })
+            .virtualScroll({ totalCount: this.playlists.length })
+            .key((item: Playlist) => item.id)
         }
         .width('100%')
         .height('100%')
@@ -46,6 +49,7 @@ export struct AllPlaylists {
               (this.displayWidth >= 600 ? "1fr 1fr 1fr" : "1fr 1fr"))))
         .columnsGap(20)
         .rowsGap(15)
+        .cachedCount(2)
         .scrollBar(BarState.Off)
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .padding({

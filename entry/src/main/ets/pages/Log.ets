@@ -152,18 +152,19 @@ export struct Log {
           .justifyContent(FlexAlign.Center)
         } else if (this.displayLogs.length > 0) {
           List({ scroller: this.logScroller }) {
-            ForEach(this.displayLogs, (log: LogEntry, index: number) => {
+            Repeat<LogEntry>(this.displayLogs)
+              .each((repeatItem: RepeatItem<LogEntry>) => {
               ListItem() {
                 Row() {
-                  Text(log.timestamp)
+                  Text(repeatItem.item.timestamp)
                     .fontColor($r('sys.color.font_secondary'))
                     .fontSize(16)
                     .margin({ right: 15 })
                     .copyOption(CopyOptions.LocalDevice)
                     .textSelectable(TextSelectableMode.SELECTABLE_FOCUSABLE)
-                  Text(log.message)
+                  Text(repeatItem.item.message)
                     .fontSize(16)
-                    .fontColor(this.getColor(log.level))
+                    .fontColor(this.getColor(repeatItem.item.level))
                     .wordBreak(WordBreak.BREAK_ALL)
                     .layoutWeight(1)
                     .textAlign(TextAlign.JUSTIFY)
@@ -175,9 +176,12 @@ export struct Log {
             }
               .width('100%')
               .padding({ left: 20, right: 20, top: 4, bottom: 4 })
-              .margin({ top: index === 0 ? this.statusBarHeight + 56 : 0, bottom: index === this.displayLogs.length - 1 ? getBottomContentInset(deviceInfo.deviceType === '2in1' ? 71 : 79, this.isStartPlaying, 150, false) : 0 })
-            })
+              .margin({ top: repeatItem.index === 0 ? this.statusBarHeight + 56 : 0, bottom: repeatItem.index === this.displayLogs.length - 1 ? getBottomContentInset(deviceInfo.deviceType === '2in1' ? 71 : 79, this.isStartPlaying, 150, false) : 0 })
+              })
+              .virtualScroll({ totalCount: this.displayLogs.length })
+              .key((item: LogEntry) => item.timestamp + ':' + item.message)
           }
+          .cachedCount(2)
           .width('100%')
           .height('100%')
           .scrollBar(BarState.Off)

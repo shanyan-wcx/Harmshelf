@@ -1757,10 +1757,11 @@ export struct EpisodeComponent {
     Column() {
       Stack() {
         List() {
-          ForEach(this.playlists, (playlist: Playlist, index) => {
+          Repeat<Playlist>(this.playlists)
+            .each((repeatItem: RepeatItem<Playlist>) => {
             ListItem() {
               Row() {
-                Text(playlist.name)
+                Text(repeatItem.item.name)
                   .fontSize(18)
                   .width('100%')
                   .layoutWeight(1)
@@ -1774,19 +1775,19 @@ export struct EpisodeComponent {
                     monopolizeActionEvents: false,
                     onButtonClick: async () => {
                       let tmpPlaylist: Playlist | undefined = undefined
-                      let item = playlist.items.find(p => p.episodeId === this.item.id)
+                      let item = repeatItem.item.items.find(p => p.episodeId === this.item.id)
                       if (!item) {
-                        tmpPlaylist = await addToPlaylist(playlist.id!, this.item.libraryItemId!, this.item.id)
+                        tmpPlaylist = await addToPlaylist(repeatItem.item.id!, this.item.libraryItemId!, this.item.id)
                       } else {
-                        tmpPlaylist = await removeFromPlaylist(playlist.id!, this.item.libraryItemId!, this.item.id)
+                        tmpPlaylist = await removeFromPlaylist(repeatItem.item.id!, this.item.libraryItemId!, this.item.id)
                       }
                       if (tmpPlaylist) {
                         this.showPlaylists = false
-                        playlist = tmpPlaylist
+                        this.playlists[repeatItem.index] = tmpPlaylist
                       }
                     }
                   }) {
-                    Text(playlist.items.find(p => p.episodeId === this.item.id) ? "移除" : "添加")
+                    Text(repeatItem.item.items.find(p => p.episodeId === this.item.id) ? "移除" : "添加")
                       .hitTestBehavior(HitTestMode.None)
                   }
                 }
@@ -1796,8 +1797,11 @@ export struct EpisodeComponent {
               }
               .height(60)
             }
-          })
+            })
+            .virtualScroll({ totalCount: this.playlists.length })
+            .key((item: Playlist) => item.id)
         }
+        .cachedCount(2)
         .width('100%')
         .height('100%')
         .padding({ left: 20, right: 20, bottom: 25 })
@@ -2556,10 +2560,11 @@ export struct EpisodeComponent1 {
     Column() {
       Stack() {
         List() {
-          ForEach(this.playlists, (playlist: Playlist, index) => {
+          Repeat<Playlist>(this.playlists)
+            .each((repeatItem: RepeatItem<Playlist>) => {
             ListItem() {
               Row() {
-                Text(playlist.name)
+                Text(repeatItem.item.name)
                   .fontSize(18)
                   .width('100%')
                   .layoutWeight(1)
@@ -2573,19 +2578,19 @@ export struct EpisodeComponent1 {
                     monopolizeActionEvents: false,
                     onButtonClick: async () => {
                       let tmpPlaylist: Playlist | undefined = undefined
-                      let item = playlist.items.find(p => p.episodeId === this.item.id)
+                      let item = repeatItem.item.items.find(p => p.episodeId === this.item.id)
                       if (!item) {
-                        tmpPlaylist = await addToPlaylist(playlist.id!, this.item.libraryItemId!, this.item.id)
+                        tmpPlaylist = await addToPlaylist(repeatItem.item.id!, this.item.libraryItemId!, this.item.id)
                       } else {
-                        tmpPlaylist = await removeFromPlaylist(playlist.id!, this.item.libraryItemId!, this.item.id)
+                        tmpPlaylist = await removeFromPlaylist(repeatItem.item.id!, this.item.libraryItemId!, this.item.id)
                       }
                       if (tmpPlaylist) {
                         this.showPlaylists = false
-                        playlist = tmpPlaylist
+                        this.playlists[repeatItem.index] = tmpPlaylist
                       }
                     }
                   }) {
-                    Text(playlist.items.find(p => p.episodeId === this.item.id) ? "移除" : "添加")
+                    Text(repeatItem.item.items.find(p => p.episodeId === this.item.id) ? "移除" : "添加")
                       .hitTestBehavior(HitTestMode.None)
                   }
                 }
@@ -2595,8 +2600,11 @@ export struct EpisodeComponent1 {
               }
               .height(60)
             }
-          })
+            })
+            .virtualScroll({ totalCount: this.playlists.length })
+            .key((item: Playlist) => item.id)
         }
+        .cachedCount(2)
         .width('100%')
         .height('100%')
         .padding({ left: 20, right: 20, bottom: 25 })

@@ -82,11 +82,12 @@ export struct SearchMedia {
         List({ scroller: this.searchScroller }) {
           if (this.library?.mediaType === 'book') {
             if (this.searchResult && this.searchResult.book!.length > 0) {
-              ForEach(this.searchResult.book, (libraryItemSearchResult: LibraryItemSearchResult, index) => {
+              Repeat<LibraryItemSearchResult>(this.searchResult.book)
+                .each((repeatItem: RepeatItem<LibraryItemSearchResult>) => {
                 ListItem() {
                   Row() {
                     Image(this.baseUrl +
-                      `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
+                      `/api/items/${repeatItem.item.libraryItem.id}/cover?token=${this.apiToken}`)
                       .alt($rawfile('nocover.jpg'))
                       .objectFit(ImageFit.Cover)
                       .width(64)
@@ -96,20 +97,20 @@ export struct SearchMedia {
                       .draggable(false)
 
                     Column() {
-                      Text(libraryItemSearchResult.libraryItem.media.metadata.title)
+                      Text(repeatItem.item.libraryItem.media.metadata.title)
                         .fontSize(16)
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
                         .margin({ bottom: 3 })
 
-                      Text((libraryItemSearchResult.libraryItem.media.metadata.authorName ?? "-"))
+                      Text((repeatItem.item.libraryItem.media.metadata.authorName ?? "-"))
                         .fontSize(13)
                         .fontColor($r('sys.color.font_secondary'))
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
                         .margin({ bottom: 5 })
 
-                      Text((libraryItemSearchResult.libraryItem.media.chapters?.length ?? 0) + " 章节")
+                      Text((repeatItem.item.libraryItem.media.chapters?.length ?? 0) + " 章节")
                         .fontSize(13)
                         .fontColor($r('sys.color.font_secondary'))
                     }
@@ -131,24 +132,27 @@ export struct SearchMedia {
                   })
                   .shadow(ShadowStyle.OUTER_DEFAULT_XS)
                   .onClick(() => {
-                    this.libraryItem = libraryItemSearchResult.libraryItem
+                    this.libraryItem = repeatItem.item.libraryItem
                     this.pageInfos.pushPathByName('libraryItemDetail', null)
                   })
                   .clip(false)
                 }
                   .width('100%')
                   .padding({ left: 20, right: 20 })
-                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 8, bottom: index === this.searchResult!.book!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 8 })
+                  .margin({ top: repeatItem.index === 0 ? 66 + this.statusBarHeight : 8, bottom: repeatItem.index === this.searchResult!.book!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 8 })
                   .clip(false)
-              })
+                })
+                .virtualScroll({ totalCount: this.searchResult.book!.length })
+                .key((item: LibraryItemSearchResult) => item.libraryItem.id)
             }
           } else if (this.library?.mediaType === 'podcast') {
             if (this.searchResult && this.searchResult.podcast!.length > 0) {
-              ForEach(this.searchResult.podcast, (libraryItemSearchResult: LibraryItemSearchResult, index) => {
+              Repeat<LibraryItemSearchResult>(this.searchResult.podcast)
+                .each((repeatItem: RepeatItem<LibraryItemSearchResult>) => {
                 ListItem() {
                   Row() {
                     Image(this.baseUrl +
-                      `/api/items/${libraryItemSearchResult.libraryItem.id}/cover?token=${this.apiToken}`)
+                      `/api/items/${repeatItem.item.libraryItem.id}/cover?token=${this.apiToken}`)
                       .alt($rawfile('nocover.jpg'))
                       .objectFit(ImageFit.Cover)
                       .width(64)
@@ -158,20 +162,20 @@ export struct SearchMedia {
                       .draggable(false)
 
                     Column() {
-                      Text(libraryItemSearchResult.libraryItem.media.metadata.title)
+                      Text(repeatItem.item.libraryItem.media.metadata.title)
                         .fontSize(16)
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
                         .margin({ bottom: 3 })
 
-                      Text((libraryItemSearchResult.libraryItem.media.metadata.author ?? "-"))
+                      Text((repeatItem.item.libraryItem.media.metadata.author ?? "-"))
                         .fontSize(13)
                         .fontColor($r('sys.color.font_secondary'))
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
                         .margin({ bottom: 5 })
 
-                      Text((libraryItemSearchResult.libraryItem.media.episodes?.length ?? 0) + " 剧集")
+                      Text((repeatItem.item.libraryItem.media.episodes?.length ?? 0) + " 剧集")
                         .fontSize(13)
                         .fontColor($r('sys.color.font_secondary'))
                     }
@@ -193,21 +197,24 @@ export struct SearchMedia {
                   })
                   .shadow(ShadowStyle.OUTER_DEFAULT_XS)
                   .onClick(() => {
-                    this.libraryItem = libraryItemSearchResult.libraryItem
+                    this.libraryItem = repeatItem.item.libraryItem
                     this.pageInfos.pushPathByName('libraryItemDetail', null)
                   })
                   .clip(false)
                 }
                   .width('100%')
                   .padding({ left: 20, right: 20 })
-                  .margin({ top: index === 0 ? 66 + this.statusBarHeight : 8, bottom: index === this.searchResult!.podcast!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 8 })
+                  .margin({ top: repeatItem.index === 0 ? 66 + this.statusBarHeight : 8, bottom: repeatItem.index === this.searchResult!.podcast!.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 99, false) : 8 })
                   .clip(false)
-              })
+                })
+                .virtualScroll({ totalCount: this.searchResult.podcast!.length })
+                .key((item: LibraryItemSearchResult) => item.libraryItem.id)
             }
           }
         }
         .width('100%')
         .height('100%')
+        .cachedCount(2)
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .scrollBar(BarState.Off)
         .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)

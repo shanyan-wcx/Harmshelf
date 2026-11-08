@@ -46,40 +46,45 @@ export struct SubHome {
               })
 
               List({ scroller: this.continueListeningScroller, space: 20 }) {
-                ForEach(this.homeData.find(item => item.id === "continue-listening")!.entities,
-                  (libraryItem: LibraryItem, index) => {
+                Repeat<LibraryItem>(this.homeData.find(item => item.id === "continue-listening")!.entities as LibraryItem[])
+                  .each((repeatItem: RepeatItem<LibraryItem>) => {
                   if (this.library?.mediaType === 'book') {
                     ListItem() {
                       LibraryItemComponent({
-                        item: libraryItem,
-                        progress: this.progress.find(p => p.libraryItemId === libraryItem.id)
+                        item: repeatItem.item,
+                        progress: this.progress.find(p => p.libraryItemId === repeatItem.item.id)
                       })
                         .margin({
-                          left: index === 0 ? 20 : 0,
-                          right: index ===
+                          left: repeatItem.index === 0 ? 20 : 0,
+                          right: repeatItem.index ===
                             this.homeData.find(item => item.id === "continue-listening")!.entities.length - 1 ? 20 : 0
                         })
                     }
                     .clip(false)
-                  } else if (this.library?.mediaType === 'podcast') {
+                  } else {
                     ListItem() {
                       RecentEpisodeComponent({
-                        item: libraryItem,
-                        progress: this.progress.find(p => p.episodeId === libraryItem.recentEpisode?.id)
+                        item: repeatItem.item,
+                        progress: this.progress.find(p => p.episodeId === repeatItem.item.recentEpisode?.id)
                       })
                         .margin({
-                          left: index === 0 ? 20 : 0,
-                          right: index ===
+                          left: repeatItem.index === 0 ? 20 : 0,
+                          right: repeatItem.index ===
                             this.homeData.find(item => item.id === "continue-listening")!.entities.length - 1 ? 20 : 0
                         })
                     }
                     .clip(false)
                   }
                   })
+                  .virtualScroll({
+                    totalCount: this.homeData.find(item => item.id === "continue-listening")!.entities.length
+                  })
+                  .key((item: LibraryItem) => item.id)
               }
               .width('100%')
               .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
               .listDirection(Axis.Horizontal)
+              .cachedCount(2)
               .scrollBar(BarState.Off)
               .clip(false)
             }
@@ -107,25 +112,30 @@ export struct SubHome {
               })
 
               List({ scroller: this.newestEpisodesScroller, space: 20 }) {
-                ForEach(this.homeData.find(item => item.id === "newest-episodes")!.entities,
-                  (libraryItem: LibraryItem, index) => {
+                Repeat<LibraryItem>(this.homeData.find(item => item.id === "newest-episodes")!.entities as LibraryItem[])
+                  .each((repeatItem: RepeatItem<LibraryItem>) => {
                     ListItem() {
                       RecentEpisodeComponent({
-                        item: libraryItem,
-                        progress: this.progress.find(p => p.episodeId === libraryItem.recentEpisode?.id)
+                        item: repeatItem.item,
+                        progress: this.progress.find(p => p.episodeId === repeatItem.item.recentEpisode?.id)
                       })
                         .margin({
-                          left: index === 0 ? 20 : 0,
-                          right: index ===
+                          left: repeatItem.index === 0 ? 20 : 0,
+                          right: repeatItem.index ===
                             this.homeData.find(item => item.id === "newest-episodes")!.entities.length - 1 ? 20 : 0
                         })
                     }
                     .clip(false)
                   })
+                  .virtualScroll({
+                    totalCount: this.homeData.find(item => item.id === "newest-episodes")!.entities.length
+                  })
+                  .key((item: LibraryItem) => item.id)
               }
               .width('100%')
               .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
               .listDirection(Axis.Horizontal)
+              .cachedCount(2)
               .scrollBar(BarState.Off)
               .clip(false)
             }
@@ -153,25 +163,30 @@ export struct SubHome {
               })
 
               List({ scroller: this.recentlyAddedScroller, space: 20 }) {
-                ForEach(this.homeData.find(item => item.id === "recently-added")!.entities,
-                  (libraryItem: LibraryItem, index) => {
+                Repeat<LibraryItem>(this.homeData.find(item => item.id === "recently-added")!.entities as LibraryItem[])
+                  .each((repeatItem: RepeatItem<LibraryItem>) => {
                     ListItem() {
                       LibraryItemComponent({
-                        item: libraryItem,
-                        progress: this.progress.find(p => p.libraryItemId === libraryItem.id)
+                        item: repeatItem.item,
+                        progress: this.progress.find(p => p.libraryItemId === repeatItem.item.id)
                       })
                         .margin({
-                          left: index === 0 ? 20 : 0,
-                          right: index ===
+                          left: repeatItem.index === 0 ? 20 : 0,
+                          right: repeatItem.index ===
                             this.homeData.find(item => item.id === "recently-added")!.entities.length - 1 ? 20 : 0
                         })
                     }
                     .clip(false)
                   })
+                  .virtualScroll({
+                    totalCount: this.homeData.find(item => item.id === "recently-added")!.entities.length
+                  })
+                  .key((item: LibraryItem) => item.id)
               }
               .width('100%')
               .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
               .listDirection(Axis.Horizontal)
+              .cachedCount(2)
               .scrollBar(BarState.Off)
               .clip(false)
             }
@@ -199,25 +214,30 @@ export struct SubHome {
               })
 
               List({ scroller: this.discoverScroller, space: 20 }) {
-                ForEach(this.homeData.find(item => item.id === "discover")!.entities,
-                  (libraryItem: LibraryItem, index) => {
+                Repeat<LibraryItem>(this.homeData.find(item => item.id === "discover")!.entities as LibraryItem[])
+                  .each((repeatItem: RepeatItem<LibraryItem>) => {
                     ListItem() {
                       LibraryItemComponent({
-                        item: libraryItem,
-                        progress: this.progress.find(p => p.libraryItemId === libraryItem.id)
+                        item: repeatItem.item,
+                        progress: this.progress.find(p => p.libraryItemId === repeatItem.item.id)
                       })
                         .margin({
-                          left: index === 0 ? 20 : 0,
-                          right: index === this.homeData.find(item => item.id === "discover")!.entities.length - 1 ?
+                          left: repeatItem.index === 0 ? 20 : 0,
+                          right: repeatItem.index === this.homeData.find(item => item.id === "discover")!.entities.length - 1 ?
                             20 : 0
                         })
                     }
                     .clip(false)
                   })
+                  .virtualScroll({
+                    totalCount: this.homeData.find(item => item.id === "discover")!.entities.length
+                  })
+                  .key((item: LibraryItem) => item.id)
               }
               .width('100%')
               .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
               .listDirection(Axis.Horizontal)
+              .cachedCount(2)
               .scrollBar(BarState.Off)
               .clip(false)
             }
@@ -246,40 +266,45 @@ export struct SubHome {
               })
 
               List({ scroller: this.listenAgainScroller, space: 20 }) {
-                ForEach(this.homeData.find(item => item.id === "listen-again")!.entities,
-                  (libraryItem: LibraryItem, index) => {
+                Repeat<LibraryItem>(this.homeData.find(item => item.id === "listen-again")!.entities as LibraryItem[])
+                  .each((repeatItem: RepeatItem<LibraryItem>) => {
                     if (this.library?.mediaType === 'book') {
                       ListItem() {
                         LibraryItemComponent({
-                          item: libraryItem,
-                          progress: this.progress.find(p => p.libraryItemId === libraryItem.id)
+                          item: repeatItem.item,
+                          progress: this.progress.find(p => p.libraryItemId === repeatItem.item.id)
                         })
                           .margin({
-                            left: index === 0 ? 20 : 0,
-                            right: index === this.homeData.find(item => item.id === "listen-again")!.entities.length - 1 ?
+                            left: repeatItem.index === 0 ? 20 : 0,
+                            right: repeatItem.index === this.homeData.find(item => item.id === "listen-again")!.entities.length - 1 ?
                               20 : 0
                           })
                       }
                       .clip(false)
-                    } else if (this.library?.mediaType === 'podcast') {
+                    } else {
                       ListItem() {
                         RecentEpisodeComponent({
-                          item: libraryItem,
-                          progress: this.progress.find(p => p.episodeId === libraryItem.recentEpisode?.id)
+                          item: repeatItem.item,
+                          progress: this.progress.find(p => p.episodeId === repeatItem.item.recentEpisode?.id)
                         })
                           .margin({
-                            left: index === 0 ? 20 : 0,
-                            right: index === this.homeData.find(item => item.id === "listen-again")!.entities.length - 1 ?
+                            left: repeatItem.index === 0 ? 20 : 0,
+                            right: repeatItem.index === this.homeData.find(item => item.id === "listen-again")!.entities.length - 1 ?
                               20 : 0
                           })
                       }
                       .clip(false)
                     }
                   })
+                  .virtualScroll({
+                    totalCount: this.homeData.find(item => item.id === "listen-again")!.entities.length
+                  })
+                  .key((item: LibraryItem) => item.id)
               }
               .width('100%')
               .height(this.displayWidth >= 1400 ? 245 : (this.displayWidth >= 1200 ? 225 : 205))
               .listDirection(Axis.Horizontal)
+              .cachedCount(2)
               .scrollBar(BarState.Off)
               .clip(false)
             }
@@ -307,23 +332,29 @@ export struct SubHome {
               })
 
               List({ scroller: this.newestAuthorsScroller, space: 20 }) {
-                ForEach(this.homeData.find(item => item.id === "newest-authors")!.entities, (author: Author, index) => {
+                Repeat<Author>(this.homeData.find(item => item.id === "newest-authors")!.entities as Author[])
+                  .each((repeatItem: RepeatItem<Author>) => {
                   ListItem() {
                     AuthorComponent({
-                      author: author
+                      author: repeatItem.item
                     })
                       .margin({
-                        left: index === 0 ? 20 : 0,
-                        right: index === this.homeData.find(item => item.id === "newest-authors")!.entities.length - 1 ?
+                        left: repeatItem.index === 0 ? 20 : 0,
+                        right: repeatItem.index === this.homeData.find(item => item.id === "newest-authors")!.entities.length - 1 ?
                           20 : 0
                       })
                   }
                   .clip(false)
                 })
+                .virtualScroll({
+                  totalCount: this.homeData.find(item => item.id === "newest-authors")!.entities.length
+                })
+                .key((item: Author) => item.id)
               }
               .width('100%')
               .height(this.displayWidth >= 1400 ? 172 : (this.displayWidth >= 1200 ? 158 : 144))
               .listDirection(Axis.Horizontal)
+              .cachedCount(2)
               .scrollBar(BarState.Off)
               .clip(false)
             }

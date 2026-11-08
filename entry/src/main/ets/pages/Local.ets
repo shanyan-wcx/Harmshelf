@@ -372,12 +372,13 @@ export struct LocalMedia {
 
             if (this.subFolderList.length > 0) {
               List({ space: 12 }) {
-                ForEach(this.subFolderList.sort((a, b) => a.localeCompare(b)), (folder: string, index) => {
+                Repeat<string>(this.subFolderList.sort((a, b) => a.localeCompare(b)))
+                  .each((repeatItem: RepeatItem<string>) => {
                   ListItem() {
                     Stack() {
                       Stack() {
                         Row() {
-                          Text(folder)
+                          Text(repeatItem.item)
                             .fontSize(16)
                             .fontWeight(FontWeight.Medium)
                             .maxLines(1)
@@ -414,7 +415,7 @@ export struct LocalMedia {
                   .swipeAction({
                     end: {
                       builder: () => {
-                        this.deleteSubFolderButton(folder)
+                        this.deleteSubFolderButton(repeatItem.item)
                       }
                     }
                   })
@@ -422,20 +423,23 @@ export struct LocalMedia {
                   .onClick(async () => {
                     try {
                       this.audioFolderList = []
-                      const entries = await fs.listFile(this.downloadPath + "/" + this.folderList[this.folderIdx] + "/" + folder);
+                      const entries = await fs.listFile(this.downloadPath + "/" + this.folderList[this.folderIdx] + "/" + repeatItem.item);
                       for (let name of entries) {
-                        const fullPath = `${this.downloadPath}/${this.folderList[this.folderIdx]}/${folder}/${name}`;
+                        const fullPath = `${this.downloadPath}/${this.folderList[this.folderIdx]}/${repeatItem.item}/${name}`;
                         const stat = await fs.stat(fullPath);
                         if (stat.isFile() && this.isAudioFile(name)) {
                           this.audioFolderList.push(name);
                         }
                       }
-                      this.subFolderIdx = index
+                      this.subFolderIdx = repeatItem.index
                       this.folderDeep = 2
                     } catch (_) {}
                   })
-                })
+                  })
+                  .virtualScroll({ totalCount: this.subFolderList.length })
+                  .key((item: string) => item)
               }
+              .cachedCount(2)
               .width('100%')
               .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
               .scrollBar(BarState.Off)
@@ -486,12 +490,13 @@ export struct LocalMedia {
 
             if (this.audioFolderList.length > 0) {
               List({ space: 12 }) {
-                ForEach(this.audioFolderList.sort((a, b) => a.localeCompare(b)), (file: string, index) => {
+                Repeat<string>(this.audioFolderList.sort((a, b) => a.localeCompare(b)))
+                  .each((repeatItem: RepeatItem<string>) => {
                   ListItem() {
                     Stack() {
                       Stack() {
                         Row() {
-                          Text(file)
+                          Text(repeatItem.item)
                             .fontSize(16)
                             .fontWeight(FontWeight.Medium)
                             .maxLines(1)
@@ -524,16 +529,19 @@ export struct LocalMedia {
                   .swipeAction({
                     end: {
                       builder: () => {
-                        this.deleteButton(file)
+                        this.deleteButton(repeatItem.item)
                       }
                     }
                   })
                   .clip(false)
                   .onClick(() => {
-                    this.startLocalPlayback(index)
+                    this.startLocalPlayback(repeatItem.index)
                   })
-                })
+                  })
+                  .virtualScroll({ totalCount: this.audioFolderList.length })
+                  .key((item: string) => item)
               }
+              .cachedCount(2)
               .width('100%')
               .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
               .scrollBar(BarState.Off)

@@ -25,21 +25,25 @@ export struct AllCollections {
           .columnEnd(this.displayWidth >= 1200 ? 2 : (this.displayWidth >= 800 ? 1 : 0))
           .clip(false)
 
-          ForEach(this.collections, (collection: Collection, index) => {
+          Repeat<Collection>(this.collections)
+            .each((repeatItem: RepeatItem<Collection>) => {
             GridItem() {
               CollectionItemComponent({
-                collection: collection
+                collection: repeatItem.item
               })
-                .margin({ bottom: index === this.collections.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
+                .margin({ bottom: repeatItem.index === this.collections.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
             }
             .clip(false)
-          })
+            })
+            .virtualScroll({ totalCount: this.collections.length })
+            .key((item: Collection) => item.id)
         }
         .width('100%')
         .height('100%')
         .columnsTemplate(this.displayWidth >= 1200 ? "1fr 1fr 1fr" : (this.displayWidth >= 800 ? "1fr 1fr" : "1fr"))
         .columnsGap(20)
         .rowsGap(15)
+        .cachedCount(2)
         .scrollBar(BarState.Off)
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .padding({

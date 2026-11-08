@@ -433,13 +433,14 @@ export struct CollectionDetail {
               .alignItems(VerticalAlign.Center)
 
               List({ space: 12 }) {
-                ForEach(this.collection1!.books, (book: Book, index) => {
+                Repeat<Book>(this.collection1!.books)
+                  .each((repeatItem: RepeatItem<Book>) => {
                   ListItem() {
                     Stack() {
                       Stack() {
                         Row() {
                         Row() {
-                          Image(this.baseUrl + `/api/items/${book.id}/cover?token=${this.apiToken}`)
+                          Image(this.baseUrl + `/api/items/${repeatItem.item.id}/cover?token=${this.apiToken}`)
                             .alt($rawfile('nocover.jpg'))
                             .objectFit(ImageFit.Cover)
                             .width(55)
@@ -449,19 +450,19 @@ export struct CollectionDetail {
                             .draggable(false)
 
                           Column() {
-                            Text(book.media!.metadata.title)
+                            Text(repeatItem.item.media!.metadata.title)
                               .fontSize(16)
                               .maxLines(1)
                               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                            Text(book.mediaType === 'book' ? (book.media!.metadata.authorName ?? "-") :
-                              (book.media!.metadata.author ?? "-"))
+                            Text(repeatItem.item.mediaType === 'book' ? (repeatItem.item.media!.metadata.authorName ?? "-") :
+                              (repeatItem.item.media!.metadata.author ?? "-"))
                               .fontSize(13)
                               .fontColor($r('sys.color.font_secondary'))
                               .maxLines(1)
                               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                            Text(this.formatDuration(book.media!.duration))
+                            Text(this.formatDuration(repeatItem.item.media!.duration))
                               .fontSize(12)
                               .fontColor($r('sys.color.font_secondary'))
                               .maxLines(1)
@@ -473,7 +474,7 @@ export struct CollectionDetail {
                         .layoutWeight(1)
                         .margin({ right: 10 })
                         .onClick(() => {
-                          this.libraryItem = this.libraryItems.find(item => item.id === book.id)
+                          this.libraryItem = this.libraryItems.find(item => item.id === repeatItem.item.id)
                           this.pageInfos.pushPathByName('libraryItemDetail', null)
                         })
 
@@ -484,7 +485,7 @@ export struct CollectionDetail {
                             onButtonClick: async () => {
                               this.toCloseIndex = this.playingIndex
                               this.toCloseSession = this.playingItem
-                              this.playingItem = await getPlayItem(book.id)
+                              this.playingItem = await getPlayItem(repeatItem.item.id)
                               if (this.playingItem) {
                                 await this.avPlayer!.reset();
                                 this.isStartPlaying = true
@@ -508,12 +509,12 @@ export struct CollectionDetail {
                         .padding(10)
 
                         Progress({
-                          value: (this.progress.find(p => p.libraryItemId === book.id)?.progress ?? 0) * 100,
+                          value: (this.progress.find(p => p.libraryItemId === repeatItem.item.id)?.progress ?? 0) * 100,
                           total: 100,
                           type: ProgressType.Linear
                         })
                           .width('100%')
-                          .color(this.progress.find(p => p.libraryItemId === book.id)?.progress === 1 ?
+                          .color(this.progress.find(p => p.libraryItemId === repeatItem.item.id)?.progress === 1 ?
                             $r('sys.color.ohos_id_color_palette4') :
                             $r('sys.color.multi_color_11'))
                           .backgroundColor(Color.Transparent)
@@ -551,13 +552,16 @@ export struct CollectionDetail {
                   .swipeAction({
                     end: {
                       builder: () => {
-                        this.collectionEnd(index)
+                        this.collectionEnd(repeatItem.index)
                       }
                     }
                   })
                   .clip(false)
-                })
+                  })
+                  .virtualScroll({ totalCount: this.collection1!.books!.length })
+                  .key((item: Book) => item.id)
               }
+              .cachedCount(2)
               .clip(false)
             }
             .width('100%')

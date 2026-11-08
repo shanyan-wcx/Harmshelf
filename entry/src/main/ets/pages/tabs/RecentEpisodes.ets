@@ -14,35 +14,26 @@ export struct RecentEpisodes {
   @Consumer() statusBarHeight: number = 0
   build() {
     Stack() {
-      Scroll(this.recentEpisodesScroller) {
-        Column() {
+      List({ scroller: this.recentEpisodesScroller }) {
+        ListItem() {
           Text("最新剧集")
             .fontSize(18)
             .fontWeight(FontWeight.Medium)
             .margin({ top: 16 })
-
-          Column() {
-            ForEach(this.recentEpisodes, (episode: Episode, index) => {
-              EpisodeComponent({
-                item: episode
-              })
-            })
-          }
-          .offset({ y: -5 })
-
-          Column() {
-            Text("没有剧集")
-              .fontSize(24)
-              .fontColor($r('sys.color.font'))
-          }
-          .width('100%')
-          .height('100%')
-          .padding({ bottom: 100 })
-          .justifyContent(FlexAlign.Center)
-          .visibility(this.recentEpisodes.length === 0 ? Visibility.Visible : Visibility.None)
         }
-        .alignItems(HorizontalAlign.Start)
-        .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
+        .clip(false)
+
+        Repeat<Episode>(this.recentEpisodes)
+          .each((repeatItem: RepeatItem<Episode>) => {
+            ListItem() {
+              EpisodeComponent({
+                item: repeatItem.item
+              })
+            }
+            .clip(false)
+          })
+          .virtualScroll({ totalCount: this.recentEpisodes.length })
+          .key((item: Episode) => item.id)
       }
       .width('100%')
       .height('100%')
@@ -50,6 +41,8 @@ export struct RecentEpisodes {
       .padding({ top: this.statusBarHeight + 56 + 31, left: 20, right: 20, bottom: getBottomContentInset(20, this.isStartPlaying, 104) })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
+      .cachedCount(2)
+      .visibility(this.showLoadingProgress || this.recentEpisodes.length === 0 ? Visibility.None : Visibility.Visible)
       .clip(false)
       .onReachEnd(async () => {
         let tmpEpisodes: Episode[] = await getRecentEpisodes(this.library!.id, this.recentEpisodesPage + 1)
@@ -58,6 +51,17 @@ export struct RecentEpisodes {
           this.recentEpisodes.push(...tmpEpisodes)
         }
       })
+
+      Column() {
+        Text("没有剧集")
+          .fontSize(24)
+          .fontColor($r('sys.color.font'))
+      }
+      .width('100%')
+      .height('100%')
+      .padding({ bottom: 100 })
+      .justifyContent(FlexAlign.Center)
+      .visibility(this.showLoadingProgress || this.recentEpisodes.length > 0 ? Visibility.None : Visibility.Visible)
     }
     .width('100%')
     .height('100%')

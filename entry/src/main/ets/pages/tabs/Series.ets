@@ -26,21 +26,25 @@ export struct AllSeries {
           .columnEnd(this.displayWidth >= 1200 ? 2 : (this.displayWidth >= 800 ? 1 : 0))
           .clip(false)
 
-          ForEach(this.series, (series: Series, index) => {
+          Repeat<Series>(this.series)
+            .each((repeatItem: RepeatItem<Series>) => {
             GridItem() {
               SeriesItemComponent({
-                series: series
+                series: repeatItem.item
               })
-                .margin({ bottom: index === this.series.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
+                .margin({ bottom: repeatItem.index === this.series.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
             }
             .clip(false)
-          })
+            })
+            .virtualScroll({ totalCount: this.series.length })
+            .key((item: Series) => item.id)
         }
         .width('100%')
         .height('100%')
         .columnsTemplate(this.displayWidth >= 1200 ? "1fr 1fr 1fr" : (this.displayWidth >= 800 ? "1fr 1fr" : "1fr"))
         .columnsGap(20)
         .rowsGap(15)
+        .cachedCount(2)
         .scrollBar(BarState.Off)
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .padding({

@@ -29,15 +29,18 @@ export struct AllAuthors {
                   (this.displayWidth >= 400 ? 3 : 2)))))
           .clip(false)
 
-          ForEach(this.authors, (author: Author, index) => {
+          Repeat<Author>(this.authors)
+            .each((repeatItem: RepeatItem<Author>) => {
             GridItem() {
               AuthorComponent1({
-                author: author
+                author: repeatItem.item
               })
-                .margin({ bottom: index === this.authors.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
+                .margin({ bottom: repeatItem.index === this.authors.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
             }
             .clip(false)
-          })
+            })
+            .virtualScroll({ totalCount: this.authors.length })
+            .key((item: Author) => item.id)
         }
         .width('100%')
         .height('100%')
@@ -48,6 +51,7 @@ export struct AllAuthors {
                 (this.displayWidth >= 400 ? "1fr 1fr 1fr 1fr" : "1fr 1fr 1fr")))))
         .columnsGap(20)
         .rowsGap(20)
+        .cachedCount(2)
         .scrollBar(BarState.Off)
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .padding({

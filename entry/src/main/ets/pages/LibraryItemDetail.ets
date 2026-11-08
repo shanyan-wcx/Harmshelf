@@ -313,12 +313,13 @@ export struct LibraryItemDetail {
   feedEpisodesBuilder() {
     Column() {
       List() {
-        ForEach(this.feedEpisodes, (episode: Episode, index) => {
+        Repeat<Episode>(this.feedEpisodes)
+          .each((repeatItem: RepeatItem<Episode>) => {
           ListItem() {
             Column() {
               Row() {
                 Column() {
-                  if (this.episodes.find(e => e.enclosure && e.enclosure.url === episode.enclosure.url)) {
+                  if (this.episodes.find(e => e.enclosure && e.enclosure.url === repeatItem.item.enclosure.url)) {
                     SymbolGlyph($r('sys.symbol.checkmark'))
                       .fontWeight(FontWeight.Bold)
                       .fontSize(20)
@@ -327,21 +328,21 @@ export struct LibraryItemDetail {
                   } else {
                     Checkbox()
                       .width(20)
-                      .select(this.addToServer[index])
+                      .select(this.addToServer[repeatItem.index])
                       .selectedColor($r('sys.color.comp_emphasize_secondary'))
                       .onClick(() => {
-                        this.addToServer[index] = !this.addToServer[index]
+                        this.addToServer[repeatItem.index] = !this.addToServer[repeatItem.index]
                       })
                   }
                 }
                 .margin({ left: 10, right: 10 })
 
                 Column() {
-                  Text(episode.title)
+                  Text(repeatItem.item.title)
                     .fontSize(16)
                     .margin({ bottom: 5 })
 
-                  Text(this.formatTime(episode.publishedAt??0))
+                  Text(this.formatTime(repeatItem.item.publishedAt??0))
                     .fontSize(12)
                     .fontColor($r('sys.color.font_secondary'))
                 }
@@ -352,7 +353,7 @@ export struct LibraryItemDetail {
               .width('100%')
               .margin({ bottom: 10 })
 
-              if (index !== this.feedEpisodes.length - 1) {
+              if (repeatItem.index !== this.feedEpisodes.length - 1) {
                 Divider()
                   .width('100%')
                   .strokeWidth(1)
@@ -360,8 +361,11 @@ export struct LibraryItemDetail {
               }
             }
           }
-        })
+          })
+          .virtualScroll({ totalCount: this.feedEpisodes.length })
+          .key((item: Episode) => item.id)
       }
+      .cachedCount(2)
       .width('100%')
       .height('100%')
       .layoutWeight(1)
@@ -669,10 +673,11 @@ export struct LibraryItemDetail {
     Column() {
       Stack() {
         List() {
-          ForEach(this.playlists, (playlist: Playlist, index) => {
+          Repeat<Playlist>(this.playlists)
+            .each((repeatItem: RepeatItem<Playlist>) => {
             ListItem() {
               Row() {
-                Text(playlist.name)
+                Text(repeatItem.item.name)
                   .fontSize(18)
                   .width('100%')
                   .layoutWeight(1)
@@ -686,19 +691,19 @@ export struct LibraryItemDetail {
                     monopolizeActionEvents: false,
                     onButtonClick: async () => {
                       let tmpPlaylist: Playlist | undefined = undefined
-                      let item = playlist.items.find(p => p.libraryItemId === this.libraryItem!.id)
+                      let item = repeatItem.item.items.find(p => p.libraryItemId === this.libraryItem!.id)
                       if (!item) {
-                        tmpPlaylist = await addToPlaylist(playlist.id!, this.libraryItem!.id)
+                        tmpPlaylist = await addToPlaylist(repeatItem.item.id!, this.libraryItem!.id)
                       } else {
-                        tmpPlaylist = await removeFromPlaylist(playlist.id!, this.libraryItem!.id)
+                        tmpPlaylist = await removeFromPlaylist(repeatItem.item.id!, this.libraryItem!.id)
                       }
                       if (tmpPlaylist) {
                         this.showPlaylists = false
-                        playlist = tmpPlaylist
+                        this.playlists[repeatItem.index] = tmpPlaylist
                       }
                     }
                   }) {
-                    Text(playlist.items.find(p => p.libraryItemId === this.libraryItem!.id) ? "移除" : "添加")
+                    Text(repeatItem.item.items.find(p => p.libraryItemId === this.libraryItem!.id) ? "移除" : "添加")
                       .hitTestBehavior(HitTestMode.None)
                   }
                 }
@@ -708,8 +713,11 @@ export struct LibraryItemDetail {
               }
               .height(60)
             }
-          })
+            })
+            .virtualScroll({ totalCount: this.playlists.length })
+            .key((item: Playlist) => item.id)
         }
+        .cachedCount(2)
         .width('100%')
         .height('100%')
         .padding({ left: 20, right: 20, bottom: 25 })
@@ -903,10 +911,11 @@ export struct LibraryItemDetail {
     Column() {
       Stack() {
         List() {
-          ForEach(this.collections, (collection: Collection, index) => {
+          Repeat<Collection>(this.collections)
+            .each((repeatItem: RepeatItem<Collection>) => {
             ListItem() {
               Row() {
-                Text(collection.name)
+                Text(repeatItem.item.name)
                   .fontSize(18)
                   .width('100%')
                   .layoutWeight(1)
@@ -920,19 +929,19 @@ export struct LibraryItemDetail {
                     monopolizeActionEvents: false,
                     onButtonClick: async () => {
                       let tmpCollection: Collection | undefined = undefined
-                      let book = collection.books!.find(b => b.id === this.libraryItem!.id)
+                      let book = repeatItem.item.books!.find(b => b.id === this.libraryItem!.id)
                       if (!book) {
-                        tmpCollection = await addToCollection(collection.id!, this.libraryItem!.id)
+                        tmpCollection = await addToCollection(repeatItem.item.id!, this.libraryItem!.id)
                       } else {
-                        tmpCollection = await removeFromCollection(collection.id!, this.libraryItem!.id)
+                        tmpCollection = await removeFromCollection(repeatItem.item.id!, this.libraryItem!.id)
                       }
                       if (tmpCollection) {
                         this.showCollections = false
-                        collection = tmpCollection
+                        this.collections[repeatItem.index] = tmpCollection
                       }
                     }
                   }) {
-                    Text(collection.books!.find(b => b.id === this.libraryItem!.id) ? "移除" : "添加")
+                    Text(repeatItem.item.books!.find(b => b.id === this.libraryItem!.id) ? "移除" : "添加")
                       .hitTestBehavior(HitTestMode.None)
                   }
                 }
@@ -942,8 +951,11 @@ export struct LibraryItemDetail {
               }
               .height(60)
             }
-          })
+            })
+            .virtualScroll({ totalCount: this.collections.length })
+            .key((item: Collection) => item.id)
         }
+        .cachedCount(2)
         .width('100%')
         .height('100%')
         .padding({ left: 20, right: 20, bottom: 25 })
@@ -2004,16 +2016,17 @@ export struct LibraryItemDetail {
                       .backgroundColor(Color.Transparent)
                     }
 
-                    ForEach(this.libraryItem?.media.chapters, (chapter: Chapter, index) => {
+                    Repeat<Chapter>(this.libraryItem?.media.chapters ?? [])
+                      .each((repeatItem: RepeatItem<Chapter>) => {
                       ListItem() {
                         Row() {
-                          Text(chapter.title)
+                          Text(repeatItem.item.title)
                             .fontSize(16)
                             .fontWeight(FontWeight.Medium)
                             .width('100%')
                             .layoutWeight(1)
 
-                          Text(this.formatSeconds(chapter.start))
+                          Text(this.formatSeconds(repeatItem.item.start))
                             .fontSize(15)
                             .fontWeight(FontWeight.Medium)
                             .fontColor($r('sys.color.font_secondary'))
@@ -2025,7 +2038,7 @@ export struct LibraryItemDetail {
                             .onClick(async () => {
                               this.tmpPlayingItem = await getPlayItem(this.libraryItem!.id)
                               if (this.tmpPlayingItem) {
-                                this.tmpPlayingIndex = index
+                                this.tmpPlayingIndex = repeatItem.index
                                 this.showConfirm = !this.showConfirm;
                               }
                             })
@@ -2040,7 +2053,9 @@ export struct LibraryItemDetail {
                         .justifyContent(FlexAlign.SpaceBetween)
                         .backgroundColor(Color.Transparent)
                       }
-                    })
+                      })
+                      .virtualScroll({ totalCount: this.libraryItem?.media.chapters?.length ?? 0 })
+                      .key((item: Chapter) => item.start + ':' + item.title)
                     }
                     .width('100%')
                     .height('100%')
@@ -2055,6 +2070,7 @@ export struct LibraryItemDetail {
                     })
                     .contentStartOffset(8)
                     .contentEndOffset(8)
+                    .cachedCount(2)
                     }
                     .width('100%')
                     .height('100%')
@@ -2129,16 +2145,17 @@ export struct LibraryItemDetail {
                       .backgroundColor(Color.Transparent)
                     }
 
-                    ForEach(this.libraryItem?.media.audioFiles, (audioFile: AudioFile, index) => {
+                    Repeat<AudioFile>(this.libraryItem?.media.audioFiles ?? [])
+                      .each((repeatItem: RepeatItem<AudioFile>) => {
                       ListItem() {
                         Row() {
-                          Text(audioFile.metadata.filename)
+                          Text(repeatItem.item.metadata.filename)
                             .fontSize(16)
                             .fontWeight(FontWeight.Medium)
                             .width('100%')
                             .layoutWeight(1)
 
-                          Text(this.formatSeconds(audioFile.duration))
+                          Text(this.formatSeconds(repeatItem.item.duration))
                             .fontSize(15)
                             .fontWeight(FontWeight.Medium)
                             .fontColor($r('sys.color.font_secondary'))
@@ -2154,7 +2171,9 @@ export struct LibraryItemDetail {
                         .justifyContent(FlexAlign.SpaceBetween)
                         .backgroundColor(Color.Transparent)
                       }
-                    })
+                      })
+                      .virtualScroll({ totalCount: this.libraryItem?.media.audioFiles?.length ?? 0 })
+                      .key((item: AudioFile) => item.metadata.filename)
                     }
                     .width('100%')
                     .height('100%')
@@ -2169,6 +2188,7 @@ export struct LibraryItemDetail {
                     })
                     .contentStartOffset(8)
                     .contentEndOffset(8)
+                    .cachedCount(2)
                     }
                     .width('100%')
                     .height('100%')

@@ -363,10 +363,11 @@ export struct EpisodeDetail {
     Column() {
       Stack() {
         List() {
-          ForEach(this.playlists, (playlist: Playlist, index) => {
+          Repeat<Playlist>(this.playlists)
+            .each((repeatItem: RepeatItem<Playlist>) => {
             ListItem() {
               Row() {
-                Text(playlist.name)
+                Text(repeatItem.item.name)
                   .fontSize(18)
                   .width('100%')
                   .layoutWeight(1)
@@ -379,19 +380,19 @@ export struct EpisodeDetail {
                     barHeight: 40,
                     onButtonClick: async () => {
                       let tmpPlaylist: Playlist | undefined = undefined
-                      let item = playlist.items.find(p => p.episodeId === this.episode!.id)
+                      let item = repeatItem.item.items.find(p => p.episodeId === this.episode!.id)
                       if (!item) {
-                        tmpPlaylist = await addToPlaylist(playlist.id!, this.episode!.libraryItemId!, this.episode!.id)
+                        tmpPlaylist = await addToPlaylist(repeatItem.item.id!, this.episode!.libraryItemId!, this.episode!.id)
                       } else {
-                        tmpPlaylist = await removeFromPlaylist(playlist.id!, this.episode!.libraryItemId!, this.episode!.id)
+                        tmpPlaylist = await removeFromPlaylist(repeatItem.item.id!, this.episode!.libraryItemId!, this.episode!.id)
                       }
                       if (tmpPlaylist) {
                         this.showPlaylists = false
-                        playlist = tmpPlaylist
+                        this.playlists[repeatItem.index] = tmpPlaylist
                       }
                     }
                   }) {
-                    Text(playlist.items.find(p => p.episodeId === this.episode!.id) ? "移除" : "添加")
+                    Text(repeatItem.item.items.find(p => p.episodeId === this.episode!.id) ? "移除" : "添加")
                       .hitTestBehavior(HitTestMode.None)
                   }
                 }
@@ -401,8 +402,11 @@ export struct EpisodeDetail {
               }
               .height(60)
             }
-          })
+            })
+            .virtualScroll({ totalCount: this.playlists.length })
+            .key((item: Playlist) => item.id)
         }
+        .cachedCount(2)
         .width('100%')
         .height('100%')
         .padding({ left: 20, right: 20, bottom: 20 })

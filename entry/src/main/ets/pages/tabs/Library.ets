@@ -30,16 +30,19 @@ export struct MediaLibrary {
                 (this.displayWidth >= 400 ? 2 : 1))))
           .clip(false)
 
-          ForEach(this.libraryItems, (libraryItem: LibraryItem, index) => {
+          Repeat<LibraryItem>(this.libraryItems)
+            .each((repeatItem: RepeatItem<LibraryItem>) => {
             GridItem() {
               LibraryItemComponent1({
-                item: libraryItem,
-                progress: this.progress.find(p => p.libraryItemId === libraryItem.id)
+                item: repeatItem.item,
+                progress: this.progress.find(p => p.libraryItemId === repeatItem.item.id)
               })
-                .margin({ bottom: index === this.libraryItems.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
+                .margin({ bottom: repeatItem.index === this.libraryItems.length - 1 ? getBottomContentInset(20, this.isStartPlaying, 104) : 0 })
             }
             .clip(false)
-          })
+            })
+            .virtualScroll({ totalCount: this.libraryItems.length })
+            .key((item: LibraryItem) => item.id)
         }
         .width('100%')
         .height('100%')
@@ -49,6 +52,7 @@ export struct MediaLibrary {
               (this.displayWidth >= 400 ? "1fr 1fr 1fr" : "1fr 1fr"))))
         .columnsGap(20)
         .rowsGap(15)
+        .cachedCount(2)
         .scrollBar(BarState.Off)
         .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
         .padding({

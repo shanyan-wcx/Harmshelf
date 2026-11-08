@@ -109,16 +109,19 @@ export struct FilterItems {
       Stack() {
         Column() {
           Grid(this.filterItemsScroller) {
-            ForEach(this.filterItems, (libraryItem: LibraryItem, index) => {
+            Repeat<LibraryItem>(this.filterItems)
+              .each((repeatItem: RepeatItem<LibraryItem>) => {
               GridItem() {
                 LibraryItemComponent1({
-                  item: libraryItem,
-                  progress: this.progress.find(p => p.libraryItemId === libraryItem.id)
+                  item: repeatItem.item,
+                  progress: this.progress.find(p => p.libraryItemId === repeatItem.item.id)
                 })
-                  .margin({ bottom: index === this.filterItems.length - 1 ? 20 : 0 })
+                  .margin({ bottom: repeatItem.index === this.filterItems.length - 1 ? 20 : 0 })
               }
               .clip(false)
-            })
+              })
+              .virtualScroll({ totalCount: this.filterItems.length })
+              .key((item: LibraryItem) => item.id)
           }
           .width('100%')
           .height('100%')
@@ -128,6 +131,7 @@ export struct FilterItems {
                 (this.displayWidth >= 400 ? "1fr 1fr 1fr" : "1fr 1fr"))))
           .columnsGap(20)
           .rowsGap(15)
+          .cachedCount(2)
           .scrollBar(BarState.Off)
           .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
           .padding({

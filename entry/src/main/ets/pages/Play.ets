@@ -1433,7 +1433,8 @@ export struct Play {
     Column() {
       Stack() {
         List() {
-           ForEach(this.bookmarks, (bookmark: Bookmark, index) => {
+          Repeat<Bookmark>(this.bookmarks)
+            .each((repeatItem: RepeatItem<Bookmark>) => {
              ListItem() {
                HdsListItem({
                  hdsListItemCard: {
@@ -1441,14 +1442,14 @@ export struct Play {
                    cardBackgroundColor: Color.Transparent,
                    textItem: {
                      primaryText: {
-                       text: bookmark.title.length === 0 ? this.formatTime(bookmark.createdAt) : bookmark.title,
+                       text: repeatItem.item.title.length === 0 ? this.formatTime(repeatItem.item.createdAt) : repeatItem.item.title,
                        modifier: new TextModifier().fontSize(16).fontColor(this.playColorPalette.primary)
                      },
                      primaryPrefixSymbol: {
                        symbol: this.playbackSheetSymbol($r('sys.symbol.bookmark'), this.playColorPalette.secondary)
                      },
                      secondaryText: {
-                       text: this.formatSeconds(bookmark.time),
+                       text: this.formatSeconds(repeatItem.item.time),
                        modifier: new TextModifier().fontSize(16).fontColor(this.playColorPalette.secondary)
                      },
                      secondaryPrefixSymbol: {
@@ -1459,7 +1460,7 @@ export struct Play {
                      this.showBookmark = false
                      await this.avPlayer!.reset();
                      this.isPlaying = true
-                     await this.getPlayContent(this.playingItem!, bookmark.time)
+                     await this.getPlayContent(this.playingItem!, repeatItem.item.time)
                      this.getUIContext().getPromptAction().showToast({
                        message: '跳转书签成功！',
                        duration: 500
@@ -1471,14 +1472,17 @@ export struct Play {
              .swipeAction({
                end: {
                  builder: () => {
-                   this.bookmarkEnd(bookmark, index)
+                   this.bookmarkEnd(repeatItem.item, repeatItem.index)
                  }
                }
              })
              .clip(false)
-          })
+            })
+            .virtualScroll({ totalCount: this.bookmarks.length })
+            .key((item: Bookmark) => item.createdAt + ':' + item.time)
 
         }
+        .cachedCount(2)
         .width('100%')
         .height('100%')
         .scrollBar(BarState.Off)
@@ -1917,9 +1921,10 @@ export struct Play {
     Column() {
       if (this.isLocalPlaying) {
         List({ scroller: this.chapterScroller }) {
-          ForEach(this.localPlayItem!.tracks, (track: LocalTrack, index: number) => {
+          Repeat<LocalTrack>(this.localPlayItem!.tracks)
+            .each((repeatItem: RepeatItem<LocalTrack>) => {
             ListItem() {
-              if (this.playingIndex === index) {
+              if (this.playingIndex === repeatItem.index) {
                 Row() {
                   ImmersiveActionButton({
                     barWidth: '100%',
@@ -1929,10 +1934,10 @@ export struct Play {
                     onButtonClick: async () => {
                       this.showChapter = false
                       await this.avPlayer!.reset();
-                      this.playingIndex = index
-                      this.playingTitle = track.title
+                      this.playingIndex = repeatItem.index
+                      this.playingTitle = repeatItem.item.title
                       try {
-                        const file = fs.openSync(track.filePath, fs.OpenMode.READ_ONLY)
+                        const file = fs.openSync(repeatItem.item.filePath, fs.OpenMode.READ_ONLY)
                         try {
                           this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
                         } catch (_) {
@@ -1944,7 +1949,7 @@ export struct Play {
                     }
                   }) {
                     Row() {
-                      Text(track.title)
+                      Text(repeatItem.item.title)
                         .fontSize(16)
                         .fontColor(this.playColorPalette.primary)
                         .width('100%')
@@ -1961,7 +1966,7 @@ export struct Play {
               } else {
                 Button({ type: ButtonType.Normal }) {
                   Row() {
-                    Text(track.title)
+                    Text(repeatItem.item.title)
                       .fontSize(16)
                       .fontColor(this.playColorPalette.primary)
                       .width('100%')
@@ -1979,10 +1984,10 @@ export struct Play {
                 .onClick(async () => {
                   this.showChapter = false
                   await this.avPlayer!.reset();
-                  this.playingIndex = index
-                  this.playingTitle = track.title
+                  this.playingIndex = repeatItem.index
+                  this.playingTitle = repeatItem.item.title
                   try {
-                    const file = fs.openSync(track.filePath, fs.OpenMode.READ_ONLY)
+                    const file = fs.openSync(repeatItem.item.filePath, fs.OpenMode.READ_ONLY)
                     try {
                       this.avPlayer!.fdSrc = { fd: file.fd, offset: 0, length: -1 }
                     } catch (_) {
@@ -1995,7 +2000,9 @@ export struct Play {
               }
             }
             .clip(false)
-          })
+            })
+            .virtualScroll({ totalCount: this.localPlayItem!.tracks.length })
+            .key((item: LocalTrack) => item.filePath)
         }
         .width('100%')
         .height('100%')
@@ -2004,11 +2011,13 @@ export struct Play {
         .borderRadius(10)
         .clip(false)
         .clipContent(ContentClipMode.BOUNDARY)
+        .cachedCount(2)
       } else {
         List({ scroller: this.chapterScroller }) {
-          ForEach(this.playingItem!.chapters, (chapter: Chapter, index) => {
+          Repeat<Chapter>(this.playingItem!.chapters)
+            .each((repeatItem: RepeatItem<Chapter>) => {
             ListItem() {
-              if (this.playingIndex === index) {
+              if (this.playingIndex === repeatItem.index) {
                 Row() {
                   ImmersiveActionButton({
                     barWidth: '100%',
@@ -2019,13 +2028,13 @@ export struct Play {
                       this.showChapter = false
                       await this.avPlayer!.reset();
                       this.isPlaying = true
-                      this.playingIndex = index
-                      this.playingTitle = chapter.title
+                      this.playingIndex = repeatItem.index
+                      this.playingTitle = repeatItem.item.title
                       this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
                     }
                   }) {
                     Row() {
-                      Text(chapter.title)
+                      Text(repeatItem.item.title)
                         .fontSize(16)
                         .fontColor(this.playColorPalette.primary)
                         .width('100%')
@@ -2033,7 +2042,7 @@ export struct Play {
                         .maxLines(1)
                         .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                      Text(this.formatSeconds(chapter.start))
+                      Text(this.formatSeconds(repeatItem.item.start))
                         .fontSize(16)
                         .fontColor(this.playColorPalette.secondary)
                         .margin({ left: 10 })
@@ -2047,7 +2056,7 @@ export struct Play {
               } else {
                 Button({ type: ButtonType.Normal }) {
                   Row() {
-                    Text(chapter.title)
+                    Text(repeatItem.item.title)
                       .fontSize(16)
                       .fontColor(this.playColorPalette.primary)
                       .width('100%')
@@ -2055,7 +2064,7 @@ export struct Play {
                       .maxLines(1)
                       .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-                    Text(this.formatSeconds(chapter.start))
+                    Text(this.formatSeconds(repeatItem.item.start))
                       .fontSize(16)
                       .fontColor(this.playColorPalette.secondary)
                       .margin({ left: 10 })
@@ -2071,14 +2080,16 @@ export struct Play {
                   this.showChapter = false
                   await this.avPlayer!.reset();
                   this.isPlaying = true
-                  this.playingIndex = index
-                  this.playingTitle = chapter.title
+                  this.playingIndex = repeatItem.index
+                  this.playingTitle = repeatItem.item.title
                   this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
                 })
               }
             }
             .clip(false)
-          })
+            })
+            .virtualScroll({ totalCount: this.playingItem!.chapters.length })
+            .key((item: Chapter) => item.start + ':' + item.title)
         }
         .width('100%')
         .height('100%')
@@ -2087,6 +2098,7 @@ export struct Play {
         .borderRadius(10)
         .clip(false)
         .clipContent(ContentClipMode.BOUNDARY)
+        .cachedCount(2)
       }
     }
     .clip(false)

@@ -235,12 +235,12 @@ export struct Add {
 
   build() {
     Stack() {
-      Scroll(this.addScroller) {
-        Column() {
-          if (this.searchPodcasts.length > 0) {
-            ForEach(this.searchPodcasts, (searchPodcast: SearchPodcast, index) => {
+      List({ scroller: this.addScroller }) {
+        Repeat<SearchPodcast>(this.searchPodcasts)
+          .each((repeatItem: RepeatItem<SearchPodcast>) => {
+            ListItem() {
               Row() {
-                Image(searchPodcast.cover)
+                Image(repeatItem.item.cover)
                   .alt($rawfile('nocover.jpg'))
                   .objectFit(ImageFit.Cover)
                   .width(64)
@@ -250,19 +250,19 @@ export struct Add {
                   .draggable(false)
 
                 Column() {
-                  Text(searchPodcast.title)
+                  Text(repeatItem.item.title)
                     .fontSize(16)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
                     .margin({ bottom: 3 })
 
-                  Text("by " + searchPodcast.artistName)
+                  Text("by " + repeatItem.item.artistName)
                     .fontSize(13)
                     .maxLines(1)
                     .textOverflow({ overflow: TextOverflow.Ellipsis })
                     .margin({ bottom: 5 })
 
-                  Text(searchPodcast.trackCount + " 剧集")
+                  Text(repeatItem.item.trackCount + " 剧集")
                     .fontSize(13)
                     .fontColor($r('sys.color.font_secondary'))
                 }
@@ -283,13 +283,13 @@ export struct Add {
                 color: $r('sys.color.ohos_id_color_focused_outline_transparent')
               })
               .shadow(ShadowStyle.OUTER_DEFAULT_XS)
-              .margin({ bottom: index === this.searchPodcasts.length - 1 ? getBottomContentInset(25, this.isStartPlaying, 109) : 16 })
+              .margin({ bottom: repeatItem.index === this.searchPodcasts.length - 1 ? getBottomContentInset(25, this.isStartPlaying, 109) : 16 })
               .onClick(async () => {
-                let podcast1 = await getFeed(searchPodcast.feedUrl)
+                let podcast1 = await getFeed(repeatItem.item.feedUrl)
                 if (podcast1) {
                   this.podcast = podcast1
-                  this.autoDownload[index] = false
-                  this.showConfirm[index] = true
+                  this.autoDownload[repeatItem.index] = false
+                  this.showConfirm[repeatItem.index] = true
                 } else {
                   this.getUIContext().getPromptAction().showToast({
                     message: '获取播客失败，请检查网络！',
@@ -298,7 +298,7 @@ export struct Add {
                 }
               })
               .clip(false)
-              .bindSheet(this.showConfirm[index], this.confirmBuilder(searchPodcast, this.podcast!, index), {
+              .bindSheet(this.showConfirm[repeatItem.index], this.confirmBuilder(repeatItem.item, this.podcast!, repeatItem.index), {
                 systemMaterial: new uiMaterial.ImmersiveMaterial({ style: uiMaterial.ImmersiveStyle.THIN }),
                 height: SheetSize.FIT_CONTENT,
                 preferType: SheetType.CENTER,
@@ -307,26 +307,14 @@ export struct Add {
                 },
                 showClose: false,
                 onDisappear: () => {
-                  this.showConfirm[index] = false
+                  this.showConfirm[repeatItem.index] = false
                 }
               })
-            })
-          }
-
-          if (this.searchPodcasts.length === 0) {
-            Column() {
-              Text("没有结果")
-                .fontSize(24)
             }
-            .width('100%')
-            .height('100%')
-            .padding({ bottom: 210 })
-            .justifyContent(FlexAlign.Center)
-            .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
-          }
-        }
-        .width('100%')
-        .clip(false)
+            .clip(false)
+          })
+          .virtualScroll({ totalCount: this.searchPodcasts.length })
+          .key((item: SearchPodcast) => item.feedUrl)
       }
       .width('100%')
       .height('100%')
@@ -334,8 +322,21 @@ export struct Add {
       .padding({ left: 4, right: 4, top: this.statusBarHeight + 56 + 36 + 75, bottom: 0 })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
+      .cachedCount(2)
       .align(Alignment.Top)
       .clip(false)
+
+      if (this.searchPodcasts.length === 0) {
+        Column() {
+          Text("没有结果")
+            .fontSize(24)
+        }
+        .width('100%')
+        .height('100%')
+        .padding({ bottom: 210 })
+        .justifyContent(FlexAlign.Center)
+        .visibility(this.showLoadingProgress ? Visibility.None : Visibility.Visible)
+      }
 
     }
     .width('100%')
