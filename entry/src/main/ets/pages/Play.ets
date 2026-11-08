@@ -907,8 +907,8 @@ export struct Play {
         .width('100%')
         .layoutWeight(1)
       } else {
-        Scroll(this.recommendationScroller) {
-          Column() {
+        List({ scroller: this.recommendationScroller }) {
+          ListItem() {
             Text('相关推荐')
               .fontSize(20)
               .fontWeight(FontWeight.Medium)
@@ -916,12 +916,16 @@ export struct Play {
               .height(28)
               .width('100%')
               .textAlign(TextAlign.Start)
-              .margin({ left: 20, bottom: 12 })
+          }
+          .width('100%')
+          .padding({ left: 20, right: 20, bottom: 12 })
+          .clip(false)
 
-            Column({ space: 12 }) {
-              ForEach(this.recommendationItems, (item: LibraryItem) => {
+          Repeat<LibraryItem>(this.recommendationItems)
+            .each((repeatItem: RepeatItem<LibraryItem>) => {
+              ListItem() {
                 Row() {
-                  this.recommendationCard(item)
+                  this.recommendationCard(repeatItem.item)
                 }
                 .width('100%')
                 .height(88)
@@ -929,17 +933,22 @@ export struct Play {
                 .hitTestBehavior(HitTestMode.Transparent)
                 .onTouchIntercept(() => HitTestMode.Transparent)
                 .onClick(() => {
-                  this.openRecommendation(item)
+                  this.openRecommendation(repeatItem.item)
                 })
-              })
-            }
-            .width('100%')
-            .padding({ left: 20, right: 20 })
-          }
-          .width('100%')
-          .alignItems(HorizontalAlign.Start)
-          .padding({ bottom: 12 })
+              }
+              .width('100%')
+              .height(88)
+              .padding({ left: 20, right: 20 })
+              .margin({ bottom: 12 })
+              .clip(false)
+            })
+            .virtualScroll({ totalCount: this.recommendationItems.length })
+            .key((item: LibraryItem) => item.id)
         }
+        .cachedCount(2)
+        .width('100%')
+        .height('100%')
+        .clip(false)
         .layoutWeight(1)
         .scrollBar(BarState.Off)
         .fadingEdge(true, { fadingEdgeLength: LengthMetrics.vp(24) })
