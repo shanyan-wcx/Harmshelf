@@ -773,9 +773,7 @@ export struct Play {
       barHeight: 88,
       barRadius: 18,
       monopolizeActionEvents: false,
-      onButtonClick: () => {
-        this.openRecommendation(item)
-      }
+      passThroughPointerEvents: true
     }) {
       Row() {
         Stack({ alignContent: Alignment.Center }) {
@@ -821,13 +819,13 @@ export struct Play {
             .width('100%')
         }
         .layoutWeight(1)
-        .margin({ left: 8 })
+        .margin({ left: 4 })
         .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.Center)
       }
       .width('100%')
       .height('100%')
-      .padding({ top: 8, bottom: 8, left: 4, right: 8 })
+      .padding({ top: 8, bottom: 8, left: 4, right: 4 })
       .alignItems(VerticalAlign.Center)
       .clip(false)
     }
@@ -881,6 +879,9 @@ export struct Play {
                   .width('100%')
                   .height(88)
                   .clip(false)
+                  .onClick(() => {
+                    this.openRecommendation(item)
+                  })
                 })
               }
               .width('100%')
