@@ -418,6 +418,7 @@ export struct Play {
   @Local coverColor: number = 0xff181818
   @Local isFloatingWindow: boolean = false
   @Local colorModeRevision: number = 0
+  private colorModeUpdateTimeout: number = -1
   private coverColorRequest: number = 0
   private coverColorPromise: Promise<void> | undefined = undefined
   private coverColorPromiseKey: string = ''
@@ -429,8 +430,17 @@ export struct Play {
   }
   private colorModeUpdateCallback: () => void = () => {
     this.colorModeRevision++
+    if (this.colorModeUpdateTimeout !== -1) {
+      clearTimeout(this.colorModeUpdateTimeout)
+      this.colorModeUpdateTimeout = -1
+    }
     if (this.showPlay) {
-      this.updateStatusBarContentColor()
+      this.colorModeUpdateTimeout = setTimeout(() => {
+        this.colorModeUpdateTimeout = -1
+        if (this.showPlay) {
+          this.updateStatusBarContentColor()
+        }
+      }, 200)
     }
   }
 
@@ -553,6 +563,10 @@ export struct Play {
     this.preparePlayColor = undefined
     AppStorage.set<boolean>('playStatusBarOverride', false)
     setColorModeUpdateCallback(undefined)
+    if (this.colorModeUpdateTimeout !== -1) {
+      clearTimeout(this.colorModeUpdateTimeout)
+      this.colorModeUpdateTimeout = -1
+    }
     if (this.playbackWindow) {
       this.playbackWindow.off('windowStatusDidChange', this.windowStatusCallback)
       this.playbackWindow = undefined
