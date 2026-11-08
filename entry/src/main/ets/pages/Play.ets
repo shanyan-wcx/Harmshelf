@@ -836,6 +836,8 @@ export struct Play {
             .fontWeight(FontWeight.Medium)
             .fontColor(this.playColorPalette.primary)
             .height(28)
+            .width('100%')
+            .textAlign(TextAlign.Start)
             .margin({ bottom: 16 })
 
           if (this.recommendationLoading) {
@@ -858,10 +860,12 @@ export struct Play {
                 this.recommendationCard(item)
               })
             }
+            .width('100%')
+            .padding({ left: 4, right: 4 })
           }
         }
         .width('100%')
-        .padding({ bottom: 8 })
+        .alignItems(HorizontalAlign.Start)
       }
       .layoutWeight(1)
       .scrollBar(BarState.Off)
