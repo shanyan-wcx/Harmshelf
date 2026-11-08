@@ -564,22 +564,22 @@ export struct Play {
   }
   @Monitor('playingItem')
   async refreshPlayingCoverColor(_: IMonitor) {
-    await this.refreshCoverColor()
+    await this.refreshCoverColor(true)
   }
   @Monitor('localPlayItem')
   async refreshLocalCoverColor(_: IMonitor) {
-    await this.refreshCoverColor()
+    await this.refreshCoverColor(true)
   }
   @Monitor('isLocalPlaying')
   async refreshLocalModeCoverColor(_: IMonitor) {
-    await this.refreshCoverColor()
+    await this.refreshCoverColor(true)
   }
   @Monitor('showPlay')
   async refreshShownCoverColor(_: IMonitor) {
     if (this.showPlay) {
+      await this.refreshCoverColor()
       this.changeSpeedIcon()
       await this.updateStatusBarContentColor()
-      await this.refreshCoverColor()
       await this.loadRecommendations()
     } else {
       await this.restoreStatusBarContentColor()
@@ -772,6 +772,7 @@ export struct Play {
       barWidth: '100%',
       barHeight: 88,
       barRadius: 18,
+      monopolizeActionEvents: false,
       onButtonClick: () => {
         this.openRecommendation(item)
       }
@@ -781,21 +782,12 @@ export struct Play {
           Image(this.baseUrl + `/api/items/${item.id}/cover?token=${this.apiToken}`)
             .alt($rawfile('nocover.jpg'))
             .objectFit(ImageFit.Cover)
-            .width(64)
-            .height(64)
-            .clipShape(new CircleShape({ width: '100%', height: '100%' }))
-            .borderRadius(32)
-            .clip(true)
-            .draggable(false)
-
-          Progress({ value: 100, total: 100, type: ProgressType.Ring })
             .width(72)
             .height(72)
-            .color($r('sys.color.comp_background_secondary'))
-            .style({
-              strokeWidth: 2,
-              enableSmoothEffect: false
-            })
+            .clipShape(new CircleShape({ width: '100%', height: '100%' }))
+            .borderRadius(36)
+            .clip(true)
+            .draggable(false)
         }
         .width(72)
         .height(72)
@@ -829,13 +821,13 @@ export struct Play {
             .width('100%')
         }
         .layoutWeight(1)
-        .margin({ left: 12 })
+        .margin({ left: 8 })
         .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.Center)
       }
       .width('100%')
       .height('100%')
-      .padding(8)
+      .padding({ top: 8, bottom: 8, left: 4, right: 8 })
       .alignItems(VerticalAlign.Center)
       .clip(false)
     }
@@ -857,6 +849,7 @@ export struct Play {
           LoadingProgress()
             .width(36)
             .height(36)
+            .color(this.playColorPalette.primary)
         }
         .width('100%')
         .layoutWeight(1)
@@ -927,9 +920,9 @@ export struct Play {
     return this.baseUrl + `/api/items/${this.playingItem.libraryItemId}/cover?token=${this.apiToken}`
   }
 
-  private async refreshCoverColor(): Promise<void> {
+  private async refreshCoverColor(force: boolean = false): Promise<void> {
     const coverSource = this.getCoverSource()
-    if (!coverSource || coverSource === this.coverColorKey) {
+    if (!coverSource || (!force && coverSource === this.coverColorKey)) {
       return
     }
     this.coverColorKey = coverSource
