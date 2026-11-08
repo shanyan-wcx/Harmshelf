@@ -1,13 +1,14 @@
 import { HdsBarStyle, HdsListItem } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LibraryItem, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
 import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier, uiMaterial, window } from '@kit.ArkUI'
-import { common } from '@kit.AbilityKit'
+import { common, ConfigurationConstant } from '@kit.AbilityKit'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { createBookmark, deleteBookmark, getBookmarks, getItem, getLibraryItems, getSeries } from '../utils/Api';
 import { PlaySetting } from './Index';
 import { media } from '@kit.MediaKit';
 import { Logger } from '../utils/Logger';
+import { env } from '../utils/Class';
 import { image } from '@kit.ImageKit';
 import { effectKit } from '@kit.ArkGraphics2D';
 import { rcp } from '@kit.RemoteCommunicationKit';
@@ -422,6 +423,8 @@ export struct Play {
   private coverColorReadyKey: string = ''
   private previousStatusBarContentColor: string = ''
   private playbackWindow: window.Window | undefined = undefined
+  private colorModeMonitorId: number = -1
+  private lastSystemColorMode: ConfigurationConstant.ColorMode | undefined = undefined
   private windowStatusCallback: (status: window.WindowStatusType) => void = (status: window.WindowStatusType) => {
     this.isFloatingWindow = status === window.WindowStatusType.FLOATING
   }
@@ -522,6 +525,16 @@ export struct Play {
       this.isFloatingWindow = mainWindow.getWindowStatus() === window.WindowStatusType.FLOATING
       mainWindow.on('windowStatusDidChange', this.windowStatusCallback)
       this.previousStatusBarContentColor = mainWindow.getWindowSystemBarProperties().statusBarContentColor ?? ''
+      this.lastSystemColorMode = env.colorMode
+      this.colorModeMonitorId = setInterval(() => {
+        const currentMode = env.colorMode
+        if (currentMode !== this.lastSystemColorMode) {
+          this.lastSystemColorMode = currentMode
+          if (this.showPlay) {
+            this.updateStatusBarContentColor()
+          }
+        }
+      }, 500)
       if (this.showPlay) {
         await this.updateStatusBarContentColor()
       }
@@ -541,6 +554,10 @@ export struct Play {
     }
     this.coverColorRequest++
     this.preparePlayColor = undefined
+    if (this.colorModeMonitorId !== -1) {
+      clearInterval(this.colorModeMonitorId)
+      this.colorModeMonitorId = -1
+    }
     if (this.playbackWindow) {
       this.playbackWindow.off('windowStatusDidChange', this.windowStatusCallback)
       this.playbackWindow = undefined
@@ -846,6 +863,7 @@ export struct Play {
     .padding(8)
     .borderRadius(18)
     .backgroundColor(this.coverColor)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_THIN)
     .border({
       width: 0.35,
       radius: 18,
@@ -936,12 +954,27 @@ export struct Play {
   private getCoverSource(): string {
     if (this.isLocalPlaying) {
       const coverPath = this.localPlayItem?.coverPath ?? ''
-      return coverPath ? fileUri.getUriFromPath(coverPath) : ''
+      try {
+        return coverPath && fs.accessSync(coverPath) ? fileUri.getUriFromPath(coverPath) : ''
+      } catch (_) {
+        return ''
+      }
     }
     if (!this.baseUrl || !this.playingItem?.libraryItemId) {
       return ''
     }
     return this.baseUrl + `/api/items/${this.playingItem.libraryItemId}/cover?token=${this.apiToken}`
+  }
+
+  private async useAppBackgroundColor(): Promise<void> {
+    try {
+      const context = this.getUIContext().getHostContext() as common.UIAbilityContext
+      this.coverColor = await context.resourceManager.getColor($r('sys.color.background_secondary'))
+    } catch (_) {
+      this.coverColor = 0xff181818
+    }
+    this.coverColorReadyKey = ''
+    await this.updateStatusBarContentColor()
   }
 
   private getCoverCachePath(coverSource: string): string {
@@ -955,7 +988,13 @@ export struct Play {
 
   private async refreshCoverColor(force: boolean = false): Promise<void> {
     const coverSource = this.getCoverSource()
-    if (!coverSource || (!force && coverSource === this.coverColorReadyKey)) {
+    if (!coverSource) {
+      if (this.isLocalPlaying) {
+        await this.useAppBackgroundColor()
+      }
+      return
+    }
+    if (!force && coverSource === this.coverColorReadyKey) {
       return
     }
     if (this.coverColorPromise && this.coverColorPromiseKey === coverSource) {
@@ -1004,6 +1043,8 @@ export struct Play {
             imageSource = image.createImageSource(response.body)
           }
         }
+      } else if (this.isLocalPlaying && this.localPlayItem?.coverPath) {
+        imageSource = image.createImageSource(this.localPlayItem.coverPath)
       } else {
         imageSource = image.createImageSource(coverSource)
       }
