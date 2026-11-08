@@ -1,10 +1,10 @@
 import { HdsBarStyle, HdsListItem } from '@kit.UIDesignKit'
-import { Bookmark, Chapter, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
+import { Bookmark, Chapter, LibraryItem, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
 import { ColorMetrics, CircleShape, PersistenceV2, SymbolGlyphModifier, TextModifier, uiMaterial, window } from '@kit.ArkUI'
 import { common } from '@kit.AbilityKit'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
-import { createBookmark, deleteBookmark, getBookmarks } from '../utils/Api';
+import { createBookmark, deleteBookmark, getBookmarks, getLibraryItems, getSeries } from '../utils/Api';
 import { PlaySetting } from './Index';
 import { media } from '@kit.MediaKit';
 import { Logger } from '../utils/Logger';
@@ -22,6 +22,13 @@ interface PlayColorPalette {
   secondary: string
   sliderBlock: string
   sliderTrack: string
+}
+
+interface RecommendationCandidate {
+  item: LibraryItem
+  score: number
+  sameSeries: boolean
+  seriesOrder: number
 }
 
 @ComponentV2
@@ -366,11 +373,14 @@ export struct PlaybackMiniBar {
 @ComponentV2
 export struct Play {
   private chapterScroller: Scroller = new Scroller();
+  private recommendationScroller: Scroller = new Scroller();
   @Env(SystemProperties.WINDOW_AVOID_AREA)
   windowAvoidArea: window.UIEnvWindowAvoidAreaInfoVP
   @Consumer() playSetting: PlaySetting | undefined = PersistenceV2.connect(PlaySetting, () => new PlaySetting());
   @Consumer() displayWidth: number = 0
   @Consumer() displayHeight: number = 0
+  @Consumer() pageInfos: NavPathStack = new NavPathStack()
+  @Consumer() libraryItem: LibraryItem | undefined = undefined
   @Consumer() isPlaying: boolean = false
   @Consumer() isStartPlaying: boolean = false
   @Consumer() isIndex: boolean = true
@@ -532,6 +542,10 @@ export struct Play {
   @Local selectedSleepOption: number = 0
   @Local maxIntroLine: number = 5
   @Local showMoreIntro: boolean = false
+  @Local recommendationItems: LibraryItem[] = []
+  @Local recommendationLoading: boolean = false
+  @Local recommendationToOpen: LibraryItem | undefined = undefined
+  private recommendationRequestId: number = 0
   @Monitor('playingItem')
   async setSpeed(_: IMonitor) {
     this.sleepTime = 0
@@ -566,9 +580,305 @@ export struct Play {
       this.changeSpeedIcon()
       await this.updateStatusBarContentColor()
       await this.refreshCoverColor()
+      await this.loadRecommendations()
     } else {
       await this.restoreStatusBarContentColor()
+      await this.loadRecommendations()
     }
+  }
+
+  @Monitor('playingItem')
+  async refreshPlayingRecommendations(_: IMonitor) {
+    if (this.showPlay) {
+      await this.loadRecommendations()
+    }
+  }
+
+  private normalizeRecommendationText(value: string): string {
+    return value.toLowerCase().replace(/\s/g, '')
+  }
+
+  private recommendationTerms(value: string): string[] {
+    return value.toLowerCase().split(/[\s,_\-·/|，、;；:：]+/).filter(term => term.length > 0)
+  }
+
+  private recommendationTextScore(left: string, right: string): number {
+    const first = this.normalizeRecommendationText(left)
+    const second = this.normalizeRecommendationText(right)
+    if (!first || !second) {
+      return 0
+    }
+    if (first === second) {
+      return 1
+    }
+    if (first.includes(second) || second.includes(first)) {
+      return 0.7
+    }
+    const firstTerms = this.recommendationTerms(left)
+    const secondTerms = this.recommendationTerms(right)
+    return firstTerms.some(term => secondTerms.includes(term)) ? 0.45 : 0
+  }
+
+  private recommendationListScore(left: string[], right: string[]): number {
+    if (left.length === 0 || right.length === 0) {
+      return 0
+    }
+    let score = 0
+    for (const leftValue of left) {
+      let best = 0
+      for (const rightValue of right) {
+        best = Math.max(best, this.recommendationTextScore(leftValue, rightValue))
+      }
+      score += best
+    }
+    return Math.min(1, score / Math.max(left.length, right.length))
+  }
+
+  private recommendationAuthors(item: LibraryItem): string[] {
+    const authors: string[] = []
+    item.media.metadata.authors?.forEach(author => {
+      if (author.name && !authors.includes(author.name)) {
+        authors.push(author.name)
+      }
+    })
+    const authorNames = [item.media.metadata.authorName, item.media.metadata.author]
+    authorNames.forEach(author => {
+      if (author && !authors.includes(author)) {
+        authors.push(author)
+      }
+    })
+    return authors
+  }
+
+  private async recommendationSeriesOrder(libraryId: string): Promise<Map<string, number>> {
+    const orders = new Map<string, number>()
+    const series = await getSeries(libraryId)
+    series.forEach(seriesItem => {
+      seriesItem.books?.forEach(book => {
+        if (book.sequence !== '') {
+          const sequence = Number(book.sequence)
+          if (!isNaN(sequence)) {
+            orders.set(book.id, sequence)
+          }
+        }
+      })
+    })
+    return orders
+  }
+
+  private async loadRecommendations(): Promise<void> {
+    const requestId = ++this.recommendationRequestId
+    this.recommendationItems = []
+    if (!this.showPlay || this.isLocalPlaying || !this.playingItem?.libraryId) {
+      this.recommendationLoading = false
+      return
+    }
+
+    this.recommendationLoading = true
+    const libraryId = this.playingItem.libraryId
+    try {
+      const items = await getLibraryItems(libraryId)
+      if (requestId !== this.recommendationRequestId) {
+        return
+      }
+      const currentItem = items.find(item => item.id === this.playingItem?.libraryItemId) ?? this.playingItem.libraryItem
+      if (!currentItem) {
+        return
+      }
+
+      const currentSeries = currentItem.media.metadata.seriesName ?? ''
+      const currentAuthors = this.recommendationAuthors(currentItem)
+      const currentGenres = currentItem.media.metadata.genres ?? []
+      const currentTags = currentItem.media.tags ?? []
+      const seriesOrders = currentSeries ? await this.recommendationSeriesOrder(libraryId) : new Map<string, number>()
+      const candidates: RecommendationCandidate[] = []
+
+      items.forEach(item => {
+        if (item.id === currentItem.id || item.libraryId !== libraryId || item.mediaType !== currentItem.mediaType) {
+          return
+        }
+        const itemSeries = item.media.metadata.seriesName ?? ''
+        const itemAuthors = this.recommendationAuthors(item)
+        const itemGenres = item.media.metadata.genres ?? []
+        const itemTags = item.media.tags ?? []
+        let weightedScore = 0
+        let availableWeight = 0
+        if (currentSeries && itemSeries) {
+          weightedScore += 0.45 * this.recommendationTextScore(currentSeries, itemSeries)
+          availableWeight += 0.45
+        }
+        if (currentAuthors.length > 0 && itemAuthors.length > 0) {
+          weightedScore += 0.3 * this.recommendationListScore(currentAuthors, itemAuthors)
+          availableWeight += 0.3
+        }
+        if (currentGenres.length > 0 && itemGenres.length > 0) {
+          weightedScore += 0.15 * this.recommendationListScore(currentGenres, itemGenres)
+          availableWeight += 0.15
+        }
+        if (currentTags.length > 0 && itemTags.length > 0) {
+          weightedScore += 0.1 * this.recommendationListScore(currentTags, itemTags)
+          availableWeight += 0.1
+        }
+        const score = availableWeight > 0 ? weightedScore / availableWeight : 0
+        if (score >= 0.2) {
+          candidates.push({
+            item: item,
+            score: score,
+            sameSeries: currentSeries !== '' && this.recommendationTextScore(currentSeries, itemSeries) === 1,
+            seriesOrder: seriesOrders.get(item.id) ?? Number.MAX_VALUE
+          })
+        }
+      })
+
+      candidates.sort((left, right) => {
+        if (left.sameSeries !== right.sameSeries) {
+          return left.sameSeries ? -1 : 1
+        }
+        if (left.sameSeries && left.seriesOrder !== right.seriesOrder) {
+          return left.seriesOrder - right.seriesOrder
+        }
+        return right.score - left.score
+      })
+      this.recommendationItems = candidates.slice(0, 12).map(candidate => candidate.item)
+    } finally {
+      if (requestId === this.recommendationRequestId) {
+        this.recommendationLoading = false
+      }
+    }
+  }
+
+  private openRecommendation(item: LibraryItem) {
+    this.recommendationToOpen = item
+    this.showPlay = false
+  }
+
+  private recommendationAuthorText(item: LibraryItem): string {
+    const authors = this.recommendationAuthors(item)
+    return authors.length > 0 ? authors.join(', ') : (item.mediaType === 'book' ? '有声书' : '播客')
+  }
+
+  private get recommendationCardBackground(): string {
+    return this.playControlColor === Color.Black ?
+      ColorMetrics.rgba(255, 255, 255, 0.12).color :
+      ColorMetrics.rgba(0, 0, 0, 0.12).color
+  }
+
+  private get recommendationCardBorder(): string {
+    return this.playControlColor === Color.Black ?
+      ColorMetrics.rgba(255, 255, 255, 0.24).color :
+      ColorMetrics.rgba(0, 0, 0, 0.18).color
+  }
+
+  @Builder
+  recommendationCard(item: LibraryItem) {
+    Row() {
+      Image(this.baseUrl + `/api/items/${item.id}/cover?token=${this.apiToken}`)
+        .alt($rawfile('nocover.jpg'))
+        .objectFit(ImageFit.Cover)
+        .width(72)
+        .height(72)
+        .borderRadius(10)
+        .clip(true)
+        .draggable(false)
+
+      Column({ space: 5 }) {
+        Text(item.media.metadata.title || '-')
+          .fontSize(16)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(this.playColorPalette.primary)
+          .maxLines(2)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .width('100%')
+
+        Text(this.recommendationAuthorText(item))
+          .fontSize(13)
+          .fontColor(this.playColorPalette.secondary)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .width('100%')
+
+        Text(item.media.metadata.seriesName ?? (item.mediaType === 'book' ? '有声书' : '播客'))
+          .fontSize(13)
+          .fontColor(this.playColorPalette.secondary)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .width('100%')
+      }
+      .layoutWeight(1)
+      .margin({ left: 12 })
+      .alignItems(HorizontalAlign.Start)
+    }
+    .width('100%')
+    .height(88)
+    .padding(8)
+    .borderRadius(18)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+    .backgroundColor(this.recommendationCardBackground)
+    .border({
+      width: 0.35,
+      radius: 18,
+      color: this.recommendationCardBorder
+    })
+    .shadow(ShadowStyle.OUTER_DEFAULT_XS)
+    .clip(false)
+    .onClick(() => {
+      this.openRecommendation(item)
+    })
+  }
+
+  @Builder
+  recommendationsBuilder() {
+    Column() {
+      Row() {
+        Text('相关推荐')
+          .fontSize(20)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(this.playColorPalette.primary)
+      }
+      .width('100%')
+      .height(28)
+
+      if (this.recommendationLoading) {
+        Stack() {
+          LoadingProgress()
+            .width(32)
+            .height(32)
+        }
+        .layoutWeight(1)
+      } else if (this.recommendationItems.length === 0) {
+        Stack() {
+          Text('暂时没有相似内容')
+            .fontSize(16)
+            .fontColor(this.playColorPalette.secondary)
+        }
+        .layoutWeight(1)
+      } else {
+        Scroll(this.recommendationScroller) {
+          Column({ space: 12 }) {
+            ForEach(this.recommendationItems, (item: LibraryItem) => {
+              this.recommendationCard(item)
+            })
+          }
+          .width('100%')
+          .padding({ top: 4, bottom: 8 })
+        }
+        .layoutWeight(1)
+        .scrollBar(BarState.Off)
+        .clip(false)
+      }
+    }
+    .width('100%')
+    .height('100%')
+    .padding({
+      left: 20,
+      right: 20,
+      top: (this.windowAvoidArea.statusBar.visible ? this.windowAvoidArea.statusBar.topRect.height : 0) + 20,
+      bottom: (this.windowAvoidArea.navigationIndicator.visible ?
+        this.windowAvoidArea.navigationIndicator.bottomRect.height : 0) + 20
+    })
+    .backgroundColor(this.coverColor)
+    .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+    .clip(false)
   }
 
   private getCoverSource(): string {
@@ -2138,11 +2448,7 @@ export struct Play {
         }
       if (this.displayWidth >= 1000) {
         GridCol({ span: 1 }) {
-          Column()
-            .width('100%')
-            .height('100%')
-            .backgroundColor(this.coverColor)
-            .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
+          this.recommendationsBuilder()
         }
       }
     }
@@ -2214,6 +2520,11 @@ export struct Play {
           this.isStartPlaying = false
           this.isPlaying = false
           this.shouldClosePlayer = false
+        }
+        if (this.recommendationToOpen) {
+          this.libraryItem = this.recommendationToOpen
+          this.recommendationToOpen = undefined
+          this.pageInfos.pushPathByName('libraryItemDetail', null)
         }
       }
     })
