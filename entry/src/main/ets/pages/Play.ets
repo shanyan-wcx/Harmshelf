@@ -764,6 +764,7 @@ export struct Play {
       const currentAuthors = this.recommendationAuthors(currentItem)
       const currentGenres = currentItem.media.metadata.genres ?? []
       const currentTags = currentItem.media.tags ?? []
+      const currentTopics = currentGenres.concat(currentTags)
       const seriesOrders = currentSeries ? await this.recommendationSeriesOrder(libraryId) : new Map<string, number>()
       const candidates: RecommendationCandidate[] = []
 
@@ -775,6 +776,7 @@ export struct Play {
         const itemAuthors = this.recommendationAuthors(item)
         const itemGenres = item.media.metadata.genres ?? []
         const itemTags = item.media.tags ?? []
+        const itemTopics = itemGenres.concat(itemTags)
         let weightedScore = 0
         let availableWeight = 0
         if (currentSeries && itemSeries) {
@@ -794,10 +796,13 @@ export struct Play {
           availableWeight += 0.1
         }
         const score = availableWeight > 0 ? weightedScore / availableWeight : 0
-        if (score >= 0.2) {
+        const hasTopicMatch = currentTopics.some(leftValue =>
+          itemTopics.some(rightValue => this.recommendationTextScore(leftValue, rightValue) >= 0.45))
+        const effectiveScore = hasTopicMatch ? Math.max(score, 0.2) : score
+        if (effectiveScore >= 0.2) {
           candidates.push({
             item: item,
-            score: score,
+            score: effectiveScore,
             sameSeries: currentSeries !== '' && this.recommendationTextScore(currentSeries, itemSeries) === 1,
             seriesOrder: seriesOrders.get(item.id) ?? Number.MAX_VALUE
           })
@@ -854,7 +859,7 @@ export struct Play {
   }
 
   private get recommendationCardBackground(): string {
-    return this.playControlColor === Color.Black ? '#2B182431' : '#2BFFFFFF'
+    return this.playControlColor === Color.Black ? '#33182431' : '#33FFFFFF'
   }
 
   @Builder
