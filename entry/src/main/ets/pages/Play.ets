@@ -944,6 +944,15 @@ export struct Play {
     return this.baseUrl + `/api/items/${this.playingItem.libraryItemId}/cover?token=${this.apiToken}`
   }
 
+  private getCoverCachePath(coverSource: string): string {
+    const context = this.getUIContext().getHostContext() as common.UIAbilityContext
+    let hash = 0
+    for (let index = 0; index < coverSource.length; index++) {
+      hash = (hash * 31 + coverSource.charCodeAt(index)) >>> 0
+    }
+    return `${context.cacheDir}/harmshelf-cover-${hash.toString(16)}`
+  }
+
   private async refreshCoverColor(force: boolean = false): Promise<void> {
     const coverSource = this.getCoverSource()
     if (!coverSource || (!force && coverSource === this.coverColorReadyKey)) {
@@ -973,12 +982,28 @@ export struct Play {
     let pixelMap: image.PixelMap | undefined = undefined
     try {
       if (coverSource.startsWith('http://') || coverSource.startsWith('https://')) {
-        session = rcp.createSession()
-        const response = await session.fetch(new rcp.Request(coverSource, 'GET'))
-        if (!response.body) {
-          return
+        const cachePath = this.getCoverCachePath(coverSource)
+        if (fs.accessSync(cachePath)) {
+          imageSource = image.createImageSource(cachePath)
+        } else {
+          // shortcut: first use still downloads once; subsequent extraction reuses the app cache.
+          session = rcp.createSession()
+          const response = await session.fetch(new rcp.Request(coverSource, 'GET'))
+          if (!response.body) {
+            return
+          }
+          try {
+            const file = fs.openSync(cachePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE)
+            try {
+              fs.writeSync(file.fd, response.body)
+            } finally {
+              fs.closeSync(file.fd)
+            }
+            imageSource = image.createImageSource(cachePath)
+          } catch (_) {
+            imageSource = image.createImageSource(response.body)
+          }
         }
-        imageSource = image.createImageSource(response.body)
       } else {
         imageSource = image.createImageSource(coverSource)
       }
