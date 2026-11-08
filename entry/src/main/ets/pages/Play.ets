@@ -842,48 +842,59 @@ export struct Play {
   @Builder
   recommendationsBuilder() {
     Column() {
-      Scroll(this.recommendationScroller) {
-        Column() {
+      if (this.recommendationLoading) {
+        Stack({ alignContent: Alignment.Center }) {
           Text('相关推荐')
             .fontSize(20)
             .fontWeight(FontWeight.Medium)
             .fontColor(this.playColorPalette.primary)
             .height(28)
-            .width('100%')
             .textAlign(TextAlign.Start)
-            .margin({ bottom: 12 })
+            .position({ top: 0, left: 20 })
 
-          if (this.recommendationLoading) {
-            Stack() {
-              LoadingProgress()
-                .width(32)
-                .height(32)
-            }
-            .height(160)
-          } else if (this.recommendationItems.length === 0) {
-            Stack() {
-              Text('暂时没有相似内容')
-                .fontSize(16)
-                .fontColor(this.playColorPalette.secondary)
-            }
-            .height(160)
-          } else {
-            Column({ space: 12 }) {
-              ForEach(this.recommendationItems, (item: LibraryItem) => {
-                this.recommendationCard(item)
-              })
-            }
-            .width('100%')
-            .padding({ left: 20, right: 20 })
-          }
+          LoadingProgress()
+            .width(32)
+            .height(32)
         }
         .width('100%')
-        .alignItems(HorizontalAlign.Start)
-        .padding({ bottom: 12 })
+        .layoutWeight(1)
+      } else {
+        Scroll(this.recommendationScroller) {
+          Column() {
+            Text('相关推荐')
+              .fontSize(20)
+              .fontWeight(FontWeight.Medium)
+              .fontColor(this.playColorPalette.primary)
+              .height(28)
+              .width('100%')
+              .textAlign(TextAlign.Start)
+              .margin({ left: 20, bottom: 12 })
+
+            if (this.recommendationItems.length === 0) {
+              Stack() {
+                Text('暂时没有相似内容')
+                  .fontSize(16)
+                  .fontColor(this.playColorPalette.secondary)
+              }
+              .height(160)
+            } else {
+              Column({ space: 12 }) {
+                ForEach(this.recommendationItems, (item: LibraryItem) => {
+                  this.recommendationCard(item)
+                })
+              }
+              .width('100%')
+              .padding({ left: 20, right: 20 })
+            }
+          }
+          .width('100%')
+          .alignItems(HorizontalAlign.Start)
+          .padding({ bottom: 12 })
+        }
+        .layoutWeight(1)
+        .scrollBar(BarState.Off)
+        .fadingEdge(true, { fadingEdgeLength: LengthMetrics.vp(24) })
       }
-      .layoutWeight(1)
-      .scrollBar(BarState.Off)
-      .fadingEdge(true, { fadingEdgeLength: LengthMetrics.vp(24) })
     }
     .width('100%')
     .height('100%')
