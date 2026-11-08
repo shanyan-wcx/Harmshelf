@@ -1,13 +1,14 @@
 import { HdsBarStyle, HdsListItem } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LibraryItem, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
 import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier, uiMaterial, window } from '@kit.ArkUI'
-import { common, systemConfiguration } from '@kit.AbilityKit'
+import { common } from '@kit.AbilityKit'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { createBookmark, deleteBookmark, getBookmarks, getItem, getLibraryItems, getSeries } from '../utils/Api';
 import { PlaySetting } from './Index';
 import { media } from '@kit.MediaKit';
 import { Logger } from '../utils/Logger';
+import { setColorModeUpdateCallback } from '../utils/Class';
 import { image } from '@kit.ImageKit';
 import { effectKit } from '@kit.ArkGraphics2D';
 import { rcp } from '@kit.RemoteCommunicationKit';
@@ -426,12 +427,10 @@ export struct Play {
   private windowStatusCallback: (status: window.WindowStatusType) => void = (status: window.WindowStatusType) => {
     this.isFloatingWindow = status === window.WindowStatusType.FLOATING
   }
-  private systemConfigurationCallback: systemConfiguration.UpdatedCallback = {
-    onColorModeUpdated: () => {
-      this.colorModeRevision++
-      if (this.showPlay) {
-        this.updateStatusBarContentColor()
-      }
+  private colorModeUpdateCallback: () => void = () => {
+    this.colorModeRevision++
+    if (this.showPlay) {
+      this.updateStatusBarContentColor()
     }
   }
 
@@ -528,11 +527,11 @@ export struct Play {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
       const mainWindow = await window.getLastWindow(context)
       AppStorage.set<boolean>('playStatusBarOverride', this.showPlay)
+      setColorModeUpdateCallback(this.colorModeUpdateCallback)
       this.playbackWindow = mainWindow
       this.isFloatingWindow = mainWindow.getWindowStatus() === window.WindowStatusType.FLOATING
       mainWindow.on('windowStatusDidChange', this.windowStatusCallback)
       this.previousStatusBarContentColor = mainWindow.getWindowSystemBarProperties().statusBarContentColor ?? ''
-      context.getApplicationContext().onSystemConfigurationUpdated(this.systemConfigurationCallback)
       if (this.showPlay) {
         await this.updateStatusBarContentColor()
       }
@@ -553,11 +552,7 @@ export struct Play {
     this.coverColorRequest++
     this.preparePlayColor = undefined
     AppStorage.set<boolean>('playStatusBarOverride', false)
-    try {
-      const context = this.getUIContext().getHostContext() as common.UIAbilityContext
-      context.getApplicationContext().offSystemConfigurationUpdated(this.systemConfigurationCallback)
-    } catch (_) {
-    }
+    setColorModeUpdateCallback(undefined)
     if (this.playbackWindow) {
       this.playbackWindow.off('windowStatusDidChange', this.windowStatusCallback)
       this.playbackWindow = undefined
@@ -584,6 +579,7 @@ export struct Play {
   @Local recommendationLoadedItemId: string = ''
   @Local recommendationToOpen: LibraryItem | undefined = undefined
   private recommendationRequestId: number = 0
+  private recommendationLoadingItemId: string = ''
   @Monitor('playingItem')
   async setSpeed(_: IMonitor) {
     this.sleepTime = 0
@@ -602,15 +598,15 @@ export struct Play {
   }
   @Monitor('playingItem')
   async refreshPlayingCoverColor(_: IMonitor) {
-    await this.refreshCoverColor(true)
+    await this.refreshCoverColor()
   }
   @Monitor('localPlayItem')
   async refreshLocalCoverColor(_: IMonitor) {
-    await this.refreshCoverColor(true)
+    await this.refreshCoverColor()
   }
   @Monitor('isLocalPlaying')
   async refreshLocalModeCoverColor(_: IMonitor) {
-    await this.refreshCoverColor(true)
+    await this.refreshCoverColor()
   }
   @Monitor('showPlay')
   async refreshShownCoverColor(_: IMonitor) {
@@ -702,17 +698,26 @@ export struct Play {
   }
 
   private async loadRecommendations(): Promise<void> {
-    const requestId = ++this.recommendationRequestId
-    this.recommendationItems = []
-    this.recommendationLoadedItemId = ''
-    if (!this.playingItem?.libraryId) {
+    const libraryItemId = this.playingItem?.libraryItemId ?? ''
+    if (!this.playingItem?.libraryId || !libraryItemId) {
+      this.recommendationRequestId++
+      this.recommendationItems = []
+      this.recommendationLoadedItemId = ''
+      this.recommendationLoadingItemId = ''
       this.recommendationLoading = false
       return
     }
+    if (libraryItemId === this.recommendationLoadedItemId ||
+      (this.recommendationLoading && libraryItemId === this.recommendationLoadingItemId)) {
+      return
+    }
+    const requestId = ++this.recommendationRequestId
+    this.recommendationItems = []
+    this.recommendationLoadedItemId = ''
 
     this.recommendationLoading = true
+    this.recommendationLoadingItemId = libraryItemId
     const libraryId = this.playingItem.libraryId
-    const libraryItemId = this.playingItem.libraryItemId
     try {
       const items = await getLibraryItems(libraryId)
       if (requestId !== this.recommendationRequestId) {
@@ -789,6 +794,7 @@ export struct Play {
       if (requestId === this.recommendationRequestId) {
         this.recommendationLoading = false
         this.recommendationLoadedItemId = libraryItemId
+        this.recommendationLoadingItemId = ''
       }
     }
   }
