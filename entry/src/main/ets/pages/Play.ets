@@ -1,14 +1,13 @@
 import { HdsBarStyle, HdsListItem } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LibraryItem, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
 import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier, uiMaterial, window } from '@kit.ArkUI'
-import { common, ConfigurationConstant } from '@kit.AbilityKit'
+import { common, systemConfiguration } from '@kit.AbilityKit'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { createBookmark, deleteBookmark, getBookmarks, getItem, getLibraryItems, getSeries } from '../utils/Api';
 import { PlaySetting } from './Index';
 import { media } from '@kit.MediaKit';
 import { Logger } from '../utils/Logger';
-import { env } from '../utils/Class';
 import { image } from '@kit.ImageKit';
 import { effectKit } from '@kit.ArkGraphics2D';
 import { rcp } from '@kit.RemoteCommunicationKit';
@@ -423,10 +422,15 @@ export struct Play {
   private coverColorReadyKey: string = ''
   private previousStatusBarContentColor: string = ''
   private playbackWindow: window.Window | undefined = undefined
-  private colorModeMonitorId: number = -1
-  private lastSystemColorMode: ConfigurationConstant.ColorMode | undefined = undefined
   private windowStatusCallback: (status: window.WindowStatusType) => void = (status: window.WindowStatusType) => {
     this.isFloatingWindow = status === window.WindowStatusType.FLOATING
+  }
+  private systemConfigurationCallback: systemConfiguration.UpdatedCallback = {
+    onColorModeUpdated: () => {
+      if (this.showPlay) {
+        this.updateStatusBarContentColor()
+      }
+    }
   }
 
   private get playControlColor(): Color {
@@ -525,16 +529,7 @@ export struct Play {
       this.isFloatingWindow = mainWindow.getWindowStatus() === window.WindowStatusType.FLOATING
       mainWindow.on('windowStatusDidChange', this.windowStatusCallback)
       this.previousStatusBarContentColor = mainWindow.getWindowSystemBarProperties().statusBarContentColor ?? ''
-      this.lastSystemColorMode = env.colorMode
-      this.colorModeMonitorId = setInterval(() => {
-        const currentMode = env.colorMode
-        if (currentMode !== this.lastSystemColorMode) {
-          this.lastSystemColorMode = currentMode
-          if (this.showPlay) {
-            this.updateStatusBarContentColor()
-          }
-        }
-      }, 500)
+      context.getApplicationContext().onSystemConfigurationUpdated(this.systemConfigurationCallback)
       if (this.showPlay) {
         await this.updateStatusBarContentColor()
       }
@@ -554,9 +549,10 @@ export struct Play {
     }
     this.coverColorRequest++
     this.preparePlayColor = undefined
-    if (this.colorModeMonitorId !== -1) {
-      clearInterval(this.colorModeMonitorId)
-      this.colorModeMonitorId = -1
+    try {
+      const context = this.getUIContext().getHostContext() as common.UIAbilityContext
+      context.getApplicationContext().offSystemConfigurationUpdated(this.systemConfigurationCallback)
+    } catch (_) {
     }
     if (this.playbackWindow) {
       this.playbackWindow.off('windowStatusDidChange', this.windowStatusCallback)
