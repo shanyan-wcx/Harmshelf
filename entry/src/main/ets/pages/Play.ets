@@ -39,6 +39,7 @@ export struct PlaybackMiniBar {
   @Consumer() playSetting: PlaySetting | undefined = PersistenceV2.connect(PlaySetting, () => new PlaySetting());
   @Consumer() isPlaying: boolean = false
   @Consumer() showPlay: boolean = false
+  @Consumer() preparePlayColor: (() => Promise<void>) | undefined = undefined
   @Consumer() playingItem: PlayItem | undefined = undefined
   @Consumer() localPlayItem: LocalPlayItem | undefined = undefined
   @Consumer() isLocalPlaying: boolean = false
@@ -202,7 +203,13 @@ export struct PlaybackMiniBar {
     }
   }
 
-  private openPlayer() {
+  private async openPlayer() {
+    if (!this.canOpenPlayer()) {
+      return
+    }
+    if (this.preparePlayColor) {
+      await this.preparePlayColor()
+    }
     if (!this.canOpenPlayer()) {
       return
     }
@@ -385,6 +392,7 @@ export struct Play {
   @Consumer() isStartPlaying: boolean = false
   @Consumer() isIndex: boolean = true
   @Consumer() showPlay: boolean = false
+  @Consumer() preparePlayColor: (() => Promise<void>) | undefined = undefined
   @Consumer() playingItem: PlayItem | undefined = undefined
   @Consumer() localPlayItem: LocalPlayItem | undefined = undefined
   @Consumer() isLocalPlaying: boolean = false
@@ -408,8 +416,10 @@ export struct Play {
   @Local fadeInterval: number = -1
   @Local coverColor: number = 0xff181818
   @Local isFloatingWindow: boolean = false
-  private coverColorKey: string = ''
   private coverColorRequest: number = 0
+  private coverColorPromise: Promise<void> | undefined = undefined
+  private coverColorPromiseKey: string = ''
+  private coverColorReadyKey: string = ''
   private previousStatusBarContentColor: string = ''
   private playbackWindow: window.Window | undefined = undefined
   private windowStatusCallback: (status: window.WindowStatusType) => void = (status: window.WindowStatusType) => {
@@ -502,6 +512,9 @@ export struct Play {
   }
 
   async aboutToAppear() {
+    this.preparePlayColor = async () => {
+      await this.refreshCoverColor()
+    }
     try {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
       const mainWindow = await window.getLastWindow(context)
@@ -527,6 +540,7 @@ export struct Play {
       clearInterval(this.fadeInterval)
     }
     this.coverColorRequest++
+    this.preparePlayColor = undefined
     if (this.playbackWindow) {
       this.playbackWindow.off('windowStatusDidChange', this.windowStatusCallback)
       this.playbackWindow = undefined
@@ -831,8 +845,7 @@ export struct Play {
     .height(88)
     .padding(8)
     .borderRadius(18)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THIN)
-    .backgroundColor(Color.Transparent)
+    .backgroundColor(this.coverColor)
     .border({
       width: 0.35,
       radius: 18,
@@ -933,11 +946,28 @@ export struct Play {
 
   private async refreshCoverColor(force: boolean = false): Promise<void> {
     const coverSource = this.getCoverSource()
-    if (!coverSource || (!force && coverSource === this.coverColorKey)) {
+    if (!coverSource || (!force && coverSource === this.coverColorReadyKey)) {
       return
     }
-    this.coverColorKey = coverSource
+    if (this.coverColorPromise && this.coverColorPromiseKey === coverSource) {
+      await this.coverColorPromise
+      return
+    }
     const requestId = ++this.coverColorRequest
+    const colorPromise = this.extractCoverColor(coverSource, requestId)
+    this.coverColorPromise = colorPromise
+    this.coverColorPromiseKey = coverSource
+    try {
+      await colorPromise
+    } finally {
+      if (this.coverColorPromise === colorPromise) {
+        this.coverColorPromise = undefined
+        this.coverColorPromiseKey = ''
+      }
+    }
+  }
+
+  private async extractCoverColor(coverSource: string, requestId: number): Promise<void> {
     let session: rcp.Session | undefined = undefined
     let imageSource: image.ImageSource | undefined = undefined
     let pixelMap: image.PixelMap | undefined = undefined
@@ -969,6 +999,7 @@ export struct Play {
       if (color && requestId === this.coverColorRequest && coverSource === this.getCoverSource()) {
         this.coverColor = 0xff000000 +
           Math.round(color.red) * 0x10000 + Math.round(color.green) * 0x100 + Math.round(color.blue)
+        this.coverColorReadyKey = coverSource
         await this.updateStatusBarContentColor()
       }
     } catch (_) {
