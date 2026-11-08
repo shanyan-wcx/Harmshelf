@@ -838,7 +838,7 @@ export struct Play {
             .height(28)
             .width('100%')
             .textAlign(TextAlign.Start)
-            .margin({ bottom: 16 })
+            .margin({ left: 8, bottom: 16 })
 
           if (this.recommendationLoading) {
             Stack() {
@@ -861,11 +861,12 @@ export struct Play {
               })
             }
             .width('100%')
-            .padding({ left: 4, right: 4 })
+            .padding({ left: 8, right: 8 })
           }
         }
         .width('100%')
         .alignItems(HorizontalAlign.Start)
+        .padding({ bottom: 8 })
       }
       .layoutWeight(1)
       .scrollBar(BarState.Off)
