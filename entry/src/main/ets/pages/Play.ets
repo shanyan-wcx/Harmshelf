@@ -777,14 +777,29 @@ export struct Play {
       }
     }) {
       Row() {
-        Image(this.baseUrl + `/api/items/${item.id}/cover?token=${this.apiToken}`)
-          .alt($rawfile('nocover.jpg'))
-          .objectFit(ImageFit.Cover)
-          .width(72)
-          .height(72)
-          .borderRadius(10)
-          .clip(true)
-          .draggable(false)
+        Stack({ alignContent: Alignment.Center }) {
+          Image(this.baseUrl + `/api/items/${item.id}/cover?token=${this.apiToken}`)
+            .alt($rawfile('nocover.jpg'))
+            .objectFit(ImageFit.Cover)
+            .width(64)
+            .height(64)
+            .clipShape(new CircleShape({ width: '100%', height: '100%' }))
+            .borderRadius(32)
+            .clip(true)
+            .draggable(false)
+
+          Progress({ value: 100, total: 100, type: ProgressType.Ring })
+            .width(72)
+            .height(72)
+            .color($r('sys.color.comp_background_secondary'))
+            .style({
+              strokeWidth: 2,
+              enableSmoothEffect: false
+            })
+        }
+        .width(72)
+        .height(72)
+        .clip(false)
 
         Column() {
           Text(item.media.metadata.title || '-')
@@ -816,10 +831,12 @@ export struct Play {
         .layoutWeight(1)
         .margin({ left: 12 })
         .alignItems(HorizontalAlign.Start)
+        .justifyContent(FlexAlign.Center)
       }
       .width('100%')
       .height('100%')
       .padding(8)
+      .alignItems(VerticalAlign.Center)
       .clip(false)
     }
   }
@@ -865,7 +882,12 @@ export struct Play {
             } else {
               Column({ space: 12 }) {
                 ForEach(this.recommendationItems, (item: LibraryItem) => {
-                  this.recommendationCard(item)
+                  Row() {
+                    this.recommendationCard(item)
+                  }
+                  .width('100%')
+                  .height(88)
+                  .clip(false)
                 })
               }
               .width('100%')
