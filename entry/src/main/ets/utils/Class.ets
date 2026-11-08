@@ -14,16 +14,6 @@ export class Env {
 
 export let env: Env = new Env();
 
-let colorModeUpdateCallback: (() => void) | undefined = undefined
-
-export function setColorModeUpdateCallback(callback: (() => void) | undefined): void {
-  colorModeUpdateCallback = callback
-}
-
-export function notifyColorModeUpdate(): void {
-  colorModeUpdateCallback?.()
-}
-
 export enum DownloadStatus {
   Idle = 'Idle',
   Downloading = 'Downloading',

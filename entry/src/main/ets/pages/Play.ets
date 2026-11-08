@@ -1,14 +1,13 @@
 import { HdsBarStyle, HdsListItem } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LibraryItem, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
 import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier, uiMaterial, window } from '@kit.ArkUI'
-import { common } from '@kit.AbilityKit'
+import { common, systemConfiguration } from '@kit.AbilityKit'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
 import { createBookmark, deleteBookmark, getBookmarks, getItem, getLibraryItems, getSeries } from '../utils/Api';
 import { PlaySetting } from './Index';
 import { media } from '@kit.MediaKit';
 import { Logger } from '../utils/Logger';
-import { setColorModeUpdateCallback } from '../utils/Class';
 import { image } from '@kit.ImageKit';
 import { effectKit } from '@kit.ArkGraphics2D';
 import { rcp } from '@kit.RemoteCommunicationKit';
@@ -417,7 +416,6 @@ export struct Play {
   @Local fadeInterval: number = -1
   @Local coverColor: number = 0xff181818
   @Local isFloatingWindow: boolean = false
-  @Local colorModeRevision: number = 0
   private coverColorRequest: number = 0
   private coverColorPromise: Promise<void> | undefined = undefined
   private coverColorPromiseKey: string = ''
@@ -427,10 +425,11 @@ export struct Play {
   private windowStatusCallback: (status: window.WindowStatusType) => void = (status: window.WindowStatusType) => {
     this.isFloatingWindow = status === window.WindowStatusType.FLOATING
   }
-  private colorModeUpdateCallback: () => void = () => {
-    this.colorModeRevision++
-    if (this.showPlay) {
-      this.updateStatusBarContentColor()
+  private systemConfigurationCallback: systemConfiguration.UpdatedCallback = {
+    onColorModeUpdated: () => {
+      if (this.showPlay) {
+        this.updateStatusBarContentColor()
+      }
     }
   }
 
@@ -527,11 +526,11 @@ export struct Play {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
       const mainWindow = await window.getLastWindow(context)
       AppStorage.set<boolean>('playStatusBarOverride', this.showPlay)
-      setColorModeUpdateCallback(this.colorModeUpdateCallback)
       this.playbackWindow = mainWindow
       this.isFloatingWindow = mainWindow.getWindowStatus() === window.WindowStatusType.FLOATING
       mainWindow.on('windowStatusDidChange', this.windowStatusCallback)
       this.previousStatusBarContentColor = mainWindow.getWindowSystemBarProperties().statusBarContentColor ?? ''
+      context.getApplicationContext().onSystemConfigurationUpdated(this.systemConfigurationCallback)
       if (this.showPlay) {
         await this.updateStatusBarContentColor()
       }
@@ -552,7 +551,11 @@ export struct Play {
     this.coverColorRequest++
     this.preparePlayColor = undefined
     AppStorage.set<boolean>('playStatusBarOverride', false)
-    setColorModeUpdateCallback(undefined)
+    try {
+      const context = this.getUIContext().getHostContext() as common.UIAbilityContext
+      context.getApplicationContext().offSystemConfigurationUpdated(this.systemConfigurationCallback)
+    } catch (_) {
+    }
     if (this.playbackWindow) {
       this.playbackWindow.off('windowStatusDidChange', this.windowStatusCallback)
       this.playbackWindow = undefined
@@ -633,6 +636,19 @@ export struct Play {
     return value.toLowerCase().split(/[\s,_\-·/|，、;；:：]+/).filter(term => term.length > 0)
   }
 
+  private recommendationTopicGroup(value: string): number {
+    const normalized = this.normalizeRecommendationText(value)
+    const groups: string[][] = [
+      ['游戏', '网游', '网络游戏', '手游', '手机游戏', '端游', '电脑游戏', '电子游戏', '主机游戏', '单机游戏']
+    ]
+    for (let index = 0; index < groups.length; index++) {
+      if (groups[index].some(term => normalized.includes(term))) {
+        return index
+      }
+    }
+    return -1
+  }
+
   private recommendationTextScore(left: string, right: string): number {
     const first = this.normalizeRecommendationText(left)
     const second = this.normalizeRecommendationText(right)
@@ -644,6 +660,11 @@ export struct Play {
     }
     if (first.includes(second) || second.includes(first)) {
       return 0.7
+    }
+    const firstTopic = this.recommendationTopicGroup(first)
+    const secondTopic = this.recommendationTopicGroup(second)
+    if (firstTopic >= 0 && firstTopic === secondTopic) {
+      return 0.45
     }
     const firstTerms = this.recommendationTerms(left)
     const secondTerms = this.recommendationTerms(right)
@@ -2615,8 +2636,7 @@ export struct Play {
         .padding({
           left: 20,
           right: 20,
-          top: (this.windowAvoidArea.statusBar.visible ? this.windowAvoidArea.statusBar.topRect.height : 0) + 8 +
-            (this.displayWidth >= 1000 ? 20 : 0)
+          top: (this.windowAvoidArea.statusBar.visible ? this.windowAvoidArea.statusBar.topRect.height : 0) + 8
         })
       }
       .width('100%')
