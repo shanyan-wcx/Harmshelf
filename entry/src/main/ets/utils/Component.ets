@@ -129,7 +129,6 @@ export struct ImmersiveActionButton {
   @Param menuItems: Array<MenuElement> | undefined = undefined
   @Param onButtonClick: (() => void) | undefined = undefined
   @Param monopolizeActionEvents: boolean = true
-  @Param passThroughPointerEvents: boolean = false
   @Local measuredBarWidth: number = 1
 
   private resolvedBarWidth(): number {
@@ -160,7 +159,7 @@ export struct ImmersiveActionButton {
         this.onButtonClick()
       }
     })
-    .hitTestBehavior(this.passThroughPointerEvents ? HitTestMode.None : HitTestMode.Transparent)
+    .hitTestBehavior(HitTestMode.Transparent)
     .bindMenu(this.menuItems ?? [])
   }
 
@@ -206,8 +205,7 @@ export struct ImmersiveActionButton {
     .barBackgroundColor(this.barBackgroundColor ?? Color.Transparent)
     .barBackgroundBlurStyle(BlurStyle.NONE)
     .clip(false)
-    .hitTestBehavior(this.passThroughPointerEvents ? HitTestMode.None : HitTestMode.Default)
-    .onTouchIntercept(() => this.passThroughPointerEvents ? HitTestMode.None : HitTestMode.Default)
+    .hitTestBehavior(HitTestMode.Default)
     .onAreaChange((oldArea, newArea) => {
       let measuredWidth: number = Number(newArea.width)
       if (this.barWidth === '100%' && this.measuredBarWidth !== measuredWidth) {

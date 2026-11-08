@@ -544,6 +544,7 @@ export struct Play {
   @Local showMoreIntro: boolean = false
   @Local recommendationItems: LibraryItem[] = []
   @Local recommendationLoading: boolean = false
+  @Local recommendationLoadedItemId: string = ''
   @Local recommendationToOpen: LibraryItem | undefined = undefined
   private recommendationRequestId: number = 0
   @Monitor('playingItem')
@@ -665,6 +666,7 @@ export struct Play {
   private async loadRecommendations(): Promise<void> {
     const requestId = ++this.recommendationRequestId
     this.recommendationItems = []
+    this.recommendationLoadedItemId = ''
     if (!this.playingItem?.libraryId) {
       this.recommendationLoading = false
       return
@@ -672,6 +674,7 @@ export struct Play {
 
     this.recommendationLoading = true
     const libraryId = this.playingItem.libraryId
+    const libraryItemId = this.playingItem.libraryItemId
     try {
       const items = await getLibraryItems(libraryId)
       if (requestId !== this.recommendationRequestId) {
@@ -747,6 +750,7 @@ export struct Play {
     } finally {
       if (requestId === this.recommendationRequestId) {
         this.recommendationLoading = false
+        this.recommendationLoadedItemId = libraryItemId
       }
     }
   }
@@ -762,15 +766,13 @@ export struct Play {
     return authors.length > 0 ? authors.join(', ') : (item.mediaType === 'book' ? '有声书' : '播客')
   }
 
+  private isRecommendationPending(): boolean {
+    return this.playingItem?.libraryItemId !== this.recommendationLoadedItemId
+  }
+
   @Builder
   recommendationCard(item: LibraryItem) {
-    ImmersiveActionButton({
-      barWidth: '100%',
-      barHeight: 88,
-      barRadius: 18,
-      monopolizeActionEvents: false,
-      passThroughPointerEvents: true
-    }) {
+    Stack() {
       Row() {
         Stack({ alignContent: Alignment.Center }) {
           Image(this.baseUrl + `/api/items/${item.id}/cover?token=${this.apiToken}`)
@@ -785,6 +787,7 @@ export struct Play {
         }
         .width(72)
         .height(72)
+        .margin({ left: 8, right: 8 })
         .clip(false)
 
         Column() {
@@ -815,7 +818,7 @@ export struct Play {
             .width('100%')
         }
         .layoutWeight(1)
-        .margin({ right: 4 })
+        .margin({ right: 8 })
         .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.Center)
       }
@@ -825,12 +828,23 @@ export struct Play {
       .alignItems(VerticalAlign.Center)
       .clip(false)
     }
+    .width('100%')
+    .height(88)
+    .borderRadius(18)
+    .systemMaterial(new uiMaterial.ImmersiveMaterial({
+      style: uiMaterial.ImmersiveStyle.THIN,
+      applyShadow: true,
+      interactive: false
+    }))
+    .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+    .backgroundColor(Color.Transparent)
+    .clip(false)
   }
 
   @Builder
   recommendationsBuilder() {
     Column() {
-      if (this.recommendationLoading) {
+      if (this.recommendationLoading || this.isRecommendationPending() || this.recommendationItems.length === 0) {
         Stack({ alignContent: Alignment.Center }) {
           Text('相关推荐')
             .fontSize(20)
@@ -841,9 +855,15 @@ export struct Play {
             .position({ top: 0, left: 20 })
 
           LoadingProgress()
+            .visibility(this.recommendationLoading || this.isRecommendationPending() ? Visibility.Visible : Visibility.None)
             .width(36)
             .height(36)
             .color(this.playColorPalette.primary)
+
+          Text('暂时没有相似内容')
+            .visibility(this.recommendationLoading || this.isRecommendationPending() ? Visibility.None : Visibility.Visible)
+            .fontSize(16)
+            .fontColor(this.playColorPalette.secondary)
         }
         .width('100%')
         .layoutWeight(1)
@@ -859,32 +879,23 @@ export struct Play {
               .textAlign(TextAlign.Start)
               .margin({ left: 20, bottom: 12 })
 
-            if (this.recommendationItems.length === 0) {
-              Stack() {
-                Text('暂时没有相似内容')
-                  .fontSize(16)
-                  .fontColor(this.playColorPalette.secondary)
-              }
-              .height(160)
-            } else {
-              Column({ space: 12 }) {
-                ForEach(this.recommendationItems, (item: LibraryItem) => {
-                  Row() {
-                    this.recommendationCard(item)
-                  }
-                  .width('100%')
-                  .height(88)
-                  .clip(false)
-                  .hitTestBehavior(HitTestMode.Transparent)
-                  .onTouchIntercept(() => HitTestMode.Transparent)
-                  .onClick(() => {
-                    this.openRecommendation(item)
-                  })
+            Column({ space: 12 }) {
+              ForEach(this.recommendationItems, (item: LibraryItem) => {
+                Row() {
+                  this.recommendationCard(item)
+                }
+                .width('100%')
+                .height(88)
+                .clip(false)
+                .hitTestBehavior(HitTestMode.Transparent)
+                .onTouchIntercept(() => HitTestMode.Transparent)
+                .onClick(() => {
+                  this.openRecommendation(item)
                 })
-              }
-              .width('100%')
-              .padding({ left: 20, right: 20 })
+              })
             }
+            .width('100%')
+            .padding({ left: 20, right: 20 })
           }
           .width('100%')
           .alignItems(HorizontalAlign.Start)
