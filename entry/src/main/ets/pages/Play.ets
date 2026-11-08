@@ -890,7 +890,7 @@ export struct Play {
 
           Text('暂时没有相似内容')
             .visibility(this.recommendationLoading || this.isRecommendationPending() ? Visibility.None : Visibility.Visible)
-            .fontSize(16)
+            .fontSize(18)
             .fontColor(this.playColorPalette.secondary)
         }
         .width('100%')
