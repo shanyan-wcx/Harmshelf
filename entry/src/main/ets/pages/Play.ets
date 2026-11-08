@@ -838,7 +838,7 @@ export struct Play {
             .height(28)
             .width('100%')
             .textAlign(TextAlign.Start)
-            .margin({ left: 8, bottom: 16 })
+            .margin({ left: 8, bottom: 12 })
 
           if (this.recommendationLoading) {
             Stack() {
