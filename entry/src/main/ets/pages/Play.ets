@@ -1,6 +1,6 @@
 import { HdsBarStyle, HdsListItem } from '@kit.UIDesignKit'
 import { Bookmark, Chapter, LibraryItem, LocalPlayItem, LocalTrack, PlayItem, User } from '../utils/Interface'
-import { ColorMetrics, CircleShape, PersistenceV2, SymbolGlyphModifier, TextModifier, uiMaterial, window } from '@kit.ArkUI'
+import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphModifier, TextModifier, uiMaterial, window } from '@kit.ArkUI'
 import { common } from '@kit.AbilityKit'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
@@ -829,52 +829,53 @@ export struct Play {
   @Builder
   recommendationsBuilder() {
     Column() {
-      Row() {
-        Text('相关推荐')
-          .fontSize(20)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(this.playColorPalette.primary)
-      }
-      .width('100%')
-      .height(28)
+      Scroll(this.recommendationScroller) {
+        Column() {
+          Text('相关推荐')
+            .fontSize(20)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.playColorPalette.primary)
+            .height(28)
+            .margin({ bottom: 16 })
 
-      if (this.recommendationLoading) {
-        Stack() {
-          LoadingProgress()
-            .width(32)
-            .height(32)
-        }
-        .layoutWeight(1)
-      } else if (this.recommendationItems.length === 0) {
-        Stack() {
-          Text('暂时没有相似内容')
-            .fontSize(16)
-            .fontColor(this.playColorPalette.secondary)
-        }
-        .layoutWeight(1)
-      } else {
-        Scroll(this.recommendationScroller) {
-          Column({ space: 12 }) {
-            ForEach(this.recommendationItems, (item: LibraryItem) => {
-              this.recommendationCard(item)
-            })
+          if (this.recommendationLoading) {
+            Stack() {
+              LoadingProgress()
+                .width(32)
+                .height(32)
+            }
+            .height(160)
+          } else if (this.recommendationItems.length === 0) {
+            Stack() {
+              Text('暂时没有相似内容')
+                .fontSize(16)
+                .fontColor(this.playColorPalette.secondary)
+            }
+            .height(160)
+          } else {
+            Column({ space: 12 }) {
+              ForEach(this.recommendationItems, (item: LibraryItem) => {
+                this.recommendationCard(item)
+              })
+            }
           }
-          .width('100%')
-          .padding({ top: 4, bottom: 8 })
         }
-        .layoutWeight(1)
-        .scrollBar(BarState.Off)
-        .clip(false)
+        .width('100%')
+        .padding({ bottom: 8 })
       }
+      .layoutWeight(1)
+      .scrollBar(BarState.Off)
+      .fadingEdge(true, { fadingEdgeLength: LengthMetrics.vp(24) })
     }
     .width('100%')
     .height('100%')
     .padding({
       left: 20,
       right: 20,
-      top: (this.windowAvoidArea.statusBar.visible ? this.windowAvoidArea.statusBar.topRect.height : 0) + 20,
+      top: (this.windowAvoidArea.statusBar.visible ? this.windowAvoidArea.statusBar.topRect.height : 0) + 12,
       bottom: (this.windowAvoidArea.navigationIndicator.visible ?
-        this.windowAvoidArea.navigationIndicator.bottomRect.height : 0) + 20
+        this.windowAvoidArea.navigationIndicator.bottomRect.height : 0) +
+        (this.shouldAddPlaybackBottomInset ? 20 : 0)
     })
     .backgroundColor(this.coverColor)
     .expandSafeArea([SafeAreaType.SYSTEM], [SafeAreaEdge.TOP, SafeAreaEdge.BOTTOM])
@@ -2522,8 +2523,10 @@ export struct Play {
           this.shouldClosePlayer = false
         }
         if (this.recommendationToOpen) {
-          this.libraryItem = this.recommendationToOpen
+          const target = this.recommendationToOpen
           this.recommendationToOpen = undefined
+          this.pageInfos.clear()
+          this.libraryItem = target
           this.pageInfos.pushPathByName('libraryItemDetail', null)
         }
       }
