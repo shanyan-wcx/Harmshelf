@@ -206,7 +206,8 @@ export struct ImmersiveActionButton {
     .barBackgroundColor(this.barBackgroundColor ?? Color.Transparent)
     .barBackgroundBlurStyle(BlurStyle.NONE)
     .clip(false)
-    .hitTestBehavior(this.passThroughPointerEvents ? HitTestMode.None : HitTestMode.Default)
+    .hitTestBehavior(this.passThroughPointerEvents ? HitTestMode.Transparent : HitTestMode.Default)
+    .onTouchIntercept(() => this.passThroughPointerEvents ? HitTestMode.Transparent : HitTestMode.Default)
     .onAreaChange((oldArea, newArea) => {
       let measuredWidth: number = Number(newArea.width)
       if (this.barWidth === '100%' && this.measuredBarWidth !== measuredWidth) {

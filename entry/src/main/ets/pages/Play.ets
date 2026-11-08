@@ -885,7 +885,7 @@ export struct Play {
                 })
               }
               .width('100%')
-              .padding({ left: 20, right: 20 })
+              .padding({ left: 4, right: 4 })
             }
           }
           .width('100%')
@@ -894,6 +894,7 @@ export struct Play {
         }
         .layoutWeight(1)
         .scrollBar(BarState.Off)
+        .enableScrollWithMouse(true)
         .fadingEdge(true, { fadingEdgeLength: LengthMetrics.vp(24) })
       }
     }
