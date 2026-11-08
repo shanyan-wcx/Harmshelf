@@ -760,11 +760,10 @@ export struct Play {
         return
       }
 
+      const currentTitle = currentItem.media.metadata.title ?? ''
       const currentSeries = currentItem.media.metadata.seriesName ?? ''
       const currentAuthors = this.recommendationAuthors(currentItem)
-      const currentGenres = currentItem.media.metadata.genres ?? []
-      const currentTags = currentItem.media.tags ?? []
-      const currentTopics = currentGenres.concat(currentTags)
+      const currentTopics = (currentItem.media.metadata.genres ?? []).concat(currentItem.media.tags ?? [])
       const seriesOrders = currentSeries ? await this.recommendationSeriesOrder(libraryId) : new Map<string, number>()
       const candidates: RecommendationCandidate[] = []
 
@@ -772,11 +771,10 @@ export struct Play {
         if (item.id === currentItem.id || item.libraryId !== libraryId || item.mediaType !== currentItem.mediaType) {
           return
         }
+        const itemTitle = item.media.metadata.title ?? ''
         const itemSeries = item.media.metadata.seriesName ?? ''
         const itemAuthors = this.recommendationAuthors(item)
-        const itemGenres = item.media.metadata.genres ?? []
-        const itemTags = item.media.tags ?? []
-        const itemTopics = itemGenres.concat(itemTags)
+        const itemTopics = (item.media.metadata.genres ?? []).concat(item.media.tags ?? [])
         let weightedScore = 0
         let availableWeight = 0
         if (currentSeries && itemSeries) {
@@ -787,18 +785,20 @@ export struct Play {
           weightedScore += 0.3 * this.recommendationListScore(currentAuthors, itemAuthors)
           availableWeight += 0.3
         }
-        if (currentGenres.length > 0 && itemGenres.length > 0) {
-          weightedScore += 0.15 * this.recommendationListScore(currentGenres, itemGenres)
-          availableWeight += 0.15
+        if (currentTopics.length > 0 && itemTopics.length > 0) {
+          weightedScore += 0.25 * this.recommendationListScore(currentTopics, itemTopics)
+          availableWeight += 0.25
         }
-        if (currentTags.length > 0 && itemTags.length > 0) {
-          weightedScore += 0.1 * this.recommendationListScore(currentTags, itemTags)
-          availableWeight += 0.1
+        if (currentTitle && itemTitle) {
+          weightedScore += 0.15 * this.recommendationTextScore(currentTitle, itemTitle)
+          availableWeight += 0.15
         }
         const score = availableWeight > 0 ? weightedScore / availableWeight : 0
         const hasTopicMatch = currentTopics.some(leftValue =>
           itemTopics.some(rightValue => this.recommendationTextScore(leftValue, rightValue) >= 0.45))
-        const effectiveScore = hasTopicMatch ? Math.max(score, 0.2) : score
+        const hasTitleMatch = currentTitle !== '' && itemTitle !== '' &&
+          this.recommendationTextScore(currentTitle, itemTitle) >= 0.45
+        const effectiveScore = hasTopicMatch || hasTitleMatch ? Math.max(score, 0.2) : score
         if (effectiveScore >= 0.2) {
           candidates.push({
             item: item,
