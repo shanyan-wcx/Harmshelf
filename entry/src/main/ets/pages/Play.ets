@@ -853,6 +853,10 @@ export struct Play {
       ColorMetrics.rgba(0, 0, 0, 0.18).color
   }
 
+  private get recommendationCardBackground(): string {
+    return this.playControlColor === Color.Black ? '#12182431' : '#12FFFFFF'
+  }
+
   @Builder
   recommendationCard(item: LibraryItem) {
     Row() {
@@ -901,7 +905,7 @@ export struct Play {
     .height(88)
     .padding(8)
     .borderRadius(18)
-    .backgroundColor(this.playColorPalette.sliderTrack)
+    .backgroundColor(this.recommendationCardBackground)
     .border({
       width: 0.35,
       radius: 18,
