@@ -766,77 +766,62 @@ export struct Play {
     return authors.length > 0 ? authors.join(', ') : (item.mediaType === 'book' ? '有声书' : '播客')
   }
 
-  private get recommendationCardBackground(): string {
-    return this.playControlColor === Color.Black ?
-      ColorMetrics.rgba(255, 255, 255, 0.12).color :
-      ColorMetrics.rgba(0, 0, 0, 0.12).color
-  }
-
-  private get recommendationCardBorder(): string {
-    return this.playControlColor === Color.Black ?
-      ColorMetrics.rgba(255, 255, 255, 0.24).color :
-      ColorMetrics.rgba(0, 0, 0, 0.18).color
-  }
-
   @Builder
   recommendationCard(item: LibraryItem) {
-    Row() {
-      Image(this.baseUrl + `/api/items/${item.id}/cover?token=${this.apiToken}`)
-        .alt($rawfile('nocover.jpg'))
-        .objectFit(ImageFit.Cover)
-        .width(72)
-        .height(72)
-        .borderRadius(10)
-        .clip(true)
-        .draggable(false)
-
-      Column() {
-        Text(item.media.metadata.title || '-')
-          .fontSize(16)
-          .fontWeight(FontWeight.Medium)
-          .fontColor(this.playColorPalette.primary)
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .width('100%')
-          .margin({ bottom: 3 })
-
-        Text(this.recommendationAuthorText(item))
-          .fontSize(13)
-          .fontColor(this.playColorPalette.secondary)
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .width('100%')
-          .margin({ bottom: 5 })
-
-        Text(item.mediaType === 'book' ?
-          ((item.media.chapters?.length ?? 0) + ' 章节') :
-          ((item.media.episodes?.length ?? 0) + ' 剧集'))
-          .fontSize(13)
-          .fontColor(this.playColorPalette.secondary)
-          .maxLines(1)
-          .textOverflow({ overflow: TextOverflow.Ellipsis })
-          .width('100%')
+    ImmersiveActionButton({
+      barWidth: '100%',
+      barHeight: 88,
+      barRadius: 18,
+      onButtonClick: () => {
+        this.openRecommendation(item)
       }
-      .layoutWeight(1)
-      .margin({ left: 12 })
-      .alignItems(HorizontalAlign.Start)
+    }) {
+      Row() {
+        Image(this.baseUrl + `/api/items/${item.id}/cover?token=${this.apiToken}`)
+          .alt($rawfile('nocover.jpg'))
+          .objectFit(ImageFit.Cover)
+          .width(72)
+          .height(72)
+          .borderRadius(10)
+          .clip(true)
+          .draggable(false)
+
+        Column() {
+          Text(item.media.metadata.title || '-')
+            .fontSize(16)
+            .fontWeight(FontWeight.Medium)
+            .fontColor(this.playColorPalette.primary)
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .width('100%')
+            .margin({ bottom: 3 })
+
+          Text(this.recommendationAuthorText(item))
+            .fontSize(13)
+            .fontColor(this.playColorPalette.secondary)
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .width('100%')
+            .margin({ bottom: 5 })
+
+          Text(item.mediaType === 'book' ?
+            ((item.media.chapters?.length ?? 0) + ' 章节') :
+            ((item.media.episodes?.length ?? 0) + ' 剧集'))
+            .fontSize(13)
+            .fontColor(this.playColorPalette.secondary)
+            .maxLines(1)
+            .textOverflow({ overflow: TextOverflow.Ellipsis })
+            .width('100%')
+        }
+        .layoutWeight(1)
+        .margin({ left: 12 })
+        .alignItems(HorizontalAlign.Start)
+      }
+      .width('100%')
+      .height('100%')
+      .padding(8)
+      .clip(false)
     }
-    .width('100%')
-    .height(88)
-    .padding(8)
-    .borderRadius(18)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
-    .backgroundColor(this.recommendationCardBackground)
-    .border({
-      width: 0.35,
-      radius: 18,
-      color: this.recommendationCardBorder
-    })
-    .shadow(ShadowStyle.OUTER_DEFAULT_XS)
-    .clip(false)
-    .onClick(() => {
-      this.openRecommendation(item)
-    })
   }
 
   @Builder
@@ -853,8 +838,8 @@ export struct Play {
             .position({ top: 0, left: 20 })
 
           LoadingProgress()
-            .width(32)
-            .height(32)
+            .width(36)
+            .height(36)
         }
         .width('100%')
         .layoutWeight(1)
