@@ -1,7 +1,7 @@
 import { AbilityConstant, appRecovery, Configuration, ConfigurationConstant, errorManager, UIAbility, Want } from '@kit.AbilityKit';
 import { window } from '@kit.ArkUI';
 import { deviceInfo } from '@kit.BasicServicesKit';
-import { env } from '../utils/Class';
+import { env, notifyColorModeUpdate } from '../utils/Class';
 import { Logger } from '../utils/Logger';
 import app, { AppResponse } from '@system.app';
 import { BusinessError } from '@kit.BasicServicesKit';
@@ -91,6 +91,7 @@ export default class EntryAbility extends UIAbility {
 
   async onConfigurationUpdate(newConfig: Configuration) {
     env.colorMode = newConfig.colorMode;
+    notifyColorModeUpdate()
     if (AppStorage.get<boolean>('playStatusBarOverride') === true) {
       return
     }
