@@ -580,18 +580,14 @@ export struct Play {
       await this.refreshCoverColor()
       this.changeSpeedIcon()
       await this.updateStatusBarContentColor()
-      await this.loadRecommendations()
     } else {
       await this.restoreStatusBarContentColor()
-      await this.loadRecommendations()
     }
   }
 
   @Monitor('playingItem')
   async refreshPlayingRecommendations(_: IMonitor) {
-    if (this.showPlay) {
-      await this.loadRecommendations()
-    }
+    await this.loadRecommendations()
   }
 
   private normalizeRecommendationText(value: string): string {
@@ -669,7 +665,7 @@ export struct Play {
   private async loadRecommendations(): Promise<void> {
     const requestId = ++this.recommendationRequestId
     this.recommendationItems = []
-    if (!this.showPlay || this.isLocalPlaying || !this.playingItem?.libraryId) {
+    if (!this.playingItem?.libraryId) {
       this.recommendationLoading = false
       return
     }
@@ -819,13 +815,13 @@ export struct Play {
             .width('100%')
         }
         .layoutWeight(1)
-        .margin({ left: 4 })
+        .margin({ right: 4 })
         .alignItems(HorizontalAlign.Start)
         .justifyContent(FlexAlign.Center)
       }
-      .width('100%')
       .height('100%')
-      .padding({ top: 8, bottom: 8, left: 4, right: 4 })
+      .width('calc(100% + 22vp)')
+      .margin({ right: -8 })
       .alignItems(VerticalAlign.Center)
       .clip(false)
     }
@@ -879,13 +875,15 @@ export struct Play {
                   .width('100%')
                   .height(88)
                   .clip(false)
+                  .hitTestBehavior(HitTestMode.Transparent)
+                  .onTouchIntercept(() => HitTestMode.Transparent)
                   .onClick(() => {
                     this.openRecommendation(item)
                   })
                 })
               }
               .width('100%')
-              .padding({ left: 4, right: 4 })
+              .padding({ left: 20, right: 20 })
             }
           }
           .width('100%')
@@ -894,7 +892,6 @@ export struct Play {
         }
         .layoutWeight(1)
         .scrollBar(BarState.Off)
-        .enableScrollWithMouse(true)
         .fadingEdge(true, { fadingEdgeLength: LengthMetrics.vp(24) })
       }
     }
