@@ -270,7 +270,6 @@ struct Index {
     this.playStartTime = 0
     this.isPlaying = true
     this.isStartPlaying = true
-    this.showPlay = true
     try {
       const file = fs.openSync(localItem.tracks[index].filePath, fs.OpenMode.READ_ONLY)
       try {

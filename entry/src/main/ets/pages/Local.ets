@@ -171,7 +171,6 @@ export struct LocalMedia {
     this.playStartTime = 0
     this.isPlaying = true
     this.isStartPlaying = true
-    this.showPlay = true
     try {
       await this.avPlayer!.reset()
       const file = fs.openSync(tracks[clickIndex].filePath, fs.OpenMode.READ_ONLY)

@@ -416,6 +416,7 @@ export struct Play {
   @Local fadeInterval: number = -1
   @Local coverColor: number = 0xff181818
   @Local isFloatingWindow: boolean = false
+  @Local colorModeRevision: number = 0
   private coverColorRequest: number = 0
   private coverColorPromise: Promise<void> | undefined = undefined
   private coverColorPromiseKey: string = ''
@@ -427,6 +428,7 @@ export struct Play {
   }
   private systemConfigurationCallback: systemConfiguration.UpdatedCallback = {
     onColorModeUpdated: () => {
+      this.colorModeRevision++
       if (this.showPlay) {
         this.updateStatusBarContentColor()
       }
@@ -525,6 +527,7 @@ export struct Play {
     try {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
       const mainWindow = await window.getLastWindow(context)
+      AppStorage.set<boolean>('playStatusBarOverride', this.showPlay)
       this.playbackWindow = mainWindow
       this.isFloatingWindow = mainWindow.getWindowStatus() === window.WindowStatusType.FLOATING
       mainWindow.on('windowStatusDidChange', this.windowStatusCallback)
@@ -549,6 +552,7 @@ export struct Play {
     }
     this.coverColorRequest++
     this.preparePlayColor = undefined
+    AppStorage.set<boolean>('playStatusBarOverride', false)
     try {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
       context.getApplicationContext().offSystemConfigurationUpdated(this.systemConfigurationCallback)
@@ -610,6 +614,7 @@ export struct Play {
   }
   @Monitor('showPlay')
   async refreshShownCoverColor(_: IMonitor) {
+    AppStorage.set<boolean>('playStatusBarOverride', this.showPlay)
     if (this.showPlay) {
       await this.refreshCoverColor()
       this.changeSpeedIcon()
@@ -859,7 +864,7 @@ export struct Play {
     .padding(8)
     .borderRadius(18)
     .backgroundColor(this.coverColor)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_THIN)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
     .border({
       width: 0.35,
       radius: 18,

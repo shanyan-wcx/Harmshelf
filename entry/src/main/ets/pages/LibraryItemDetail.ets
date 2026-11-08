@@ -525,7 +525,23 @@ export struct LibraryItemDetail {
           ImmersiveActionButton({
             barWidth: '100%',
             barHeight: 50,
-            monopolizeActionEvents: false
+            monopolizeActionEvents: false,
+            onButtonClick: async () => {
+              if (this.tmpPlayingItem) {
+                this.playingItem = this.tmpPlayingItem
+                this.playingIndex = this.tmpPlayingIndex
+                await this.avPlayer!.reset();
+                this.isStartPlaying = true
+                this.isPlaying = true
+                this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
+                this.playStartTime = 0
+                this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
+                Logger.info(`共this.playingItem!.audioTracks.length条音轨`)
+                Logger.info(`播放序号为this.playingIndex`)
+                Logger.info(`起始位置为this.playStartTime`)
+              }
+              this.showConfirm = false
+            }
           }) {
             Text("确认")
               .fontSize(18)
@@ -535,22 +551,6 @@ export struct LibraryItemDetail {
         .height(50)
         .layoutWeight(1)
         .clip(false)
-        .onClick(async () => {
-          if (this.tmpPlayingItem) {
-            this.playingItem = this.tmpPlayingItem
-            this.playingIndex = this.tmpPlayingIndex
-            await this.avPlayer!.reset();
-            this.isStartPlaying = true
-            this.isPlaying = true
-            this.playingTitle = this.playingItem!.chapters?.[this.playingIndex]?.title ?? this.playingItem!.displayTitle
-            this.playStartTime = 0
-            this.avPlayer!.url = this.baseUrl + this.playingItem!.audioTracks[this.playingIndex].contentUrl + "?token=" + this.apiToken
-            Logger.info(`共this.playingItem!.audioTracks.length条音轨`)
-            Logger.info(`播放序号为this.playingIndex`)
-            Logger.info(`起始位置为this.playStartTime`)
-          }
-          this.showConfirm = false
-        })
       }
     }
     .padding({ left: 20, right: 20, top: 8, bottom: 25 })

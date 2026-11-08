@@ -91,6 +91,9 @@ export default class EntryAbility extends UIAbility {
 
   async onConfigurationUpdate(newConfig: Configuration) {
     env.colorMode = newConfig.colorMode;
+    if (AppStorage.get<boolean>('playStatusBarOverride') === true) {
+      return
+    }
     try {
       let mainWindow = await window.getLastWindow(this.context)
       if (env.colorMode === ConfigurationConstant.ColorMode.COLOR_MODE_DARK) {
