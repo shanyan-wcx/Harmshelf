@@ -988,23 +988,22 @@ export struct Play {
 
   private async refreshCoverColor(force: boolean = false): Promise<void> {
     const coverSource = this.getCoverSource()
-    if (!coverSource) {
-      if (this.isLocalPlaying) {
-        await this.useAppBackgroundColor()
-      }
+    const useFallbackCover = !coverSource && this.isLocalPlaying
+    const sourceKey = useFallbackCover ? 'resource:nocover.jpg' : coverSource
+    if (!sourceKey) {
       return
     }
-    if (!force && coverSource === this.coverColorReadyKey) {
+    if (!force && sourceKey === this.coverColorReadyKey) {
       return
     }
-    if (this.coverColorPromise && this.coverColorPromiseKey === coverSource) {
+    if (this.coverColorPromise && this.coverColorPromiseKey === sourceKey) {
       await this.coverColorPromise
       return
     }
     const requestId = ++this.coverColorRequest
-    const colorPromise = this.extractCoverColor(coverSource, requestId)
+    const colorPromise = this.extractCoverColor(coverSource, requestId, useFallbackCover)
     this.coverColorPromise = colorPromise
-    this.coverColorPromiseKey = coverSource
+    this.coverColorPromiseKey = sourceKey
     try {
       await colorPromise
     } finally {
@@ -1015,12 +1014,18 @@ export struct Play {
     }
   }
 
-  private async extractCoverColor(coverSource: string, requestId: number): Promise<void> {
+  private async extractCoverColor(coverSource: string, requestId: number, useFallbackCover: boolean = false): Promise<void> {
     let session: rcp.Session | undefined = undefined
     let imageSource: image.ImageSource | undefined = undefined
     let pixelMap: image.PixelMap | undefined = undefined
+    let fallbackRawFileOpen: boolean = false
     try {
-      if (coverSource.startsWith('http://') || coverSource.startsWith('https://')) {
+      if (useFallbackCover) {
+        const context = this.getUIContext().getHostContext() as common.UIAbilityContext
+        const rawFile = await context.resourceManager.getRawFd('nocover.jpg')
+        fallbackRawFileOpen = true
+        imageSource = image.createImageSource(rawFile)
+      } else if (coverSource.startsWith('http://') || coverSource.startsWith('https://')) {
         const cachePath = this.getCoverCachePath(coverSource)
         if (fs.accessSync(cachePath)) {
           imageSource = image.createImageSource(cachePath)
@@ -1062,14 +1067,19 @@ export struct Play {
       } catch (_) {
         color = picker.getAverageColor()
       }
-      if (color && requestId === this.coverColorRequest && coverSource === this.getCoverSource()) {
+      const currentCoverSource = this.getCoverSource()
+      if (color && requestId === this.coverColorRequest &&
+        (useFallbackCover ? !currentCoverSource && this.isLocalPlaying : coverSource === currentCoverSource)) {
         this.coverColor = 0xff000000 +
           Math.round(color.red) * 0x10000 + Math.round(color.green) * 0x100 + Math.round(color.blue)
-        this.coverColorReadyKey = coverSource
+        this.coverColorReadyKey = useFallbackCover ? 'resource:nocover.jpg' : coverSource
         await this.updateStatusBarContentColor()
       }
     } catch (_) {
       Logger.error('提取封面主色失败')
+      if (useFallbackCover) {
+        await this.useAppBackgroundColor()
+      }
     } finally {
       if (pixelMap) {
         try {
@@ -1080,6 +1090,13 @@ export struct Play {
       if (imageSource) {
         try {
           await imageSource.release()
+        } catch (_) {
+        }
+      }
+      if (fallbackRawFileOpen) {
+        try {
+          const context = this.getUIContext().getHostContext() as common.UIAbilityContext
+          context.resourceManager.closeRawFdSync('nocover.jpg')
         } catch (_) {
         }
       }
