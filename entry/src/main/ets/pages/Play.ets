@@ -854,7 +854,7 @@ export struct Play {
   }
 
   private get recommendationCardBackground(): string {
-    return this.playControlColor === Color.Black ? '#0D182431' : '#0DFFFFFF'
+    return this.playControlColor === Color.Black ? '#33182431' : '#33FFFFFF'
   }
 
   @Builder
