@@ -4,7 +4,7 @@ import { ColorMetrics, CircleShape, LengthMetrics, PersistenceV2, SymbolGlyphMod
 import { common } from '@kit.AbilityKit'
 import { deviceInfo } from '@kit.BasicServicesKit'
 import { fileIo as fs, fileUri } from '@kit.CoreFileKit';
-import { createBookmark, deleteBookmark, getBookmarks, getLibraryItems, getSeries } from '../utils/Api';
+import { createBookmark, deleteBookmark, getBookmarks, getItem, getLibraryItems, getSeries } from '../utils/Api';
 import { PlaySetting } from './Index';
 import { media } from '@kit.MediaKit';
 import { Logger } from '../utils/Logger';
@@ -739,7 +739,15 @@ export struct Play {
         }
         return right.score - left.score
       })
-      this.recommendationItems = candidates.slice(0, 12).map(candidate => candidate.item)
+      const selectedItems = candidates.slice(0, 12).map(candidate => candidate.item)
+      const detailedItems: LibraryItem[] = []
+      for (const item of selectedItems) {
+        detailedItems.push(await getItem(item.id) ?? item)
+      }
+      if (requestId !== this.recommendationRequestId) {
+        return
+      }
+      this.recommendationItems = detailedItems
     } finally {
       if (requestId === this.recommendationRequestId) {
         this.recommendationLoading = false
@@ -866,6 +874,7 @@ export struct Play {
               })
             }
             .width('100%')
+            .padding({ left: 20, right: 20 })
           }
         }
         .width('100%')
@@ -879,8 +888,6 @@ export struct Play {
     .width('100%')
     .height('100%')
     .padding({
-      left: 20,
-      right: 20,
       top: (this.windowAvoidArea.statusBar.visible ? this.windowAvoidArea.statusBar.topRect.height : 0) + 12,
       bottom: (this.windowAvoidArea.navigationIndicator.visible ?
         this.windowAvoidArea.navigationIndicator.bottomRect.height : 0) +
