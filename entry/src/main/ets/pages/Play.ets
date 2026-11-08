@@ -748,6 +748,7 @@ export struct Play {
   }
 
   private openRecommendation(item: LibraryItem) {
+    this.pageInfos.clear()
     this.recommendationToOpen = item
     this.showPlay = false
   }
@@ -781,14 +782,15 @@ export struct Play {
         .clip(true)
         .draggable(false)
 
-      Column({ space: 5 }) {
+      Column() {
         Text(item.media.metadata.title || '-')
           .fontSize(16)
           .fontWeight(FontWeight.Medium)
           .fontColor(this.playColorPalette.primary)
-          .maxLines(2)
+          .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
+          .margin({ bottom: 3 })
 
         Text(this.recommendationAuthorText(item))
           .fontSize(13)
@@ -796,8 +798,11 @@ export struct Play {
           .maxLines(1)
           .textOverflow({ overflow: TextOverflow.Ellipsis })
           .width('100%')
+          .margin({ bottom: 5 })
 
-        Text(item.media.metadata.seriesName ?? (item.mediaType === 'book' ? '有声书' : '播客'))
+        Text(item.mediaType === 'book' ?
+          ((item.media.chapters?.length ?? 0) + ' 章节') :
+          ((item.media.episodes?.length ?? 0) + ' 剧集'))
           .fontSize(13)
           .fontColor(this.playColorPalette.secondary)
           .maxLines(1)
@@ -838,7 +843,7 @@ export struct Play {
             .height(28)
             .width('100%')
             .textAlign(TextAlign.Start)
-            .margin({ left: 12, bottom: 12 })
+            .margin({ bottom: 12 })
 
           if (this.recommendationLoading) {
             Stack() {
@@ -861,7 +866,6 @@ export struct Play {
               })
             }
             .width('100%')
-            .padding({ left: 12, right: 12 })
           }
         }
         .width('100%')
@@ -2530,7 +2534,6 @@ export struct Play {
         if (this.recommendationToOpen) {
           const target = this.recommendationToOpen
           this.recommendationToOpen = undefined
-          this.pageInfos.clear()
           this.libraryItem = target
           this.pageInfos.pushPathByName('libraryItemDetail', null)
         }
