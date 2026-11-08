@@ -512,6 +512,12 @@ export struct Play {
       if (this.showPlay) {
         await this.updateStatusBarContentColor()
       }
+      if (this.playingItem?.libraryId) {
+        await Promise.all([
+          this.refreshCoverColor(true),
+          this.loadRecommendations()
+        ])
+      }
     } catch (_) {
     }
   }
@@ -767,77 +773,72 @@ export struct Play {
   }
 
   private isRecommendationPending(): boolean {
-    return this.playingItem?.libraryItemId !== this.recommendationLoadedItemId
+    const libraryItemId = this.playingItem?.libraryItemId ?? ''
+    return libraryItemId !== '' && libraryItemId !== this.recommendationLoadedItemId
+  }
+
+  private get recommendationCardBorder(): string {
+    return this.playControlColor === Color.Black ?
+      ColorMetrics.rgba(255, 255, 255, 0.24).color :
+      ColorMetrics.rgba(0, 0, 0, 0.18).color
   }
 
   @Builder
   recommendationCard(item: LibraryItem) {
-    Stack() {
-      Row() {
-        Stack({ alignContent: Alignment.Center }) {
-          Image(this.baseUrl + `/api/items/${item.id}/cover?token=${this.apiToken}`)
-            .alt($rawfile('nocover.jpg'))
-            .objectFit(ImageFit.Cover)
-            .width(72)
-            .height(72)
-            .clipShape(new CircleShape({ width: '100%', height: '100%' }))
-            .borderRadius(36)
-            .clip(true)
-            .draggable(false)
-        }
+    Row() {
+      Image(this.baseUrl + `/api/items/${item.id}/cover?token=${this.apiToken}`)
+        .alt($rawfile('nocover.jpg'))
+        .objectFit(ImageFit.Cover)
         .width(72)
         .height(72)
-        .margin({ left: 8, right: 8 })
-        .clip(false)
+        .borderRadius(10)
+        .clip(true)
+        .draggable(false)
 
-        Column() {
-          Text(item.media.metadata.title || '-')
-            .fontSize(16)
-            .fontWeight(FontWeight.Medium)
-            .fontColor(this.playColorPalette.primary)
-            .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .width('100%')
-            .margin({ bottom: 3 })
+      Column() {
+        Text(item.media.metadata.title || '-')
+          .fontSize(16)
+          .fontWeight(FontWeight.Medium)
+          .fontColor(this.playColorPalette.primary)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .width('100%')
+          .margin({ bottom: 3 })
 
-          Text(this.recommendationAuthorText(item))
-            .fontSize(13)
-            .fontColor(this.playColorPalette.secondary)
-            .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .width('100%')
-            .margin({ bottom: 5 })
+        Text(this.recommendationAuthorText(item))
+          .fontSize(13)
+          .fontColor(this.playColorPalette.secondary)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .width('100%')
+          .margin({ bottom: 5 })
 
-          Text(item.mediaType === 'book' ?
-            ((item.media.chapters?.length ?? 0) + ' 章节') :
-            ((item.media.episodes?.length ?? 0) + ' 剧集'))
-            .fontSize(13)
-            .fontColor(this.playColorPalette.secondary)
-            .maxLines(1)
-            .textOverflow({ overflow: TextOverflow.Ellipsis })
-            .width('100%')
-        }
-        .layoutWeight(1)
-        .margin({ right: 8 })
-        .alignItems(HorizontalAlign.Start)
-        .justifyContent(FlexAlign.Center)
+        Text(item.mediaType === 'book' ?
+          ((item.media.chapters?.length ?? 0) + ' 章节') :
+          ((item.media.episodes?.length ?? 0) + ' 剧集'))
+          .fontSize(13)
+          .fontColor(this.playColorPalette.secondary)
+          .maxLines(1)
+          .textOverflow({ overflow: TextOverflow.Ellipsis })
+          .width('100%')
       }
-      .height('100%')
-      .width('calc(100% + 22vp)')
-      .margin({ right: -8 })
-      .alignItems(VerticalAlign.Center)
-      .clip(false)
+      .layoutWeight(1)
+      .margin({ left: 12 })
+      .alignItems(HorizontalAlign.Start)
+      .justifyContent(FlexAlign.Center)
     }
     .width('100%')
     .height(88)
+    .padding(8)
     .borderRadius(18)
-    .systemMaterial(new uiMaterial.ImmersiveMaterial({
-      style: uiMaterial.ImmersiveStyle.THIN,
-      applyShadow: true,
-      interactive: false
-    }))
-    .backgroundBlurStyle(BlurStyle.COMPONENT_THICK)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THIN)
     .backgroundColor(Color.Transparent)
+    .border({
+      width: 0.35,
+      radius: 18,
+      color: this.recommendationCardBorder
+    })
+    .shadow(ShadowStyle.OUTER_DEFAULT_XS)
     .clip(false)
   }
 
