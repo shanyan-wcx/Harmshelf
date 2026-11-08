@@ -869,8 +869,13 @@ export struct Play {
     .height(88)
     .padding(8)
     .borderRadius(18)
-    .backgroundColor(this.coverColor)
-    .backgroundBlurStyle(BlurStyle.COMPONENT_ULTRA_THICK)
+    .backgroundColor(ColorMetrics.rgba(
+      (this.coverColor >>> 16) & 0xff,
+      (this.coverColor >>> 8) & 0xff,
+      this.coverColor & 0xff,
+      0.18
+    ).color)
+    .backgroundBlurStyle(BlurStyle.COMPONENT_THIN)
     .border({
       width: 0.35,
       radius: 18,
