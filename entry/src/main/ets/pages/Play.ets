@@ -427,6 +427,8 @@ export struct Play {
   private coverColorPromiseKey: string = ''
   private coverColorPromiseLifecycle: number = -1
   private coverColorReadyKey: string = ''
+  private coverColorResolvedKey: string = ''
+  private coverColorResolvedLifecycle: number = -1
   private hasSuccessfulCoverColor: boolean = false
   private previousStatusBarContentColor: string = ''
   private playbackWindow: window.Window | undefined = undefined
@@ -1066,6 +1068,10 @@ export struct Play {
     if (!this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
       return
     }
+    if (sourceKey) {
+      this.coverColorResolvedKey = sourceKey
+      this.coverColorResolvedLifecycle = lifecycleId
+    }
     if (this.hasSuccessfulCoverColor) {
       await this.updateStatusBarContentColor()
       return
@@ -1104,7 +1110,8 @@ export struct Play {
         await this.usePreviousCoverColorOrAppBackground(this.coverColorRequest, sourceKey, lifecycleId)
         return
       }
-      if (!force && sourceKey === this.coverColorReadyKey) {
+      if (!force && lifecycleId === this.coverColorResolvedLifecycle &&
+        (sourceKey === this.coverColorReadyKey || sourceKey === this.coverColorResolvedKey)) {
         return
       }
       if (this.coverColorPromise && this.coverColorPromiseKey === sourceKey &&
@@ -1160,6 +1167,7 @@ export struct Play {
     let imageSource: image.ImageSource | undefined = undefined
     let pixelMap: image.PixelMap | undefined = undefined
     let fallbackRawFileOpen: boolean = false
+    let temporaryCachePath: string = ''
     try {
       if (!this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
         return
@@ -1171,9 +1179,43 @@ export struct Play {
         imageSource = image.createImageSource(rawFile)
       } else if (coverSource.startsWith('http://') || coverSource.startsWith('https://')) {
         const cachePath = this.getCoverCachePath(coverSource)
-        if (fs.accessSync(cachePath)) {
-          imageSource = image.createImageSource(cachePath)
-        } else {
+        let cacheExists: boolean = false
+        try {
+          cacheExists = fs.accessSync(cachePath)
+        } catch (_) {
+        }
+        if (cacheExists) {
+          try {
+            imageSource = image.createImageSource(cachePath)
+            pixelMap = await imageSource.createPixelMap({
+              desiredSize: { width: 32, height: 32 },
+              desiredPixelFormat: image.PixelMapFormat.RGBA_8888
+            })
+          } catch (_) {
+            if (pixelMap) {
+              try {
+                await pixelMap.release()
+              } catch (_) {
+              }
+              pixelMap = undefined
+            }
+            if (imageSource) {
+              try {
+                await imageSource.release()
+              } catch (_) {
+              }
+              imageSource = undefined
+            }
+            if (!this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
+              return
+            }
+            try {
+              fs.unlinkSync(cachePath)
+            } catch (_) {
+            }
+          }
+        }
+        if (!pixelMap) {
           // shortcut: first use still downloads once; subsequent extraction reuses the app cache.
           session = rcp.createSession()
           this.coverColorSession = session
@@ -1196,12 +1238,22 @@ export struct Play {
             return
           }
           try {
-            const file = fs.openSync(cachePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE)
+            temporaryCachePath = `${cachePath}.${requestId}.tmp`
+            try {
+              fs.unlinkSync(temporaryCachePath)
+            } catch (_) {
+            }
+            const file = fs.openSync(temporaryCachePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE)
             try {
               fs.writeSync(file.fd, response.body)
             } finally {
               fs.closeSync(file.fd)
             }
+            if (!this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
+              return
+            }
+            fs.renameSync(temporaryCachePath, cachePath)
+            temporaryCachePath = ''
             imageSource = image.createImageSource(cachePath)
           } catch (_) {
             imageSource = image.createImageSource(response.body)
@@ -1216,10 +1268,12 @@ export struct Play {
         await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
         return
       }
-      pixelMap = await imageSource.createPixelMap({
-        desiredSize: { width: 32, height: 32 },
-        desiredPixelFormat: image.PixelMapFormat.RGBA_8888
-      })
+      if (!pixelMap) {
+        pixelMap = await imageSource.createPixelMap({
+          desiredSize: { width: 32, height: 32 },
+          desiredPixelFormat: image.PixelMapFormat.RGBA_8888
+        })
+      }
       const picker = await effectKit.createColorPicker(pixelMap)
       let color: effectKit.Color | undefined = undefined
       try {
@@ -1231,6 +1285,8 @@ export struct Play {
         this.coverColor = 0xff000000 +
           Math.round(color.red) * 0x10000 + Math.round(color.green) * 0x100 + Math.round(color.blue)
         this.coverColorReadyKey = sourceKey
+        this.coverColorResolvedKey = sourceKey
+        this.coverColorResolvedLifecycle = lifecycleId
         this.hasSuccessfulCoverColor = true
         await this.updateStatusBarContentColor()
       } else {
@@ -1242,6 +1298,12 @@ export struct Play {
       }
       await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
     } finally {
+      if (temporaryCachePath) {
+        try {
+          fs.unlinkSync(temporaryCachePath)
+        } catch (_) {
+        }
+      }
       if (pixelMap) {
         try {
           await pixelMap.release()
