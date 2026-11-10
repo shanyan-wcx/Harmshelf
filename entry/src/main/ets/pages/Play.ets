@@ -435,6 +435,8 @@ export struct Play {
   private coverColorFallbackLifecycle: number = -1
   private coverColorRetryKey: string = ''
   private coverColorRetryLifecycle: number = -1
+  private coverColorRetryPendingKey: string = ''
+  private coverColorRetryPendingLifecycle: number = -1
   private hasSuccessfulCoverColor: boolean = false
   private previousStatusBarContentColor: string = ''
   private statusBarUpdateRequest: number = 0
@@ -573,7 +575,18 @@ export struct Play {
     this.coverColorActive = true
     this.coverColorLifecycle++
     this.preparePlayColor = async (allowRetry: boolean = false) => {
-      await this.refreshCoverColor(this.consumeCoverColorRetry(allowRetry))
+      const retryRequested = this.consumeCoverColorRetry(allowRetry)
+      const retrySourceKey = retryRequested ? this.getCoverColorSourceKey(this.getCoverSource()) : ''
+      const retryLifecycleId = this.coverColorLifecycle
+      try {
+        await this.refreshCoverColor(retryRequested, retrySourceKey)
+      } finally {
+        if (retryRequested && this.coverColorRetryPendingKey === retrySourceKey &&
+          this.coverColorRetryPendingLifecycle === retryLifecycleId) {
+          this.coverColorRetryPendingKey = ''
+          this.coverColorRetryPendingLifecycle = -1
+        }
+      }
     }
     try {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
@@ -584,14 +597,14 @@ export struct Play {
       this.isFloatingWindow = mainWindow.getWindowStatus() === window.WindowStatusType.FLOATING
       mainWindow.on('windowStatusDidChange', this.windowStatusCallback)
       this.previousStatusBarContentColor = mainWindow.getWindowSystemBarProperties().statusBarContentColor ?? ''
-      if (this.showPlay) {
-        await this.updateStatusBarContentColor()
-      }
       if (this.playingItem?.libraryId) {
         await Promise.all([
           this.refreshCoverColor(true),
           this.loadRecommendations()
         ])
+      }
+      if (this.showPlay) {
+        await this.updateStatusBarContentColor()
       }
     } catch (_) {
     }
@@ -1077,12 +1090,25 @@ export struct Play {
     const sourceKey = this.getCoverColorSourceKey(this.getCoverSource())
     if (!sourceKey || sourceKey !== this.coverColorFallbackKey ||
       this.coverColorFallbackLifecycle !== this.coverColorLifecycle ||
-      (sourceKey === this.coverColorRetryKey && this.coverColorRetryLifecycle === this.coverColorLifecycle)) {
+      (sourceKey === this.coverColorRetryKey && this.coverColorRetryLifecycle === this.coverColorLifecycle) ||
+      (sourceKey === this.coverColorRetryPendingKey &&
+        this.coverColorRetryPendingLifecycle === this.coverColorLifecycle)) {
       return false
     }
-    this.coverColorRetryKey = sourceKey
-    this.coverColorRetryLifecycle = this.coverColorLifecycle
+    this.coverColorRetryPendingKey = sourceKey
+    this.coverColorRetryPendingLifecycle = this.coverColorLifecycle
     return true
+  }
+
+  private completeCoverColorRetry(sourceKey: string, lifecycleId: number) {
+    if (this.coverColorRetryPendingKey !== sourceKey ||
+      this.coverColorRetryPendingLifecycle !== lifecycleId) {
+      return
+    }
+    this.coverColorRetryKey = sourceKey
+    this.coverColorRetryLifecycle = lifecycleId
+    this.coverColorRetryPendingKey = ''
+    this.coverColorRetryPendingLifecycle = -1
   }
 
   private isCurrentCoverColorRequest(requestId: number, sourceKey: string, lifecycleId: number): boolean {
@@ -1152,7 +1178,7 @@ export struct Play {
     return `${context.cacheDir}/harmshelf-cover-v2-${primaryHash.toString(16)}-${secondaryHash.toString(16)}`
   }
 
-  private async refreshCoverColor(force: boolean = false): Promise<void> {
+  private async refreshCoverColor(force: boolean = false, retrySourceKey: string = ''): Promise<void> {
     while (this.coverColorActive) {
       const coverSource = this.getCoverSource()
       const useFallbackCover = !coverSource && this.isLocalPlaying
@@ -1179,8 +1205,12 @@ export struct Play {
         }
         if (pendingRequestId === this.coverColorRequest && lifecycleId === this.coverColorLifecycle &&
           sourceKey === currentSourceKey) {
+          if (retrySourceKey === sourceKey) {
+            this.completeCoverColorRetry(retrySourceKey, lifecycleId)
+          }
           return
         }
+        retrySourceKey = ''
         force = false
         continue
       }
@@ -1208,8 +1238,12 @@ export struct Play {
       }
       if (requestId === this.coverColorRequest && lifecycleId === this.coverColorLifecycle &&
         sourceKey === currentSourceKey) {
+        if (retrySourceKey === sourceKey) {
+          this.completeCoverColorRetry(retrySourceKey, lifecycleId)
+        }
         return
       }
+      retrySourceKey = ''
       force = false
     }
   }
@@ -1221,6 +1255,8 @@ export struct Play {
     let pixelMap: image.PixelMap | undefined = undefined
     let fallbackRawFileOpen: boolean = false
     let temporaryCachePath: string = ''
+    let cachePath: string = ''
+    let cacheWritten: boolean = false
     try {
       if (!this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
         return
@@ -1231,7 +1267,7 @@ export struct Play {
         fallbackRawFileOpen = true
         imageSource = image.createImageSource(rawFile)
       } else if (coverSource.startsWith('http://') || coverSource.startsWith('https://')) {
-        const cachePath = this.getCoverCachePath(coverSource)
+        cachePath = this.getCoverCachePath(coverSource)
         let cacheExists: boolean = false
         try {
           cacheExists = fs.accessSync(cachePath)
@@ -1307,6 +1343,7 @@ export struct Play {
             }
             fs.renameSync(temporaryCachePath, cachePath)
             temporaryCachePath = ''
+            cacheWritten = true
             imageSource = image.createImageSource(cachePath)
           } catch (_) {
             imageSource = image.createImageSource(response.body)
@@ -1348,6 +1385,12 @@ export struct Play {
         await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
       }
     } catch (_) {
+      if (cacheWritten && this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
+        try {
+          fs.unlinkSync(cachePath)
+        } catch (_) {
+        }
+      }
       if (this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
         Logger.error('提取封面主色失败')
       }
