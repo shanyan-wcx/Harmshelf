@@ -432,6 +432,7 @@ export struct Play {
   private hasSuccessfulCoverColor: boolean = false
   private previousStatusBarContentColor: string = ''
   private statusBarUpdateRequest: number = 0
+  private statusBarUpdateChain: Promise<void> = Promise.resolve()
   private playbackWindow: window.Window | undefined = undefined
   private windowStatusCallback: (status: window.WindowStatusType) => void = (status: window.WindowStatusType) => {
     this.isFloatingWindow = status === window.WindowStatusType.FLOATING
@@ -517,17 +518,24 @@ export struct Play {
       return
     }
     const updateRequest = ++this.statusBarUpdateRequest
-    try {
-      const context = this.getUIContext().getHostContext() as common.UIAbilityContext
-      const mainWindow = await window.getLastWindow(context)
+    const updatePromise = this.statusBarUpdateChain.then(async () => {
       if (!this.showPlay || updateRequest !== this.statusBarUpdateRequest) {
         return
       }
-      await mainWindow.setWindowSystemBarProperties({
-        statusBarContentColor: this.playControlColor === Color.Black ? '#000000' : '#FFFFFF'
-      })
-    } catch (_) {
-    }
+      try {
+        const context = this.getUIContext().getHostContext() as common.UIAbilityContext
+        const mainWindow = await window.getLastWindow(context)
+        if (!this.showPlay || updateRequest !== this.statusBarUpdateRequest) {
+          return
+        }
+        await mainWindow.setWindowSystemBarProperties({
+          statusBarContentColor: this.playControlColor === Color.Black ? '#000000' : '#FFFFFF'
+        })
+      } catch (_) {
+      }
+    })
+    this.statusBarUpdateChain = updatePromise
+    await updatePromise
   }
 
   private async restoreStatusBarContentColor() {
@@ -535,17 +543,24 @@ export struct Play {
     if (!this.previousStatusBarContentColor) {
       return
     }
-    try {
-      const context = this.getUIContext().getHostContext() as common.UIAbilityContext
-      const mainWindow = await window.getLastWindow(context)
+    const restorePromise = this.statusBarUpdateChain.then(async () => {
       if (updateRequest !== this.statusBarUpdateRequest) {
         return
       }
-      await mainWindow.setWindowSystemBarProperties({
-        statusBarContentColor: this.previousStatusBarContentColor
-      })
-    } catch (_) {
-    }
+      try {
+        const context = this.getUIContext().getHostContext() as common.UIAbilityContext
+        const mainWindow = await window.getLastWindow(context)
+        if (updateRequest !== this.statusBarUpdateRequest) {
+          return
+        }
+        await mainWindow.setWindowSystemBarProperties({
+          statusBarContentColor: this.previousStatusBarContentColor
+        })
+      } catch (_) {
+      }
+    })
+    this.statusBarUpdateChain = restorePromise
+    await restorePromise
   }
 
   async aboutToAppear() {
