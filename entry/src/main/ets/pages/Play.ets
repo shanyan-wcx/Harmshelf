@@ -1094,42 +1094,63 @@ export struct Play {
   }
 
   private async refreshCoverColor(force: boolean = false): Promise<void> {
-    if (!this.coverColorActive) {
-      return
-    }
-    const coverSource = this.getCoverSource()
-    const useFallbackCover = !coverSource && this.isLocalPlaying
-    const sourceKey = this.getCoverColorSourceKey(coverSource)
-    const lifecycleId = this.coverColorLifecycle
-    if (!sourceKey) {
-      this.invalidateCoverColorRequest()
-      await this.usePreviousCoverColorOrAppBackground(this.coverColorRequest, sourceKey, lifecycleId)
-      return
-    }
-    if (!force && sourceKey === this.coverColorReadyKey) {
-      return
-    }
-    if (!force && this.coverColorPromise && this.coverColorPromiseKey === sourceKey &&
-      this.coverColorPromiseLifecycle === lifecycleId) {
-      await this.coverColorPromise
-      return
-    }
-    if (this.coverColorPromise) {
-      this.invalidateCoverColorRequest()
-    }
-    const requestId = ++this.coverColorRequest
-    const colorPromise = this.extractCoverColor(coverSource, sourceKey, requestId, lifecycleId, useFallbackCover)
-    this.coverColorPromise = colorPromise
-    this.coverColorPromiseKey = sourceKey
-    this.coverColorPromiseLifecycle = lifecycleId
-    try {
-      await colorPromise
-    } finally {
-      if (this.coverColorPromise === colorPromise) {
-        this.coverColorPromise = undefined
-        this.coverColorPromiseKey = ''
-        this.coverColorPromiseLifecycle = -1
+    while (this.coverColorActive) {
+      const coverSource = this.getCoverSource()
+      const useFallbackCover = !coverSource && this.isLocalPlaying
+      const sourceKey = this.getCoverColorSourceKey(coverSource)
+      const lifecycleId = this.coverColorLifecycle
+      if (!sourceKey) {
+        this.invalidateCoverColorRequest()
+        await this.usePreviousCoverColorOrAppBackground(this.coverColorRequest, sourceKey, lifecycleId)
+        return
       }
+      if (!force && sourceKey === this.coverColorReadyKey) {
+        return
+      }
+      if (this.coverColorPromise && this.coverColorPromiseKey === sourceKey &&
+        this.coverColorPromiseLifecycle === lifecycleId) {
+        const pendingPromise = this.coverColorPromise
+        const pendingRequestId = this.coverColorRequest
+        await pendingPromise
+        const currentCoverSource = this.getCoverSource()
+        const currentSourceKey = this.getCoverColorSourceKey(currentCoverSource)
+        if (!this.coverColorActive) {
+          return
+        }
+        if (pendingRequestId === this.coverColorRequest && lifecycleId === this.coverColorLifecycle &&
+          sourceKey === currentSourceKey) {
+          return
+        }
+        force = false
+        continue
+      }
+      if (this.coverColorPromise) {
+        this.invalidateCoverColorRequest()
+      }
+      const requestId = ++this.coverColorRequest
+      const colorPromise = this.extractCoverColor(coverSource, sourceKey, requestId, lifecycleId, useFallbackCover)
+      this.coverColorPromise = colorPromise
+      this.coverColorPromiseKey = sourceKey
+      this.coverColorPromiseLifecycle = lifecycleId
+      try {
+        await colorPromise
+      } finally {
+        if (this.coverColorPromise === colorPromise) {
+          this.coverColorPromise = undefined
+          this.coverColorPromiseKey = ''
+          this.coverColorPromiseLifecycle = -1
+        }
+      }
+      const currentCoverSource = this.getCoverSource()
+      const currentSourceKey = this.getCoverColorSourceKey(currentCoverSource)
+      if (!this.coverColorActive) {
+        return
+      }
+      if (requestId === this.coverColorRequest && lifecycleId === this.coverColorLifecycle &&
+        sourceKey === currentSourceKey) {
+        return
+      }
+      force = false
     }
   }
 
@@ -1216,7 +1237,9 @@ export struct Play {
         await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
       }
     } catch (_) {
-      Logger.error('提取封面主色失败')
+      if (this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
+        Logger.error('提取封面主色失败')
+      }
       await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
     } finally {
       if (pixelMap) {
