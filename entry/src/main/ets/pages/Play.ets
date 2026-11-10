@@ -209,10 +209,8 @@ export struct PlaybackMiniBar {
       return
     }
     if (this.preparePlayColor) {
-      await this.preparePlayColor()
-    }
-    if (!this.canOpenPlayer()) {
-      return
+      // Color extraction must not block the content-cover presentation.
+      this.preparePlayColor().catch(() => {})
     }
     this.showPlay = true
   }
