@@ -420,9 +420,14 @@ export struct Play {
   @Local colorModeRevision: number = 0
   private colorModeUpdateTimeout: number = -1
   private coverColorRequest: number = 0
+  private coverColorLifecycle: number = 0
+  private coverColorActive: boolean = false
+  private coverColorSession: rcp.Session | undefined = undefined
   private coverColorPromise: Promise<void> | undefined = undefined
   private coverColorPromiseKey: string = ''
+  private coverColorPromiseLifecycle: number = -1
   private coverColorReadyKey: string = ''
+  private hasSuccessfulCoverColor: boolean = false
   private previousStatusBarContentColor: string = ''
   private playbackWindow: window.Window | undefined = undefined
   private windowStatusCallback: (status: window.WindowStatusType) => void = (status: window.WindowStatusType) => {
@@ -530,6 +535,8 @@ export struct Play {
   }
 
   async aboutToAppear() {
+    this.coverColorActive = true
+    this.coverColorLifecycle++
     this.preparePlayColor = async () => {
       await this.refreshCoverColor()
     }
@@ -559,7 +566,9 @@ export struct Play {
     if (this.fadeInterval !== -1) {
       clearInterval(this.fadeInterval)
     }
-    this.coverColorRequest++
+    this.coverColorActive = false
+    this.coverColorLifecycle++
+    this.invalidateCoverColorRequest()
     this.preparePlayColor = undefined
     AppStorage.set<boolean>('playStatusBarOverride', false)
     setColorModeUpdateCallback(undefined)
@@ -1022,13 +1031,55 @@ export struct Play {
     return this.baseUrl + `/api/items/${this.playingItem.libraryItemId}/cover?token=${this.apiToken}`
   }
 
-  private async useAppBackgroundColor(): Promise<void> {
+  private getCoverColorSourceKey(coverSource: string): string {
+    return !coverSource && this.isLocalPlaying ? 'resource:nocover.jpg' : coverSource
+  }
+
+  private isCurrentCoverColorRequest(requestId: number, sourceKey: string, lifecycleId: number): boolean {
+    return this.coverColorActive &&
+      requestId === this.coverColorRequest &&
+      lifecycleId === this.coverColorLifecycle &&
+      sourceKey === this.getCoverColorSourceKey(this.getCoverSource())
+  }
+
+  private invalidateCoverColorRequest() {
+    this.coverColorRequest++
+    const session = this.coverColorSession
+    this.coverColorSession = undefined
+    this.coverColorPromise = undefined
+    this.coverColorPromiseKey = ''
+    this.coverColorPromiseLifecycle = -1
+    if (session) {
+      try {
+        session.cancel()
+      } catch (_) {
+      }
+      try {
+        session.close()
+      } catch (_) {
+      }
+    }
+  }
+
+  private async usePreviousCoverColorOrAppBackground(requestId: number, sourceKey: string,
+    lifecycleId: number): Promise<void> {
+    if (!this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
+      return
+    }
+    if (this.hasSuccessfulCoverColor) {
+      await this.updateStatusBarContentColor()
+      return
+    }
+    let fallbackColor: number = 0xff181818
     try {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
-      this.coverColor = await context.resourceManager.getColor($r('sys.color.background_secondary'))
+      fallbackColor = await context.resourceManager.getColor($r('sys.color.background_secondary'))
     } catch (_) {
-      this.coverColor = 0xff181818
     }
+    if (!this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
+      return
+    }
+    this.coverColor = fallbackColor
     this.coverColorReadyKey = ''
     await this.updateStatusBarContentColor()
   }
@@ -1043,39 +1094,55 @@ export struct Play {
   }
 
   private async refreshCoverColor(force: boolean = false): Promise<void> {
+    if (!this.coverColorActive) {
+      return
+    }
     const coverSource = this.getCoverSource()
     const useFallbackCover = !coverSource && this.isLocalPlaying
-    const sourceKey = useFallbackCover ? 'resource:nocover.jpg' : coverSource
+    const sourceKey = this.getCoverColorSourceKey(coverSource)
+    const lifecycleId = this.coverColorLifecycle
     if (!sourceKey) {
+      this.invalidateCoverColorRequest()
+      await this.usePreviousCoverColorOrAppBackground(this.coverColorRequest, sourceKey, lifecycleId)
       return
     }
     if (!force && sourceKey === this.coverColorReadyKey) {
       return
     }
-    if (this.coverColorPromise && this.coverColorPromiseKey === sourceKey) {
+    if (!force && this.coverColorPromise && this.coverColorPromiseKey === sourceKey &&
+      this.coverColorPromiseLifecycle === lifecycleId) {
       await this.coverColorPromise
       return
     }
+    if (this.coverColorPromise) {
+      this.invalidateCoverColorRequest()
+    }
     const requestId = ++this.coverColorRequest
-    const colorPromise = this.extractCoverColor(coverSource, requestId, useFallbackCover)
+    const colorPromise = this.extractCoverColor(coverSource, sourceKey, requestId, lifecycleId, useFallbackCover)
     this.coverColorPromise = colorPromise
     this.coverColorPromiseKey = sourceKey
+    this.coverColorPromiseLifecycle = lifecycleId
     try {
       await colorPromise
     } finally {
       if (this.coverColorPromise === colorPromise) {
         this.coverColorPromise = undefined
         this.coverColorPromiseKey = ''
+        this.coverColorPromiseLifecycle = -1
       }
     }
   }
 
-  private async extractCoverColor(coverSource: string, requestId: number, useFallbackCover: boolean = false): Promise<void> {
+  private async extractCoverColor(coverSource: string, sourceKey: string, requestId: number, lifecycleId: number,
+    useFallbackCover: boolean = false): Promise<void> {
     let session: rcp.Session | undefined = undefined
     let imageSource: image.ImageSource | undefined = undefined
     let pixelMap: image.PixelMap | undefined = undefined
     let fallbackRawFileOpen: boolean = false
     try {
+      if (!this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
+        return
+      }
       if (useFallbackCover) {
         const context = this.getUIContext().getHostContext() as common.UIAbilityContext
         const rawFile = await context.resourceManager.getRawFd('nocover.jpg')
@@ -1088,8 +1155,22 @@ export struct Play {
         } else {
           // shortcut: first use still downloads once; subsequent extraction reuses the app cache.
           session = rcp.createSession()
-          const response = await session.fetch(new rcp.Request(coverSource, 'GET'))
+          this.coverColorSession = session
+          const request = new rcp.Request(coverSource, 'GET')
+          request.configuration = {
+            transfer: {
+              timeout: {
+                connectMs: 10000,
+                transferMs: 10000,
+                inactivityMs: 10000
+              }
+            }
+          }
+          const response = await session.fetch(request)
           if (!response.body) {
+            return
+          }
+          if (!this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
             return
           }
           try {
@@ -1123,19 +1204,16 @@ export struct Play {
       } catch (_) {
         color = picker.getAverageColor()
       }
-      const currentCoverSource = this.getCoverSource()
-      if (color && requestId === this.coverColorRequest &&
-        (useFallbackCover ? !currentCoverSource && this.isLocalPlaying : coverSource === currentCoverSource)) {
+      if (color && this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
         this.coverColor = 0xff000000 +
           Math.round(color.red) * 0x10000 + Math.round(color.green) * 0x100 + Math.round(color.blue)
-        this.coverColorReadyKey = useFallbackCover ? 'resource:nocover.jpg' : coverSource
+        this.coverColorReadyKey = sourceKey
+        this.hasSuccessfulCoverColor = true
         await this.updateStatusBarContentColor()
       }
     } catch (_) {
       Logger.error('提取封面主色失败')
-      if (useFallbackCover) {
-        await this.useAppBackgroundColor()
-      }
+      await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
     } finally {
       if (pixelMap) {
         try {
@@ -1157,6 +1235,9 @@ export struct Play {
         }
       }
       if (session) {
+        if (this.coverColorSession === session) {
+          this.coverColorSession = undefined
+        }
         try {
           session.close()
         } catch (_) {
