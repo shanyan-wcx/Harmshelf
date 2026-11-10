@@ -37,6 +37,8 @@ interface CoverColorOperationResult<T> {
   timedOut: boolean
 }
 
+const COVER_COLOR_TIMEOUT_MS = 3000
+
 @ComponentV2
 export struct PlaybackMiniBar {
   @Param forceExpanded: boolean = false
@@ -526,8 +528,8 @@ export struct Play {
     return modifier
   }
 
-  private async awaitCoverColorOperation<T>(operation: Promise<T>,
-    onLateResult: (result: T | undefined) => Promise<void>): Promise<CoverColorOperationResult<T>> {
+  private async awaitCoverColorOperation<T>(operation: Promise<T>, timeoutMs: number,
+    onTimeout: () => void, onLateResult: (result: T | undefined) => Promise<void>): Promise<CoverColorOperationResult<T>> {
     let settled: boolean = false
     let timedOut: boolean = false
     let timeoutId: number = -1
@@ -538,8 +540,12 @@ export struct Play {
         }
         settled = true
         timedOut = true
+        try {
+          onTimeout()
+        } catch (_) {
+        }
         resolve({ result: undefined, timedOut: true })
-      }, 3000)
+      }, timeoutMs)
       operation.then((result: T) => {
         if (timedOut) {
           onLateResult(result).catch(() => {})
@@ -571,7 +577,11 @@ export struct Play {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
       const files = fs.listFileSync(context.cacheDir)
       for (const fileName of files) {
-        if (fileName.startsWith('harmshelf-cover-') && fileName.endsWith('.tmp')) {
+        const isCoverCache = fileName.startsWith('harmshelf-cover-')
+        const isLegacyCache = isCoverCache && !fileName.startsWith('harmshelf-cover-v2-') &&
+          !fileName.endsWith('.tmp')
+        const isTemporaryCache = isCoverCache && fileName.endsWith('.tmp')
+        if (isLegacyCache || isTemporaryCache) {
           try {
             fs.unlinkSync(`${context.cacheDir}/${fileName}`)
           } catch (_) {
@@ -580,6 +590,10 @@ export struct Play {
       }
     } catch (_) {
     }
+  }
+
+  private getCoverColorRemainingMs(deadline: number): number {
+    return Math.max(0, deadline - Date.now())
   }
 
   private async updateStatusBarContentColor() {
@@ -1323,6 +1337,7 @@ export struct Play {
       if (!this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
         return
       }
+      const coverColorDeadline = Date.now() + COVER_COLOR_TIMEOUT_MS
       if (useFallbackCover) {
         const context = this.getUIContext().getHostContext() as common.UIAbilityContext
         const rawFile = await context.resourceManager.getRawFd('nocover.jpg')
@@ -1339,11 +1354,18 @@ export struct Play {
           try {
             imageSource = image.createImageSource(cachePath)
             const cachedImageSource = imageSource
+            const remainingTimeout = this.getCoverColorRemainingMs(coverColorDeadline)
+            if (remainingTimeout <= 0) {
+              await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
+              return
+            }
             const decodeResult = await this.awaitCoverColorOperation(
               cachedImageSource.createPixelMap({
                 desiredSize: { width: 32, height: 32 },
                 desiredPixelFormat: image.PixelMapFormat.RGBA_8888
               }),
+              remainingTimeout,
+              () => {},
               async (decodedPixelMap: image.PixelMap | undefined) => {
                 if (decodedPixelMap) {
                   try {
@@ -1397,14 +1419,49 @@ export struct Play {
           request.configuration = {
             transfer: {
               timeout: {
-                connectMs: 3000,
-                transferMs: 3000,
-                inactivityMs: 3000
+                connectMs: Math.max(1, this.getCoverColorRemainingMs(coverColorDeadline)),
+                transferMs: Math.max(1, this.getCoverColorRemainingMs(coverColorDeadline)),
+                inactivityMs: Math.max(1, this.getCoverColorRemainingMs(coverColorDeadline))
               }
             }
           }
-          const response = await session.fetch(request)
-          if (response.statusCode < 200 || response.statusCode >= 300 || !response.body) {
+          const remainingTimeout = this.getCoverColorRemainingMs(coverColorDeadline)
+          if (remainingTimeout <= 0) {
+            await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
+            return
+          }
+          const responseResult = await this.awaitCoverColorOperation(
+            session.fetch(request),
+            remainingTimeout,
+            () => {
+              try {
+                session!.cancel()
+              } catch (_) {
+              }
+              try {
+                session!.close()
+              } catch (_) {
+              }
+            },
+            async () => {
+              try {
+                session!.cancel()
+              } catch (_) {
+              }
+              try {
+                session!.close()
+              } catch (_) {
+              }
+            })
+          if (responseResult.timedOut || !responseResult.result) {
+            await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
+            return
+          }
+          const response = responseResult.result
+          const contentType = String(response.headers['content-type'] ?? '').toLowerCase()
+          const unsupportedContentType = contentType !== '' &&
+            !contentType.startsWith('image/') && contentType !== 'application/octet-stream'
+          if (response.statusCode < 200 || response.statusCode >= 300 || !response.body || unsupportedContentType) {
             await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
             return
           }
@@ -1446,11 +1503,18 @@ export struct Play {
       if (!pixelMap) {
         const sourceForDecode = imageSource
         const cacheWrittenForDecode = cacheWritten
+        const remainingTimeout = this.getCoverColorRemainingMs(coverColorDeadline)
+        if (remainingTimeout <= 0) {
+          await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
+          return
+        }
         const decodeResult = await this.awaitCoverColorOperation(
           sourceForDecode.createPixelMap({
             desiredSize: { width: 32, height: 32 },
             desiredPixelFormat: image.PixelMapFormat.RGBA_8888
           }),
+          remainingTimeout,
+          () => {},
           async (decodedPixelMap: image.PixelMap | undefined) => {
             if (decodedPixelMap) {
               try {
@@ -1483,8 +1547,15 @@ export struct Play {
       const pixelMapForPicker = pixelMap
       const sourceForPicker = imageSource
       const cacheWrittenForPicker = cacheWritten
+      const remainingTimeout = this.getCoverColorRemainingMs(coverColorDeadline)
+      if (remainingTimeout <= 0) {
+        await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
+        return
+      }
       const pickerResult = await this.awaitCoverColorOperation(
         effectKit.createColorPicker(pixelMapForPicker),
+        remainingTimeout,
+        () => {},
         async (latePicker: effectKit.ColorPicker | undefined) => {
           try {
             await pixelMapForPicker.release()
