@@ -62,6 +62,7 @@ export class ColorMode {
 
 @ObservedV2
 export class PlaySetting {
+  @Trace coverRotation: boolean = true
   @Trace fadeInOut: boolean = false
   @Trace rememberSpeed: boolean = false
   @Trace globalSpeed: media.PlaybackSpeed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
@@ -197,6 +198,7 @@ struct Index {
   @Provider() playStartTime: number = 0
   @Provider() playedTime: number = 0
   @Provider() playedPercent: number = 0
+  @Provider() coverRotation: number = 0
   @Provider() currentTrackDuration: number = 0
   @Provider() avPlayer: media.AVPlayer | undefined = undefined
   @Provider() session: avSession.AVSession | undefined = undefined
@@ -224,6 +226,7 @@ struct Index {
   @Local sleepTimerId: number = -1
   @Local fadeInterval: number = -1
   @Local stopTimeoutId: number = -1
+  @Local coverRotationTimer: number = -1
   @Local audioSessionManager: audio.AudioSessionManager | undefined = undefined
   @Local audioSessionActivated: boolean = false
   @Monitor('toCloseSession')
@@ -242,6 +245,41 @@ struct Index {
       this.localPlayItem = undefined
       this.currentTrackDuration = 0
     }
+  }
+
+  @Monitor('isPlaying')
+  syncCoverRotation(_: IMonitor) {
+    this.updateCoverRotation()
+  }
+
+  @Monitor('isOnFocus')
+  syncCoverRotationFocus(_: IMonitor) {
+    this.updateCoverRotation()
+  }
+
+  private updateCoverRotation() {
+    if (this.isPlaying && this.isOnFocus) {
+      this.startCoverRotation()
+    } else {
+      this.stopCoverRotation()
+    }
+  }
+
+  private startCoverRotation() {
+    if (this.coverRotationTimer !== -1) {
+      return
+    }
+    this.coverRotationTimer = setInterval(() => {
+      this.coverRotation += 0.1
+    }, 10)
+  }
+
+  private stopCoverRotation() {
+    if (this.coverRotationTimer === -1) {
+      return
+    }
+    clearInterval(this.coverRotationTimer)
+    this.coverRotationTimer = -1
   }
 
   async findCoverInFolder(folderPath: string): Promise<string | undefined> {
@@ -1137,6 +1175,7 @@ struct Index {
       Logger.error(`Failed to create a documentSaveOptions, err: ${err}`);
       return;
     }
+    this.updateCoverRotation()
   }
 
   aboutToDisappear() {
@@ -1164,6 +1203,7 @@ struct Index {
       this.stopTimeoutId = -1
     }
     this.stopContinuousTask()
+    this.stopCoverRotation()
     this.session?.destroy()
     this.session = undefined
     Logger.stopFileLogging()

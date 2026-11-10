@@ -976,6 +976,23 @@ export struct Setting {
             .textAlign(TextAlign.Center)
 
           Row() {
+            Text("播放栏封面旋转")
+              .fontSize(18)
+              .maxLines(1)
+              .textOverflow({ overflow: TextOverflow.Ellipsis })
+
+            Toggle({ type: ToggleType.Switch, isOn: this.playSetting?.coverRotation })
+              .selectedColor($r('sys.color.comp_emphasize_secondary'))
+              .onClick(() => {
+                if (this.playSetting) {
+                  this.playSetting.coverRotation = !this.playSetting.coverRotation
+                }
+              })
+          }
+          .width('100%')
+          .justifyContent(FlexAlign.SpaceBetween)
+
+          Row() {
             Text("淡入淡出")
               .fontSize(18)
               .maxLines(1)

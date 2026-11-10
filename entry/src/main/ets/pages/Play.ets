@@ -61,6 +61,7 @@ export struct PlaybackMiniBar {
   @Consumer() playStartTime: number = 0
   @Consumer() playedTime: number = 0
   @Consumer() playedPercent: number = 0
+  @Consumer() coverRotation: number = 0
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Local fadeInterval: number = -1
 
@@ -239,6 +240,11 @@ export struct PlaybackMiniBar {
         .borderRadius(this.isExpanded() ? 20 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT / 2 - 2)
         .clip(true)
         .transition(TransitionEffect.IDENTITY)
+        .rotate({ angle: this.playSetting?.coverRotation === true ? this.coverRotation : 0 })
+        .animation({
+          duration: 10,
+          curve: Curve.Linear
+        })
 
       Progress({ value: 100, total: 100, type: ProgressType.Ring })
         .width(this.isExpanded() ? 44 : MOBILE_BOTTOM_TAB_BAR_VISUAL_HEIGHT)
