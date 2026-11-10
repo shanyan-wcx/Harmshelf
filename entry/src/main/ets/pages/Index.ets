@@ -240,11 +240,17 @@ struct Index {
 
   @Monitor('playingItem')
   onPlayingItemChange(_: IMonitor) {
+    this.coverRotation = 0
     if (this.playingItem !== undefined) {
       this.isLocalPlaying = false
       this.localPlayItem = undefined
       this.currentTrackDuration = 0
     }
+  }
+
+  @Monitor('localPlayItem')
+  onLocalPlayItemChange(_: IMonitor) {
+    this.coverRotation = 0
   }
 
   @Monitor('isPlaying')
