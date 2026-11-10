@@ -431,6 +431,7 @@ export struct Play {
   private coverColorResolvedLifecycle: number = -1
   private hasSuccessfulCoverColor: boolean = false
   private previousStatusBarContentColor: string = ''
+  private statusBarUpdateRequest: number = 0
   private playbackWindow: window.Window | undefined = undefined
   private windowStatusCallback: (status: window.WindowStatusType) => void = (status: window.WindowStatusType) => {
     this.isFloatingWindow = status === window.WindowStatusType.FLOATING
@@ -512,9 +513,16 @@ export struct Play {
   }
 
   private async updateStatusBarContentColor() {
+    if (!this.showPlay) {
+      return
+    }
+    const updateRequest = ++this.statusBarUpdateRequest
     try {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
       const mainWindow = await window.getLastWindow(context)
+      if (!this.showPlay || updateRequest !== this.statusBarUpdateRequest) {
+        return
+      }
       await mainWindow.setWindowSystemBarProperties({
         statusBarContentColor: this.playControlColor === Color.Black ? '#000000' : '#FFFFFF'
       })
@@ -523,12 +531,16 @@ export struct Play {
   }
 
   private async restoreStatusBarContentColor() {
+    const updateRequest = ++this.statusBarUpdateRequest
     if (!this.previousStatusBarContentColor) {
       return
     }
     try {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
       const mainWindow = await window.getLastWindow(context)
+      if (updateRequest !== this.statusBarUpdateRequest) {
+        return
+      }
       await mainWindow.setWindowSystemBarProperties({
         statusBarContentColor: this.previousStatusBarContentColor
       })
