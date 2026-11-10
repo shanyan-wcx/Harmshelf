@@ -991,6 +991,7 @@ export struct Setting {
           }
           .width('100%')
           .justifyContent(FlexAlign.SpaceBetween)
+          .margin({ bottom: 5 })
 
           Row() {
             Text("淡入淡出")
