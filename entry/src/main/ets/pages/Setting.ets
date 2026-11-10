@@ -976,12 +976,12 @@ export struct Setting {
             .textAlign(TextAlign.Center)
 
           Row() {
-            Text("播放栏封面旋转")
+            Text("关闭封面旋转")
               .fontSize(18)
               .maxLines(1)
               .textOverflow({ overflow: TextOverflow.Ellipsis })
 
-            Toggle({ type: ToggleType.Switch, isOn: this.playSetting?.coverRotation })
+            Toggle({ type: ToggleType.Switch, isOn: this.playSetting?.coverRotation === false })
               .selectedColor($r('sys.color.comp_emphasize_secondary'))
               .onClick(() => {
                 if (this.playSetting) {
