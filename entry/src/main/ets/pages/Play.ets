@@ -1181,9 +1181,9 @@ export struct Play {
           request.configuration = {
             transfer: {
               timeout: {
-                connectMs: 10000,
-                transferMs: 10000,
-                inactivityMs: 10000
+                connectMs: 3000,
+                transferMs: 3000,
+                inactivityMs: 3000
               }
             }
           }
