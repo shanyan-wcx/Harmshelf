@@ -40,7 +40,7 @@ export struct PlaybackMiniBar {
   @Consumer() playSetting: PlaySetting | undefined = PersistenceV2.connect(PlaySetting, () => new PlaySetting());
   @Consumer() isPlaying: boolean = false
   @Consumer() showPlay: boolean = false
-  @Consumer() preparePlayColor: (() => Promise<void>) | undefined = undefined
+  @Consumer() preparePlayColor: ((allowRetry?: boolean) => Promise<void>) | undefined = undefined
   @Consumer() playingItem: PlayItem | undefined = undefined
   @Consumer() localPlayItem: LocalPlayItem | undefined = undefined
   @Consumer() isLocalPlaying: boolean = false
@@ -55,6 +55,7 @@ export struct PlaybackMiniBar {
   @Consumer() playedPercent: number = 0
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Local fadeInterval: number = -1
+  @Local hasOpenedPlayer: boolean = false
 
   private isExpanded(): boolean {
     return this.forceExpanded || this.miniBarState.expanded
@@ -209,12 +210,13 @@ export struct PlaybackMiniBar {
       return
     }
     if (this.preparePlayColor) {
-      await this.preparePlayColor()
+      await this.preparePlayColor(this.hasOpenedPlayer)
     }
     if (!this.canOpenPlayer()) {
       return
     }
     this.showPlay = true
+    this.hasOpenedPlayer = true
   }
 
   @Builder
@@ -393,7 +395,7 @@ export struct Play {
   @Consumer() isStartPlaying: boolean = false
   @Consumer() isIndex: boolean = true
   @Consumer() showPlay: boolean = false
-  @Consumer() preparePlayColor: (() => Promise<void>) | undefined = undefined
+  @Consumer() preparePlayColor: ((allowRetry?: boolean) => Promise<void>) | undefined = undefined
   @Consumer() playingItem: PlayItem | undefined = undefined
   @Consumer() localPlayItem: LocalPlayItem | undefined = undefined
   @Consumer() isLocalPlaying: boolean = false
@@ -429,6 +431,10 @@ export struct Play {
   private coverColorReadyKey: string = ''
   private coverColorResolvedKey: string = ''
   private coverColorResolvedLifecycle: number = -1
+  private coverColorFallbackKey: string = ''
+  private coverColorFallbackLifecycle: number = -1
+  private coverColorRetryKey: string = ''
+  private coverColorRetryLifecycle: number = -1
   private hasSuccessfulCoverColor: boolean = false
   private previousStatusBarContentColor: string = ''
   private statusBarUpdateRequest: number = 0
@@ -566,8 +572,8 @@ export struct Play {
   async aboutToAppear() {
     this.coverColorActive = true
     this.coverColorLifecycle++
-    this.preparePlayColor = async () => {
-      await this.refreshCoverColor()
+    this.preparePlayColor = async (allowRetry: boolean = false) => {
+      await this.refreshCoverColor(this.consumeCoverColorRetry(allowRetry))
     }
     try {
       const context = this.getUIContext().getHostContext() as common.UIAbilityContext
@@ -1064,6 +1070,21 @@ export struct Play {
     return !coverSource && this.isLocalPlaying ? 'resource:nocover.jpg' : coverSource
   }
 
+  private consumeCoverColorRetry(allowRetry: boolean): boolean {
+    if (!allowRetry) {
+      return false
+    }
+    const sourceKey = this.getCoverColorSourceKey(this.getCoverSource())
+    if (!sourceKey || sourceKey !== this.coverColorFallbackKey ||
+      this.coverColorFallbackLifecycle !== this.coverColorLifecycle ||
+      (sourceKey === this.coverColorRetryKey && this.coverColorRetryLifecycle === this.coverColorLifecycle)) {
+      return false
+    }
+    this.coverColorRetryKey = sourceKey
+    this.coverColorRetryLifecycle = this.coverColorLifecycle
+    return true
+  }
+
   private isCurrentCoverColorRequest(requestId: number, sourceKey: string, lifecycleId: number): boolean {
     return this.coverColorActive &&
       requestId === this.coverColorRequest &&
@@ -1098,6 +1119,8 @@ export struct Play {
     if (sourceKey) {
       this.coverColorResolvedKey = sourceKey
       this.coverColorResolvedLifecycle = lifecycleId
+      this.coverColorFallbackKey = sourceKey
+      this.coverColorFallbackLifecycle = lifecycleId
     }
     if (this.hasSuccessfulCoverColor) {
       await this.updateStatusBarContentColor()
@@ -1119,11 +1142,14 @@ export struct Play {
 
   private getCoverCachePath(coverSource: string): string {
     const context = this.getUIContext().getHostContext() as common.UIAbilityContext
-    let hash = 0
+    let primaryHash = 0
+    let secondaryHash = 0x9e3779b9
     for (let index = 0; index < coverSource.length; index++) {
-      hash = (hash * 31 + coverSource.charCodeAt(index)) >>> 0
+      const code = coverSource.charCodeAt(index)
+      primaryHash = (primaryHash * 31 + code) >>> 0
+      secondaryHash = (secondaryHash * 131 + code + index) >>> 0
     }
-    return `${context.cacheDir}/harmshelf-cover-${hash.toString(16)}`
+    return `${context.cacheDir}/harmshelf-cover-v2-${primaryHash.toString(16)}-${secondaryHash.toString(16)}`
   }
 
   private async refreshCoverColor(force: boolean = false): Promise<void> {
@@ -1314,6 +1340,8 @@ export struct Play {
         this.coverColorReadyKey = sourceKey
         this.coverColorResolvedKey = sourceKey
         this.coverColorResolvedLifecycle = lifecycleId
+        this.coverColorFallbackKey = ''
+        this.coverColorFallbackLifecycle = -1
         this.hasSuccessfulCoverColor = true
         await this.updateStatusBarContentColor()
       } else {

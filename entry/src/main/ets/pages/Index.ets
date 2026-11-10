@@ -172,7 +172,7 @@ struct Index {
   @Provider() isStartPlaying: boolean = false
   @Provider() isPlaying: boolean = false
   @Provider() showPlay: boolean = false
-  @Provider() preparePlayColor: (() => Promise<void>) | undefined = undefined
+  @Provider() preparePlayColor: ((allowRetry?: boolean) => Promise<void>) | undefined = undefined
   @Provider() playingItem: PlayItem | undefined = undefined
   @Provider() localPlayItem: LocalPlayItem | undefined = undefined
   @Provider() isLocalPlaying: boolean = false
