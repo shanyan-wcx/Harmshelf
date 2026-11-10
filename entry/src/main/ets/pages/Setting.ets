@@ -45,6 +45,7 @@ export struct Setting {
   @Consumer() playingItem: PlayItem | undefined = undefined
   @Consumer() playingTitle: string = "-"
   @Consumer() playingIndex: number = 0
+  @Consumer() coverRotation: number = 0
   @Consumer() session: avSession.AVSession | undefined = undefined
   @Consumer() speed: media.PlaybackSpeed = media.PlaybackSpeed.SPEED_FORWARD_1_00_X
   @Local showProgress:boolean = false
@@ -986,6 +987,9 @@ export struct Setting {
               .onClick(() => {
                 if (this.playSetting) {
                   this.playSetting.coverRotation = !this.playSetting.coverRotation
+                  if (this.playSetting.coverRotation === false) {
+                    this.coverRotation = 0
+                  }
                 }
               })
           }

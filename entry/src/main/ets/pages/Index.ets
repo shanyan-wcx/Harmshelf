@@ -270,7 +270,9 @@ struct Index {
       return
     }
     this.coverRotationTimer = setInterval(() => {
-      this.coverRotation += 0.1
+      if (this.playSetting?.coverRotation === true) {
+        this.coverRotation += 0.1
+      }
     }, 10)
   }
 
@@ -1077,6 +1079,7 @@ struct Index {
   }
 
   async aboutToAppear() {
+    this.coverRotation = 0
     Logger.setCallback((entries) => {
       this.logs = entries
     })
