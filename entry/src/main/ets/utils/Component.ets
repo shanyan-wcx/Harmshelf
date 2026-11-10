@@ -453,6 +453,7 @@ export struct MyNavigation {
         .height(45)
         .borderRadius(this.addSearchRadius())
         .margin({ top: 15, bottom: 20 })
+        .backgroundColor(Color.Transparent)
         .systemMaterial(new uiMaterial.ImmersiveMaterial({
           style: uiMaterial.ImmersiveStyle.ULTRA_THIN,
           applyShadow: true,

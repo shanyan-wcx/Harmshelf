@@ -283,7 +283,6 @@ export struct Add {
                 color: $r('sys.color.ohos_id_color_focused_outline_transparent')
               })
               .shadow(ShadowStyle.OUTER_DEFAULT_XS)
-              .margin({ bottom: repeatItem.index === this.searchPodcasts.length - 1 ? getBottomContentInset(25, this.isStartPlaying, 109) : 16 })
               .onClick(async () => {
                 let podcast1 = await getFeed(repeatItem.item.feedUrl)
                 if (podcast1) {
@@ -311,6 +310,12 @@ export struct Add {
                 }
               })
             }
+            .width('100%')
+            .margin({
+              top: repeatItem.index === 0 ? this.statusBarHeight + 56 + 36 + 75 : 0,
+              bottom: repeatItem.index === this.searchPodcasts.length - 1 ?
+                getBottomContentInset(25, this.isStartPlaying, 109) : 16
+            })
             .clip(false)
           })
           .virtualScroll({ totalCount: this.searchPodcasts.length })
@@ -319,12 +324,13 @@ export struct Add {
       .width('100%')
       .height('100%')
       .layoutWeight(1)
-      .padding({ left: 4, right: 4, top: this.statusBarHeight + 56 + 36 + 75, bottom: 0 })
+      .padding({ left: 4, right: 4, bottom: 0 })
       .edgeEffect(EdgeEffect.None, { alwaysEnabled: false })
       .scrollBar(BarState.Off)
       .cachedCount(2)
       .align(Alignment.Top)
       .clip(false)
+      .clipContent(ContentClipMode.BOUNDARY)
 
       if (this.searchPodcasts.length === 0) {
         Column() {
