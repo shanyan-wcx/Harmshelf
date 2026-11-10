@@ -1174,6 +1174,9 @@ export struct Play {
           if (!this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
             return
           }
+          if (!this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
+            return
+          }
           try {
             const file = fs.openSync(cachePath, fs.OpenMode.CREATE | fs.OpenMode.READ_WRITE)
             try {
