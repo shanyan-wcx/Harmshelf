@@ -1168,6 +1168,7 @@ export struct Play {
           }
           const response = await session.fetch(request)
           if (!response.body) {
+            await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
             return
           }
           if (!this.isCurrentCoverColorRequest(requestId, sourceKey, lifecycleId)) {
@@ -1191,6 +1192,7 @@ export struct Play {
         imageSource = image.createImageSource(coverSource)
       }
       if (!imageSource) {
+        await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
         return
       }
       pixelMap = await imageSource.createPixelMap({
@@ -1210,6 +1212,8 @@ export struct Play {
         this.coverColorReadyKey = sourceKey
         this.hasSuccessfulCoverColor = true
         await this.updateStatusBarContentColor()
+      } else {
+        await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
       }
     } catch (_) {
       Logger.error('提取封面主色失败')
