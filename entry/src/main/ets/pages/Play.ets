@@ -32,6 +32,11 @@ interface RecommendationCandidate {
   seriesOrder: number
 }
 
+interface CoverColorOperationResult<T> {
+  result: T | undefined
+  timedOut: boolean
+}
+
 @ComponentV2
 export struct PlaybackMiniBar {
   @Param forceExpanded: boolean = false
@@ -40,6 +45,7 @@ export struct PlaybackMiniBar {
   @Consumer() playSetting: PlaySetting | undefined = PersistenceV2.connect(PlaySetting, () => new PlaySetting());
   @Consumer() isPlaying: boolean = false
   @Consumer() showPlay: boolean = false
+  @Consumer() hasOpenedPlayer: boolean = false
   @Consumer() preparePlayColor: ((allowRetry?: boolean) => Promise<void>) | undefined = undefined
   @Consumer() playingItem: PlayItem | undefined = undefined
   @Consumer() localPlayItem: LocalPlayItem | undefined = undefined
@@ -55,7 +61,6 @@ export struct PlaybackMiniBar {
   @Consumer() playedPercent: number = 0
   @Consumer() avPlayer: media.AVPlayer | undefined = undefined
   @Local fadeInterval: number = -1
-  @Local hasOpenedPlayer: boolean = false
 
   private isExpanded(): boolean {
     return this.forceExpanded || this.miniBarState.expanded
@@ -521,6 +526,62 @@ export struct Play {
     return modifier
   }
 
+  private async awaitCoverColorOperation<T>(operation: Promise<T>,
+    onLateResult: (result: T | undefined) => Promise<void>): Promise<CoverColorOperationResult<T>> {
+    let settled: boolean = false
+    let timedOut: boolean = false
+    let timeoutId: number = -1
+    return await new Promise<CoverColorOperationResult<T>>((resolve, reject) => {
+      timeoutId = setTimeout(() => {
+        if (settled) {
+          return
+        }
+        settled = true
+        timedOut = true
+        resolve({ result: undefined, timedOut: true })
+      }, 3000)
+      operation.then((result: T) => {
+        if (timedOut) {
+          onLateResult(result).catch(() => {})
+          return
+        }
+        if (settled) {
+          return
+        }
+        settled = true
+        clearTimeout(timeoutId)
+        resolve({ result: result, timedOut: false })
+      }).catch((error: Object) => {
+        if (timedOut) {
+          onLateResult(undefined).catch(() => {})
+          return
+        }
+        if (settled) {
+          return
+        }
+        settled = true
+        clearTimeout(timeoutId)
+        reject(error)
+      })
+    })
+  }
+
+  private cleanupCoverColorTempFiles() {
+    try {
+      const context = this.getUIContext().getHostContext() as common.UIAbilityContext
+      const files = fs.listFileSync(context.cacheDir)
+      for (const fileName of files) {
+        if (fileName.startsWith('harmshelf-cover-') && fileName.endsWith('.tmp')) {
+          try {
+            fs.unlinkSync(`${context.cacheDir}/${fileName}`)
+          } catch (_) {
+          }
+        }
+      }
+    } catch (_) {
+    }
+  }
+
   private async updateStatusBarContentColor() {
     if (!this.showPlay) {
       return
@@ -574,6 +635,7 @@ export struct Play {
   async aboutToAppear() {
     this.coverColorActive = true
     this.coverColorLifecycle++
+    this.cleanupCoverColorTempFiles()
     this.preparePlayColor = async (allowRetry: boolean = false) => {
       const retryRequested = this.consumeCoverColorRetry(allowRetry)
       const retrySourceKey = retryRequested ? this.getCoverColorSourceKey(this.getCoverSource()) : ''
@@ -1276,10 +1338,33 @@ export struct Play {
         if (cacheExists) {
           try {
             imageSource = image.createImageSource(cachePath)
-            pixelMap = await imageSource.createPixelMap({
-              desiredSize: { width: 32, height: 32 },
-              desiredPixelFormat: image.PixelMapFormat.RGBA_8888
-            })
+            const cachedImageSource = imageSource
+            const decodeResult = await this.awaitCoverColorOperation(
+              cachedImageSource.createPixelMap({
+                desiredSize: { width: 32, height: 32 },
+                desiredPixelFormat: image.PixelMapFormat.RGBA_8888
+              }),
+              async (decodedPixelMap: image.PixelMap | undefined) => {
+                if (decodedPixelMap) {
+                  try {
+                    await decodedPixelMap.release()
+                  } catch (_) {
+                  }
+                }
+                try {
+                  await cachedImageSource.release()
+                } catch (_) {
+                }
+              })
+            if (decodeResult.timedOut) {
+              imageSource = undefined
+              await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
+              return
+            }
+            pixelMap = decodeResult.result
+            if (!pixelMap) {
+              throw new Error('封面缓存解码结果为空')
+            }
           } catch (_) {
             if (pixelMap) {
               try {
@@ -1319,7 +1404,7 @@ export struct Play {
             }
           }
           const response = await session.fetch(request)
-          if (!response.body) {
+          if (response.statusCode < 200 || response.statusCode >= 300 || !response.body) {
             await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
             return
           }
@@ -1359,12 +1444,75 @@ export struct Play {
         return
       }
       if (!pixelMap) {
-        pixelMap = await imageSource.createPixelMap({
-          desiredSize: { width: 32, height: 32 },
-          desiredPixelFormat: image.PixelMapFormat.RGBA_8888
-        })
+        const sourceForDecode = imageSource
+        const cacheWrittenForDecode = cacheWritten
+        const decodeResult = await this.awaitCoverColorOperation(
+          sourceForDecode.createPixelMap({
+            desiredSize: { width: 32, height: 32 },
+            desiredPixelFormat: image.PixelMapFormat.RGBA_8888
+          }),
+          async (decodedPixelMap: image.PixelMap | undefined) => {
+            if (decodedPixelMap) {
+              try {
+                await decodedPixelMap.release()
+              } catch (_) {
+              }
+            }
+            try {
+              await sourceForDecode.release()
+            } catch (_) {
+            }
+            if (!decodedPixelMap && cacheWrittenForDecode) {
+              try {
+                fs.unlinkSync(cachePath)
+              } catch (_) {
+              }
+            }
+          })
+        if (decodeResult.timedOut) {
+          imageSource = undefined
+          cacheWritten = false
+          await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
+          return
+        }
+        pixelMap = decodeResult.result
+        if (!pixelMap) {
+          throw new Error('封面解码结果为空')
+        }
       }
-      const picker = await effectKit.createColorPicker(pixelMap)
+      const pixelMapForPicker = pixelMap
+      const sourceForPicker = imageSource
+      const cacheWrittenForPicker = cacheWritten
+      const pickerResult = await this.awaitCoverColorOperation(
+        effectKit.createColorPicker(pixelMapForPicker),
+        async (latePicker: effectKit.ColorPicker | undefined) => {
+          try {
+            await pixelMapForPicker.release()
+          } catch (_) {
+          }
+          try {
+            await sourceForPicker.release()
+          } catch (_) {
+          }
+          if (!latePicker && cacheWrittenForPicker) {
+            try {
+              fs.unlinkSync(cachePath)
+            } catch (_) {
+            }
+          }
+        })
+      if (pickerResult.timedOut) {
+        pixelMap = undefined
+        imageSource = undefined
+        cacheWritten = false
+        await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
+        return
+      }
+      const picker = pickerResult.result
+      if (!picker) {
+        await this.usePreviousCoverColorOrAppBackground(requestId, sourceKey, lifecycleId)
+        return
+      }
       let color: effectKit.Color | undefined = undefined
       try {
         color = picker.getLargestProportionColor()
